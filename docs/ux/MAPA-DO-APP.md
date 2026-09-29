@@ -18,6 +18,36 @@
 - **Design system:** não existe um formal. Os componentes são classes CSS reaproveitadas (seção 6).
 - **Fonte:** Atkinson Hyperlegible, feita para leitura fácil. O corpo tem 19px, ou 18px no celular.
 
+## 1b. Quem usa de verdade (respostas do Nico, 29/09)
+
+| Pessoa | Papel | Onde usa | O que mais faz |
+|---|---|---|---|
+| **Helena** | Dona da empresa e **encarregada do chão de fábrica**. **Principal usuária** | Celular na fábrica e computador | Fábrica (Começar/Terminou/Hora extra/Conserto por todas as costureiras), Avisos, Painel, Estoque, Cadastros. Às vezes confere pedido ou leva coisa no prestador |
+| **Roger** | Sócio. Vendas e **tudo que é de rua**: compras, entregas, levar e buscar no prestador de serviço | Computador e celular | Lista de compras, Logística, Na rua, Pedidos |
+| **Vendedoras** (ex.: Laiara, Paula) | Lançam pedidos e liberam para a produção depois de concluir o que é delas (fichas e mockups, arte, aprovação do cliente) | Computador | Novo pedido, Importar ficha, Pedido, Escritório › Pedidos/Artes |
+| **Costureiras e ajudantes** | **Hoje não usam o app.** No futuro terão acesso próprio | Celular (futuro) | Começar/Terminou na própria máquina |
+
+- **Objetivo do negócio:** dar clareza de processo para a equipe ganhar autonomia e os sócios saírem do operacional.
+- **Consequência para o desenho:** as telas precisam funcionar para quem **não conhece o histórico** do pedido.
+- **Aparelhos:** Android, com a letra do sistema aumentada. Tem Wi-Fi na fábrica.
+- **Travas já vividas:**
+  - trocar a costureira de máquina;
+  - dividir um mesmo processo entre 2 pessoas;
+  - registrar o que faltava na conferência de insumos.
+
+**Palavras da equipe:**
+
+| No app hoje | Como a equipe fala |
+|---|---|
+| vias | **Fichas de produção e mockups** |
+| insumos | **tecidos e aviamentos** |
+| terceirizado | **prestador de serviço** |
+| etapa | **processo** |
+| arremate | **acabamento** |
+| Fora (aba) | **Na rua** |
+| conserto | conserto |
+| personalização | personalização |
+
 ## 2. Perfis que já existem
 
 | Perfil | Quem | O que vê |
