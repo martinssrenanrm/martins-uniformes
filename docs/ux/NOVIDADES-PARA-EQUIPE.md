@@ -77,3 +77,10 @@ Cada bloco é uma mudança pequena. A Helena pode ler em voz alta ou mandar no g
 - A faixa **"Expediente encerrado"** saiu do alto da Fábrica.
 - Depois do horário, no cartão de cada máquina que está com trabalho aberto, aparece o botão **Continuar em hora extra**.
 - Toque nele. A pessoa daquela máquina já vem marcada. Escolha até que horas e toque em **Confirmar hora extra**.
+- No cartão, depois do horário, fica só a caixinha **Continuar em hora extra** (a barra "Parado, fora do horário" saiu; o contador continua parado).
+
+## Painel: tempo de cada pessoa em cada processo
+
+- Em **Gestor › Equipe**, o quadro **"Tempo de cada pessoa em cada processo"** mostra, no período escolhido, tudo o que cada pessoa terminou.
+- Para cada processo aparecem o tempo total, as peças, o tempo por peça e se foi mais rápido ou mais devagar que o previsto.
+- O tempo é o real, sem pausas e almoço.

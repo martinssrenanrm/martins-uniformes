@@ -775,6 +775,12 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 .ins-fbox{grid-column:1/-1;background:var(--red-soft);border:2px solid var(--red);border-radius:14px;padding:12px 14px;margin-top:4px}.ins-fbox .campo{max-width:220px;font-size:22px}
 .he-mini{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 20px);margin:6px 10px 0;min-height:48px;border:2px dashed var(--line-btn);border-radius:12px;background:none;font:inherit;font-size:16px;font-weight:700;color:var(--blue);cursor:pointer}.he-mini svg.ic{width:22px;height:22px}
 [data-tl]{white-space:nowrap}
+.tpp{border-top:2px solid var(--grey-soft)}.tpp summary{display:flex;align-items:center;gap:12px;min-height:60px;padding:8px 0;cursor:pointer;list-style:none}.tpp summary::-webkit-details-marker{display:none}
+.tpp summary>span{flex:1;min-width:0}.tpp summary b{display:block;font-size:19px}.tpp summary span span{font-size:16px;color:var(--ink2)}.tpp summary::after{content:'+';font-size:26px;color:var(--blue)}.tpp[open] summary::after{content:'−'}
+.tpp-l{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:10px 0 10px 8px;border-top:1px dashed var(--line)}.tpp-l b{display:block;font-size:18px}.tpp-l span{display:block;font-size:16px;color:var(--ink2)}
+.tpp-n{text-align:right}.tpp-s{font-weight:700}.tpp-s.ok{color:var(--go-dark)!important}.tpp-s.ruim{color:var(--red)!important}
+@media (max-width:640px){.tpp-l{grid-template-columns:1fr}.tpp-n{text-align:left}}
+.tpp summary .av{flex:none;width:44px;height:44px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1489,7 +1495,7 @@ function tileTempo(t,u){const x=t.x,sit=situacao(),a=heAtiva(x),tm=`<span data-t
   if(a)return `<div class="p-st st-he"><span class="dot"></span>Hora extra até ${tsHm(a.f)} · ${tm}</div>`;
   if(sit.k==='trab')return `<div class="p-st"><span class="dot"></span>Trabalhando · ${tm}</div>`;
   if(sit.k==='pausa')return `<div class="p-st st-pausa">${ic('i-relogio')}${esc(sit.nome)} até ${tsHm(sit.ate)} · ${tm}</div>`;
-  return `<div class="p-st st-pausa">${ic('i-dormir')}Parado, fora do horário · ${tm}</div><button class="he-mini" data-a="heAbrir" data-m="${u.id}">${ic('i-relogio')}Continuar em hora extra</button>`}
+  return `<button class="he-mini" data-a="heAbrir" data-m="${u.id}">${ic('i-relogio')}Continuar em hora extra</button>`}
 function faixaHora(P){const sit=situacao();if(sit.k!=='pausa')return '';const tr=Object.values(P.uso),sem=tr.filter(t=>!heAtiva(t.x)),com=tr.length-sem.length;
   if(sit.k==='pausa')return `<div class="faixa">${ic('i-relogio')}<span><b>${esc(sit.nome)} até ${tsHm(sit.ate)}.</b> Os contadores param e voltam sozinhos.</span></div>`;
   const qd=sod(sit.prox).getTime()===sod(now()).getTime()?'hoje':sod(sit.prox).getTime()===sod(now()+DIA).getTime()?'amanhã':fD(sit.prox);
@@ -2068,6 +2074,7 @@ const FAQ=[
 /* gestor */
 {c:'gestor',q:'Onde vejo o que precisa de atenção agora?',k:'atenção problemas agora alerta gestor painel',r:['Toque em Gestor, aba Agora.','Cada problema tem um link que leva onde resolver.'],ir:'gest:agora',g:1},
 {c:'gestor',q:'Quem produziu mais?',k:'ranking produtividade quem produziu mais pontos equipe desempenho',r:['Gestor › Equipe.','Escolha o período (Hoje, 7 dias, 30 dias).','Os pontos juntam volume e tempo de cada processo. Toque em "Como os pontos são calculados".'],ir:'gest:equipe',g:1},
+{c:'gestor',q:'Quanto tempo cada pessoa levou em cada processo?',k:'tempo pessoa processo relatório performance desempenho quanto tempo levou demorou por peça',r:['Gestor › Equipe, escolha o período (Hoje, 7 dias, 30 dias).','No quadro "Tempo de cada pessoa em cada processo", toque na pessoa.','Cada processo mostra o tempo total, as peças, o tempo por peça e se foi mais rápido ou mais devagar que o previsto.'],ir:'gest:equipe',g:1},
 {c:'gestor',q:'Quais pedidos vão atrasar?',k:'atrasos atrasar prazo pedidos atrasados entrega',r:['Gestor › Atrasos: os pedidos do mais apertado para o menos.'],ir:'gest:atrasos',g:1},
 {c:'gestor',q:'A equipe está seguindo o sistema?',k:'organização seguem sistema manual ajustes',r:['Gestor › Organização: mostra quanto foi decidido à mão e o que ajustar no cadastro.'],ir:'gest:org',g:1},
 /* cadastros */
@@ -2598,13 +2605,23 @@ function gDados(desde){const T=now(),P=plano(),st={};
     Object.entries(l.steps).forEach(([sid,x])=>{const s=sm[sid];if(!s||isExt(s)||!x.op||!x.ini)return;const r=st[x.op];
       if(r){r.busy+=util2(Math.max(x.ini,desde),Math.min(x.fim||T,T),x.he);(x.he||[]).forEach(h=>r.he+=sobre(h.i,Math.min(h.f,x.fim||T,T),desde,T))}
       if(x.st!=='ok'||!x.fim||x.fim<desde)return;const real=x.util!=null?x.util*MIN:tempoUtil(x),pad=s.min*q*MIN;
-      if(r){r.proc++;r.pecas+=q;r.padrao+=pad;r.real+=real;if(real>=MIN){r.padEf+=pad;r.realEf+=real}}
+      if(r){r.proc++;r.pecas+=q;r.padrao+=pad;r.real+=real;if(real>=MIN){r.padEf+=pad;r.realEf+=real}
+        const pp=r.pp=r.pp||{},kk=l.prod+'|'+sid,e=pp[kk]=pp[kk]||{et:s.nome,prod:prod(l.prod).nome,n:0,pecas:0,real:0,pad:0,cons:0};e.n++;e.pecas+=q;e.real+=real;e.pad+=pad;if(l.rework)e.cons++}
       if(real>=MIN&&!l.rework){const k=prod(l.prod).nome+' · '+s.nome;const e=porEt[k]=porEt[k]||{k,n:0,pad:0,real:0,min:s.min,p:l.prod,sid};e.n++;e.pad+=pad;e.real+=real}})});
   (state.consertos||[]).forEach(c=>{if(c.ts<desde||!st[c.op])return;const r=lote(c.r);const m=r?sum(rp(r).steps.map(z=>z.min||0))*qtdEf(r)*MIN:0;st[c.op].retr+=c.n;st[c.op].retrMin+=m});
   const disp=dispPeriodo(desde,T);
   const rank=Object.values(st).map(r=>{const ef=r.realEf?r.padEf/r.realEf:null,efC=ef==null?1:Math.min(1.5,Math.max(.5,ef));
     return {...r,ef,ocup:disp?Math.min(1,r.busy/disp):0,pontos:Math.max(0,Math.round((r.padrao*efC-r.retrMin)/MIN))}}).sort((a,b)=>b.pontos-a.pontos||b.pecas-a.pecas);
   return {T,P,rank,disp,porEt:Object.values(porEt)}}
+/* Tempo de cada pessoa em cada processo (processos terminados no período; tempo real, sem pausas) */
+function gTempoPessoa(R){const L=R.filter(r=>r.pp&&Object.keys(r.pp).length);
+  if(!L.length)return `<div class="card"><h2>Tempo de cada pessoa em cada processo</h2><p class="dica" style="margin:0">Nenhum processo terminado no período.</p></div>`;
+  return `<div class="card"><h2>Tempo de cada pessoa em cada processo</h2><p class="dica" style="margin:-4px 0 10px">Processos terminados no período. O tempo é o real, sem contar pausas e almoço. Toque na pessoa para ver.</p>
+  ${L.map((r,i)=>{const E=Object.values(r.pp).sort((a,b)=>b.real-a.real),tot=sum(E.map(e=>e.real));
+    return `<details class="tpp"${i===0?' open':''}><summary>${av(r.p.id,'s')}<span><b>${esc(r.p.nome)}</b><span>${fDur(tot)} em ${E.length} ${E.length>1?'processos':'processo'}</span></span></summary>
+    ${E.map(e=>{const por=e.pecas?e.real/e.pecas:0,prev=e.pecas?e.pad/e.pecas:0,dif=prev?por/prev:null;
+      const sit=dif==null||e.real<MIN?'':dif<=.95?`<span class="tpp-s ok">▲ mais rápido que o previsto (${fDur(prev)})</span>`:dif>=1.15?`<span class="tpp-s ruim">▼ mais devagar que o previsto (${fDur(prev)})</span>`:`<span class="tpp-s">● no previsto (${fDur(prev)})</span>`;
+      return `<div class="tpp-l"><div><b>${esc(e.et)}</b><span>${esc(e.prod)}${e.cons?` · ${e.cons} de conserto`:''}</span></div><div class="tpp-n">${e.real<1000?`<b>—</b><span>${nf(e.pecas,0)} peças · sem tempo marcado</span>`:`<b>${fDur(e.real)}</b><span>${nf(e.pecas,0)} peças · ${fDur(por)} por peça</span>${sit}`}</div></div>`}).join('')}</details>`}).join('')}</div>`}
 const pctTxt=x=>x==null?'—':Math.round(x*100)+'%';
 function gAlertas(){const T=now(),P=plano(),sit=situacao(),out=[],lim=(prm().parado||20)*MIN,esc_=tarefasEsc();
   const A=(sev,i,t,d,to,ir)=>out.push({sev,i,t,d,to,ir});
@@ -2632,6 +2649,7 @@ function gEquipe(desde){const D=gDados(desde),R=D.rank,tot=k=>sum(R.map(r=>r[k])
   <div class="card"><h2>Ranking de produção</h2>
     ${R.map((r,i)=>`<div class="rk">${medal(i)}${av(r.p.id)}<div class="rk-t"><b>${esc(r.p.nome)}</b><span>${r.proc} ${r.proc===1?'processo':'processos'} · ${nf(r.pecas,0)} peças · eficiência <b class="${r.ef==null?'':r.ef>=1?'ok':r.ef<.8?'ruim':''}">${pctTxt(r.ef)}</b>${r.retr?` · <b class="ruim">${r.retr} refeitas</b>`:''}${r.proc<3?' · <i>poucos dados</i>':''}</span>${barra(r.pontos,maxP,i<3?'var(--go)':'var(--blue)')}</div><div class="rk-p"><b>${nf(r.pontos,0)}</b><small>pontos</small></div></div>`).join('')}
     <details class="como"><summary>Como os pontos são calculados</summary><p>Cada processo terminado vale o <b>tempo previsto</b> dele (minutos por peça × peças). Assim, fazer muitas peças de um processo difícil vale mais que poucas de um fácil.</p><p>Esse total é multiplicado pela <b>eficiência</b>: tempo previsto ÷ tempo que a pessoa levou de verdade (sem contar pausas). Fazer mais rápido que o previsto aumenta os pontos (até 150%). Mais devagar diminui (até 50%).</p><p>Peças que voltaram para <b>conserto</b> descontam o tempo gasto para refazer.</p><p>Atenção: se o tempo previsto de uma etapa estiver errado no cadastro, a eficiência de quem faz essa etapa fica distorcida. Veja a aba Organização.</p></details></div>
+  ${gTempoPessoa(R)}
   <div class="card"><h2>Ocupação no período</h2><p class="dica" style="margin:-4px 0 8px">Parte do horário de trabalho (${fDur(D.disp)}) em que a pessoa estava com um processo em andamento. Faltas e folgas aparecem como tempo livre.</p>
     ${[...R].sort((a,b)=>b.ocup-a.ocup).map(r=>`<div class="grow"><span style="display:flex;gap:8px;align-items:center">${av(r.p.id,'s')}${esc(r.p.nome)}</span>${barra(r.ocup,1,r.ocup>=.7?'var(--go)':r.ocup>=.4?'var(--atn)':'var(--red)')}<b>${pctTxt(r.ocup)}</b></div>`).join('')}</div>
   <div class="card"><h2>Horas extras</h2>${R.some(r=>r.he>0)?[...R].filter(r=>r.he>0).sort((a,b)=>b.he-a.he).map(r=>`<div class="grow"><span style="display:flex;align-items:center;gap:8px">${av(r.p.id,'s')}${esc(r.p.nome)}</span>${barra(r.he,Math.max(...R.map(x=>x.he)),'#7A3E9D')}<b>${fDur(r.he)}</b></div>`).join('')+`<p class="dica" style="margin:8px 0 0">Total: <b>${fDur(tot('he'))}</b> no período.</p>`:'<p class="dica" style="margin:0">Nenhuma hora extra no período.</p>'}</div>`}
