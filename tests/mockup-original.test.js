@@ -43,8 +43,8 @@ const nuvemMock=id=>{const m=store.get('mock/'+id);if(!m)return null;let s='';fo
   console.log('4) Formato antigo (mockups guardados na coleção "mockups") é recuperado');
   store.set('mockups/0419-1',{img:ORIG.marinho});['mock/0419-1','mockp/0419-1~0','mockp/0419-1~1','mockp/0419-1~2'].forEach(k=>store.delete(k));
   const C=await aparelho('C');await C.p.waitForTimeout(3000);ok(nuvemMock('0419-1')===ORIG.marinho,'original antigo migrado de volta para a nuvem');
-  console.log('5) Aparelho sem IndexedDB e sem nuvem (usa a reserva local)');
-  const D=await aparelho('D',{nuvem:false,semIDB:true});await D.p.evaluate(()=>openSheet({t:'pedido',id:'0419'}));await D.p.click('[data-a=mockUm] >> nth=0');await D.p.setInputFiles('#fImpM1',FX.royal);await D.p.waitForTimeout(2500);
-  await D.p.reload();await D.p.waitForTimeout(1000);z=await zoomDe(D.p,'0419',0);ok(z.w===562&&z.src===ORIG.royal,`sem IndexedDB o original continua depois de recarregar (${z.w}px)`);
+  console.log('5) Aparelho sem IndexedDB (usa a reserva local)');
+  const D=await aparelho('D',{semIDB:true});await D.p.evaluate(()=>openSheet({t:'pedido',id:'0420'}));await D.p.click('[data-a=mockUm] >> nth=0');await D.p.setInputFiles('#fImpM1',FX.royal);await D.p.waitForTimeout(2500);
+  await D.p.reload();await D.p.waitForTimeout(1000);z=await zoomDe(D.p,'0420',0);ok(z.w===562&&z.src===ORIG.royal,`sem IndexedDB o original continua depois de recarregar (${z.w}px)`);
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} FALHA(S)`:'\nTudo certo.');process.exit(falhas?1:0)})();

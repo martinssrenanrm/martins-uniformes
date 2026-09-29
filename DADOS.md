@@ -22,3 +22,10 @@
   - `NODE_PATH=$(npm root -g) node tests/dados-persistem.test.js`
   - `NODE_PATH=$(npm root -g) node tests/mockup-original.test.js`
 - Para mudanças grandes, fazer um ensaio com uma cópia dos dados reais: baixar as coleções com o ArtifactData, carregar num banco falso e conferir que nada sumiu.
+
+## Quem consegue salvar (regra da plataforma Claude)
+- O banco do app só aceita gravação de quem é **da organização dona do app** (Leaderei) ou foi **convidado por e-mail como Editor** — e o convite de Editor para gente de fora só vale **enquanto o app não está compartilhado por link público**.
+- Quem entra pelo link público com uma conta de fora (ex.: Gmail da Helena) **só consegue ver**. Sem estar logado no Claude, não vê nada.
+- O app nunca trabalha "só no aparelho": sem nuvem mostra a tela "Este aparelho não está ligado à nuvem"; com acesso só de leitura mostra a faixa vermelha "Só leitura" e desfaz a mudança na hora (nada finge que salvou).
+- Pedidos que um aparelho antigo tinha só na memória dele aparecem na Fábrica com o botão **Enviar** para a nuvem.
+- Teste: `tests/sincronia.test.js`.
