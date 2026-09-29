@@ -84,3 +84,17 @@ Cada bloco é uma mudança pequena. A Helena pode ler em voz alta ou mandar no g
 - Em **Gestor › Equipe**, o quadro **"Tempo de cada pessoa em cada processo"** mostra, no período escolhido, tudo o que cada pessoa terminou.
 - Para cada processo aparecem o tempo total, as peças, o tempo por peça e se foi mais rápido ou mais devagar que o previsto.
 - O tempo é o real, sem pausas e almoço.
+
+## Pausar no meio e dividir entre 2 pessoas
+
+Toque na máquina que está trabalhando. Embaixo de Terminou e Deu problema tem dois botões novos:
+
+- **Pausar (parar no meio):**
+  - Diga quantas peças já ficaram prontas e toque em **Pausar e liberar a máquina**.
+  - A máquina fica livre para outro serviço, e o que faltou volta para a fila marcado **"retomar"**.
+  - Quem pegar depois continua das peças que faltavam.
+- **Dividir com outra pessoa:**
+  - Diga quantas peças passam para a outra pessoa e escolha a máquina e quem faz. Também dá para escolher **Depois**, e a outra parte fica na fila.
+  - As duas trabalham ao mesmo tempo. O processo fica pronto quando as duas tocarem em **Terminou**.
+
+O tempo de cada parte conta para quem fez, no Painel.

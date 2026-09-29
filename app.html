@@ -781,6 +781,9 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 .tpp-n{text-align:right}.tpp-s{font-weight:700}.tpp-s.ok{color:var(--go-dark)!important}.tpp-s.ruim{color:var(--red)!important}
 @media (max-width:640px){.tpp-l{grid-template-columns:1fr}.tpp-n{text-align:left}}
 .tpp summary .av{flex:none;width:44px;height:44px}
+.maq-mais{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.maq-mais .mbtn{justify-content:center;min-height:56px}
+@media (max-width:640px){.maq-mais{grid-template-columns:1fr}}
+.qtd-ed{display:flex;gap:10px;align-items:center}.qtd-ed .campo{width:130px;text-align:center;font-size:26px;font-weight:700}.qtd-ed .stp{min-width:64px;min-height:56px;font-size:20px;font-weight:700}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1151,6 +1154,18 @@ const stOf=(l,sid)=>l.steps[sid]||{st:'pend'};
 const done=(l,sid)=>stOf(l,sid).st==='ok';
 const qtdEf=l=>l.qtd-(l.desm||0);
 const loteFora=l=>Object.values(l.steps).some(x=>x.st==='fora');
+/* Partes de um processo: quando alguém pausa no meio ou divide com outra pessoa, o registro do processo
+   ganha x.partes = [{id,n,st,ini,fim,op,maq,he,util}]. Sem partes, tudo funciona como sempre. */
+const pecasFeitas=x=>sum((x&&x.partes||[]).filter(p=>p.st==='ok').map(p=>p.n||0));
+const pecasRodando=x=>sum((x&&x.partes||[]).filter(p=>p.st==='and').map(p=>p.n||0));
+const restante=(l,sid)=>{const x=l.steps[sid];if(!x||!x.partes)return !x||x.st==='pend'?qtdEf(l):0;return Math.max(0,qtdEf(l)-pecasFeitas(x)-pecasRodando(x))};
+const qtdDe=t=>t.x&&t.x.n!=null&&t.pai?t.x.n:(t.l.steps[t.s.id]?.partes?restante(t.l,t.s.id):qtdEf(t.l));
+const proxParte=x=>Math.max(0,...(x.partes||[]).map(p=>p.id||0))+1;
+function acertaPai(l,sid){const x=l.steps[sid];if(!x||!x.partes)return;const rod=x.partes.filter(p=>p.st==='and');
+  if(rod.length){x.st='and';x.op=rod[0].op;x.maq=rod[0].maq;delete x.fim}
+  else if(pecasFeitas(x)>=qtdEf(l)){x.st='ok';x.fim=Math.max(...x.partes.map(p=>p.fim||0));x.util=sum(x.partes.map(p=>p.util||0));x.op=(x.partes.filter(p=>p.st==='ok'&&p.n).slice(-1)[0]||{}).op;delete x.maq}
+  else{x.st='pend';delete x.maq;delete x.fim}}
+function paraPartes(x,n){if(x.partes)return;x.partes=[{id:1,n,st:x.st,ini:x.ini,op:x.op,maq:x.maq,he:x.he,manual:x.manual}];delete x.ini;delete x.he;delete x.manual}
 const loteAnd=l=>Object.values(l.steps).some(x=>x.st==='and');
 function topo(p){const m=sMap(p),seen={},out=[];const v=id=>{if(seen[id]||!m[id])return;seen[id]=1;m[id].deps.forEach(v);out.push(m[id])};p.steps.forEach(s=>v(s.id));return out}
 function anc(p,id){const m=sMap(p),r=new Set();const v=x=>(m[x]?.deps||[]).forEach(d=>{if(!r.has(d)){r.add(d);v(d)}});v(id);return r}
@@ -1187,7 +1202,7 @@ const prm=()=>state.params;
 const loteDone=l=>rp(l).steps.every(s=>done(l,s.id));
 const arteOk=(ped,l,s)=>!!(ped.artes||{})[(l.parent||l.id)+':'+s.id];
 const liberado=ped=>ped.vias&&ped.arte&&ped.materiais.every(m=>m.conf&&m.st!=='comprar'&&m.st!=='pedido');
-function ready(l,s,ped){if(stOf(l,s.id).st!=='pend')return false;if(!s.deps.every(d=>done(l,d)))return false;if(!s.deps.length&&!liberado(ped))return false;
+function ready(l,s,ped){{const x=stOf(l,s.id);if(x.st!=='pend'&&!(x.partes&&x.st==='and'&&restante(l,s.id)>0))return false}if(!s.deps.every(d=>done(l,d)))return false;if(!s.deps.length&&!liberado(ped))return false;
   if(s.pers&&!arteOk(ped,l,s))return false;           // a arte precisa ter sido enviada a quem aplica
   if(isExt(s)){const R=rp(l);   // só leva se a parte não estiver numa máquina
     if(R.steps.some(x=>stOf(l,x.id).st==='and'&&usa(R,x).some(pp=>s.partes.includes(pp))))return false}
@@ -1211,7 +1226,7 @@ function prontas(){const out=[];state.pedidos.filter(p=>!p.concluido).forEach(pe
 const nota=(p,it)=>(p.melhor.includes(it.s.nome)?12:0)+(p.melhor.includes(it.s.posto)?10:0)-p.sabe.length;
 function plano(){const uso={},ocup=new Set();
   state.lotes.forEach(l=>{const ped=pedById(l.ped);if(!ped||ped.concluido)return;const p=rp(l),m=sMap(p);
-    Object.entries(l.steps).forEach(([sid,x])=>{if(x.st==='and'&&m[sid]){uso[x.maq]={ped,inf:info(ped),l,p,s:m[sid],x};ocup.add(x.op)}})});
+    Object.entries(l.steps).forEach(([sid,x])=>{if(!m[sid])return;if(x.partes){x.partes.forEach(pt=>{if(pt.st==='and'&&pt.maq){uso[pt.maq]={ped,inf:info(ped),l,p,s:m[sid],x:pt,pai:x};ocup.add(pt.op)}})}else if(x.st==='and'){uso[x.maq]={ped,inf:info(ped),l,p,s:m[sid],x};ocup.add(x.op)}})});
   const resEspera={},us=unidades(),plan={},usados=new Set(),espera={},semPessoa={},todas=prontas().filter(it=>!isExt(it.s)),fixas=new Set();
   Object.entries(state.reservas||{}).forEach(([m,r])=>{const u=us.find(x=>x.id===m);if(!u||uso[m])return;const it=todas.find(x=>x.l.id===r.l&&x.s.id===r.s);if(!it){const l=lote(r.l);if(l){const z=sMap(rp(l))[r.s];if(z&&stOf(l,z.id).st==='pend')resEspera[m]={l,s:z,ped:pedById(l.ped)}}return}
     const c=aptos(u.tipo).filter(p=>!ocup.has(p.id)&&!usados.has(p.id)).sort((a,b)=>nota(b,it)-nota(a,it)),pe=c.find(p=>p.id===r.p)||c[0];if(!pe)return;
@@ -1422,7 +1437,7 @@ function shapeSvg(forma,cor,nome){const hx=coresAll()[cor],f=hx||'#B9C0C8',claro
 const upill=u=>`<span class="pill u-${u}"><span class="dot"></span>${ULAB[u]}</span>`;
 function entregaTxt(ped,inf){if(ped.concluido)return `Entregue ${fD(ped.concluido)}`;const d=inf.du;return `Entrega ${fD(ped.entrega)} · ${d>1?`faltam ${d} dias úteis`:d===1?'falta 1 dia útil':d===0?'é hoje':'passou da data'}`}
 function chips(it){const r=[upill(it.inf.u)];if(it.l.rework)r.push(`<span class="pill cons">${ic('i-conserto')}Conserto</span>`);if(it.adianta)r.push(`<span class="pill adi">${ic('i-adiantar')}Adiantar</span>`);return r.join('')}
-function tarefaCard(it,sug){const q=qtdEf(it.l);
+function tarefaCard(it,sug){const q=qtdDe(it);
   return `<div class="tarefa ${sug?'sug':''}">${loteSvg(it.l)}<div>
     <div class="etapa">${esc(it.s.nome)}</div><div class="qtd">${q} peças</div>
     <div class="desc" style="display:flex;align-items:center;gap:6px">${ic('i-relogio')}Tempo estimado ≈ ${esc(durEt(it.s,q))}</div>
@@ -1491,7 +1506,7 @@ function fornCard(f,esc_){const fora=[];state.lotes.forEach(l=>{const ped=pedByI
     ${fora.map(o=>{const d=diasDesde(o.x.saiu);return `<div class="fitem">${loteSvg(o.l)}<button class="tar-t" data-a="pedido" data-id="${o.ped.id}" title="Abrir o pedido"><b>${esc(o.s.nome)} · ${qtdEf(o.l)} peças</b><span>${esc(o.ped.cliente)} · lá ${haQuanto(o.x.saiu)}</span>${d>f.prazo?'<span class="late" style="display:block">Passou do prazo</span>':''}</button><button class="mbtn go" data-a="buscou" data-l="${o.l.id}" data-s="${o.s.id}">Chegou</button></div>`}).join('')||'<div class="vazio-s">Nada lá agora</div>'}
     ${lev.length?`<div class="vazio-s" style="color:var(--atn-ink);font-weight:700">${lev.length} ${lev.length>1?'pacotes prontos':'pacote pronto'} para levar</div>`:''}</div>`}
 const ehSemp=(u,P)=>!P.uso[u.id]&&!P.plan[u.id]&&!!(P.semPessoa[u.tipo]||[])[P.us.filter(x=>x.tipo===u.tipo&&!P.uso[x.id]&&!P.plan[x.id]).findIndex(x=>x.id===u.id)];
-function tileTempo(t,u){const x=t.x,sit=situacao(),a=heAtiva(x),tm=`<span data-tl="${t.l.id}" data-ts="${t.s.id}">${fDur(tempoUtil(x))}</span>`;
+function tileTempo(t,u){const x=t.x,sit=situacao(),a=heAtiva(x),tm=`<span data-tl="${t.l.id}" data-ts="${t.s.id}"${t.pai?` data-tp="${x.id}"`:''}>${fDur(tempoUtil(x))}</span>`;
   if(a)return `<div class="p-st st-he"><span class="dot"></span>Hora extra até ${tsHm(a.f)} · ${tm}</div>`;
   if(sit.k==='trab')return `<div class="p-st"><span class="dot"></span>Trabalhando · ${tm}</div>`;
   if(sit.k==='pausa')return `<div class="p-st st-pausa">${ic('i-relogio')}${esc(sit.nome)} até ${tsHm(sit.ate)} · ${tm}</div>`;
@@ -1509,7 +1524,7 @@ function maqTile(u,P,esp){const t=P.uso[u.id],pl=P.plan[u.id],sp=!t&&!pl?(P.semP
   const cls=t?'st-trab':pl?'st-livre':sp?'st-semp':'st-nada';const quem=t?t.x.op:pl?pl.pessoa:null;
   return `<div class="pessoa ${cls}"><button class="p-open" data-a="maq" data-m="${u.id}">
     <div class="m-top"><span class="m-ic">${ic(tipo(u.tipo).i)}</span><b>${esc(u.nome)}</b>${esp?`<span class="fila">+${esp} na fila</span>`:''}</div>
-    <div class="p-body">${it?`${loteSvg(it.l)}<div>${pl?`<span class="prox">${pl.reservado?'Reservado':'Próximo'}</span>`:''}<b>${esc(it.s.nome)}</b><span>${qtdEf(it.l)} peças</span><span class="emp">${ic('i-predio')}${esc(it.ped.cliente)}</span>${quem?`<span class="quem-l">${av(quem,'s')}${esc(pNome(quem))} ${pl?estrela(pessoa(quem),pl):''}</span>`:''}</div>`:'<span class="vazio">Sem trabalho para esta máquina</span>'}</div></button>
+    <div class="p-body">${it?`${loteSvg(it.l)}<div>${pl?`<span class="prox">${pl.reservado?'Reservado':'Próximo'}</span>`:''}<b>${esc(it.s.nome)}</b><span>${qtdDe(it)} peças${it.l.steps[it.s.id]?.partes&&!it.pai?' <b style="color:var(--blue)">· retomar</b>':''}</span><span class="emp">${ic('i-predio')}${esc(it.ped.cliente)}</span>${quem?`<span class="quem-l">${av(quem,'s')}${esc(pNome(quem))} ${pl?estrela(pessoa(quem),pl):''}</span>`:''}</div>`:'<span class="vazio">Sem trabalho para esta máquina</span>'}</div></button>
     ${P.resEspera[u.id]?`<div class="dica" style="padding:0 14px 8px;color:var(--blue);font-weight:700">Reservado a seguir: ${esc(P.resEspera[u.id].s.nome)} · ${esc(P.resEspera[u.id].ped.cliente)}</div>`:''}
     ${t?tileTempo(t,u):sp?'<div class="p-st"><span class="dot"></span>Esperando alguém livre</div>':''}
     ${t?`<button class="p-act fim" data-a="terminou" data-m="${u.id}">${ic('i-check')}Terminou</button>${heAtiva(t.x)?`<button class="he-b" data-a="hePara" data-m="${u.id}">Parar a hora extra agora</button>`:''}`:pl?`<button class="p-act ini" data-a="comecar" data-m="${u.id}" data-l="${pl.l.id}" data-s="${pl.s.id}" data-p="${pl.pessoa}">${ic('i-play')}Começar</button>`:''}
@@ -1605,7 +1620,8 @@ function layout(p){const L=lv(p),cols=[],row={};topo(p).forEach(s=>(cols[L[s.id]
   return{pos,w:Math.max(NW,cols.length*(NW+GX)-GX),h:maxR*(NH+GY)-GY}}
 function ndStatus(l,s,ped){const x=stOf(l,s.id),m=sMap(rp(l));
   if(x.st==='ok')return['ok',`${ic('i-check')}${x.herdado?'Já estava feito':'Feito'+(x.op?' · '+esc(pNome(x.op)):'')}`];
-  if(x.st==='and')return['and',`${ic('i-mao')}${esc(pNome(x.op))} · ${esc(unidade(x.maq)?.nome||'')}`];
+  if(x.st==='and'){if(x.partes){const r=x.partes.filter(p=>p.st==='and');return['and',`${ic('i-mao')}${r.map(p=>esc(pNome(p.op))).join(' e ')} · ${pecasFeitas(x)} de ${qtdEf(l)} prontas`]}return['and',`${ic('i-mao')}${esc(pNome(x.op))} · ${esc(unidade(x.maq)?.nome||'')}`]}
+  if(x.st==='pend'&&x.partes&&ready(l,s,ped))return['ready',`${ic('i-seta')}Pausado · faltam ${restante(l,s.id)}`];
   if(x.st==='fora'){const d=diasDesde(x.saiu);return['fora',`${ic('i-caminhao')}No fornecedor ${haQuanto(x.saiu)}`]}
   if(ready(l,s,ped))return['ready',`${ic('i-seta')}${isExt(s)?'Pronta para levar':'Pode começar'}`];
   const f=s.deps.filter(d=>!done(l,d));
@@ -1856,13 +1872,14 @@ function sMaq(){const e=ui.sheet,u=unidade(e.m);if(!u)return voltar();const P=pl
   const ondePlan=it=>{const m=Object.keys(P.plan).find(k=>kIt(P.plan[k])===kIt(it));return m?(m===u.id?'sugerido aqui':`sugerido para ${unidade(m)?.nome}`):''};
   const resOutra=it=>{const m=Object.keys(state.reservas||{}).find(k=>k!==u.id&&state.reservas[k].l===it.l.id&&state.reservas[k].s===it.s.id);return m?`reservado para ${unidade(m)?.nome}`:''};
   const linha=(it,bloq)=>{const tag=bloq?`Espera: ${it.falta.join(', ')}`:(resOutra(it)||ondePlan(it));const on=e.sel===kIt(it);
-    return `<button class="outra" data-a="mSel" data-v="${kIt(it)}" style="${on?'border-color:var(--blue);box-shadow:inset 0 0 0 2px var(--blue)':''}">${loteSvg(it.l)}<div><b>${esc(it.s.nome)} · ${qtdEf(it.l)} peças${it.l.rework?' · conserto':''}</b><span>${esc(it.ped.cliente)} · ${ULAB[it.inf.u]}${tag?` · <b style="color:${bloq?'var(--atn-ink)':'var(--blue)'}">${esc(tag)}</b>`:''}</span></div><span class="ir">${on?'Escolhido':'Escolher'}${ic('i-seta')}</span></button>`};
+    return `<button class="outra" data-a="mSel" data-v="${kIt(it)}" style="${on?'border-color:var(--blue);box-shadow:inset 0 0 0 2px var(--blue)':''}">${loteSvg(it.l)}<div><b>${esc(it.s.nome)} · ${qtdDe(it)} peças${it.l.rework?' · conserto':''}${it.l.steps[it.s.id]?.partes?' · retomar':''}</b><span>${esc(it.ped.cliente)} · ${ULAB[it.inf.u]}${tag?` · <b style="color:${bloq?'var(--atn-ink)':'var(--blue)'}">${esc(tag)}</b>`:''}</span></div><span class="ir">${on?'Escolhido':'Escolher'}${ic('i-seta')}</span></button>`};
   const listas=(tit)=>`${O.pr.length?`<h2 style="margin-top:26px">${tit}</h2><p class="dica" style="margin:-4px 0 8px">Já podem entrar nesta máquina.</p><div class="outras">${O.pr.map(it=>linha(it,false)).join('')}</div>`:''}
     ${O.ch.length?`<h2 style="margin-top:26px">Chegando depois</h2><p class="dica" style="margin:-4px 0 8px">Ainda esperam uma etapa anterior. Escolha só se as peças já estiverem na máquina.</p><div class="outras">${O.ch.slice(0,8).map(it=>linha(it,true)).join('')}</div>`:''}`;
   const all=[...O.pr,...O.ch],achar=k=>all.find(it=>kIt(it)===k);
   if(t){const sel=e.sel&&achar(e.sel),rIt=res&&achar(res.l+'|'+res.s);
     return `${voltar()}${head}<h2>${av(t.x.op,'s')} ${esc(pNome(t.x.op))} está fazendo</h2>${tarefaCard(t)}
     <div class="acoes"><button class="big go" data-a="terminou" data-m="${u.id}">${ic('i-check')}Terminou</button><button class="big prob" data-a="problema" data-m="${u.id}">${ic('i-alerta')}Deu problema</button></div>
+    <div class="maq-mais"><button class="mbtn neutro2" data-a="pausar" data-m="${u.id}">${ic('i-relogio')}Pausar (parar no meio)</button><button class="mbtn neutro2" data-a="dividir" data-m="${u.id}">${ic('i-pessoas')}Dividir com outra pessoa</button></div>
     <div class="card" style="margin-top:22px"><h2>Depois deste</h2>${rIt?`<p style="margin:0 0 10px"><b>Reservado:</b> ${esc(rIt.s.nome)} · ${esc(rIt.ped.cliente)}</p><button class="mbtn" data-a="mResX" data-m="${u.id}">Tirar reserva</button>`:'<p style="margin:0;color:var(--ink2)">O sistema escolhe sozinho quando terminar. Para decidir você, escolha abaixo e reserve.</p>'}
       ${sel?`<div class="acoes"><button class="big azul" data-a="mRes" data-m="${u.id}" data-l="${sel.l.id}" data-s="${sel.s.id}" data-p="">${ic('i-check')}Reservar "${esc(sel.s.nome)}" como próximo</button></div>`:''}</div>
     ${listas('Opções para esta máquina')}`}
@@ -1985,6 +2002,27 @@ function salvarEdicao(){const w=ui.sheet.w,ped=pedById(w.edit);if(!ped)return;co
   ped.edicoes=[...(ped.edicoes||[]),{ts:now(),por:quemNome()||usuarioAtual()?.nome||'',mud:md.slice(0,20)}].slice(-20);
   registrar({tipo:'edicao',ped:ped.id,cli:ped.cliente,step:md.join(' | ').slice(0,300)});RC={};
   ui.sheet={t:'pedido',id:ped.id};commit();toast('Pedido corrigido')}
+/* Pausar no meio: registra quantas peças ficaram prontas, libera a máquina e o resto volta para a fila */
+function sPausa(){const e=ui.sheet,t=tarefaNa(e.m);if(!t)return voltar();const tot=qtdDe(t),n=e.n;
+  return `${voltar('Cancelar')}<h1>Pausar ${esc(t.s.nome)}</h1><p class="sub-l">${esc(pNome(t.x.op))} para no meio. A ${esc(unidade(e.m)?.nome||'máquina')} fica livre para outro serviço. O que faltar volta para a fila, e qualquer pessoa retoma depois de onde parou.</p>
+  <div class="rotulo">Quantas peças já ficaram prontas? <span style="font-weight:400">(de ${tot})</span></div>
+  <div class="qtd-ed"><button class="stp" data-a="pzN" data-d="-10" aria-label="Menos 10">−10</button><input class="campo" id="pzN" inputmode="numeric" value="${n}" aria-label="Peças prontas"><button class="stp" data-a="pzN" data-d="10" aria-label="Mais 10">+10</button></div>
+  <p class="dica">Ficam para depois: <b id="pzResta" data-tot="${tot}">${Math.max(0,tot-n)} peças</b>.</p>
+  ${e.err?`<div class="aviso">${ic('i-alerta')}${esc(e.err)}</div>`:''}
+  <div class="acoes"><button class="big go" data-a="pzOk">${ic('i-relogio')}Pausar e liberar a máquina</button></div>`}
+/* Dividir: parte das peças vai para outra pessoa, ao mesmo tempo ou depois */
+function sDiv(){const e=ui.sheet,t=tarefaNa(e.m);if(!t)return voltar();const P=plano(),tot=qtdDe(t),n2=e.n,tp=unidade(e.m)?.tipo;
+  const livres=unidades().filter(u=>u.tipo===tp&&!P.uso[u.id]),gente=aptos(tp).filter(p=>!P.ocup.has(p.id));
+  const ok=n2>=1&&n2<tot&&(e.m2==='depois'||(e.m2&&e.p2));
+  return `${voltar('Cancelar')}<h1>Dividir ${esc(t.s.nome)}</h1><p class="sub-l">Parte das peças vai para outra pessoa. As duas trabalham ao mesmo tempo, e o processo fica pronto quando as duas terminarem.</p>
+  <div class="rotulo">Quantas peças passam para a outra pessoa? <span style="font-weight:400">(de ${tot})</span></div>
+  <div class="qtd-ed"><button class="stp" data-a="dvN" data-d="-10" aria-label="Menos 10">−10</button><input class="campo" id="dvN" inputmode="numeric" value="${n2}" aria-label="Peças para a outra pessoa"><button class="stp" data-a="dvN" data-d="10" aria-label="Mais 10">+10</button></div>
+  <p class="dica">Ficam com ${esc(pNome(t.x.op))} na ${esc(unidade(e.m)?.nome||'')}: <b id="dvResta" data-tot="${tot}">${Math.max(0,tot-n2)} peças</b>.</p>
+  <div class="rotulo">Em qual máquina?</div><div class="linha-dep">${livres.map(u=>`<button class="pchip" data-a="dvM" data-v="${u.id}" aria-pressed="${e.m2===u.id}">${ic(tipo(u.tipo).i)}${esc(u.nome)}</button>`).join('')}<button class="pchip" data-a="dvM" data-v="depois" aria-pressed="${e.m2==='depois'}">Depois (fica na fila)</button></div>
+  ${livres.length?'':'<p class="dica">Nenhuma outra máquina deste tipo está livre agora. Escolha "Depois": a outra parte fica na fila e começa quando uma máquina liberar.</p>'}
+  ${e.m2&&e.m2!=='depois'?`<div class="rotulo">Quem faz a outra parte?</div>${gente.length?`<div class="linha-dep">${gente.map(p=>`<button class="pchip" data-a="dvP" data-v="${p.id}" aria-pressed="${e.p2===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div>`:'<p class="dica">Ninguém livre sabe usar esta máquina. Escolha "Depois".</p>'}`:''}
+  ${e.err?`<div class="aviso">${ic('i-alerta')}${esc(e.err)}</div>`:''}
+  <div class="acoes"><button class="big go" data-a="dvOk" ${ok?'':'disabled'}>${ic('i-pessoas')}Dividir</button></div>`}
 function sTroca(){const e=ui.sheet,t=tarefasEsc().find(x=>x.key===e.key);if(!t)return voltar();const c0=capazes(e.f),cs=[...c0,...state.pessoas.filter(p=>!c0.includes(p)&&((p.funcoes||[]).length||(state.usuarios||[]).some(u=>u.pessoa===p.id)))];
   return `${voltar('Cancelar')}<h1>Quem faz esta tarefa?</h1><div class="card"><b style="font-size:21px">${esc(tarTxt(t))}</b><div style="color:var(--ink2)">${esc(t.ped.cliente)}${t.sub?' · '+esc(t.sub):''}</div></div>
   <div class="linha-dep">${cs.map(p=>`<button class="pchip" data-a="trocaSel" data-v="${p.id}" aria-pressed="${t.resp===p.id}">${av(p.id,'s')}${esc(p.nome)}${p.disp===false?' <small>(fora)</small>':''}${p.viaApp&&['levar','entregar'].includes(e.f)?' <small>(app)</small>':''}</button>`).join('')}</div>
@@ -2011,8 +2049,9 @@ const FAQ=[
 {c:'maq',q:'Terminei. Como registro?',k:'terminar terminou acabou finalizar concluir pronto',r:['No cartão da máquina, toque em Terminou.','Aparece "Pronto! Fulana terminou …".','O próximo trabalho da máquina já aparece sozinho.'],ir:'fab:maq'},
 {c:'maq',q:'Quero começar com outra pessoa (não a sugerida)',k:'trocar costureira outra pessoa escolher quem faz operadora',r:['Toque no cartão da máquina (no nome ou no desenho da peça).','Em "Quem vai fazer?", toque no nome da pessoa.','Toque em Começar com Fulana.'],ir:'fab:maq'},
 {c:'maq',q:'Quero fazer outro trabalho na máquina (não o sugerido)',k:'outro trabalho escolher peça outro pedido prioridade mudar ordem',r:['Toque no cartão da máquina.','Em "Outras opções agora", toque em Escolher no trabalho que quer.','Escolha quem faz e toque em Começar.'],ir:'fab:maq'},
-{c:'maq',q:'A pessoa aparece apagada, "(na Galoneira 1)". Como trago ela para esta máquina?',k:'mudar costureira de máquina trocar de máquina pessoa ocupada apagada',r:['Ela está com um trabalho aberto em outra máquina.','Se ela já acabou lá, toque em Terminou naquela máquina. Depois ela aparece livre aqui.','Ainda não existe "pausar e passar para outra máquina" sem terminar. Essa melhoria está anotada.'],ir:'fab:maq'},
-{c:'maq',q:'Dá para dividir um processo entre 2 pessoas?',k:'dividir duas pessoas metade repartir processo junto',r:['Ainda não. Hoje cada processo de cada peça fica com uma pessoa só.','Registre com quem vai fazer a maior parte.','Essa melhoria está anotada para uma próxima versão.']},
+{c:'maq',q:'A pessoa aparece apagada, "(na Galoneira 1)". Como trago ela para esta máquina?',k:'mudar costureira de máquina trocar de máquina pessoa ocupada apagada',r:['Ela está com um trabalho aberto em outra máquina.','Toque na máquina onde ela está e em Pausar (parar no meio). Diga quantas peças ficaram prontas.','Pronto: ela fica livre para vir para esta máquina, e o resto daquele serviço volta para a fila.'],ir:'fab:maq'},
+{c:'maq',q:'Como divido um processo entre 2 pessoas?',k:'dividir duas pessoas metade repartir processo junto ajuda outra máquina',r:['Toque na máquina onde o serviço está sendo feito.','Toque em Dividir com outra pessoa.','Diga quantas peças passam para a outra pessoa e escolha a máquina e quem faz (ou Depois, para ficar na fila).','Toque em Dividir. As duas trabalham ao mesmo tempo; o processo fica pronto quando as duas tocarem em Terminou.'],ir:'fab:maq'},
+{c:'maq',q:'Como pauso um serviço no meio e retomo depois?',k:'pausar parar no meio interromper trocar serviço urgente retomar continuar depois',r:['Toque na máquina e em Pausar (parar no meio).','Diga quantas peças já ficaram prontas e toque em Pausar e liberar a máquina.','A máquina fica livre para outro serviço. O que faltou aparece na fila marcado "retomar".','Para retomar, escolha esse serviço e toque em Começar: ele continua das peças que faltavam.'],ir:'fab:maq'},
 {c:'maq',q:'Como deixo um trabalho reservado para a próxima vez?',k:'reservar reserva guardar próximo fila ordem',r:['Toque no cartão da máquina.','Máquina parada: toque em Reservar para esta máquina.','Máquina trabalhando: em "Depois deste", toque em Escolher num trabalho e depois em Reservar como próximo.','Para desfazer: Tirar reserva.'],ir:'fab:maq'},
 {c:'maq',q:'O que quer dizer "Próximo", "Reservado", "+1 na fila"?',k:'próximo reservado fila significado cartão',r:['Próximo: é o que o sistema sugere para começar agora.','Reservado: alguém escolheu esse trabalho para essa máquina.','+1 na fila: tem mais trabalho esperando esse tipo de máquina.']},
 {c:'maq',q:'O que é "fora da ordem"?',k:'fora da ordem espera etapa anterior aviso vermelho',r:['O trabalho ainda depende de um processo anterior que não terminou no sistema.','Só comece se as peças já estiverem de fato na máquina.']},
@@ -2155,7 +2194,7 @@ function gOrg(desde){const L=(state.log||[]).filter(e=>e.ts>=desde);
     <div class="card"><h2>Por pessoa na máquina</h2>${porPes.map(([k,n])=>`<div class="grow"><span style="display:flex;gap:8px;align-items:center">${av(k,'s')}${esc(pNome(k)||k)}</span>${barra(n,porPes[0][1])}<b>${n}</b></div>`).join('')||'<p class="dica">Nada no período.</p>'}</div>
   </div>
   <div class="card"><h2>Últimos ajustes manuais</h2><div class="tw"><table class="gt"><thead><tr><th>Quando</th><th>O quê</th><th>Máquina</th><th>Pessoa</th><th>Tipo</th><th>Registrado por</th></tr></thead><tbody>
-    ${[...man,...L.filter(e=>e.tipo!=='inicio')].sort((a,b)=>b.ts-a.ts).slice(0,15).map(e=>`<tr><td>${fD(e.ts)} ${pad(new Date(e.ts).getHours())}:${pad(new Date(e.ts).getMinutes())}</td><td>${esc(e.step)}${e.prod?' · '+esc(e.prod):''}<br><small>${esc(e.cli||'')}</small></td><td>${esc(e.maq?(unidade(e.maq)?.nome||e.maq):'Escritório')}</td><td>${e.tipo==='troca'?`${esc(pNome(e.de)||'—')} → ${esc(pNome(e.para)||'sistema')}`:esc(pNome(e.op)||'—')}${e.modo==='pessoa'&&e.sug?`<br><small>sugerida: ${esc(pNome(e.sug))}</small>`:''}</td><td>${e.tipo==='inicio'?esc(MODOS[e.modo]):e.tipo==='reserva'?'Reserva feita':'Tarefa trocada'}</td><td>${esc(e.por||'')}</td></tr>`).join('')}
+    ${[...man,...L.filter(e=>e.tipo!=='inicio')].sort((a,b)=>b.ts-a.ts).slice(0,15).map(e=>`<tr><td>${fD(e.ts)} ${pad(new Date(e.ts).getHours())}:${pad(new Date(e.ts).getMinutes())}</td><td>${esc(e.step)}${e.prod?' · '+esc(e.prod):''}<br><small>${esc(e.cli||'')}</small></td><td>${esc(e.maq?(unidade(e.maq)?.nome||e.maq):'Escritório')}</td><td>${e.tipo==='troca'?`${esc(pNome(e.de)||'—')} → ${esc(pNome(e.para)||'sistema')}`:esc(pNome(e.op)||'—')}${e.modo==='pessoa'&&e.sug?`<br><small>sugerida: ${esc(pNome(e.sug))}</small>`:''}</td><td>${e.tipo==='inicio'?esc(MODOS[e.modo]):({reserva:'Reserva feita',pausa:`Pausado (${e.n??'?'} prontas)`,divisao:`Dividido (${e.n??'?'} peças)`,edicao:'Pedido corrigido',troca:'Tarefa trocada'})[e.tipo]||'Ajuste'}</td><td>${esc(e.por||'')}</td></tr>`).join('')}
   </tbody></table></div><p class="dica">"Registrado por" mostra quem estava usando o aparelho (escolhido tocando no nome, lá em cima).</p></div>
   <p class="dica">Os números deste painel juntam os cliques de todos os aparelhos.</p>`}
 
@@ -2602,12 +2641,12 @@ function gDados(desde){const T=now(),P=plano(),st={};
   state.pessoas.filter(p=>p.sabe.length).forEach(p=>st[p.id]={p,proc:0,pecas:0,real:0,padrao:0,padEf:0,realEf:0,retr:0,retrMin:0,busy:0,he:0});
   const porEt={};
   state.lotes.forEach(l=>{const ped=pedById(l.ped);if(!ped)return;const pr=rp(l),sm=sMap(pr),q=qtdEf(l);
-    Object.entries(l.steps).forEach(([sid,x])=>{const s=sm[sid];if(!s||isExt(s)||!x.op||!x.ini)return;const r=st[x.op];
+    Object.entries(l.steps).forEach(([sid,x0])=>{const s=sm[sid];if(!s||isExt(s))return;(x0.partes?x0.partes.map(pt=>({...pt,q:pt.n||0})):[{...x0,q:qtdEf(l)}]).forEach(x=>{const q=x.q;if(!x.op||!x.ini)return;const r=st[x.op];
       if(r){r.busy+=util2(Math.max(x.ini,desde),Math.min(x.fim||T,T),x.he);(x.he||[]).forEach(h=>r.he+=sobre(h.i,Math.min(h.f,x.fim||T,T),desde,T))}
       if(x.st!=='ok'||!x.fim||x.fim<desde)return;const real=x.util!=null?x.util*MIN:tempoUtil(x),pad=s.min*q*MIN;
       if(r){r.proc++;r.pecas+=q;r.padrao+=pad;r.real+=real;if(real>=MIN){r.padEf+=pad;r.realEf+=real}
         const pp=r.pp=r.pp||{},kk=l.prod+'|'+sid,e=pp[kk]=pp[kk]||{et:s.nome,prod:prod(l.prod).nome,n:0,pecas:0,real:0,pad:0,cons:0};e.n++;e.pecas+=q;e.real+=real;e.pad+=pad;if(l.rework)e.cons++}
-      if(real>=MIN&&!l.rework){const k=prod(l.prod).nome+' · '+s.nome;const e=porEt[k]=porEt[k]||{k,n:0,pad:0,real:0,min:s.min,p:l.prod,sid};e.n++;e.pad+=pad;e.real+=real}})});
+      if(real>=MIN&&!l.rework){const k=prod(l.prod).nome+' · '+s.nome;const e=porEt[k]=porEt[k]||{k,n:0,pad:0,real:0,min:s.min,p:l.prod,sid};e.n++;e.pad+=pad;e.real+=real}})})});
   (state.consertos||[]).forEach(c=>{if(c.ts<desde||!st[c.op])return;const r=lote(c.r);const m=r?sum(rp(r).steps.map(z=>z.min||0))*qtdEf(r)*MIN:0;st[c.op].retr+=c.n;st[c.op].retrMin+=m});
   const disp=dispPeriodo(desde,T);
   const rank=Object.values(st).map(r=>{const ef=r.realEf?r.padEf/r.realEf:null,efC=ef==null?1:Math.min(1.5,Math.max(.5,ef));
@@ -2628,11 +2667,11 @@ function gAlertas(){const T=now(),P=plano(),sit=situacao(),out=[],lim=(prm().par
   state.pedidos.filter(p=>!p.concluido).map(p=>({p,f:info(p)})).filter(x=>x.f.u==='crit'||x.f.u==='warn').sort((a,b)=>a.f.folga-b.f.folga).forEach(({p,f})=>
     A(f.u==='crit'?'crit':'warn','i-alerta',`${p.cliente}: ${f.u==='crit'?'vai atrasar':'prazo apertado'}`,`Entrega ${fD(p.entrega)} · ${Math.round(f.prog*100)}% feito · faltam ~${nf(f.need,0)} dias de trabalho para ${f.du} dias úteis`,'ped:'+p.id,'Abrir o pedido'));
   if(sit.k==='trab'||Object.values(P.uso).some(t=>heAtiva(t.x)))state.pessoas.filter(p=>p.sabe.length&&p.disp!==false&&!P.ocup.has(p.id)).forEach(p=>{
-    let ult=0;state.lotes.forEach(l=>Object.values(l.steps).forEach(x=>{if(x.op===p.id&&x.fim&&x.fim>ult)ult=x.fim}));
+    let ult=0;state.lotes.forEach(l=>Object.values(l.steps).forEach(x0=>(x0.partes||[x0]).forEach(x=>{if(x.op===p.id&&x.fim&&x.fim>ult)ult=x.fim})));
     const ini0=janelasDia(sod(T))[0]?.[0]||T,de=Math.max(ult,ini0),par=util2(de,T,[]);if(par<lim)return;
     const tem=Object.values(P.plan).some(pl=>pl.pessoa===p.id);
     A(tem?'crit':'warn','i-dormir',`${p.nome}: sem processo há ${fDur(par)}`,tem?'Tem trabalho esperando por essa pessoa. Veja o botão Começar na Fábrica.':'Não há trabalho que essa pessoa saiba fazer agora. Treinar em outra máquina ou adiantar outro pedido?',tem?'fab:maq':'pes:'+p.id,tem?'Ir para as máquinas':'Ver o que a pessoa sabe fazer')});
-  Object.values(P.uso).forEach(t=>{const real=tempoUtil(t.x),pad=t.s.min*qtdEf(t.l)*MIN;if(real>30*MIN&&real>1.5*pad)A('warn','i-relogio',`${t.s.nome} na ${unidade(t.x.maq)?.nome||''} está demorando`,`${pNome(t.x.op)} · ${fDur(real)} até agora, o previsto era ${fDur(pad)} (${nf(real/pad,1)}×). Algum problema na máquina ou no material?`,'maq:'+t.x.maq,'Abrir a máquina')});
+  Object.values(P.uso).forEach(t=>{const real=tempoUtil(t.x),pad=t.s.min*qtdDe(t)*MIN;if(real>30*MIN&&real>1.5*pad)A('warn','i-relogio',`${t.s.nome} na ${unidade(t.x.maq)?.nome||''} está demorando`,`${pNome(t.x.op)} · ${fDur(real)} até agora, o previsto era ${fDur(pad)} (${nf(real/pad,1)}×). Algum problema na máquina ou no material?`,'maq:'+t.x.maq,'Abrir a máquina')});
   state.tipos.forEach(t=>{const e=(P.espera[t.id]||[]).length,sp=(P.semPessoa[t.id]||[]).length;
     if(e>=2)A('warn','i-maquina',`Fila na ${t.nome}: ${e} processos esperando máquina`,'Gargalo. Vale ver se outra máquina pode fazer, ou hora extra nessa.','fab:maq','Ir para as máquinas');
     if(sp)A('warn','i-pessoas',`${sp} ${sp>1?'processos':'processo'} na ${t.nome} sem ninguém livre que saiba usar`,`Hoje sabem usar: ${aptos(t.id).map(p=>p.nome).join(', ')||'ninguém'}. Treinar mais alguém reduz esse risco.`,'cad:equipe','Abrir a equipe')});
@@ -2684,7 +2723,7 @@ function render(){RC={};
   const sh=document.getElementById('sheet');const s=ui.sheet;
   if(!s){sh.innerHTML='';document.body.style.overflow='';return}
   const old=sh.querySelector('.sheet'),keep=old&&old.dataset.id===sheetId(s)?{top:old.scrollTop,x:[...old.querySelectorAll('.fx-wrap')].map(e=>[e.dataset.k,e.scrollLeft])}:null;
-  const html=({tipo:sTipoEd,troca:sTroca,maq:sMaq,pedido:()=>sPedido(s.id),prob:sProblema,novo:sNovo,ajuda:sAjuda,produto:()=>sProduto(s.p),etapa:sEtapa,nprod:sNovoProd,pes:sPesEd,forn:sFornEd,quem:sQuem,he:sHE,setor:sSetor,menu:sMenu,imp:sImp,mock:sMock,cli:sCli,doc:sDoc,ins:sIns,arqPick:sArqPick,seg:sSegLista}[s.t]||(()=>''))();
+  const html=({tipo:sTipoEd,troca:sTroca,maq:sMaq,pedido:()=>sPedido(s.id),prob:sProblema,novo:sNovo,ajuda:sAjuda,produto:()=>sProduto(s.p),etapa:sEtapa,nprod:sNovoProd,pes:sPesEd,forn:sFornEd,quem:sQuem,he:sHE,setor:sSetor,pausa:sPausa,div:sDiv,menu:sMenu,imp:sImp,mock:sMock,cli:sCli,doc:sDoc,ins:sIns,arqPick:sArqPick,seg:sSegLista}[s.t]||(()=>''))();
   sh.innerHTML=`<div class="sheet ${['pedido','produto'].includes(s.t)?'largo':''}" data-id="${esc(sheetId(s))}" role="dialog" aria-modal="true"><div class="wrap">${html}</div></div>`;document.body.style.overflow='hidden';
   if(keep){const n=sh.querySelector('.sheet');n.scrollTop=keep.top;keep.x.forEach(([k,x])=>{const e=n.querySelector(`.fx-wrap[data-k="${k}"]`);if(e)e.scrollLeft=x})}
   document.querySelectorAll('[aria-label]:not([title])').forEach(el=>el.title=el.getAttribute('aria-label'));
@@ -2726,11 +2765,11 @@ const A={
   mRes:d=>{snap();{const l=lote(d.l);registrar({tipo:'reserva',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:sMap(rp(l))[d.s].nome})}state.reservas=state.reservas||{};Object.keys(state.reservas).forEach(k=>{const r=state.reservas[k];if(r.l===d.l&&r.s===d.s)delete state.reservas[k]});state.reservas[d.m]={l:d.l,s:d.s,p:d.p||''};ui.sheet.sel=null;commit();toast(`Reservado para ${unidade(d.m)?.nome}`)},
   mResX:d=>{snap();delete (state.reservas||{})[d.m];ui.sheet.sel=null;commit();toast('Reserva tirada: o sistema volta a escolher')},
   pedido:d=>{ui.fx=null;openSheet({t:'pedido',id:d.id});if(avisos().some(p=>p.id===d.id))marcaVisto([d.id])},
-  terminou:d=>{const t=tarefaNa(d.m);if(!t)return;snap();t.x.st='ok';t.x.fim=now();{const a=heAtiva(t.x,t.x.fim-1);if(a)a.f=t.x.fim}t.x.util=Math.round(tempoUtil(t.x)/MIN);save();const n=`${pNome(t.x.op)} terminou ${t.s.nome}`;openSheet({t:'maq',m:d.m,feito:n});toast(n)},
+  terminou:d=>{const t=tarefaNa(d.m);if(!t)return;snap();t.x.st='ok';t.x.fim=now();{const a=heAtiva(t.x,t.x.fim-1);if(a)a.f=t.x.fim}t.x.util=Math.round(tempoUtil(t.x)/MIN);if(t.pai)acertaPai(t.l,t.s.id);save();const n=t.pai?`${pNome(t.x.op)} terminou ${t.x.n} peças de ${t.s.nome}${t.pai.st==='ok'?'. Processo completo':`. Faltam ${qtdEf(t.l)-pecasFeitas(t.pai)}`}`:`${pNome(t.x.op)} terminou ${t.s.nome}`;openSheet({t:'maq',m:d.m,feito:n});toast(n)},
   comecar:d=>{if(!d.p)return;const l=lote(d.l);snap();const s=sMap(rp(l))[d.s],fora=!ready(l,s,pedById(l.ped));
     {const P0=plano(),pl=P0.plan[d.m],rs=(state.reservas||{})[d.m],k=d.l+'|'+d.s;
      const modo=fora?'fora':rs&&rs.l===d.l&&rs.s===d.s?'reserva':pl&&kIt(pl)===k?(pl.pessoa===d.p?'sugerido':'pessoa'):'outro';
-     registrar({tipo:'inicio',modo,maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,sug:pl?.pessoa||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:s.nome})}l.steps[d.s]={st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};let heTxt='';if(situacao().k!=='trab'){const ot=Object.values(plano().uso).map(q=>heAtiva(q.x)).filter(Boolean)[0];const ate=situacao().k==='pausa'?null:(ot?ot.f:heOpcoes()[1]||heOpcoes()[0]);if(ate){l.steps[d.s].he=[{i:now(),f:ate}];heTxt=` · hora extra até ${tsHm(ate)}`}}const R_=state.reservas||{};Object.keys(R_).forEach(k=>{if(k===d.m||(R_[k].l===d.l&&R_[k].s===d.s))delete R_[k]});ui.sheet=null;commit();toast(`${pNome(d.p)} começou ${s.nome} na ${unidade(d.m)?.nome||''}${fora?' (fora da ordem)':''}${heTxt}`)},
+     registrar({tipo:'inicio',modo,maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,sug:pl?.pessoa||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:s.nome})}const x0=l.steps[d.s];let alvo,retoma='';if(x0&&x0.partes){const n=restante(l,d.s);alvo={id:proxParte(x0),n,st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};x0.partes.push(alvo);acertaPai(l,d.s);retoma=` (${n} peças que faltavam)`}else alvo=l.steps[d.s]={st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};let heTxt='';if(situacao().k!=='trab'){const ot=Object.values(plano().uso).map(q=>heAtiva(q.x)).filter(Boolean)[0];const ate=situacao().k==='pausa'?null:(ot?ot.f:heOpcoes()[1]||heOpcoes()[0]);if(ate){alvo.he=[{i:now(),f:ate}];heTxt=` · hora extra até ${tsHm(ate)}`}}const R_=state.reservas||{};Object.keys(R_).forEach(k=>{if(k===d.m||(R_[k].l===d.l&&R_[k].s===d.s))delete R_[k]});ui.sheet=null;commit();toast(`${pNome(d.p)} começou ${s.nome}${retoma} na ${unidade(d.m)?.nome||''}${fora?' (fora da ordem)':''}${heTxt}`)},
   impFichas:()=>{const i=document.getElementById('fImpF');i.value='';i.click()},
   impMocks:()=>{const i=document.getElementById('fImpM');i.value='';i.click()},
   wMock:d=>{wRead();ui.mockK=null;ui.mockL=null;ui.mockW=+d.k;const i=document.getElementById('fImpM1');i.value='';i.click()},
@@ -2861,6 +2900,25 @@ const A={
   hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`)},
   desfazer:()=>{if(!undo)return;state=JSON.parse(undo);undo=null;document.getElementById('toast').innerHTML='';ui.sheet=null;commit()},
   problema:d=>openSheet({t:'prob',m:d.m,step:1,n:1,orig:null,mot:null}),
+  pausar:d=>{const t=tarefaNa(d.m);if(!t)return;const tot=qtdDe(t),pad=t.s.min*tot*MIN,est=pad?Math.floor(tot*tempoUtil(t.x)/pad):0;openSheet({t:'pausa',m:d.m,n:Math.max(0,Math.min(tot-1,est)),err:''})},
+  pzN:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('pzN')?.value,10);e.n=Math.max(0,(isNaN(v)?e.n:v)+(+d.d));e.err='';render()},
+  pzOk:()=>{const e=ui.sheet,t=tarefaNa(e.m);if(!t)return;const tot=qtdDe(t),v=parseInt(document.getElementById('pzN')?.value,10),n=isNaN(v)?e.n:v;
+    if(n<0){e.err='O número não pode ser negativo.';return render()}if(n>=tot){e.err=`Se todas as ${tot} peças ficaram prontas, toque em Terminou.`;return render()}
+    snap();const T=now(),x=t.x;{const a=heAtiva(x,T-1);if(a)a.f=T}const util=Math.round(tempoUtil({...x,fim:T})/MIN);
+    if(!t.pai){paraPartes(x,n);const pt=x.partes[0];pt.st='ok';pt.fim=T;pt.util=util}else{x.st='ok';x.fim=T;x.util=util;x.n=n}
+    acertaPai(t.l,t.s.id);registrar({tipo:'pausa',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:x.op||t.pai?.op,ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n});
+    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} pausado: ${n} prontas, ${restante(t.l,t.s.id)} voltam para a fila`)},
+  dividir:d=>{const t=tarefaNa(d.m);if(!t)return;const tot=qtdDe(t);if(tot<2)return toast('Com uma peça só não dá para dividir',false);openSheet({t:'div',m:d.m,n:Math.floor(tot/2),m2:null,p2:null,err:''})},
+  dvN:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('dvN')?.value,10);e.n=Math.max(1,(isNaN(v)?e.n:v)+(+d.d));e.err='';render()},
+  dvM:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('dvN')?.value,10);if(!isNaN(v))e.n=v;e.m2=d.v;e.p2=null;render()},
+  dvP:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('dvN')?.value,10);if(!isNaN(v))e.n=v;e.p2=d.v;render()},
+  dvOk:()=>{const e=ui.sheet,t=tarefaNa(e.m);if(!t)return;const tot=qtdDe(t),v=parseInt(document.getElementById('dvN')?.value,10),n2=isNaN(v)?e.n:v;
+    if(!(n2>=1&&n2<tot)){e.err=`Escolha de 1 a ${tot-1} peças.`;return render()}
+    snap();const x=t.x;let pai;if(!t.pai){paraPartes(x,tot-n2);pai=x}else{x.n=tot-n2;pai=t.pai}
+    let txt=`${n2} peças ficam na fila para outra pessoa`;
+    if(e.m2&&e.m2!=='depois'&&e.p2){const pt={id:proxParte(pai),n:n2,st:'and',ini:now(),op:e.p2,maq:e.m2};if(situacao().k!=='trab'){const a=heAtiva(t.x);if(a)pt.he=[{i:now(),f:a.f}]}pai.partes.push(pt);txt=`${pNome(e.p2)} começou ${n2} peças na ${unidade(e.m2)?.nome||''}`}
+    acertaPai(t.l,t.s.id);registrar({tipo:'divisao',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:e.p2||'',ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n:n2});
+    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} dividido: ${txt}`)},
   pMot:d=>{const s=ui.sheet,t=tarefaNa(s.m),pr=state.probs[+d.k];s.mot=pr.k;const opts=topo(t.p).filter(x=>(x.id===t.s.id||anc(t.p,t.s.id).has(x.id))&&x.posto!=='corte').map(x=>x.id);s.orig=(pr.alvo||[]).find(a=>opts.includes(a))||t.s.id;s.step=2;render()},
   pN:d=>{const s=ui.sheet,t=tarefaNa(s.m);s.n=Math.min(qtdEf(t.l),Math.max(1,s.n+(+d.d)));render()},
   pNext:()=>{ui.sheet.step=3;render()},
@@ -3050,11 +3108,11 @@ document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)re
   else if(d.papel!=null){snap();state.papeis[d.papel]=t.value.trim()||state.papeis[d.papel];ok=true}
   if(ok){save();if(!d.est)render();toast('Salvo',true)}});
 function wLerFalta(){const i=document.getElementById('insFQ');if(i&&ui.sheet)ui.sheet.fq=i.value}
-document.addEventListener('input',e=>{if(e.target.id==='insFQ'&&ui.sheet){ui.sheet.fq=e.target.value;return}if(e.target.id==='ajBusca'&&ui.sheet?.t==='ajuda'){ui.sheet.q=e.target.value;const L=document.getElementById('ajRes');if(L)L.innerHTML=ajRes();return}if(e.target.id==='wCli'&&ui.sheet?.w){ui.sheet.w.cliente=e.target.value;ui.sheet.w.cli=null;const L=document.getElementById('wCliSug');if(L)L.innerHTML=sugClientes(e.target.value,null)}if(e.target.id==='estBusca'){ui.eq=e.target.value;const L=document.getElementById('estLista');if(L)L.innerHTML=listaEst()}if(e.target.id==='empBusca'){ui.eqc=e.target.value;const L=document.getElementById('empLista');if(L)L.innerHTML=listaEmpresas()}if(e.target.id==='pedBusca'){ui.pf.q=e.target.value;const L=document.getElementById('pedLista');if(L)L.innerHTML=listaPedidos()}if(e.target.id==='wCnpj'){const v=fmtCnpj(e.target.value);if(v!==e.target.value)e.target.value=v}});
+document.addEventListener('input',e=>{if(e.target.id==='pzN'||e.target.id==='dvN'){const b=document.getElementById(e.target.id==='pzN'?'pzResta':'dvResta'),v=parseInt(e.target.value,10);if(b&&!isNaN(v))b.textContent=Math.max(0,(+b.dataset.tot)-v)+' peças';return}if(e.target.id==='insFQ'&&ui.sheet){ui.sheet.fq=e.target.value;return}if(e.target.id==='ajBusca'&&ui.sheet?.t==='ajuda'){ui.sheet.q=e.target.value;const L=document.getElementById('ajRes');if(L)L.innerHTML=ajRes();return}if(e.target.id==='wCli'&&ui.sheet?.w){ui.sheet.w.cliente=e.target.value;ui.sheet.w.cli=null;const L=document.getElementById('wCliSug');if(L)L.innerHTML=sugClientes(e.target.value,null)}if(e.target.id==='estBusca'){ui.eq=e.target.value;const L=document.getElementById('estLista');if(L)L.innerHTML=listaEst()}if(e.target.id==='empBusca'){ui.eqc=e.target.value;const L=document.getElementById('empLista');if(L)L.innerHTML=listaEmpresas()}if(e.target.id==='pedBusca'){ui.pf.q=e.target.value;const L=document.getElementById('pedLista');if(L)L.innerHTML=listaPedidos()}if(e.target.id==='wCnpj'){const v=fmtCnpj(e.target.value);if(v!==e.target.value)e.target.value=v}});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&['lgE','lgS'].includes(e.target.id)){e.preventDefault();A.lgEntrar();return}if(e.key==='Enter'&&['lgS1','lgS2'].includes(e.target.id)){e.preventDefault();A.lgCriar();return}if(e.key==='Escape'&&ui.sheet)A.fechar();if(e.key==='Enter'&&(['eNome','eObs','pNome','pTec','xNome','wCont','wCnpj','pedBusca','estBusca'].includes(e.target.id)||e.target.closest?.('.card')&&e.target.tagName==='INPUT'))e.preventDefault();if(e.key==='Enter'&&e.target.id==='wCli'){e.preventDefault();A.wNext()}});
 function tick(){
   if(MOCK_PEND.size&&NV.modo==='nuvem')mockPendentes();
-  document.querySelectorAll('[data-tl]').forEach(el=>{const l=lote(el.dataset.tl),x=l&&l.steps[el.dataset.ts];if(x)el.textContent=fDur(tempoUtil(x))});
+  document.querySelectorAll('[data-tl]').forEach(el=>{const l=lote(el.dataset.tl),x0=l&&l.steps[el.dataset.ts],x=x0&&el.dataset.tp?(x0.partes||[]).find(p=>String(p.id)===el.dataset.tp):x0;if(x)el.textContent=fDur(tempoUtil(x))});
   const P=state&&plano(),k=situacao().k+'|'+(P?Object.values(P.uso).filter(t=>heAtiva(t.x)).length:0);if(tick.k&&tick.k!==k){tick.k=k;nuvemRender();return}tick.k=k}
 
 /* ================= quem usa este aparelho ================= */
