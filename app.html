@@ -344,6 +344,7 @@ h2{font-size:24px;margin:0 0 10px;text-wrap:balance}
 .escp-h{display:flex;align-items:center;gap:12px;margin-bottom:6px}
 .escp-h b{display:block;font-size:22px}
 .escp-h span{color:var(--muted);font-size:16px}
+.mudou{margin:0;padding-left:22px;display:grid;gap:6px;font-size:17px}
 .tela-h{font-size:30px;margin:6px 0 14px}.sec-t{font-size:19px;color:var(--ink2);margin:22px 0 8px}
 .avisos{display:grid;gap:10px}.aviso{display:grid;grid-template-columns:34px minmax(0,1fr) 22px;gap:12px;align-items:center;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px;font:inherit;color:var(--ink);cursor:pointer}.aviso.novo{border-color:var(--blue);background:var(--blue-soft)}.aviso svg.ic{width:30px;height:30px;color:var(--ink2)}.aviso b{display:block;font-size:19px}.aviso span span{font-size:16px;color:var(--ink2)}
 .menu-u{display:flex;align-items:center;gap:12px;margin:6px 0 16px}.menu-u b{display:block;font-size:21px}.menu-u span span{color:var(--ink2);font-size:15px}
@@ -677,6 +678,7 @@ body.operacao .nb[data-t="cadastros"],body.operacao .nb[data-t="gestor"]{display
   .sheet .wrap{padding-inline:14px}
   .ped-ent{font-size:16px;padding-inline:0}
   .menu-r{padding:14px}
+  .item-h{flex-wrap:wrap;row-gap:8px}.cores{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))!important;display:grid!important}.cor{min-width:0;font-size:14px}
   .cad-row{grid-template-columns:44px minmax(0,1fr)!important;row-gap:8px}.cad-row>.m-ic{width:44px;height:44px}.cad-row>:nth-child(3){grid-column:1/-1;justify-self:end}
 }
 .ped-ent>.av,.ped-ent>svg{flex:none}
@@ -1455,7 +1457,8 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     ${ped.contato||ped.cnpj?`<div class="ped-ent">${ic('i-predio')}<span>${ped.contato?`Cliente: <b>${esc(ped.contato)}</b>`:''}${ped.contato&&ped.cnpj?' · ':''}${ped.cnpj?`<span class="nw">CNPJ ${esc(ped.cnpj)}</span>`:''}</span></div>`:''}
     ${!ped.concluido&&i.ab.length?`<div class="ped-ent">${ic('i-relogio')}<span>Trabalho restante ≈ ${nf(i.need)} dias úteis</span></div>`:''}
     <div class="ped-ent">${v?av(v,'s'):''}<span>Vendedora: <b>${esc(pNome(v)||'—')}</b> · Pedido ${esc(ped.id)} feito em ${fD(ped.chegada)}</span></div>
-    <div class="doc-bts"><button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
+    ${(ped.edicoes||[]).length?`<div class="ped-ent" style="font-size:15px">${ic('i-engr')}<span>Corrigido por ${esc(ped.edicoes[ped.edicoes.length-1].por||'?')} ${haQuanto(ped.edicoes[ped.edicoes.length-1].ts)}${ped.edicoes.length>1?` · ${ped.edicoes.length} correções`:''}</span></div>`:''}
+    <div class="doc-bts"><button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button><button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
     ${tEnt?`<div class="acoes"><button class="big go" data-a="entregar" data-id="${id}">${ic('i-caminhao')}${esc(tarTxt(tEnt))}${tEnt.resp?' · '+esc(pNome(tEnt.resp)):''}</button></div>`:''}</div>
   ${ped.concluido?'':`<div class="card"><h2>Antes de cortar</h2><div class="checks">
     ${chk('vias',ped.vias,'i-vias','Vias separadas')}${chk('artePrep',ped.artePrep,'i-arte','Arte preparada')}${chk('arte',ped.arte,'i-arte','Arte aprovada')}
@@ -1776,14 +1779,21 @@ function sugClientes(q,sel){const n=nCli(q);if(sel&&cliById(sel))return `<span c
   const L=state.clientes.filter(c=>nCli(c.nome).includes(n)||(c.apelidos||[]).some(a=>a.includes(n))).slice(0,6);
   return L.map(c=>`<button class="depc" data-a="wCliSel" data-v="${c.id}">${ic('i-predio')}${esc(c.nome)}<small style="font-weight:400">&nbsp;${pedsDoCli(c.id).length} ${pedsDoCli(c.id).length===1?"pedido":"pedidos"}</small></button>`).join('')}
 function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(n=>`<i class="${n<=w.step?'on':''}"></i>`).join('')}</div>`;
-  const head=`${voltar(w.step>1?'Voltar':'Cancelar')}${passos}<div class="passo-n">Passo ${w.step} de 4</div>`;
+  const head=`${voltar(w.step>1?'Voltar':'Cancelar')}${passos}<div class="passo-n">${w.edit?`Corrigindo o pedido ${esc(w.edit)} · `:''}Passo ${w.step} de 4</div>`;
   const nav=(lab='Próximo')=>`${w.err?`<div class="aviso">${ic('i-alerta')}${esc(w.err)}</div>`:''}<div class="acoes"><button class="big go" data-a="wNext">${lab}${ic('i-seta')}</button></div>`;
+  if(w.step===1&&w.edit)return `${head}<h1>Dados do pedido</h1><div class="rotulo" style="margin-top:0">Nome da empresa</div><input class="campo" id="wCli" value="${esc(w.cliente)}" autocomplete="off"><div id="wCliSug" class="linha-dep" style="margin-top:8px">${sugClientes(w.cliente,w.cli)}</div>
+    <div class="rotulo">Nome do cliente (contato)</div><input class="campo" id="wCont" value="${esc(w.contato||'')}" autocomplete="off">
+    <div class="rotulo">CNPJ</div><input class="campo" id="wCnpj" value="${esc(w.cnpj||'')}" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off">
+    <div class="rotulo">Número da ficha</div><input class="campo" id="wFicha" value="${esc(w.ficha||'')}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off">
+    <div class="rotulo">Quem vendeu?</div><div class="linha-dep">${state.pessoas.filter(p=>temPapel(p,'vendas')||p.id===w.vend).map(p=>`<button class="pchip" data-a="wVend" data-v="${p.id}" aria-pressed="${w.vend===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div>${nav()}`;
   if(w.step===1)return `${head}<div class="imp-box"><b>Tem a ficha de produção em PDF?</b><span>O sistema lê a ficha e preenche o pedido para você conferir.</span><div class="imp-bar" style="margin:6px 0 0"><button class="mbtn" data-a="impFichas">${ic('i-lista')}Importar fichas</button><button class="mbtn neutro2" data-a="impMocks">${ic('i-camisa')}Importar mockups</button></div></div><h1>Para quem é o pedido?</h1><div class="rotulo" style="margin-top:0">Nome da empresa</div><input class="campo" id="wCli" value="${esc(w.cliente)}" placeholder="Ex.: Hospital Santa Clara" autocomplete="off"><div id="wCliSug" class="linha-dep" style="margin-top:8px">${sugClientes(w.cliente,w.cli)}</div>
     <div class="rotulo">Nome do cliente (contato)</div><input class="campo" id="wCont" value="${esc(w.contato||'')}" placeholder="Ex.: Ana Souza" autocomplete="off">
     <div class="rotulo">CNPJ</div><input class="campo" id="wCnpj" value="${esc(w.cnpj||'')}" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off">
     <div class="rotulo">Quem vendeu?</div><div class="linha-dep">${state.pessoas.filter(p=>temPapel(p,'vendas')).map(p=>`<button class="pchip" data-a="wVend" data-v="${p.id}" aria-pressed="${w.vend===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div>${nav()}`;
-  if(w.step===2)return `${head}<h1>Quais peças?</h1><p style="color:var(--ink2);margin-top:-6px">Toque na peça para adicionar.</p><div class="escolhe">${state.produtos.map(p=>`<button class="opc" data-a="wAdd" data-p="${p.id}">${prodSvg(p.id,'')}${esc(p.nome)}</button>`).join('')}</div>
-    ${w.itens.map((it,k)=>`<div class="item"><div class="item-h">${it.mock?mockSvg(it.mock,'W:'+k):prodSvg(it.prod,it.cor,it.cores2)}<b>${esc(prod(it.prod).nome)}</b><button class="x azul" data-a="wMock" data-k="${k}" style="font-size:15px">${ic('i-camisa')}${it.mock?'Trocar mockup':'Pôr mockup'}</button><button class="x" data-a="wRm" data-k="${k}">Tirar</button></div>
+  if(w.step===2){const catalogo=`<div class="escolhe">${state.produtos.map(p=>`<button class="opc" data-a="wAdd" data-p="${p.id}">${prodSvg(p.id,'')}${esc(p.nome)}</button>`).join('')}</div>`;
+    return `${head}<h1>${w.edit?'Peças do pedido':'Quais peças?'}</h1>${w.edit?'':`<p style="color:var(--ink2);margin-top:-6px">Toque na peça para adicionar.</p>${catalogo}`}
+    ${w.itens.map((it,k)=>`<div class="item"><div class="item-h">${it.mock?mockSvg(it.mock,'W:'+k):prodSvg(it.prod,it.cor,it.cores2)}<b>${esc(prod(it.prod).nome)}</b><button class="x azul" data-a="wMock" data-k="${k}" style="font-size:15px">${ic('i-camisa')}${it.mock?'Trocar mockup':'Pôr mockup'}</button>${it.travado?'':`<button class="x" data-a="wRm" data-k="${k}">Tirar</button>`}</div>
+      ${it.travado?`<div class="instr" style="margin:0">${ic('i-cadeado')}<span><b>A produção desta peça já começou.</b> Dá para corrigir quantidades e personalização. Peça, tecido e cor ficam como estão: <b>${esc(modeloTxt(it))}</b>.</span></div>`:`
       <div><div class="passo-n">Tecido</div><div class="linha-dep">${prod(it.prod).tecidos.map(t=>`<button class="depc" data-a="wTec" data-k="${k}" data-v="${esc(t)}" aria-pressed="${it.tecido===t}">${ic('i-rolo')}${esc(t)}</button>`).join('')}<button class="depc" data-a="wNovoTec" data-k="${k}">${ic('i-mais')}Novo tecido</button></div>
         ${it.novoTec?`<div class="novo-in"><input class="campo" id="nt${k}" placeholder="Nome do tecido (ex.: Malha PV)" autocomplete="off"><button class="mbtn go" data-a="wSalvaTec" data-k="${k}">Salvar</button></div><p class="dica">Fica cadastrado no ${esc(prod(it.prod).nome)} para os próximos pedidos.</p>`:''}</div>
       ${(prod(it.prod).opcoes||[]).length?`<div><div class="passo-n">Modelo</div><div class="linha-dep">${prod(it.prod).opcoes.map(o=>`<button class="depc" data-a="wOpc" data-k="${k}" data-v="${o.id}" aria-pressed="${it.opcoes.includes(o.id)}">${esc(o.nome)}</button>`).join('')}</div></div>`:''}
@@ -1799,7 +1809,7 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
           ${prod(it.prod).golaItem?`<p class="dica" style="margin:0 0 8px">A gola é comprada pronta: se marcar Gola, a compra sai como "${esc(prod(it.prod).golaItem)}" nessa cor.</p>`:''}
           <div class="linha-dep">${[...new Set([...(prod(it.prod).partes||[]),...state.partesExtra,...it.novaC2.partes])].map(pt=>`<button class="depc" data-a="wC2pt" data-k="${k}" data-v="${esc(pt)}" aria-pressed="${it.novaC2.partes.includes(pt)}">${esc(pt)}</button>`).join('')}</div>
           <div class="novo-in"><input class="campo" id="c2o${k}" placeholder="Outra parte (ex.: Bolso da manga)" autocomplete="off"><button class="mbtn" data-a="wC2outra" data-k="${k}">Incluir</button></div>
-          <div class="acoes"><button class="big go" data-a="wC2ok" data-k="${k}" style="min-height:60px;font-size:21px">${ic('i-check')}Confirmar cor</button><button class="big neutro" data-a="wC2x" data-k="${k}" style="min-height:52px">Cancelar</button></div></div>`:''}</div>
+          <div class="acoes"><button class="big go" data-a="wC2ok" data-k="${k}" style="min-height:60px;font-size:21px">${ic('i-check')}Confirmar cor</button><button class="big neutro" data-a="wC2x" data-k="${k}" style="min-height:52px">Cancelar</button></div></div>`:''}</div>`}
       <div><div class="passo-n">Personalização: o quê e onde</div><div class="linha-dep">${it.pers.map((x,j)=>`<span class="depc" aria-pressed="true">${ic(tipo(x.tipo).i)}${esc(tNome(x.tipo))} · ${esc(localTxt(x))}${tipo(x.tipo).externo?' <small style="font-weight:400">(fora)</small>':''}<button class="x" data-a="wPrm" data-k="${k}" data-j="${j}" aria-label="Tirar" style="padding:0 8px;margin-left:4px">×</button></span>`).join('')}
         <button class="depc" data-a="wPadd" data-k="${k}">${ic('i-mais')}Adicionar</button></div>
         ${it.novaP?`<div class="card" style="margin:10px 0 0;background:var(--bg)"><div class="passo-n">Qual personalização?</div><div class="linha-dep">${state.tipos.filter(t=>t.grupo==='pers').map(t=>`<button class="depc" data-a="wPt" data-k="${k}" data-v="${t.id}" aria-pressed="${it.novaP.tipo===t.id}">${ic(t.i)}${esc(tNome(t.id))}</button>`).join('')}</div>
@@ -1810,18 +1820,55 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
       <div><div class="passo-n">Quantidade por tamanho</div>
         <div class="linha-dep" style="margin-bottom:10px">${state.cats.map(c=>{const n=sum(c.t.map(z=>it.g[z]||0));return `<button class="depc" data-a="wCat" data-k="${k}" data-v="${c.id}" aria-pressed="${catDe(it).id===c.id}">${c.nome} <small style="font-weight:400">${c.t[0]} a ${c.t[c.t.length-1]}</small>${n?` <span class="tagp" style="padding:0 8px">${n}</span>`:''}</button>`}).join('')}</div>
         <div class="tams">${catDe(it).t.map(s=>`<div class="tam"><b>${s}</b><button class="stp" data-a="wQ" data-k="${k}" data-s="${s}" data-d="-10" aria-label="Menos 10 no ${s}">−</button><input id="q${k}${s}" data-q="${k}" data-s="${s}" inputmode="numeric" value="${it.g[s]||0}" aria-label="Quantidade ${s}"><button class="stp" data-a="wQ" data-k="${k}" data-s="${s}" data-d="10" aria-label="Mais 10 no ${s}">+</button></div>`).join('')}</div>
-      <p style="margin:0;font-weight:700">Total: ${sum(sizesAll().map(s=>it.g[s]||0))} peças</p></div>`).join('')}${nav()}`;
+      <p style="margin:0;font-weight:700">Total: ${sum(sizesAll().map(s=>it.g[s]||0))} peças</p></div>`).join('')}${w.edit?`<h2 style="margin-top:24px">Adicionar outra peça</h2><p style="color:var(--ink2);margin-top:-6px">Toque na peça para incluir no pedido.</p>${catalogo}`:''}${nav()}`}
   if(w.step===3){const ops=[15,20,30].map(d=>{const dt=new Date(now()+d*DIA);dt.setHours(17,0,0,0);return dt.getTime()});
     const iso=w.entrega?(()=>{const d=new Date(w.entrega);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`})():'';
     return `${head}<h1>Para quando?</h1><div class="datas">${ops.map((t,k)=>`<button class="data-op" data-a="wData" data-t="${t}" aria-pressed="${w.entrega===t}"><b>Daqui ${[15,20,30][k]} dias</b><span>${DOW[new Date(t).getDay()]}, ${new Date(t).getDate()} de ${MES[new Date(t).getMonth()]}</span></button>`).join('')}</div>
       <p class="passo-n" style="margin-top:18px">Ou escolha outra data</p><input class="campo" type="date" id="wDt" value="${iso}">${nav()}`}
   const tot=sum(w.itens.map(it=>sum(sizesAll().map(s=>it.g[s]||0))));
   const mats=calcMat(w.itens.map(it=>({prod:it.prod,cor:it.cor,qtd:sum(sizesAll().map(s=>it.g[s]||0))}))).filter(m=>m.st==='comprar');
-  return `${head}<h1>Está certo?</h1><div class="card"><h2>${esc(w.cliente)}</h2>${w.contato||w.cnpj?`<div class="ped-ent">${esc(w.contato||'')}${w.contato&&w.cnpj?' · ':''}${w.cnpj?'CNPJ '+esc(w.cnpj):''}</div>`:''}<div class="ped-ent">${av(w.vend,'s')}<span>Vendedora: <b>${esc(pNome(w.vend))}</b></span></div>
+  const md=w.edit?mudancasPed(w):[];
+  return `${head}<h1>${w.edit?'Confira a correção':'Está certo?'}</h1>${w.edit?`<div class="card" style="border-color:var(--blue)"><h2>O que vai mudar</h2>${md.length?`<ul class="mudou">${md.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="dica">Nada mudou ainda. Volte e corrija o que precisar.</p>'}${pedById(w.edit)?.aprov&&md.length?`<div class="instr" style="margin:10px 0 0">${ic('i-alerta')}<span>O cliente já tinha aprovado este pedido. Depois de salvar, gere o <b>Pedido</b> de novo e peça uma nova aprovação.</span></div>`:''}</div>`:''}<div class="card"><h2>${esc(w.cliente)}</h2>${w.contato||w.cnpj?`<div class="ped-ent">${esc(w.contato||'')}${w.contato&&w.cnpj?' · ':''}${w.cnpj?'CNPJ '+esc(w.cnpj):''}</div>`:''}<div class="ped-ent">${av(w.vend,'s')}<span>Vendedora: <b>${esc(pNome(w.vend))}</b></span></div>
     ${w.itens.map(it=>`<div class="resumo-item">${prodSvg(it.prod,it.cor,it.cores2)}<div><b>${esc(prod(it.prod).nome)}</b><div style="color:var(--ink2)">${esc(modeloTxt(it))}</div><div style="color:var(--ink2)">${sizesAll().filter(s=>it.g[s]).map(s=>`${s}: ${it.g[s]}`).join(' · ')}</div><div style="color:var(--ink2)">${it.pers.map(x=>`${esc(tNome(x.tipo))} na ${esc(localTxt(x).toLowerCase())}`).join(' · ')||'Sem personalização'}</div></div></div>`).join('')}
     <div class="resumo-item">${ic('i-caminhao')}<b>Entrega ${DOW[new Date(w.entrega).getDay()]}, ${new Date(w.entrega).getDate()} de ${MES[new Date(w.entrega).getMonth()]} · ${tot} peças</b></div></div>
     <div class="card"><h2>${mats.length?'Provavelmente vai precisar comprar':'Pelo cadastro, tem o material'}</h2>${mats.length?mats.map(m=>`<div class="mat">${ic('i-carrinho')}<div><b>${esc(m.item)}</b><span>${qtdTxt(m.nec-m.est,m.un)}</span></div><span></span></div>`).join(''):`<div class="lib u-ok">${ic('i-check')}Pode seguir</div>`}${avisoEst()}<p class="dica">Consumo de tecido por tamanho: ${state.cats.map(c=>`${esc(c.nome.toLowerCase())} ${Math.round(c.fator*100)}%`).join(', ')}${Object.entries(state.fatorEsp).map(([t,f])=>`, ${esc(t)} ${Math.round(f*100)}%`).join('')}. Dá para mudar em Cadastros → Ajustes.</p></div>
-    <div class="acoes"><button class="big go" data-a="wCriar">${ic('i-check')}Criar pedido</button></div>`}
+    ${w.edit?`<div class="acoes"><button class="big go" data-a="wSalvarEd" ${md.length?'':'disabled'}>${ic('i-check')}Salvar correção</button></div>`:`<div class="acoes"><button class="big go" data-a="wCriar">${ic('i-check')}Criar pedido</button></div>`}`}
+/* Corrigir pedido já lançado: abre o mesmo passo a passo do Novo pedido, preenchido. */
+function wDoPedido(ped){const ls=lotesDe(ped.id).filter(l=>!l.rework);
+  return {step:1,edit:ped.id,cliente:ped.cliente,cli:ped.cli,contato:ped.contato||'',cnpj:ped.cnpj||'',ficha:ped.ficha||'',vend:ped.vendedor,entrega:ped.entrega,err:'',
+    itens:ls.map(l=>({lote:l.id,travado:Object.keys(l.steps||{}).length>0||(state.lotes||[]).some(x=>x.parent===l.id),prod:l.prod,cor:l.cor,cores2:JSON.parse(JSON.stringify(l.cores2||[])),novaC2:null,tecido:l.tecido||'',opcoes:[...(l.opcoes||[])],
+      g:{...(l.grade||l.g||{})},qtd0:l.qtd,pers:JSON.parse(JSON.stringify(l.pers||[])),novaP:null,mock:l.mock||null}))}}
+const gradeTxt=g=>sizesAll().filter(s=>g[s]).map(s=>`${s} ${g[s]}`).join(', ')||'0';
+function mudancasPed(w){const ped=pedById(w.edit);if(!ped)return[];const m=[],d=(a,b)=>String(a||'').trim()!==String(b||'').trim();
+  if(d(ped.cliente,w.cliente))m.push(`Empresa: ${ped.cliente} → ${w.cliente.trim()}`);if(d(ped.contato,w.contato))m.push(`Contato: ${ped.contato||'—'} → ${w.contato.trim()||'—'}`);
+  if(d(soDig(ped.cnpj),soDig(w.cnpj)))m.push(`CNPJ: ${ped.cnpj||'—'} → ${w.cnpj.trim()||'—'}`);if(d(ped.ficha,w.ficha))m.push(`Ficha: ${ped.ficha||'—'} → ${w.ficha.trim()||'—'}`);
+  if(ped.vendedor!==w.vend)m.push(`Vendedora: ${pNome(ped.vendedor)||'—'} → ${pNome(w.vend)}`);if(sod(ped.entrega).getTime()!==sod(w.entrega).getTime())m.push(`Entrega: ${fD(ped.entrega)} → ${fD(w.entrega)}`);
+  const ls=lotesDe(ped.id).filter(l=>!l.rework);
+  w.itens.forEach(it=>{const l=it.lote&&lote(it.lote),n=prod(it.prod).nome;if(!l){m.push(`Nova peça: ${n} · ${modeloTxt(it)} · ${sum(sizesAll().map(s=>it.g[s]||0))} peças`);return}
+    if(l.prod!==it.prod)m.push(`${prod(l.prod).nome} → ${n}`);if(modeloTxt(l)!==modeloTxt({...it}))m.push(`${n}: ${modeloTxt(l)} → ${modeloTxt(it)}`);
+    const g0=l.grade||l.g||{};if(gradeTxt(g0)!==gradeTxt(it.g))m.push(`${n}: ${gradeTxt(g0)} → ${gradeTxt(it.g)} (${l.qtd} → ${sum(sizesAll().map(s=>it.g[s]||0))} peças)`);
+    const pt=a=>(a||[]).map(x=>`${tNome(x.tipo)} ${localTxt(x)}`).join(' + ')||'sem personalização';if(pt(l.pers)!==pt(it.pers))m.push(`${n}: ${pt(l.pers)} → ${pt(it.pers)}`);
+    if(it.mockG)m.push(`${n}: mockup novo`)});
+  ls.filter(l=>!w.itens.some(it=>it.lote===l.id)).forEach(l=>m.push(`Sai do pedido: ${prod(l.prod).nome} · ${modeloTxt(l)} · ${l.qtd} peças`));
+  return m}
+function salvarEdicao(){const w=ui.sheet.w,ped=pedById(w.edit);if(!ped)return;const md=mudancasPed(w);if(!md.length)return;snap();
+  const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);
+  Object.assign(ped,{cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim(),vendedor:w.vend,entrega:w.entrega});
+  if((w.ficha||'').trim())ped.ficha=w.ficha.trim();else delete ped.ficha;
+  const ids=new Set(w.itens.map(it=>it.lote).filter(Boolean));
+  state.lotes=state.lotes.filter(l=>l.ped!==ped.id||l.rework||ids.has(l.id)||Object.keys(l.steps||{}).length);
+  let n=Math.max(0,...state.lotes.filter(l=>l.ped===ped.id).map(l=>parseInt(String(l.id).split('-')[1],10)||0));
+  w.itens.forEach(it=>{const qtd=sum(sizesAll().map(s=>it.g[s]||0));let pz=0;const pers=it.pers.map(x=>({tipo:x.tipo,parte:x.parte,lado:x.lado,pos:x.pos,id:x.id||('pz'+Date.now().toString(36)+(pz++))}));
+    let l=it.lote&&lote(it.lote);
+    if(!l){l={id:`${ped.id}-${++n}`,ped:ped.id,desm:0,steps:{},rework:false,parent:null};state.lotes.push(l)}
+    Object.assign(l,{pers,qtd,grade:{...it.g}});if(!it.travado)Object.assign(l,{prod:it.prod,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...it.opcoes]});
+    if(it.mockG){guardaMockG(l.id,it.mockG);l.mock=it.mock;delete l.mockBin}});
+  const velhos=ped.materiais||[],lines=state.lotes.filter(l=>l.ped===ped.id&&!l.rework).map(l=>({prod:l.prod,cor:l.cor,cores2:l.cores2,tecido:l.tecido,opcoes:l.opcoes,g:l.grade,qtd:l.qtd}));
+  const novos=calcMat(lines).map(m=>{const o=velhos.find(x=>x.item===m.item);if(!o)return m;return {...m,conf:!!o.conf&&m.nec<=o.nec,st:o.st==='pedido'?'pedido':o.st==='ok'&&m.nec<=o.nec?'ok':m.st}});
+  velhos.filter(o=>(o.extra||o.st==='pedido')&&!novos.some(m=>m.item===o.item)).forEach(o=>novos.push(o));ped.materiais=novos;
+  ped.edicoes=[...(ped.edicoes||[]),{ts:now(),por:quemNome()||usuarioAtual()?.nome||'',mud:md.slice(0,20)}].slice(-20);
+  registrar({tipo:'edicao',ped:ped.id,cli:ped.cliente,step:md.join(' | ').slice(0,300)});RC={};
+  ui.sheet={t:'pedido',id:ped.id};commit();toast('Pedido corrigido')}
 function sTroca(){const e=ui.sheet,t=tarefasEsc().find(x=>x.key===e.key);if(!t)return voltar();const c0=capazes(e.f),cs=[...c0,...state.pessoas.filter(p=>!c0.includes(p)&&((p.funcoes||[]).length||(state.usuarios||[]).some(u=>u.pessoa===p.id)))];
   return `${voltar('Cancelar')}<h1>Quem faz esta tarefa?</h1><div class="card"><b style="font-size:21px">${esc(tarTxt(t))}</b><div style="color:var(--ink2)">${esc(t.ped.cliente)}${t.sub?' · '+esc(t.sub):''}</div></div>
   <div class="linha-dep">${cs.map(p=>`<button class="pchip" data-a="trocaSel" data-v="${p.id}" aria-pressed="${t.resp===p.id}">${av(p.id,'s')}${esc(p.nome)}${p.disp===false?' <small>(fora)</small>':''}${p.viaApp&&['levar','entregar'].includes(e.f)?' <small>(app)</small>':''}</button>`).join('')}</div>
@@ -2386,7 +2433,7 @@ function toast(msg,comDesfazer=true){const el=document.getElementById('toast');c
   el.innerHTML=`<div class="toast" role="status"><span>${esc(msg)}</span>${comDesfazer?'<button data-a="desfazer">Desfazer</button>':''}</div>`;toastT=setTimeout(()=>{el.innerHTML='';undo=null},9000)}
 function commit(){save();render()}
 function openSheet(s){ui.sheet=s;render();const e=document.querySelector('.sheet');if(e)e.scrollTop=0}
-function wRead(){const w=ui.sheet?.w;if(!w)return;const c=document.getElementById('wCli');if(c)w.cliente=c.value;const ct=document.getElementById('wCont');if(ct)w.contato=ct.value;const cj=document.getElementById('wCnpj');if(cj)w.cnpj=cj.value;
+function wRead(){const w=ui.sheet?.w;if(!w)return;const fi=document.getElementById('wFicha');if(fi)w.ficha=fi.value;const c=document.getElementById('wCli');if(c)w.cliente=c.value;const ct=document.getElementById('wCont');if(ct)w.contato=ct.value;const cj=document.getElementById('wCnpj');if(cj)w.cnpj=cj.value;
   document.querySelectorAll('[data-q]').forEach(i=>{w.itens[+i.dataset.q].g[i.dataset.s]=Math.max(0,parseInt(i.value)||0)});
   const d=document.getElementById('wDt');if(d&&d.value){const[y,m,dd]=d.value.split('-').map(Number);w.entrega=new Date(y,m-1,dd,17).getTime()}}
 const togl=(a,v)=>{const i=a.indexOf(v);i<0?a.push(v):a.splice(i,1)};
@@ -2398,7 +2445,7 @@ const A={
   tela:d=>{if(['cadastros','gestor'].includes(d.t)&&!ehGestao())return;ui.tela=d.t;ui.sheet=null;render();window.scrollTo(0,0)},
   cad:d=>{ui.cad=d.k;render()},
   irEquipe:()=>{ui.tela='cadastros';ui.cad='equipe';ui.sheet=null;render();window.scrollTo(0,0)},
-  fechar:()=>{const s=ui.sheet;if(s?.t==='etapa'){ui.sheet={t:'produto',p:s.p};return render()}if(s?.t==='prob'&&s.step>1){s.step--;return render()}if(s?.t==='novo'&&s.w.step>1){wRead();s.w.step--;s.w.err='';return render()}ui.sheet=null;render()},
+  fechar:()=>{const s=ui.sheet;if(s?.t==='etapa'){ui.sheet={t:'produto',p:s.p};return render()}if(s?.t==='prob'&&s.step>1){s.step--;return render()}if(s?.t==='novo'&&s.w.step>1){wRead();s.w.step--;s.w.err='';return render()}if(s?.t==='novo'&&s.w.edit){ui.sheet={t:'pedido',id:s.w.edit};return render()}ui.sheet=null;render()},
   ajuda:()=>openSheet({t:'ajuda'}),
   maq:d=>openSheet({t:'maq',m:d.m}),
   mP:d=>{ui.sheet.p=d.v;render()},
@@ -2675,6 +2722,8 @@ const A={
     if(w.step===2){if(!w.itens.length)w.err='Toque em uma peça para adicionar';else if(w.itens.some(i=>!i.tecido))w.err='Escolha o tecido de cada peça';else if(w.itens.some(i=>i.pers.some(x=>x.parte==='Mangas'&&!x.lado)))w.err='Diga em qual manga vai a personalização';else if(w.itens.some(i=>!i.cor))w.err='Escolha a cor principal de cada peça';else if(w.itens.some(i=>i.novaC2))w.err='Confirme ou cancele a cor que está adicionando';else if(w.itens.some(i=>!sum(sizesAll().map(s=>i.g[s]||0))))w.err='Coloque a quantidade de cada peça'}
     if(w.step===3&&!w.entrega)w.err='Escolha a data de entrega';
     if(!w.err)w.step++;render();const e=document.querySelector('.sheet');if(e&&!w.err)e.scrollTop=0},
+  pedEditar:d=>{const p=pedById(d.id);if(!p)return;openSheet({t:'novo',w:wDoPedido(p)})},
+  wSalvarEd:()=>salvarEdicao(),
   wCriar:()=>{const w=ui.sheet.w;snap();const id=String(state.seq++).padStart(4,'0');const lines=w.itens.map(it=>({prod:it.prod,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...it.opcoes],pers:it.pers.map((x,j)=>({tipo:x.tipo,parte:x.parte,lado:x.lado,pos:x.pos,id:'pz'+j})),g:{...it.g},qtd:sum(sizesAll().map(s=>it.g[s]||0))}));
     const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);
     state.pedidos.push({id,cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim()||cl.cnpj||'',vendedor:w.vend,chegada:now(),entrega:w.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null});
