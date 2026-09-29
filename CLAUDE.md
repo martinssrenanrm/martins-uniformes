@@ -22,6 +22,7 @@ O sistema inteiro está em `app.html`. Antes de mudar qualquer coisa, leia `READ
    - trabalhe em ondas pequenas aprovadas (`docs/ux/PLANO-DE-ONDAS.md`);
    - registre cada onda em `docs/ux/NOVIDADES-PARA-EQUIPE.md`.
 4. **Nenhuma função é adicionada ou removida** numa onda de usabilidade. Função nova é pedido separado.
+5. **Central "Como usar o app" (lista `FAQ` em `app.html`):** toda função nova, botão renomeado ou tela mudada atualiza as perguntas e respostas no mesmo commit. Rode `tests/ajuda.test.js`.
 
 ## Testes
 
@@ -30,4 +31,5 @@ NODE_PATH=$(npm root -g) node tests/sincronia.test.js
 NODE_PATH=$(npm root -g) node tests/corrigir-pedido.test.js
 NODE_PATH=$(npm root -g) node tests/dados-persistem.test.js
 NODE_PATH=$(npm root -g) node tests/mockup-original.test.js
+NODE_PATH=$(npm root -g) node tests/ajuda.test.js
 ```

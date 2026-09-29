@@ -39,3 +39,13 @@ Cada bloco é uma mudança pequena. A Helena pode ler em voz alta ou mandar no g
 - **Gestor** e **Cadastros** aparecem direto na barra (só para quem é da gestão).
 - **Empresas** fica na chave da tela de Pedidos.
 - **Como usar o app** e **Sair** ficam na **sua letra ou foto**, ao lado do sininho.
+
+---
+
+## "Como usar o app" virou uma central de dúvidas
+
+- Toque na **sua letra ou foto** (no alto, ao lado do sininho) e depois em **Como usar o app**. Na Fábrica, também tem o botão no fim da tela.
+- **Escreva a dúvida do seu jeito:** "como faço hora extra", "onde fica o estoque", "errei o pedido", "peça com defeito"…
+- Aparecem as respostas com o **passo a passo**. Muitas têm o botão **Me leve até lá**, que abre a tela certa.
+- Também dá para escolher um **assunto**, por exemplo Máquinas, Pedidos ou Na rua, e ver todas as perguntas dele.
+- Não achou? Pergunte para a Helena, e a resposta entra na central.
