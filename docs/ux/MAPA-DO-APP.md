@@ -68,6 +68,14 @@
 
 ## 3. Navegação
 
+> **Atualizado em 29/09 (pedido do Nico):**
+> - Barra de baixo: **Fábrica · Pedidos · (+) Novo · Gestor · Cadastros**. Gestor e Cadastros só para a gestão.
+> - No alto de Fábrica, Pedidos, Painel e Cadastros ficam a **inicial/foto** (Como usar, Sair) e o **sininho** de avisos, que abre uma janelinha.
+> - Pedidos: busca + **Filtrar** + **Ordenar** + chave Pedidos/Empresas.
+> - O Menu e o item Avisos saíram da barra.
+>
+> Abaixo, o mapa como era na Fase 0.
+
 **Barra de baixo, sempre visível:**
 - No celular: **Fábrica · Pedidos · (+) Novo · Avisos · Menu**.
 - No computador, com 900px ou mais, aparecem também **Gestor** e **Cadastros**.

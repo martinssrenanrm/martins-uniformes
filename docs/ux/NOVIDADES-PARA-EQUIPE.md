@@ -19,3 +19,23 @@ Cada bloco é uma mudança pequena. A Helena pode ler em voz alta ou mandar no g
 - Nenhum botão mudou de lugar.
 - Nenhum nome mudou.
 - Tudo funciona do mesmo jeito.
+
+---
+
+## Pedidos mais limpo, sininho de avisos e fim do Menu
+
+**Tela de Pedidos:**
+- Em cima fica só a **busca**.
+- Para escolher o que aparece (Atrasando, Em dia, Entregues…), toque em **Filtrar**.
+- Para mudar a ordem, toque em **Ordenar**.
+- **Pedidos** e **Empresas** viraram uma chave pequena. No celular ela fica ao lado de Filtrar.
+
+**Avisos:**
+- Agora é um **sininho no canto de cima, à direita**, com o número de avisos novos.
+- Toque nele para ver os avisos. Tocando no aviso, o app abre o pedido.
+
+**Menu:**
+- O botão **Menu saiu** da barra de baixo.
+- **Gestor** e **Cadastros** aparecem direto na barra (só para quem é da gestão).
+- **Empresas** fica na chave da tela de Pedidos.
+- **Como usar o app** e **Sair** ficam na **sua letra ou foto**, ao lado do sininho.

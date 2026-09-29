@@ -40,7 +40,7 @@ main{padding-block:20px 150px}
 .nb.novo{background:var(--go);color:#fff}
 .nb-i{position:relative;display:inline-flex}.nb-i em{position:absolute;top:-6px;right:-12px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--red);color:#fff;font-style:normal;font-size:13px;font-weight:700;display:grid;place-items:center;border:2px solid var(--card)}
 .nb-mais{display:inline-flex}
-@media (max-width:899px){.nb.lg{display:none}}
+
 @media (max-width:640px){.nav .wrap{gap:2px;padding-block:6px 4px}.nb.novo{background:none;color:var(--go-dark)}.nb.novo .nb-mais{width:52px;height:52px;margin-top:-22px;border-radius:50%;background:var(--go);color:#fff;display:grid;place-items:center;box-shadow:0 4px 14px rgba(20,110,60,.35);border:3px solid var(--card)}.nb.novo .nb-mais svg.ic{width:30px;height:30px}.nb.novo .nb-l{font-size:13px}.nb.novo .nb-l::before{content:'Novo';font-size:13px}.nb.novo .nb-l{font-size:0}}
 .nb.novo[aria-current="page"]{background:var(--go-dark);color:#fff}
 
@@ -721,6 +721,32 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
   .setor-h{flex-wrap:wrap}.setor-t{flex:1 1 60%}.setor-dono{max-width:100%;margin-left:52px}
   .resumo{flex-wrap:wrap;overflow:visible}
 }
+
+/* Topo das telas: título (ou resumo) à esquerda, sininho de avisos à direita */
+.topo{display:flex;align-items:center;gap:10px;margin-bottom:12px}.topo h1{margin:0;margin-right:auto;min-width:0}.topo .ped-l{flex:1;min-width:0;padding-bottom:0}
+.sino{position:relative;flex:none;width:52px;height:52px;display:grid;place-items:center;border:2px solid var(--line-btn);background:var(--card);border-radius:50%;color:var(--ink);cursor:pointer}.sino svg.ic{width:28px;height:28px}
+.sino em{position:absolute;top:-6px;right:-6px;min-width:26px;height:26px;padding:0 6px;border-radius:13px;background:var(--red);color:#fff;font-style:normal;font-size:16px;font-weight:700;display:grid;place-items:center;border:2px solid var(--card)}
+.sino[aria-expanded="true"]{background:var(--blue-soft);border-color:var(--blue)}
+.pop-fundo{position:fixed;inset:0;z-index:70;background:rgba(22,32,44,.25)}
+.pop{position:fixed;z-index:71;top:12px;right:max(12px,calc(50% - 600px));width:min(440px,calc(100vw - 24px));max-height:calc(100vh - 120px);overflow:auto;background:var(--card);border:2px solid var(--line-btn);border-radius:18px;padding:14px;box-shadow:0 12px 40px rgba(22,32,44,.25)}
+.pop-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.pop-h b{font-size:22px}
+.vista{display:flex;gap:4px;background:var(--card);border:2px solid var(--line-btn);border-radius:14px;padding:3px;flex:none}
+.vista-b{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:0;border-radius:10px;background:none;font:inherit;font-size:16px;font-weight:700;color:var(--ink2);cursor:pointer}.vista-b svg.ic{width:24px;height:24px}
+.vista-b[aria-pressed="true"]{background:var(--ink);color:#fff}
+.busca-l{display:flex;gap:8px;align-items:stretch;margin-bottom:12px}
+.busca-c{position:relative;flex:1;display:block;min-width:0}.busca-c svg.ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:24px;height:24px;color:var(--ink2);pointer-events:none}.busca-c .busca{width:100%;padding-left:48px;margin:0}
+.busca-bts{display:flex;gap:8px}.fo-b{white-space:nowrap}.fo-b.ativo{border-color:var(--blue)!important;background:var(--blue-soft);color:var(--blue)}.fo-b[aria-expanded="true"]{border-color:var(--ink)!important}
+.fo-p{background:var(--card);border:2px solid var(--line-btn);border-radius:16px;padding:12px 14px;margin-bottom:14px}
+@media (max-width:640px){.busca-l{flex-direction:column}.busca-bts>*{flex:1}.vista-b span{display:none}.vista-b{padding:0 10px;min-width:48px;justify-content:center}.sino{width:48px;height:48px}}
+.eu{flex:none;width:52px;height:52px;border-radius:50%;border:2px solid var(--line-btn);background:var(--card);padding:0;display:grid;place-items:center;cursor:pointer;overflow:hidden}.eu .av{width:44px;height:44px}.eu-i{font-weight:700;font-size:20px;color:var(--ink)}.eu[aria-expanded="true"]{border-color:var(--blue)}
+.eu-h{display:flex;align-items:center;gap:10px;min-width:0}.eu-h b{display:block;font-size:20px}.eu-h span span{font-size:16px;color:var(--ink2);word-break:break-all}
+@media (max-width:640px){.eu{width:48px;height:48px}.eu .av{width:40px;height:40px}}
+@media (max-width:640px){.nav .nb{flex:1 1 auto;min-width:0}.nav .nb.novo{flex:0 0 56px}}
+@media (max-width:389px){.nb,.nb.novo .nb-l::before{font-size:15px}.nav .nb svg.ic{width:24px;height:24px}}
+.nav .nb{overflow:hidden;white-space:nowrap}
+.so-cel{display:none}
+@media (max-width:640px){.so-pc{display:none}.so-cel{display:inline-flex}.busca-bts{align-items:stretch}.busca-bts .vista{flex:none}.busca-bts .fo-b{flex:1;padding-inline:8px;justify-content:center}.topo h1{font-size:25px}}
+@media (max-width:420px){.busca-bts .fo-b svg.ic{display:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -732,6 +758,8 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
   <symbol id="i-lupa" viewBox="0 0 48 48"><circle cx="21" cy="21" r="13"/><path d="M31 31l11 11"/></symbol>
   <symbol id="i-caixa" viewBox="0 0 48 48"><path d="M6 15l18-8 18 8v19l-18 8-18-8z"/><path d="M6 15l18 8 18-8M24 23v19"/></symbol>
   <symbol id="i-check" viewBox="0 0 48 48"><path d="M10 25l9 9 19-20"/></symbol>
+  <symbol id="i-filtro" viewBox="0 0 48 48"><path d="M6 9h36L28 26v12l-8 4V26z"/></symbol>
+  <symbol id="i-ordenar" viewBox="0 0 48 48"><path d="M15 8v32M7 32l8 8 8-8M33 40V8M25 16l8-8 8 8"/></symbol>
   <symbol id="i-sino" viewBox="0 0 48 48"><path d="M12 34V22a12 12 0 0 1 24 0v12l4 4H8z"/><path d="M20 42a4 4 0 0 0 8 0"/></symbol>
   <symbol id="i-menu" viewBox="0 0 48 48"><path d="M8 13h32M8 24h32M8 35h32"/></symbol>
   <symbol id="i-alerta" viewBox="0 0 48 48"><path d="M24 6l20 36H4z"/><path d="M24 19v10M24 35v1"/></symbol>
@@ -773,12 +801,11 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
   <button class="nb" data-a="tela" data-t="fabrica"><svg class="ic"><use href="#i-fabrica"/></svg>Fábrica</button>
   <button class="nb" data-a="tela" data-t="pedidos"><svg class="ic"><use href="#i-lista"/></svg>Pedidos</button>
   <button class="nb novo" data-a="novo" aria-label="Novo pedido"><span class="nb-mais"><svg class="ic"><use href="#i-mais"/></svg></span><span class="nb-l">Novo pedido</span></button>
-  <button class="nb" data-a="tela" data-t="avisos"><span class="nb-i"><svg class="ic"><use href="#i-sino"/></svg><em id="nbAv" hidden></em></span>Avisos</button>
   <button class="nb lg" data-a="tela" data-t="gestor"><svg class="ic"><use href="#i-grafico"/></svg>Gestor</button>
   <button class="nb lg" data-a="tela" data-t="cadastros"><svg class="ic"><use href="#i-engr"/></svg>Cadastros</button>
-  <button class="nb" data-a="menu" data-t="menu"><svg class="ic"><use href="#i-menu"/></svg>Menu</button>
 </div></nav>
 <div id="sheet"></div>
+<div id="pop"></div>
 <div id="zoom"></div>
 <div id="docRender" aria-hidden="true"></div>
 <div id="toast"></div>
@@ -1376,7 +1403,7 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
   const nTrab=P.us.filter(u=>P.uso[u.id]).length,nIni=P.us.filter(u=>!P.uso[u.id]&&P.plan[u.id]).length;
   const z=ui.fz||'maq';
   const zonas=[['maq','Máquinas','i-maquina',nIni],['fora','Fora','i-caminhao',foraN],['esc','Escritório','i-vias',esc_.length]];
-  return `${quemNome()||usuarioAtual()||!state.pessoas.length?'':`<button class="faixa quem-f" data-a="quem">${ic('i-pessoas')}<span><b>Quem está usando este aparelho?</b> Toque para escolher seu nome.</span></button>`}${faixasTopo()}${faixaHora(P)}<button class="ped-l" data-a="tela" data-t="pedidos"><span class="pl-t">Pedidos</span>${res||'<span class="pl-i">nenhum aberto</span>'}<span class="pl-go">›</span></button>
+  return `${quemNome()||usuarioAtual()||!state.pessoas.length?'':`<button class="faixa quem-f" data-a="quem">${ic('i-pessoas')}<span><b>Quem está usando este aparelho?</b> Toque para escolher seu nome.</span></button>`}<div class="topo"><button class="ped-l" data-a="tela" data-t="pedidos"><span class="pl-t">Pedidos</span>${res||'<span class="pl-i">nenhum aberto</span>'}<span class="pl-go">›</span></button>${sino()}</div>${faixasTopo()}${faixaHora(P)}
   <div class="zonas" role="tablist">${zonas.map(([k,n,i,c])=>`<button class="zona" role="tab" data-a="fz" data-v="${k}" aria-pressed="${z===k}">${ic(i)}<span>${n}</span>${c?`<em>${c}</em>`:''}</button>`).join('')}</div>
   ${z==='maq'?`<div class="agora"><span><b>${nIni}</b> para começar</span><span><b>${nTrab}</b> trabalhando</span></div>
   ${livres.length?`<div class="livres"><span class="t">Livres:</span>${livres.map(p=>`<span class="pl-p">${av(p.id,'s')}${esc(p.nome)}</span>`).join('')}</div>`:''}
@@ -1401,8 +1428,19 @@ function sSetor(){const z=SETORES_ESC.find(x=>x.id===ui.sheet.v);if(!z)return vo
   return `${voltar('Pronto')}<h1>${ic(z.i)} ${z.nome}</h1><p class="sub-l">Escolha quem cuida de cada tarefa deste setor. <b>Automático</b> divide entre quem sabe fazer. Dá para trocar uma tarefa só, tocando no nome dela.</p>
   ${z.fs.map(f=>{const c0=capazes(f),ps=[...c0,...state.pessoas.filter(p=>!c0.includes(p)&&(state.usuarios||[]).some(u=>u.pessoa===p.id))];
     return `<div class="card"><h2 style="font-size:19px">${esc(FN[f].nome)}</h2><div class="linha-dep"><button class="pchip" data-a="donoSel" data-f="${f}" data-v="" aria-pressed="${!D[f]}">Automático</button>${ps.map(p=>`<button class="pchip" data-a="donoSel" data-f="${f}" data-v="${p.id}" aria-pressed="${D[f]===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div></div>`}).join('')}`}
+/* Sininho de avisos: sempre no canto de cima, à direita. Abre uma janelinha com os avisos. */
+function sino(){const u=usuarioAtual();if(!u)return '';const n=avisos().length;return `${euBtn(u)}<button class="sino" data-a="sinoAbre" aria-expanded="${!!ui.sino}" aria-label="${n?n+(n>1?' avisos novos':' aviso novo'):'Avisos'}" title="Avisos">${ic('i-sino')}${n?`<em>${n>9?'9+':n}</em>`:''}</button>`}
+function euBtn(u){const pid=u.pessoa&&pessoa(u.pessoa)?u.pessoa:null;return `<button class="eu" data-a="euAbre" aria-expanded="${!!ui.eu}" aria-label="Você: ${esc(quemNome()||u.nome)}. Como usar e Sair" title="${esc(quemNome()||u.nome)}">${pid?av(pid,'s'):`<span class="eu-i">${esc((u.nome||'?')[0].toUpperCase())}</span>`}</button>`}
+function popEu(){const u=usuarioAtual();if(!u)return '';const pid=u.pessoa&&pessoa(u.pessoa)?u.pessoa:null;
+  return `<div class="pop-fundo" data-a="euFecha"></div><div class="pop" role="dialog" aria-label="Você"><div class="pop-h"><span class="eu-h">${pid?av(pid):''}<span><b>${esc(quemNome()||u.nome)}</b><span>${esc(u.email||'')}</span></span></span><button class="x" data-a="euFecha" aria-label="Fechar">× Fechar</button></div>
+  <div class="menu-l"><button class="menu-r" data-a="euAjuda">${ic('i-duvida')}<span><b>Como usar o app</b></span>${ic('i-seta')}</button><button class="menu-r" data-a="euSair">${ic('i-pessoas')}<span><b>Sair</b><span>Trocar de pessoa neste aparelho</span></span>${ic('i-seta')}</button></div></div>`}
+function popAvisos(){const u=usuarioAtual(),rec=(state.avisarNovos||[]).includes(u?.id),av_=avisos();
+  const vistos=rec?state.pedidos.filter(p=>p.criado&&!p.criado.antigo&&(p.vistoPor||{})[u.id]>1&&now()-p.criado.ts<7*DIA).sort((a,b)=>b.criado.ts-a.criado.ts).slice(0,6):[];
+  const item=(p,novo)=>{const q=sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd));return `<button class="av-item${novo?' novo':''}" data-a="avAbrir" data-id="${p.id}">${ic('i-lista')}<span><b>${novo?'Pedido novo: ':''}${esc(p.cliente)}</b><span>${q?q+' peças · ':''}entrega ${fD(p.entrega)}${p.criado.por?` · por ${esc(p.criado.por)}`:''} · ${haQuanto(p.criado.ts)}</span></span>${ic('i-seta')}</button>`};
+  return `<div class="pop-fundo" data-a="sinoFecha"></div><div class="pop" role="dialog" aria-label="Avisos"><div class="pop-h"><b>Avisos</b><button class="x" data-a="sinoFecha" aria-label="Fechar avisos">× Fechar</button></div>
+  ${!rec?`<p class="dica">Você não recebe avisos de pedido novo. Quem escolhe é a gestão, em Cadastros › Ajustes.</p>`:av_.length?`<div class="avisos">${av_.map(p=>item(p,true)).join('')}</div><button class="mbtn neutro2" data-a="avVistoPop" style="width:100%;margin-top:10px">${ic('i-check')}Marcar todos como vistos</button>`:`<p class="dica" style="margin:6px 0">Nenhum aviso novo.</p>`}
+  ${vistos.length?`<div class="rotulo">Vistos nos últimos 7 dias</div><div class="avisos">${vistos.map(p=>item(p,false)).join('')}</div>`:''}</div>`}
 function faixasTopo(){let h='';const av_=avisos();
-  if(av_.length)h+=`<button class="faixa novo-f" data-a="tela" data-t="avisos">${ic('i-sino')}<span><b>${av_.length>1?av_.length+' pedidos novos':'Pedido novo'}:</b> ${esc(av_.slice(0,3).map(p=>p.cliente).join(', '))}${av_.length>3?'…':''}. Toque para ver.</span></button>`;
   const g=soAqui();if(g)h+=`<div class="faixa" style="border-color:var(--red)">${ic('i-alerta')}<span><b>${g.pedidos.length} ${g.pedidos.length>1?'pedidos ficaram':'pedido ficou'} só neste aparelho</b> (${esc(g.pedidos.map(p=>p.cliente).slice(0,3).join(', '))}). Envie para a nuvem para todos verem.</span><span class="linha-dep" style="margin:0"><button class="mbtn go" data-a="soAquiEnviar">Enviar</button>${ui.soAquiConf?`<button class="mbtn" style="background:var(--red)" data-a="soAquiDescartar" data-ok="1">Apagar mesmo</button>`:`<button class="mbtn neutro2" data-a="soAquiDescartar">Descartar</button>`}</span></div>`;
   return h}
 function tarRow(t){const lab={insumos:'Conferir',vias:'Separei',artePrep:'Pronta',arte:'Aprovada',arteEnv:'Enviei',comprei:'Comprei',chegou:'Chegou',levei:viaApp(t)?'Enviado':'Levei',buscou:'Chegou',entregar:'Entregue'}[t.a];
@@ -1460,18 +1498,19 @@ function listaPedidos(){const f=ui.pf||{},q=(f.q||'').trim().toLowerCase(),qd=so
       ${falta.length&&!p.concluido?`<div class="falta">${ic('i-cadeado')}Falta: ${falta.join(', ')}</div>`:''}
       ${fora&&!p.concluido?`<div class="falta" style="background:#F3ECFB;color:#6B2F8C">${ic('i-caminhao')}Parte da peça no fornecedor</div>`:''}
     </button>`}).join('')}</div>`}
-function vPedidos(){const f=ui.pf=ui.pf||{st:'todos',ord:'urg',q:'',inv:false};
+function vPedidos(){const f=ui.pf=ui.pf||{st:'todos',ord:'urg',q:'',inv:false};const emp=ui.pv==='emp';
   const cnt=u=>u==='todos'?state.pedidos.length:state.pedidos.filter(p=>info(p).u===u).length;
-  return `<h1>Pedidos</h1>
-
-  <div class="zonas pv"><button class="zona" data-a="pv" data-v="ped" aria-pressed="${(ui.pv||'ped')==='ped'}">${ic('i-lista')}<span>Pedidos</span></button><button class="zona" data-a="pv" data-v="emp" aria-pressed="${ui.pv==='emp'}">${ic('i-predio')}<span>Empresas</span></button></div>
-  ${ui.pv==='emp'?vEmpresas():`<div class="filtros">
-    <input class="campo busca" id="pedBusca" value="${esc(f.q)}" placeholder="Buscar por empresa, cliente ou CNPJ" autocomplete="off" aria-label="Buscar pedido">
-    <div class="linha-dep">${PF_ST.map(([k,n])=>`<button class="depc st-${k}" data-a="pfSt" data-v="${k}" aria-pressed="${f.st===k}">${k!=='todos'?`<span class="dot u-${k}" style="width:12px;height:12px;background:currentColor"></span>`:''}${n} <small style="font-weight:400">${cnt(k)}</small></button>`).join('')}</div>
-    <div class="linha-dep"><span class="rotulo" style="margin:0 4px 0 0;align-self:center">Ordenar por</span>${PF_ORD.map(([k,n])=>`<button class="depc" data-a="pfOrd" data-v="${k}" aria-pressed="${f.ord===k}">${n}${f.ord===k&&k!=='urg'?(k==='entrega'?(f.inv?' ↓ mais longe':' ↑ mais perto'):(f.inv?' ↑ mais antigo':' ↓ mais recente')):''}</button>`).join('')}</div>
-  </div>
+  const stN=(PF_ST.find(x=>x[0]===f.st)||PF_ST[0])[1],ordN=(PF_ORD.find(x=>x[0]===f.ord)||PF_ORD[0])[1];
+  const seta=k=>f.ord===k&&k!=='urg'?(k==='entrega'?(f.inv?' ↓ mais longe':' ↑ mais perto'):(f.inv?' ↑ mais antigo':' ↓ mais recente')):'';
+  const vista=`<div class="vista" role="group" aria-label="Ver"><button class="vista-b" data-a="pv" data-v="ped" aria-pressed="${!emp}" aria-label="Ver pedidos" title="Pedidos">${ic('i-lista')}<span>Pedidos</span></button><button class="vista-b" data-a="pv" data-v="emp" aria-pressed="${emp}" aria-label="Ver empresas" title="Empresas">${ic('i-predio')}<span>Empresas</span></button></div>`;
+  return `<div class="topo"><h1>${emp?'Empresas':'Pedidos'}</h1><span class="so-pc">${vista}</span>${sino()}</div>
+  ${emp?`<div class="so-cel" style="margin-bottom:10px">${vista}</div>`+vEmpresas():`<div class="busca-l"><label class="busca-c">${ic('i-lupa')}<input class="campo busca" id="pedBusca" value="${esc(f.q)}" placeholder="Buscar pedido" autocomplete="off" aria-label="Buscar pedido"></label>
+    <div class="busca-bts"><span class="so-cel">${vista}</span><button class="mbtn neutro2 fo-b${f.st!=='todos'?' ativo':''}" data-a="pfAbre" data-v="f" aria-expanded="${ui.pfAb==='f'}">${ic('i-filtro')}<span>${f.st==='todos'?'Filtrar':esc(stN)}</span></button>
+    <button class="mbtn neutro2 fo-b" data-a="pfAbre" data-v="o" aria-expanded="${ui.pfAb==='o'}">${ic('i-ordenar')}<span class="so-pc">${esc(ordN)}</span><span class="so-cel">Ordenar</span></button></div></div>
+    ${ui.pfAb==='f'?`<div class="fo-p"><div class="rotulo" style="margin-top:0">Mostrar</div><div class="linha-dep">${PF_ST.map(([k,n])=>`<button class="depc st-${k}" data-a="pfSt" data-v="${k}" aria-pressed="${f.st===k}">${k!=='todos'?`<span class="dot u-${k}" style="width:12px;height:12px;background:currentColor"></span>`:''}${n} <small style="font-weight:400">${cnt(k)}</small></button>`).join('')}</div></div>`:''}
+    ${ui.pfAb==='o'?`<div class="fo-p"><div class="rotulo" style="margin-top:0">Ordenar por <span style="font-weight:400">(toque de novo para inverter)</span></div><div class="linha-dep">${PF_ORD.map(([k,n])=>`<button class="depc" data-a="pfOrd" data-v="${k}" aria-pressed="${f.ord===k}">${n}${seta(k)}</button>`).join('')}</div></div>`:''}
   <div id="pedLista">${listaPedidos()}</div>`}`}
-function vEmpresas(){const q=ui.eqc||'';return `<input class="campo busca" id="empBusca" value="${esc(q)}" placeholder="Buscar empresa ou CNPJ" autocomplete="off" aria-label="Buscar empresa" style="margin-bottom:14px"><div id="empLista">${listaEmpresas()}</div>`}
+function vEmpresas(){const q=ui.eqc||'';return `<label class="busca-c" style="margin-bottom:14px">${ic('i-lupa')}<input class="campo busca" id="empBusca" value="${esc(q)}" placeholder="Buscar empresa" autocomplete="off" aria-label="Buscar empresa"></label><div id="empLista">${listaEmpresas()}</div>`}
 function listaEmpresas(){const q=nCli(ui.eqc||''),qd=(ui.eqc||'').replace(/\D/g,'');
   const L=state.clientes.filter(c=>!q||nCli(c.nome).includes(q)||(c.apelidos||[]).some(a=>a.includes(q))||(qd.length>=2&&String(c.cnpj||'').replace(/\D/g,'').includes(qd))).map(c=>{const ps=pedsDoCli(c.id),ab=ps.filter(p=>!p.concluido),inf=ab.map(info);
     return {c,ps,ab,crit:inf.filter(i=>i.u==='crit').length,warn:inf.filter(i=>i.u==='warn').length,pecas:sum(ps.map(p=>sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd||0)))),ult:Math.max(0,...ps.map(p=>p.chegada||0))}}).sort((a,b)=>b.ab.length-a.ab.length||b.ult-a.ult);
@@ -1588,7 +1627,7 @@ function legendaStatus(){return `<div class="legenda"><span><i style="background
 /* ================= CADASTROS ================= */
 function vCadastros(){const tabs=[['maquinas','Máquinas','i-maquina'],['equipe','Equipe','i-pessoas'],['forn','Terceirizados','i-caminhao'],['produtos','Produtos','i-camisa'],['estoque','Estoque','i-rolo'],['ajustes','Ajustes','i-engr']];
   const body=ui.cad==='estoque'?cEstoque():ui.cad==='ajustes'?cAjustes():ui.cad==='equipe'?cEquipe():ui.cad==='forn'?cForn():ui.cad==='produtos'?cProdutos():cMaquinas();
-  return `<h1>Cadastros</h1><div class="subtabs">${tabs.map(([k,n,i])=>`<button class="subtab" data-a="cad" data-k="${k}" aria-current="${ui.cad===k?'page':'false'}">${ic(i)}${n}</button>`).join('')}</div>${body}`}
+  return `<div class="topo"><h1>Cadastros</h1>${sino()}</div><div class="subtabs">${tabs.map(([k,n,i])=>`<button class="subtab" data-a="cad" data-k="${k}" aria-current="${ui.cad===k?'page':'false'}">${ic(i)}${n}</button>`).join('')}</div>${body}`}
 function cMaquinas(){const P=plano();return `<p style="margin:-6px 0 14px;color:var(--ink2)">Cada máquina é um posto de trabalho. Ajuste a quantidade com + e −.</p>
   ${GRUPOS.map(g=>{const ts=state.tipos.filter(t=>t.grupo===g.id&&!t.externo);if(!ts.length)return '';return `<div class="tipo-h">${ic(g.i)}${g.nome}</div>${ts.map(t=>{const ap=aptos(t.id);
     return `<div class="cad-row"><span class="m-ic">${ic(t.i)}</span><div><button class="x azul" data-a="tipoEd" data-t="${t.id}" style="border:0;padding:0;background:none;font-size:20px;color:var(--ink);text-align:left">${esc(t.nome)} <span style="font-size:16px;color:var(--blue)">✎ editar</span></button><span style="display:block">${ap.length?'Sabem usar: '+ap.map(p=>esc(p.nome)+(p.melhor.includes(t.id)?' ★':'')).join(', '):'<b style="color:var(--red);display:inline">Ninguém cadastrado para usar</b>'}</span></div>
@@ -2443,7 +2482,7 @@ function gConsertos(desde){const C=(state.consertos||[]).filter(c=>c.ts>=desde);
   return `<div class="card"><h2>Consertos no período</h2>${L.map(([m,n])=>`<div class="grow"><span>${esc(m)}</span>${barra(n,L[0][1],'var(--red)')}<b>${n}</b></div>`).join('')}<p class="dica" style="margin:8px 0 0">${sum(L.map(x=>x[1]))} peças voltaram. O mesmo motivo repetido indica treino ou ajuste de máquina.</p></div>`}
 function vGestor(){const aba=ui.gt||'agora',desde=gDesde(),per=ui.gp||7;
   const abas=[['agora','Agora','i-alerta'],['equipe','Equipe','i-pessoas'],['atrasos','Atrasos','i-relogio'],['org','Organização','i-engr']];
-  return `<h1>Painel do gestor</h1>
+  return `<div class="topo"><h1>Painel do gestor</h1>${sino()}</div>
   <div class="zonas g-abas">${abas.map(([k,n,i])=>`<button class="zona" data-a="gt" data-v="${k}" aria-pressed="${aba===k}">${ic(i)}<span>${n}</span></button>`).join('')}</div>
   ${aba==='agora'?'':`<div class="linha-dep" style="margin:0 0 14px">${PERIODOS.map(([d,n])=>`<button class="depc" data-a="gp" data-v="${d}" aria-pressed="${per===d}">${n}</button>`).join('')}</div>`}
   ${aba==='agora'?gAgora():aba==='equipe'?gEquipe(desde):aba==='atrasos'?gAtrasos(desde):gOrg(desde)}
@@ -2456,8 +2495,8 @@ function render(){RC={};
   if(!NV.pronto){document.body.classList.add('sem-login');document.getElementById('app').innerHTML=vConectando();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());
   if(!logado){document.getElementById('app').innerHTML=vLogin();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
-  {const n=usuarioAtual()?avisos().length:0,b=document.getElementById('nbAv');if(b){b.hidden=!n;b.textContent=n>9?'9+':n}}
   document.getElementById('app').innerHTML=ui.inicio?vInicio():ui.tela==='avisos'?vAvisos():ui.tela==='gestor'?vGestor():ui.tela==='pedidos'?vPedidos():ui.tela==='cadastros'?vCadastros():vFabrica();
+  {const pp=document.getElementById('pop');if(pp)pp.innerHTML=ui.sheet?'':ui.sino?popAvisos():ui.eu?popEu():''}
   const sh=document.getElementById('sheet');const s=ui.sheet;
   if(!s){sh.innerHTML='';document.body.style.overflow='';return}
   const old=sh.querySelector('.sheet'),keep=old&&old.dataset.id===sheetId(s)?{top:old.scrollTop,x:[...old.querySelectorAll('.fx-wrap')].map(e=>[e.dataset.k,e.scrollLeft])}:null;
@@ -2488,8 +2527,9 @@ const A={
   ajuda:()=>openSheet({t:'ajuda'}),
   maq:d=>openSheet({t:'maq',m:d.m}),
   mP:d=>{ui.sheet.p=d.v;render()},
-  pfSt:d=>{ui.pf.st=d.v;render()},
-  pfOrd:d=>{if(ui.pf.ord===d.v&&d.v!=='urg')ui.pf.inv=!ui.pf.inv;else{ui.pf.ord=d.v;ui.pf.inv=false}render()},
+  pfSt:d=>{ui.pf.st=d.v;ui.pfAb=null;render()},
+  pfAbre:d=>{ui.pfAb=ui.pfAb===d.v?null:d.v;render()},
+  pfOrd:d=>{if(ui.pf.ord===d.v&&d.v!=='urg')ui.pf.inv=!ui.pf.inv;else{ui.pf.ord=d.v;ui.pf.inv=false;ui.pfAb=null}render()},
   gt:d=>{ui.gt=d.v;render();scrollTo(0,0)},
   gp:d=>{ui.gp=+d.v;render()},
   mSel:d=>{ui.sheet.sel=d.v;ui.sheet.p=null;render();document.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'})},
@@ -2523,7 +2563,15 @@ const A={
   impCriar:()=>impCriar(),
   mockAlvo:d=>{ui.sheet.itens[+d.i].alvo=d.v;render()},
   mockOk:()=>{snap();let n=0;ui.sheet.itens.forEach(m=>{const l=m.alvo&&lote(m.alvo);if(l){setMock(l,m.img,m.g);n++}});ui.sheet=null;commit();toast(`${n} ${n===1?'mockup salvo':'mockups salvos'}`)},
-  pv:d=>{ui.pv=d.v;render()},
+  pv:d=>{ui.pv=d.v;ui.pfAb=null;render()},
+  sinoAbre:()=>{ui.sino=!ui.sino;ui.eu=false;render()},
+  euAbre:()=>{ui.eu=!ui.eu;ui.sino=false;render()},
+  euFecha:()=>{ui.eu=false;render()},
+  euAjuda:()=>{ui.eu=false;A.ajuda()},
+  euSair:()=>{ui.eu=false;sair()},
+  sinoFecha:()=>{ui.sino=false;render()},
+  avAbrir:d=>{ui.sino=false;A.pedido({id:d.id})},
+  avVistoPop:()=>{marcaVisto(avisos().map(p=>p.id));render();toast('Tudo visto',false)},
   cli:d=>{openSheet({t:'cli',id:d.id})},
   wCliSel:d=>{const c=cliById(d.v),w=ui.sheet.w;w.cli=c.id;w.cliente=c.nome;if(c.cnpj)w.cnpj=c.cnpj;if(c.contato)w.contato=c.contato;render()},
   cliOk:()=>{const c=cliById(ui.sheet.id);const n=document.getElementById('cNome').value.trim();if(!n)return;snap();const old=nCli(c.nome);c.nome=n;c.cnpj=document.getElementById('cCnpj').value.trim();c.contato=document.getElementById('cCont').value.trim();

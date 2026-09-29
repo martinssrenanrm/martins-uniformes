@@ -62,7 +62,7 @@ const dbop=modo=>async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null}
   await R.evaluate(()=>{A.novo();const w=ui.sheet.w;w.cliente='Cliente Aviso';w.vend=state.pessoas[0].id;w.step=2;render();A.wAdd({p:state.produtos[0].id});const it=ui.sheet.w.itens[0];it.cor='Marinho';it.tecido='Malha PV';it.g={M:10};ui.sheet.w.step=3;ui.sheet.w.entrega=Date.now()+20*864e5;A.wCriar()});await R.waitForTimeout(2000);
   const novo=list('pedidos').find(x=>x.data.cliente==='Cliente Aviso');ok(!!novo&&novo.data.criado&&/Roger/.test(novo.data.criado.por||''),'pedido novo guarda quem cadastrou');
   ok(await C.evaluate(()=>avisos().some(p=>p.cliente==='Cliente Aviso')),'Helena recebe o aviso');
-  ok(await C.evaluate(()=>!document.getElementById('nbAv').hidden),'sino com número no menu');
+  ok(await C.evaluate(()=>{ui.sheet=null;ui.tela='fabrica';render();return document.querySelector('.sino em')?.textContent==='1'}),'sininho com número no alto da tela');
   ok(await R.evaluate(()=>avisos().length===0),'quem não recebe avisos não vê');
   await C.evaluate(id=>A.pedido({id}),novo.id);await C.waitForTimeout(1200);
   ok(!!store.get('pedidos/'+novo.id).vistoPor?.['u-helena'],'abrir o pedido marca como visto na nuvem');

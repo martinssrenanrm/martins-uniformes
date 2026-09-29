@@ -29,7 +29,7 @@ As costureiras vão entrar depois. **Celular primeiro**, sem quebrar o computado
 | Borda de botão e campo | **3:1** contra o fundo | Borda de botão claro mais escura que `--line` |
 | Informação não depende só de cor | cor + texto e/ou ícone | Situação sempre escrita ("Atrasando"). Item escolhido tem ✓ ou texto "Escolhido", não só borda verde |
 | Nada fino ou miúdo | peso 400 ou mais; nada em maiúsculas pequenas | Selos em maiúsculas com no mínimo 16px |
-| Exceção registrada | Barra de baixo com 5 rótulos: **15px só em telas com menos de 360px** de largura (ou letra do sistema muito aumentada), para as palavras não encostarem | — |
+| Exceção registrada | Barra de baixo com 5 rótulos: **15px só em telas com menos de 390px** de largura (ou letra do sistema muito aumentada), para as palavras não encostarem | — |
 | Letra do celular aumentada | a tela funciona com **letra do sistema em 130%** | Nada de altura fixa em caixas com texto; textos longos quebram linha em vez de cortar com "…" |
 
 ## 2. Toque
