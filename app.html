@@ -682,6 +682,45 @@ body.operacao .nb[data-t="cadastros"],body.operacao .nb[data-t="gestor"]{display
   .cad-row{grid-template-columns:44px minmax(0,1fr)!important;row-gap:8px}.cad-row>.m-ic{width:44px;height:44px}.cad-row>:nth-child(3){grid-column:1/-1;justify-self:end}
 }
 .ped-ent>.av,.ped-ent>svg{flex:none}
+
+/* ================= Onda 1 de usabilidade: ler e tocar sem esforço =================
+   Regras em docs/ux/GUIA-USABILIDADE.md. Os documentos A4 (.a4, fichas e pedido para o cliente) ficam como estão: são papel. */
+:root{--muted:#535D69;--line-btn:#7F8A97}
+/* 1. Letra de 16px ou mais em tudo que se lê na tela */
+.p-body .prox,.tp,.tp small,.cor,.exemplo,.pchip small,.menu-u span span,.menu-r span span,.setor-t span,.setor-dono,.resp,.resp small,.disp-l .t,.tar span,.tar-t span,.sk,.dica,.gt th,.aj-in small,.cor-ed,.fila,.ped-l,.sync,.depc.icn small,.kpi span,.rk-t>span,.rk-p small,.imp-ok,.imp-q,.lido,.imp-g label,.obs-f,.emp-al,.zm-dica,.tam-in,.ins span,.aq-t span,.pz-arq,.alrt-go,.filtros .depc,.faixa,.faixa .mbtn,.resumo .rs{font-size:16px}
+.zona em,.nb-i em{font-size:15px;min-width:26px;height:26px;font-weight:700}
+:where(#app,.sheet) small:not(.a4 small){font-size:16px}
+@media (max-width:640px){.nb{font-size:16px}.nb.novo .nb-l::before{font-size:16px}.zona{font-size:16px}.g-abas .zona{font-size:15px}.subtab{font-size:16px}.filtros .depc,.faixa,.faixa .mbtn{font-size:16px}}
+/* 2. Texto de apoio escuro o bastante para vista cansada */
+.dica,.sub-l,.lido,.vazio-s,.paradas .t,.livres .t,.pchip small,.gt th,.rk-p small,.zm-dica{color:var(--ink2)}
+.zm-dica{opacity:1}
+/* 3. Contorno dos botões claros visível */
+.ped:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.prodc:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.depc:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.voltar:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.big.neutro:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.chk:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.campo:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.opc:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.x:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.tam input:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.stp:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.data-op:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.pchip:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.av-item:not(.novo):not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.menu-r:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.setor-dono:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.subtab:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.cor-pick:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.pm:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.eq:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.mbtn.neutro2:not([aria-pressed="true"]):not([aria-current="page"]):not(:focus),.cor:not([aria-pressed="true"]) span{border-color:var(--line-btn)}
+/* 4. Alvo de toque de 48px ou mais */
+.x,.pchip,.depc,.mbtn,.subtab,.zona,.pm,.setor-dono,.resp,.data-op,.stp,.toast button{min-height:48px}
+.x,.pm{display:inline-flex;align-items:center;justify-content:center}
+.depc .x,.sk .x,.pchip .x,.sk button{min-width:48px;min-height:48px;display:inline-grid;place-items:center;margin:-10px -12px -10px 2px;padding:0!important;font-size:22px}
+.resp{padding:4px 14px 4px 4px}
+.faixa .mbtn{padding:10px 16px}
+/* 5. O que está escolhido tem ✓, não só cor */
+button.depc[aria-pressed="true"]:not(.ok):not(.no)::before,button.pchip[aria-pressed="true"]::before{content:"✓";font-weight:700;margin-right:2px}
+.cor{position:relative}.cor[aria-pressed="true"] span::after{content:"✓";position:absolute;top:0;left:50%;transform:translateX(-50%);width:50px;height:50px;display:grid;place-items:center;color:#fff;font-size:26px;font-weight:700;text-shadow:0 0 3px #000,0 0 6px #000}
+/* 4b. Ajustes finos de alvo */
+.x{min-width:48px}
+input[type=color],.cor-pick{min-width:48px;min-height:48px}
+.tam-in{display:grid!important;gap:4px;margin-top:8px}.tam-in .campo{width:100%;min-height:48px;font-size:18px;padding:8px 12px}
+.nd-m,.nd-s{font-size:16px}
+.zona em,.nb-i em{font-size:16px}.med{font-size:16px}
+@media (max-width:640px){.g-abas{grid-template-columns:repeat(2,1fr)!important}.g-abas .zona{font-size:16px;flex-direction:row;gap:8px}}
+@media (max-width:640px){.nav .wrap{padding-inline:2px;gap:0}.nav .nb{padding-inline:0;letter-spacing:-.2px}.nav .nb.novo{flex:0 0 62px}}
+@media (max-width:359px){.nb,.nb.novo .nb-l::before{font-size:15px}}
+/* 6. Nada escondido rolando para o lado */
+.linha-dep{flex-wrap:wrap}
+@media (max-width:640px){
+  .subtabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .setor-h{flex-wrap:wrap}.setor-t{flex:1 1 60%}.setor-dono{max-width:100%;margin-left:52px}
+  .resumo{flex-wrap:wrap;overflow:visible}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1416,7 +1455,7 @@ function listaPedidos(){const f=ui.pf||{},q=(f.q||'').trim().toLowerCase(),qd=so
     const fora=i.ls.some(loteFora);
     return `<button class="ped" data-a="pedido" data-id="${p.id}"><div class="ped-st u-${i.u}"><span class="dot"></span>${ULAB[i.u]}</div>
       <h3>${esc(p.cliente)}</h3>${p.contato||p.cnpj?`<div class="ped-ent" style="font-size:16px;color:var(--muted)">${esc(p.contato)}${p.contato&&p.cnpj?' · ':''}${p.cnpj?`<span style="white-space:nowrap">CNPJ ${esc(p.cnpj)}</span>`:''}</div>`:''}
-      <div class="ped-ent">${ic('i-caminhao')}${entregaTxt(p,i)}</div><div class="ped-ent" style="font-size:15px;color:var(--muted)">Pedido ${esc(p.id)} · feito em ${fD(p.chegada)}</div>
+      <div class="ped-ent">${ic('i-caminhao')}${entregaTxt(p,i)}</div><div class="ped-ent" style="font-size:16px;color:var(--muted)">Pedido ${esc(p.id)} · feito em ${fD(p.chegada)}</div>
       <div class="ped-prods">${i.ls.filter(l=>!l.rework).map(l=>{const[d,t]=minsTot(l);return `<div class="pp">${loteSvg(l)}<b>${l.qtd}</b><div class="barra"><i style="width:${d/t*100}%"></i></div></div>`}).join('')}</div>
       ${falta.length&&!p.concluido?`<div class="falta">${ic('i-cadeado')}Falta: ${falta.join(', ')}</div>`:''}
       ${fora&&!p.concluido?`<div class="falta" style="background:#F3ECFB;color:#6B2F8C">${ic('i-caminhao')}Parte da peça no fornecedor</div>`:''}
@@ -1450,20 +1489,20 @@ function sCli(){const e=ui.sheet,c=cliById(e.id);if(!c)return voltar();const ps=
     <div class="acoes"><button class="big go" data-a="cliOk">${ic('i-check')}Salvar</button></div></div>`}
 function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter(m=>m.st!=='ok'),lib=liberado(ped),v=ped.vendedor;
   const TS=tarefasEsc().filter(t=>t.ped.id===id),resp=(a,x)=>{const t=TS.find(t=>t.a===a&&(!x||(t.l===x.l&&t.s===x.s)));return t&&t.resp?pNome(t.resp):''};
-  const chk=(a,on,icn,t)=>`<button class="chk" data-a="${a}" data-id="${id}" aria-pressed="${!!on}">${ic(icn)}${t}<span class="box">${ic('i-check')}</span>${!on&&resp(a)?`<span style="font-weight:400;font-size:15px;color:var(--muted)">${esc(resp(a))}</span>`:''}</button>`;
+  const chk=(a,on,icn,t)=>`<button class="chk" data-a="${a}" data-id="${id}" aria-pressed="${!!on}">${ic(icn)}${t}<span class="box">${ic('i-check')}</span>${!on&&resp(a)?`<span style="font-weight:400;font-size:16px;color:var(--muted)">${esc(resp(a))}</span>`:''}</button>`;
   const envs=[];i.ls.filter(l=>!l.rework).forEach(l=>rp(l).steps.filter(z=>z.pers).forEach(z=>envs.push({l,z,ok:arteOk(ped,l,z)})));
   const tEnt=TS.find(t=>t.a==='entregar');
   return `${voltar()}<div class="card ped-head">${upill(i.u)}<h1>${ped.cli&&cliById(ped.cli)?`<button class="h1-link" data-a="cli" data-id="${ped.cli}">${esc(ped.cliente)} ${ic('i-seta')}</button>`:esc(ped.cliente)}</h1>${ped.ficha?`<div class="ped-ent">${ic('i-lista')}<span>Ficha de produção nº <b>${esc(ped.ficha)}</b></span></div>`:''}<div class="ped-ent">${ic('i-caminhao')}<span>${entregaTxt(ped,i)}</span></div>
     ${ped.contato||ped.cnpj?`<div class="ped-ent">${ic('i-predio')}<span>${ped.contato?`Cliente: <b>${esc(ped.contato)}</b>`:''}${ped.contato&&ped.cnpj?' · ':''}${ped.cnpj?`<span class="nw">CNPJ ${esc(ped.cnpj)}</span>`:''}</span></div>`:''}
     ${!ped.concluido&&i.ab.length?`<div class="ped-ent">${ic('i-relogio')}<span>Trabalho restante ≈ ${nf(i.need)} dias úteis</span></div>`:''}
     <div class="ped-ent">${v?av(v,'s'):''}<span>Vendedora: <b>${esc(pNome(v)||'—')}</b> · Pedido ${esc(ped.id)} feito em ${fD(ped.chegada)}</span></div>
-    ${(ped.edicoes||[]).length?`<div class="ped-ent" style="font-size:15px">${ic('i-engr')}<span>Corrigido por ${esc(ped.edicoes[ped.edicoes.length-1].por||'?')} ${haQuanto(ped.edicoes[ped.edicoes.length-1].ts)}${ped.edicoes.length>1?` · ${ped.edicoes.length} correções`:''}</span></div>`:''}
+    ${(ped.edicoes||[]).length?`<div class="ped-ent" style="font-size:16px">${ic('i-engr')}<span>Corrigido por ${esc(ped.edicoes[ped.edicoes.length-1].por||'?')} ${haQuanto(ped.edicoes[ped.edicoes.length-1].ts)}${ped.edicoes.length>1?` · ${ped.edicoes.length} correções`:''}</span></div>`:''}
     <div class="doc-bts"><button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button><button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
     ${tEnt?`<div class="acoes"><button class="big go" data-a="entregar" data-id="${id}">${ic('i-caminhao')}${esc(tarTxt(tEnt))}${tEnt.resp?' · '+esc(pNome(tEnt.resp)):''}</button></div>`:''}</div>
   ${ped.concluido?'':`<div class="card"><h2>Antes de cortar</h2><div class="checks">
     ${chk('vias',ped.vias,'i-vias','Vias separadas')}${chk('artePrep',ped.artePrep,'i-arte','Arte preparada')}${chk('arte',ped.arte,'i-arte','Arte aprovada')}
-    <button class="chk" data-a="insumos" data-id="${id}" aria-pressed="${ped.materiais.every(m=>m.conf)}">${ic('i-lupa')}Insumos conferidos<span class="box">${ic('i-check')}</span>${ped.materiais.some(m=>!m.conf)?`<span style="font-weight:400;font-size:15px;color:var(--muted)">${ped.materiais.filter(m=>!m.conf).length} para conferir${resp('insumos')?' · '+esc(resp('insumos')):''}</span>`:''}</button>
-    <div class="chk" aria-pressed="${!mats.some(m=>m.st!=='recebido'&&m.conf)}">${ic('i-rolo')}Material<span class="box">${ic('i-check')}</span>${mats.some(m=>m.st!=='recebido')&&resp('comprei')?`<span style="font-weight:400;font-size:15px;color:var(--muted)">${esc(resp('comprei'))}</span>`:''}</div></div>
+    <button class="chk" data-a="insumos" data-id="${id}" aria-pressed="${ped.materiais.every(m=>m.conf)}">${ic('i-lupa')}Insumos conferidos<span class="box">${ic('i-check')}</span>${ped.materiais.some(m=>!m.conf)?`<span style="font-weight:400;font-size:16px;color:var(--muted)">${ped.materiais.filter(m=>!m.conf).length} para conferir${resp('insumos')?' · '+esc(resp('insumos')):''}</span>`:''}</button>
+    <div class="chk" aria-pressed="${!mats.some(m=>m.st!=='recebido'&&m.conf)}">${ic('i-rolo')}Material<span class="box">${ic('i-check')}</span>${mats.some(m=>m.st!=='recebido')&&resp('comprei')?`<span style="font-weight:400;font-size:16px;color:var(--muted)">${esc(resp('comprei'))}</span>`:''}</div></div>
     ${mats.filter(m=>m.st!=='recebido'&&m.conf).map(m=>{const k=ped.materiais.indexOf(m);return `<div class="mat">${ic(m.st==='pedido'?'i-caminhao':'i-carrinho')}<div><b>${esc(m.item)}</b><span>${m.st==='pedido'?'Comprado, esperando chegar':'Comprar '+qtdTxt(m.nec-m.est,m.un)}</span></div><button class="mbtn" data-a="${m.st==='pedido'?'chegou':'comprei'}" data-id="${id}" data-k="${k}">${m.st==='pedido'?'Chegou':'Comprei'}</button></div>`}).join('')}
     ${mats.some(m=>m.st==='comprar'&&m.conf)?avisoEst():''}
     <div class="lib ${lib?'u-ok':'u-warn'}">${ic(lib?'i-check':'i-cadeado')}${lib?'Pode cortar':'Ainda não pode cortar'}</div></div>
@@ -1477,7 +1516,7 @@ function prodLine(l,ped){const p=rp(l);
     const c=n===ss.length?'ok':fo?'fora':(and||n>0)?'and':'';return `<div class="tp ${c}"><span class="tc">${ic(c==='ok'?'i-check':c==='fora'?'i-caminhao':e.i)}</span>${e.nome}${ss.length>1&&c!=='ok'?`<small>${n} de ${ss.length}</small>`:''}</div>`}).join('');
   const ands=p.steps.filter(s=>stOf(l,s.id).st==='and'),fo=p.steps.filter(s=>stOf(l,s.id).st==='fora');
   const agora=loteDone(l)?'Pronto':fo.length?`No fornecedor: ${fo.map(s=>s.nome).join(', ')}`:ands.length?'Agora: '+ands.map(s=>`${s.nome} (${pNome(stOf(l,s.id).op)})`).join(', '):!liberado(ped)?'Esperando liberar o corte':'Esperando a próxima máquina';
-  return `<div class="prodbloco"><div class="prodline">${loteSvg(l)}<div><h3>${l.rework?`<span class="pill cons">${ic('i-conserto')}Conserto</span> `:''}${esc(p.nome)} · ${esc(modeloTxt(l))} · ${qtdEf(l)} peças</h3><div class="agora">${esc(agora)}</div>${l.obs?`<div class="obs-f">${ic('i-lista')}${esc(l.obs)}</div>`:''}${l.rework?'':`<button class="x azul" data-a="mockUm" data-l="${l.id}" style="margin:4px 0 8px;font-size:15px">${ic('i-camisa')}${l.mock?'Trocar mockup':'Pôr mockup'}</button>${ped.cli&&arqsDoCli(ped.cli,'mockup').filter(a=>a.id!==l.mockArq).length?` <button class="x azul" data-a="mockBib" data-l="${l.id}" style="margin:4px 0 8px;font-size:15px">Usar mockup já guardado</button>`:''}`}<div class="trilha">${et}</div></div></div>${fluxo(rotaV(l,ped),'L'+l.id,l,ped)}</div>`}
+  return `<div class="prodbloco"><div class="prodline">${loteSvg(l)}<div><h3>${l.rework?`<span class="pill cons">${ic('i-conserto')}Conserto</span> `:''}${esc(p.nome)} · ${esc(modeloTxt(l))} · ${qtdEf(l)} peças</h3><div class="agora">${esc(agora)}</div>${l.obs?`<div class="obs-f">${ic('i-lista')}${esc(l.obs)}</div>`:''}${l.rework?'':`<button class="x azul" data-a="mockUm" data-l="${l.id}" style="margin:4px 0 8px;font-size:16px">${ic('i-camisa')}${l.mock?'Trocar mockup':'Pôr mockup'}</button>${ped.cli&&arqsDoCli(ped.cli,'mockup').filter(a=>a.id!==l.mockArq).length?` <button class="x azul" data-a="mockBib" data-l="${l.id}" style="margin:4px 0 8px;font-size:16px">Usar mockup já guardado</button>`:''}`}<div class="trilha">${et}</div></div></div>${fluxo(rotaV(l,ped),'L'+l.id,l,ped)}</div>`}
 
 /* ================= mapa de etapas ================= */
 const NW=200,NH=104,GX=48,GY=14;
@@ -1552,7 +1591,7 @@ function vCadastros(){const tabs=[['maquinas','Máquinas','i-maquina'],['equipe'
   return `<h1>Cadastros</h1><div class="subtabs">${tabs.map(([k,n,i])=>`<button class="subtab" data-a="cad" data-k="${k}" aria-current="${ui.cad===k?'page':'false'}">${ic(i)}${n}</button>`).join('')}</div>${body}`}
 function cMaquinas(){const P=plano();return `<p style="margin:-6px 0 14px;color:var(--ink2)">Cada máquina é um posto de trabalho. Ajuste a quantidade com + e −.</p>
   ${GRUPOS.map(g=>{const ts=state.tipos.filter(t=>t.grupo===g.id&&!t.externo);if(!ts.length)return '';return `<div class="tipo-h">${ic(g.i)}${g.nome}</div>${ts.map(t=>{const ap=aptos(t.id);
-    return `<div class="cad-row"><span class="m-ic">${ic(t.i)}</span><div><button class="x azul" data-a="tipoEd" data-t="${t.id}" style="border:0;padding:0;background:none;font-size:20px;color:var(--ink);text-align:left">${esc(t.nome)} <span style="font-size:15px;color:var(--blue)">✎ editar</span></button><span style="display:block">${ap.length?'Sabem usar: '+ap.map(p=>esc(p.nome)+(p.melhor.includes(t.id)?' ★':'')).join(', '):'<b style="color:var(--red);display:inline">Ninguém cadastrado para usar</b>'}</span></div>
+    return `<div class="cad-row"><span class="m-ic">${ic(t.i)}</span><div><button class="x azul" data-a="tipoEd" data-t="${t.id}" style="border:0;padding:0;background:none;font-size:20px;color:var(--ink);text-align:left">${esc(t.nome)} <span style="font-size:16px;color:var(--blue)">✎ editar</span></button><span style="display:block">${ap.length?'Sabem usar: '+ap.map(p=>esc(p.nome)+(p.melhor.includes(t.id)?' ★':'')).join(', '):'<b style="color:var(--red);display:inline">Ninguém cadastrado para usar</b>'}</span></div>
       <div class="qtdbox"><button class="stp" data-a="tQtd" data-t="${t.id}" data-d="-1" aria-label="Menos uma ${esc(t.nome)}">−</button><output>${t.qtd}</output><button class="stp" data-a="tQtd" data-t="${t.id}" data-d="1" aria-label="Mais uma ${esc(t.nome)}">+</button></div></div>`}).join('')}`}).join('')}
   <button class="prodc add" data-a="tipoEd" data-t="" style="width:100%;margin-top:6px">${ic('i-mais')}<b>Adicionar máquina ou mesa</b></button>`}
 const ICONES=['i-maquina','i-botao','i-corte','i-estampa','i-bordado','i-lupa','i-caixa','i-regua'];
@@ -1582,7 +1621,7 @@ function cForn(){const ext=state.tipos.filter(t=>t.externo);
     ${fs.length?'':`<div class="aviso" style="margin-bottom:10px">${ic('i-alerta')}Ninguém cadastrado para fazer ${esc(t.nome)}.</div>`}
     <div class="eq-l">${fs.map(f=>`<button class="eq" data-a="fornEd" data-id="${f.id}"><span class="m-ic" style="background:#F3ECFB;color:#6B2F8C">${ic('i-predio')}</span><span class="eq-t"><b>${esc(f.nome)}</b><span>Prazo ${f.prazo} ${f.prazo>1?'dias':'dia'} · leva: ${esc(pNome(f.leva)||'ninguém')}</span></span><span class="eq-go">›</span></button>`).join('')}
       <button class="eq add-f" data-a="fornEd" data-id="" data-serv="${t.id}">${ic('i-mais')}<span class="eq-t"><b>Adicionar fornecedor de ${esc(t.nome)}</b></span></button></div></section>`}).join('')}
-  <button class="prodc add" data-a="tipoEd" data-t="" data-ext="1" style="width:100%">${ic('i-mais')}<b>Novo tipo de serviço feito fora</b><span style="font-size:15px;color:var(--muted)">Ex.: silk, sublimação terceirizada</span></button>`}
+  <button class="prodc add" data-a="tipoEd" data-t="" data-ext="1" style="width:100%">${ic('i-mais')}<b>Novo tipo de serviço feito fora</b><span style="font-size:16px;color:var(--muted)">Ex.: silk, sublimação terceirizada</span></button>`}
 function listaEst(){const q=(ui.eq||'').toLowerCase();const it=Object.entries(state.estoque).filter(([k])=>k.toLowerCase().includes(q)).sort((a,b)=>a[0].localeCompare(b[0]));
   return it.map(([k,v])=>`<div class="est-row"><span>${esc(k)}</span><input class="campo" type="number" min="0" step="1" data-est="${esc(k)}" value="${v}" aria-label="Quantidade de ${esc(k)}"><button class="x" data-a="rmEst" data-v="${esc(k)}" aria-label="Tirar ${esc(k)}">×</button></div>`).join('')||'<p class="dica">Nada encontrado.</p>'}
 function cEstoque(){return `<div class="nota">O sistema usa estes números para sugerir compras. São o registro do app: confira sempre o estoque real antes de comprar.</div>
@@ -1708,7 +1747,7 @@ function eRead(){const e=ui.sheet;[['xForn','forn'],['eNome','nome'],['eObs','ob
 function sEtapa(){const e=ui.sheet,p=prod(e.p),proib=e.sid?desc(p,e.sid):new Set();
   return `${voltar('Cancelar')}<h1>${e.sid?'Editar etapa':'Nova etapa em '+esc(p.nome)}</h1>
   <div class="rotulo">Nome da etapa</div><input class="campo" id="eNome" value="${esc(e.nome)}" placeholder="Ex.: Pregar vivo na gola" autocomplete="off">
-  <div class="rotulo">Onde é feita?</div><div class="escolhe">${state.tipos.map(t=>`<button class="opc" data-a="eP" data-v="${t.id}" aria-pressed="${e.posto===t.id}">${ic(t.i)}${esc(t.nome)}${t.externo?'<span style="font-weight:400;font-size:15px;color:#6B2F8C">terceirizado</span>':''}</button>`).join('')}</div>
+  <div class="rotulo">Onde é feita?</div><div class="escolhe">${state.tipos.map(t=>`<button class="opc" data-a="eP" data-v="${t.id}" aria-pressed="${e.posto===t.id}">${ic(t.i)}${esc(t.nome)}${t.externo?'<span style="font-weight:400;font-size:16px;color:#6B2F8C">terceirizado</span>':''}</button>`).join('')}</div>
   <div class="rotulo">O que precisa estar pronto antes?</div><div class="linha-dep">${topo(p).filter(s=>!proib.has(s.id)).map(s=>`<button class="depc" data-a="eD" data-v="${s.id}" aria-pressed="${e.deps.includes(s.id)}">${ic(PICON[s.posto])}${esc(s.nome)}</button>`).join('')}</div>
   <div class="rotulo">Quais partes da peça ela usa?</div><div class="linha-dep">${(p.partes||[]).map(x=>`<button class="depc" data-a="ePt" data-v="${esc(x)}" aria-pressed="${e.partes.includes(x)}">${esc(x)}</button>`).join('')}</div>
   <div class="rotulo">Tempo por peça (minutos)</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="eM" data-d="-0.1" aria-label="Menos tempo">−</button><output>${nf(e.min)}</output><button class="stp" data-a="eM" data-d="0.1" aria-label="Mais tempo">+</button></div>
@@ -1792,7 +1831,7 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
     <div class="rotulo">Quem vendeu?</div><div class="linha-dep">${state.pessoas.filter(p=>temPapel(p,'vendas')).map(p=>`<button class="pchip" data-a="wVend" data-v="${p.id}" aria-pressed="${w.vend===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div>${nav()}`;
   if(w.step===2){const catalogo=`<div class="escolhe">${state.produtos.map(p=>`<button class="opc" data-a="wAdd" data-p="${p.id}">${prodSvg(p.id,'')}${esc(p.nome)}</button>`).join('')}</div>`;
     return `${head}<h1>${w.edit?'Peças do pedido':'Quais peças?'}</h1>${w.edit?'':`<p style="color:var(--ink2);margin-top:-6px">Toque na peça para adicionar.</p>${catalogo}`}
-    ${w.itens.map((it,k)=>`<div class="item"><div class="item-h">${it.mock?mockSvg(it.mock,'W:'+k):prodSvg(it.prod,it.cor,it.cores2)}<b>${esc(prod(it.prod).nome)}</b><button class="x azul" data-a="wMock" data-k="${k}" style="font-size:15px">${ic('i-camisa')}${it.mock?'Trocar mockup':'Pôr mockup'}</button>${it.travado?'':`<button class="x" data-a="wRm" data-k="${k}">Tirar</button>`}</div>
+    ${w.itens.map((it,k)=>`<div class="item"><div class="item-h">${it.mock?mockSvg(it.mock,'W:'+k):prodSvg(it.prod,it.cor,it.cores2)}<b>${esc(prod(it.prod).nome)}</b><button class="x azul" data-a="wMock" data-k="${k}" style="font-size:16px">${ic('i-camisa')}${it.mock?'Trocar mockup':'Pôr mockup'}</button>${it.travado?'':`<button class="x" data-a="wRm" data-k="${k}">Tirar</button>`}</div>
       ${it.travado?`<div class="instr" style="margin:0">${ic('i-cadeado')}<span><b>A produção desta peça já começou.</b> Dá para corrigir quantidades e personalização. Peça, tecido e cor ficam como estão: <b>${esc(modeloTxt(it))}</b>.</span></div>`:`
       <div><div class="passo-n">Tecido</div><div class="linha-dep">${prod(it.prod).tecidos.map(t=>`<button class="depc" data-a="wTec" data-k="${k}" data-v="${esc(t)}" aria-pressed="${it.tecido===t}">${ic('i-rolo')}${esc(t)}</button>`).join('')}<button class="depc" data-a="wNovoTec" data-k="${k}">${ic('i-mais')}Novo tecido</button></div>
         ${it.novoTec?`<div class="novo-in"><input class="campo" id="nt${k}" placeholder="Nome do tecido (ex.: Malha PV)" autocomplete="off"><button class="mbtn go" data-a="wSalvaTec" data-k="${k}">Salvar</button></div><p class="dica">Fica cadastrado no ${esc(prod(it.prod).nome)} para os próximos pedidos.</p>`:''}</div>
