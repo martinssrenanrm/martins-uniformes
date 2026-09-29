@@ -71,3 +71,9 @@ Cada bloco é uma mudança pequena. A Helena pode ler em voz alta ou mandar no g
 
 - Nada de "0,4 min": agora aparece **24 s**, **1 min 30 s**, **12 min** ou **1h27**.
 - No cadastro de processos, o tempo por peça sobe e desce de **5 em 5 segundos**.
+
+## Hora extra direto no cartão da máquina
+
+- A faixa **"Expediente encerrado"** saiu do alto da Fábrica.
+- Depois do horário, no cartão de cada máquina que está com trabalho aberto, aparece o botão **Continuar em hora extra**.
+- Toque nele. A pessoa daquela máquina já vem marcada. Escolha até que horas e toque em **Confirmar hora extra**.

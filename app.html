@@ -773,6 +773,8 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 .resp2{flex:none;width:48px;height:48px;border-radius:50%;border:2px solid var(--line-btn);background:var(--card);padding:0;display:grid;place-items:center;overflow:hidden;cursor:pointer;color:var(--ink2)}.resp2 .av{width:42px;height:42px}.resp2 svg.ic{width:24px;height:24px}.resp2.reserva{border-color:var(--red)}
 .tar-res{color:var(--red);font-weight:700;font-size:16px;line-height:1.2}
 .ins-fbox{grid-column:1/-1;background:var(--red-soft);border:2px solid var(--red);border-radius:14px;padding:12px 14px;margin-top:4px}.ins-fbox .campo{max-width:220px;font-size:22px}
+.he-mini{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 20px);margin:6px 10px 0;min-height:48px;border:2px dashed var(--line-btn);border-radius:12px;background:none;font:inherit;font-size:16px;font-weight:700;color:var(--blue);cursor:pointer}.he-mini svg.ic{width:22px;height:22px}
+[data-tl]{white-space:nowrap}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1487,8 +1489,8 @@ function tileTempo(t,u){const x=t.x,sit=situacao(),a=heAtiva(x),tm=`<span data-t
   if(a)return `<div class="p-st st-he"><span class="dot"></span>Hora extra até ${tsHm(a.f)} · ${tm}</div>`;
   if(sit.k==='trab')return `<div class="p-st"><span class="dot"></span>Trabalhando · ${tm}</div>`;
   if(sit.k==='pausa')return `<div class="p-st st-pausa">${ic('i-relogio')}${esc(sit.nome)} até ${tsHm(sit.ate)} · ${tm}</div>`;
-  return `<div class="p-st st-pausa">${ic('i-dormir')}Parado, fora do horário · ${tm}</div>`}
-function faixaHora(P){const sit=situacao();if(sit.k==='trab')return '';const tr=Object.values(P.uso),sem=tr.filter(t=>!heAtiva(t.x)),com=tr.length-sem.length;
+  return `<div class="p-st st-pausa">${ic('i-dormir')}Parado, fora do horário · ${tm}</div><button class="he-mini" data-a="heAbrir" data-m="${u.id}">${ic('i-relogio')}Continuar em hora extra</button>`}
+function faixaHora(P){const sit=situacao();if(sit.k!=='pausa')return '';const tr=Object.values(P.uso),sem=tr.filter(t=>!heAtiva(t.x)),com=tr.length-sem.length;
   if(sit.k==='pausa')return `<div class="faixa">${ic('i-relogio')}<span><b>${esc(sit.nome)} até ${tsHm(sit.ate)}.</b> Os contadores param e voltam sozinhos.</span></div>`;
   const qd=sod(sit.prox).getTime()===sod(now()).getTime()?'hoje':sod(sit.prox).getTime()===sod(now()+DIA).getTime()?'amanhã':fD(sit.prox);
   return `<div class="faixa">${ic('i-dormir')}<span><b>${!isWD(sod(now()))?'Hoje não é dia de trabalho: tudo conta como hora extra.':sit.depois?'Expediente encerrado.':'Fora do horário.'}</b> Volta ${qd} às ${tsHm(sit.prox)}.${com?` ${com} em hora extra.`:''}</span>${tr.length?`<button class="mbtn" data-a="heAbrir">Hora extra</button>`:''}</div>`}
@@ -2013,7 +2015,7 @@ const FAQ=[
 {c:'maq',q:'Uma máquina está parada sem trabalho. Por quê?',k:'máquina parada sem trabalho vazia',r:['Não tem peça pronta para esse tipo de máquina agora, ou ninguém livre sabe usar.','Na Fábrica elas aparecem em "Paradas, sem trabalho". Toque para ver o que está chegando.'],ir:'fab:maq'},
 /* conserto e hora extra */
 {c:'conserto',q:'Deu defeito na peça. Como mando para conserto?',k:'conserto defeito problema refazer retrabalho estragou torta',r:['Toque no cartão da máquina onde a peça está.','Toque em Deu problema.','Escolha o motivo, quantas peças e para qual processo elas voltam.','Toque em Mandar para conserto. As peças voltam para a fila com a marca Conserto.'],ir:'fab:maq'},
-{c:'conserto',q:'Como marco hora extra?',k:'hora extra horas extras depois do horário sábado',r:['Depois do horário aparece a faixa "Expediente encerrado" na Fábrica, com o botão Hora extra.','Toque, marque quem vai continuar e até que horas.','Toque em Confirmar hora extra.','Quem começa algo fora do horário (ou no sábado) já entra em hora extra sozinho.'],ir:'fab:maq'},
+{c:'conserto',q:'Como marco hora extra?',k:'hora extra horas extras depois do horário sábado',r:['Depois do horário, no cartão da máquina aparece "Parado, fora do horário" e, embaixo, Continuar em hora extra.','Toque, confira quem vai continuar e escolha até que horas.','Toque em Confirmar hora extra.','Quem começa algo fora do horário (ou no sábado) já entra em hora extra sozinho.'],ir:'fab:maq'},
 {c:'conserto',q:'Como paro a hora extra antes?',k:'parar hora extra encerrar acabar hora extra',r:['No cartão da máquina, toque em Parar a hora extra agora.'],ir:'fab:maq'},
 {c:'conserto',q:'Como adiciono um motivo de conserto novo?',k:'motivo conserto novo defeito lista',r:['Cadastros › Ajustes › Motivos de conserto.','Escreva em Novo motivo e toque em Adicionar.'],ir:'cad:ajustes#Motivos de conserto',g:1},
 /* rua */
