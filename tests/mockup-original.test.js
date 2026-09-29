@@ -1,5 +1,5 @@
 // Teste de regressão: o mockup original NUNCA pode se perder nem perder definição.
-// Rodar: NODE_PATH=$(npm root -g) node martins-uniformes/tests/mockup-original.test.js
+// Rodar: NODE_PATH=$(npm root -g) node tests/mockup-original.test.js
 const { chromium } = require('playwright');const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const APP='file://'+path.resolve(__dirname,'../app.html');
 const FX={marinho:path.join(__dirname,'fixtures/mockup-marinho.png'),royal:path.join(__dirname,'fixtures/mockup-royal.png')};

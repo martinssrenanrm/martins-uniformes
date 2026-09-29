@@ -1,5 +1,5 @@
 // Teste de regressão: dados reais nunca se perdem em atualizações.
-// Rodar: NODE_PATH=$(npm root -g) node martins-uniformes/tests/dados-persistem.test.js
+// Rodar: NODE_PATH=$(npm root -g) node tests/dados-persistem.test.js
 const { chromium } = require('playwright');const fs=require('fs'),path=require('path');
 const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=(c,m)=>{console.log((c?'  ✔ ':'  ✘ ')+m);if(!c)falhas++};
 const store=new Map(),pages=[];

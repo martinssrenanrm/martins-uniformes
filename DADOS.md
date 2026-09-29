@@ -19,6 +19,6 @@
 - Migração de formato: **copiar primeiro, conferir, só depois deixar de usar o antigo**. Nunca apagar dado antigo na mesma versão.
 - Novos campos entram com valor padrão em `normalizar()` e `cfgDefaults()`, sem remover campos existentes.
 - Antes de publicar, rodar:
-  - `NODE_PATH=$(npm root -g) node martins-uniformes/tests/dados-persistem.test.js`
-  - `NODE_PATH=$(npm root -g) node martins-uniformes/tests/mockup-original.test.js`
+  - `NODE_PATH=$(npm root -g) node tests/dados-persistem.test.js`
+  - `NODE_PATH=$(npm root -g) node tests/mockup-original.test.js`
 - Para mudanças grandes, fazer um ensaio com uma cópia dos dados reais: baixar as coleções com o ArtifactData, carregar num banco falso e conferir que nada sumiu.
