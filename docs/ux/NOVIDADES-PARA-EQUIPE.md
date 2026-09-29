@@ -58,3 +58,16 @@ Cada bloco é uma mudança pequena. A Helena pode ler em voz alta ou mandar no g
 - Em cada tarefa, a **foto** mostra quem faz. Para trocar a pessoa, **toque na foto**.
 - O botão de ação fica sempre **à direita**, alinhado.
 - O **botão redondo no canto de cada setor** mostra quem cuida dele (foto ou bonequinhos). Toque nele para mudar.
+
+---
+
+## Conferência: dizer quanto falta
+
+- Na conferência de tecidos e aviamentos, ao tocar em **Falta** abre uma caixinha: **"Quanto falta?"** e **"Em quê?"** (unidade, metro ou Kg).
+- Toque em **Pôr na lista de compras**. A lista de compras mostra exatamente o que falta ("Faltam 20 metros").
+- As unidades agora são só **unidade, metro e Kg**. A linha de costura aparece em unidades (1 cone = 1 unidade).
+
+## Tempo sempre em segundos ou minutos
+
+- Nada de "0,4 min": agora aparece **24 s**, **1 min 30 s**, **12 min** ou **1h27**.
+- No cadastro de processos, o tempo por peça sobe e desce de **5 em 5 segundos**.
