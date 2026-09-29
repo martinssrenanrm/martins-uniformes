@@ -757,6 +757,12 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 .aj-ab{width:100%;display:grid;grid-template-columns:34px minmax(0,1fr) 28px;gap:12px;align-items:center;padding:14px 16px;border:0;background:none;font:inherit;text-align:left;color:var(--ink);cursor:pointer;min-height:64px}.aj-ab svg.ic{width:30px;height:30px}.aj-ab b{display:block;font-size:20px}.aj-ab span span{font-size:16px;color:var(--ink2)}.aj-seta{font-size:28px;color:var(--blue);text-align:center}
 .aj-l{padding:0 10px 4px}.aj-l .faq{border-width:1.5px}
 .aj-luz{box-shadow:0 0 0 4px var(--blue)!important;transition:box-shadow .3s}
+/* Escritório: quadros em colunas que se encaixam, sem buracos */
+.setores{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start}
+.setores .setor{margin:0}
+@media (min-width:1100px){.setores .tar{grid-template-columns:minmax(0,1fr) auto}.setores .tar>svg.ic{display:none}.setores .setor{padding:12px}.setores .setor-h{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center}.setores .setor-t{margin:0;min-width:0}.setores .setor-dono{grid-column:1/-1;justify-self:start;max-width:100%;margin:0}}
+@media (max-width:1099px){.setores{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.setores{grid-template-columns:minmax(0,1fr)}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
