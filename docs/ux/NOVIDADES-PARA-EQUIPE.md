@@ -49,3 +49,12 @@ Cada bloco é uma mudança pequena. A Helena pode ler em voz alta ou mandar no g
 - Aparecem as respostas com o **passo a passo**. Muitas têm o botão **Me leve até lá**, que abre a tela certa.
 - Também dá para escolher um **assunto**, por exemplo Máquinas, Pedidos ou Na rua, e ver todas as perguntas dele.
 - Não achou? Pergunte para a Helena, e a resposta entra na central.
+
+---
+
+## Escritório mais arrumado
+
+- Os 4 setores ficam **lado a lado** no computador.
+- Em cada tarefa, a **foto** mostra quem faz. Para trocar a pessoa, **toque na foto**.
+- O botão de ação fica sempre **à direita**, alinhado.
+- O **botão redondo no canto de cada setor** mostra quem cuida dele (foto ou bonequinhos). Toque nele para mudar.

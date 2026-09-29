@@ -763,6 +763,15 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 @media (min-width:1100px){.setores .tar{grid-template-columns:minmax(0,1fr) auto}.setores .tar>svg.ic{display:none}.setores .setor{padding:12px}.setores .setor-h{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center}.setores .setor-t{margin:0;min-width:0}.setores .setor-dono{grid-column:1/-1;justify-self:start;max-width:100%;margin:0}}
 @media (max-width:1099px){.setores{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){.setores{grid-template-columns:minmax(0,1fr)}}
+/* Escritório: tarefas alinhadas, só a foto de quem faz */
+.setor-h{display:flex!important;align-items:center;gap:10px}.setor-h .setor-t{flex:1 1 auto;min-width:0;margin:0}
+.setor-dono2{position:relative;flex:none;width:48px;height:48px;border-radius:50%;border:2px solid var(--line-btn);background:var(--card);padding:0;display:grid;place-items:center;cursor:pointer;color:var(--ink2)}.setor-dono2 .av{width:40px;height:40px}.setor-dono2 svg.ic{width:24px;height:24px}
+.setor-dono2 em{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:14px;font-weight:700;background:var(--ink);color:#fff;border-radius:10px;padding:0 5px}
+.tar2{display:grid;gap:8px;padding:12px 0;border-top:2px solid var(--grey-soft)}
+.tar2 .tar-t b{font-size:18px}.tar2 .tar-t span{display:block;line-height:1.35}
+.tar-pe{display:flex;align-items:center;gap:10px}.tar-pe .mbtn{margin-left:auto;min-width:112px;justify-content:center}
+.resp2{flex:none;width:48px;height:48px;border-radius:50%;border:2px solid var(--line-btn);background:var(--card);padding:0;display:grid;place-items:center;overflow:hidden;cursor:pointer;color:var(--ink2)}.resp2 .av{width:42px;height:42px}.resp2 svg.ic{width:24px;height:24px}.resp2.reserva{border-color:var(--red)}
+.tar-res{color:var(--red);font-weight:700;font-size:16px;line-height:1.2}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1435,9 +1444,9 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
   ${z==='esc'?vEscritorio(esc_):''}<div class="fim-ajuda"><button class="x azul" data-a="ajuda" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px">${ic('i-duvida')}Como usar o app</button></div>`}
 function vEscritorio(esc_){const D=state.donos||{};
   const setores=SETORES_ESC.map(z=>{const ts=esc_.filter(t=>z.fs.includes(t.f)),ds=[...new Set(z.fs.map(f=>D[f]).filter(id=>id&&pessoa(id)))];
-    const dn=!ds.length?'Automático':ds.map(pNome).join(', ')+(z.fs.every(f=>D[f])?'':' + automático');
+    const dn='Quem cuida deste setor: '+(!ds.length?'o sistema divide':ds.map(pNome).join(', ')+(z.fs.every(f=>D[f])?'':' e o sistema'));
     return `<section class="setor${ts.length?'':' vazio-set'}" id="set-${z.id}"><header class="setor-h"><span class="m-ic">${ic(z.i)}</span><div class="setor-t"><b>${z.nome}</b><span>${ts.length?`${ts.length} ${ts.length>1?'pendentes':'pendente'}`:'Nada pendente'}</span></div>
-      <button class="setor-dono" data-a="setor" data-v="${z.id}" title="Quem cuida deste setor">${ds.length===1?av(ds[0],'s'):ic('i-pessoas')}<span>${esc(dn)}</span></button></header>${ts.map(tarRow).join('')}</section>`}).join('');
+      <button class="setor-dono2" data-a="setor" data-v="${z.id}" title="${esc(dn)}" aria-label="${esc(dn)}. Toque para mudar">${ds.length?av(ds[0],'s'):ic('i-pessoas')}${ds.length>1?`<em>+${ds.length-1}</em>`:''}</button></header>${ts.map(tarRow).join('')}</section>`}).join('');
   const gente=state.pessoas.filter(p=>(p.funcoes||[]).length);
   return `<div class="setores">${setores}</div>${gente.length?`<div class="disp-l"><span class="t">No escritório agora (toque para marcar quem saiu):</span><div class="linha-dep">${gente.map(p=>`<button class="pchip" data-a="disp" data-id="${p.id}" aria-pressed="${p.disp!==false}">${av(p.id,'s')}${esc(p.nome)}${p.disp===false?' <small>· fora</small>':''}</button>`).join('')}</div></div>`:''}`}
 function sSetor(){const z=SETORES_ESC.find(x=>x.id===ui.sheet.v);if(!z)return voltar();const D=state.donos||{};
@@ -1460,9 +1469,10 @@ function faixasTopo(){let h='';const av_=avisos();
   const g=soAqui();if(g)h+=`<div class="faixa" style="border-color:var(--red)">${ic('i-alerta')}<span><b>${g.pedidos.length} ${g.pedidos.length>1?'pedidos ficaram':'pedido ficou'} só neste aparelho</b> (${esc(g.pedidos.map(p=>p.cliente).slice(0,3).join(', '))}). Envie para a nuvem para todos verem.</span><span class="linha-dep" style="margin:0"><button class="mbtn go" data-a="soAquiEnviar">Enviar</button>${ui.soAquiConf?`<button class="mbtn" style="background:var(--red)" data-a="soAquiDescartar" data-ok="1">Apagar mesmo</button>`:`<button class="mbtn neutro2" data-a="soAquiDescartar">Descartar</button>`}</span></div>`;
   return h}
 function tarRow(t){const lab={insumos:'Conferir',vias:'Separei',artePrep:'Pronta',arte:'Aprovada',arteEnv:'Enviei',comprei:'Comprei',chegou:'Chegou',levei:viaApp(t)?'Enviado':'Levei',buscou:'Chegou',entregar:'Entregue'}[t.a];
-  return `<div class="tar">${ic(t.i)}<div class="tar-c"><button class="tar-t" data-a="pedido" data-id="${t.ped.id}" title="Abrir o pedido"><b>${esc(tarTxt(t))}</b><span>${esc(t.ped.cliente)}${t.sub?' · '+esc(t.sub):''}</span>${t.late?'<span style="display:block;color:var(--red);font-weight:700">Passou do prazo do fornecedor</span>':''}</button>
-    <button class="resp" data-a="troca" data-key="${esc(t.key)}" data-f="${t.f}" title="Trocar quem faz">${t.resp?av(t.resp,'s'):ic('i-pessoas')}<span>${t.resp?esc(pNome(t.resp)):'Escolher quem faz'}</span>${t.como==='reserva'?'<small>ninguém tem esta função</small>':''}</button></div>
-  <button class="mbtn ${['buscou','chegou','entregar'].includes(t.a)?'go':''}" data-a="${t.a}" data-id="${t.ped.id}" data-k="${t.k??''}" data-l="${t.l||''}" data-s="${t.s||''}">${lab}</button></div>`}
+  const quem=t.resp?pNome(t.resp):'';
+  return `<div class="tar2"><button class="tar-t" data-a="pedido" data-id="${t.ped.id}" title="Abrir o pedido"><b>${esc(tarTxt(t))}</b><span>${esc(t.ped.cliente)}${t.sub?' · '+esc(t.sub):''}</span>${t.late?'<span style="display:block;color:var(--red);font-weight:700">Passou do prazo do fornecedor</span>':''}</button>
+  <div class="tar-pe"><button class="resp2${t.como==='reserva'?' reserva':''}" data-a="troca" data-key="${esc(t.key)}" data-f="${t.f}" title="${quem?'Quem faz: '+esc(quem):'Escolher quem faz'}" aria-label="${quem?'Quem faz: '+esc(quem)+'. Toque para trocar':'Escolher quem faz'}">${t.resp?av(t.resp,'s'):ic('i-pessoas')}</button>${t.como==='reserva'?'<small class="tar-res">ninguém tem esta função</small>':''}
+  <button class="mbtn ${['buscou','chegou','entregar'].includes(t.a)?'go':''}" data-a="${t.a}" data-id="${t.ped.id}" data-k="${t.k??''}" data-l="${t.l||''}" data-s="${t.s||''}">${lab}</button></div></div>`}
 function fornCard(f,esc_){const fora=[];state.lotes.forEach(l=>{const ped=pedById(l.ped);if(ped.concluido)return;const p=rp(l);Object.entries(l.steps).forEach(([sid,x])=>{if(x.st==='fora'&&x.forn===f.id)fora.push({l,p,s:sMap(p)[sid],x,ped})})});
   const lev=esc_.filter(t=>t.a==='levei'&&(fornById(stOf(lote(t.l),t.s).forn)||fornDe(sMap(rp(lote(t.l)))[t.s].posto)[0])?.id===f.id);
   return `<div class="forn"><div class="forn-h"><span class="m-ic">${ic(tipo(f.servico).i)}</span><div><b>${esc(f.nome)}</b><span>${esc(tNome(f.servico))} · prazo ${f.prazo} ${f.prazo>1?'dias':'dia'}</span></div></div>
@@ -2010,8 +2020,8 @@ const FAQ=[
 {c:'rua',q:'Como mudo o prazo de um prestador?',k:'prazo fornecedor dias atraso',r:['Cadastros › Terceirizados.','Toque no fornecedor, ajuste o Prazo (dias) e toque em Salvar.'],ir:'cad:forn',g:1},
 /* escritório */
 {c:'esc',q:'Onde vejo as tarefas do escritório?',k:'tarefas escritório pendências fazer lista afazeres',r:['Na Fábrica, toque na aba Escritório.','As tarefas ficam por setor: Pedidos, Artes, Lista de compras e Logística.','Cada tarefa mostra o pedido, quem faz e o botão para marcar.'],ir:'fab:esc'},
-{c:'esc',q:'Como passo uma tarefa para outra pessoa?',k:'trocar pessoa responsável atribuir passar tarefa quem faz',r:['Na aba Escritório, toque no nome da pessoa embaixo da tarefa.','Toque em quem vai fazer.','Para voltar ao automático: Deixar o sistema escolher.'],ir:'fab:esc'},
-{c:'esc',q:'Como deixo um setor sempre com a mesma pessoa?',k:'responsável fixo setor sempre dono automático roger compras',r:['Na aba Escritório, toque no botão de pessoa ao lado do nome do setor.','Para cada tipo de tarefa, toque na pessoa (ou Automático).'],ir:'fab:esc'},
+{c:'esc',q:'Como passo uma tarefa para outra pessoa?',k:'trocar pessoa responsável atribuir passar tarefa quem faz',r:['Na aba Escritório, toque na foto de quem faz, embaixo da tarefa.','Toque em quem vai fazer.','Para voltar ao automático: Deixar o sistema escolher.'],ir:'fab:esc'},
+{c:'esc',q:'Como deixo um setor sempre com a mesma pessoa?',k:'responsável fixo setor sempre dono automático roger compras',r:['Na aba Escritório, toque no botão redondo no canto do setor (foto ou bonequinhos).','Para cada tipo de tarefa, toque na pessoa (ou Automático, para o sistema dividir).'],ir:'fab:esc'},
 {c:'esc',q:'Alguém saiu (médico, rua). Como tiro as tarefas dela?',k:'pessoa saiu fora ausente faltou redistribuir',r:['No fim da aba Escritório, em "No escritório agora", toque no nome da pessoa.','Ela fica "fora" e as tarefas vão para outras pessoas. Toque de novo quando voltar.'],ir:'fab:esc'},
 {c:'esc',q:'Como marco que as fichas e os mockups (vias) foram separados?',k:'vias separar fichas mockups separei',r:['Escritório › Pedidos: tarefa "Separar as vias" → toque em Separei.','Ou abra o pedido e toque em Vias separadas, em "Antes de cortar".'],ir:'fab:esc'},
 {c:'esc',q:'Como confiro os tecidos e aviamentos (insumos) de um pedido?',k:'conferir insumos tecidos aviamentos estoque material conferência',r:['Escritório › Lista de compras: "Conferir insumos" → toque em Conferir (ou abra o pedido e toque em Insumos conferidos).','Vá até o estoque e, em cada item, toque em Tem ou Falta.','O que falta vai sozinho para a lista de compras.']},
