@@ -32,4 +32,10 @@ NODE_PATH=$(npm root -g) node tests/corrigir-pedido.test.js
 NODE_PATH=$(npm root -g) node tests/dados-persistem.test.js
 NODE_PATH=$(npm root -g) node tests/mockup-original.test.js
 NODE_PATH=$(npm root -g) node tests/ajuda.test.js
+NODE_PATH=$(npm root -g) node tests/pausar-dividir.test.js
+NODE_PATH=$(npm root -g) node tests/supabase.test.js
 ```
+
+## Supabase (endereço próprio)
+
+O mesmo `app.html` roda no Claude (sem `window.MARTINS_SB`) e no Supabase (com `window.MARTINS_SB`, gerado por `tools/build.js`). Toda mudança no banco ou no login precisa passar nos dois modos. Roteiro completo em `docs/SUPABASE.md`.

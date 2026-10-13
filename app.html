@@ -2592,7 +2592,7 @@ async function hashSenha(senha,salt){const enc=new TextEncoder();const k=await c
   const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:150000,hash:'SHA-256'},k,256);return [...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 const novoSalt=()=>[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');
 function entrar(u){SESSAO={id:u.id,email:u.email,ts:now()};try{localStorage.setItem('martins-sessao',JSON.stringify(SESSAO))}catch(e){}ui.login=null;if(u.perfil!=='gestao'&&['cadastros','gestor'].includes(ui.tela))ui.tela='fabrica';render();tick();toast(`Olá, ${quemNome()||u.nome}!`,false)}
-function sair(){SESSAO=null;try{localStorage.removeItem('martins-sessao')}catch(e){}ui.sheet=null;ui.login={};render()}
+function sair(){if(SB_CFG&&SB.c){try{localStorage.removeItem('martins-sessao')}catch(e){}SB.c.auth.signOut().finally(()=>location.reload());return}SESSAO=null;try{localStorage.removeItem('martins-sessao')}catch(e){}ui.sheet=null;ui.login={};render()}
 function vLogin(){const L=ui.login=ui.login||{};const u=L.passo==='criar'?(state.usuarios||[]).find(x=>normEmail(x.email)===normEmail(L.email)):null;const m=marca();
   return `<div class="login">${logoMarca(false)}<h1>${L.passo==='criar'?'Primeiro acesso':'Entrar'}</h1>
   ${L.passo==='criar'?`<p class="sub-l">Olá, <b>${esc(u?.nome||'')}</b>! Crie uma senha para <b>${esc(L.email)}</b>. Use pelo menos 6 letras ou números.</p>
@@ -2606,9 +2606,9 @@ function vLogin(){const L=ui.login=ui.login||{};const u=L.passo==='criar'?(state
     <button class="big go" data-a="lgEntrar">${ic('i-check')}Entrar</button>
     <p class="dica" style="margin:0">É o primeiro acesso? Digite só o e-mail e toque em Entrar.<br>Esqueceu a senha? Peça para a gestão redefinir em Cadastros › Ajustes › Acessos.</p>`}</div>`}
 function cardAcessos(){if(!ehGestao())return '';const us=state.usuarios||[];
-  return `<div class="card"><h2>Acessos ao sistema</h2><p class="dica" style="margin:-4px 0 8px">Quem pode entrar com e-mail e senha. No primeiro acesso, a própria pessoa cria a senha.</p>
-  ${us.map(u=>`<div class="aj-row acs"><span><b>${esc(u.nome)}</b><br><small class="lido">${esc(u.email)} · ${esc(PERFIS[u.perfil]||u.perfil)}${u.hash?'':' · ainda não criou a senha'}</small></span>
-    <span class="aq-b">${u.hash?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Redefinir senha</button>`:''}<button class="x azul" data-a="acsPerfil" data-id="${u.id}">${u.perfil==='gestao'?'Mudar para operação':'Mudar para gestão'}</button>${u.id!==usuarioAtual()?.id?`<button class="x" data-a="acsRm" data-id="${u.id}">Tirar</button>`:''}</span></div>`).join('')}
+  return `<div class="card"><h2>Acessos ao sistema</h2><p class="dica" style="margin:-4px 0 8px">Quem pode entrar com e-mail e senha. No primeiro acesso, a própria pessoa cria a senha${SB_CFG?' (toca em "É meu primeiro acesso" e confirma pelo e-mail)':''}.</p>
+  ${us.map(u=>`<div class="aj-row acs"><span><b>${esc(u.nome)}</b><br><small class="lido">${esc(u.email)} · ${esc(PERFIS[u.perfil]||u.perfil)}${SB_CFG?'':u.hash?'':' · ainda não criou a senha'}</small></span>
+    <span class="aq-b">${SB_CFG?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Mandar link de senha nova</button>`:u.hash?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Redefinir senha</button>`:''}<button class="x azul" data-a="acsPerfil" data-id="${u.id}">${u.perfil==='gestao'?'Mudar para operação':'Mudar para gestão'}</button>${u.id!==usuarioAtual()?.id?`<button class="x" data-a="acsRm" data-id="${u.id}">Tirar</button>`:''}</span></div>`).join('')}
   <div class="acs-novo"><input class="campo" id="acsNome" placeholder="Nome"><input class="campo" id="acsEmail" type="email" placeholder="E-mail"><select class="campo" id="acsPerfil">${Object.entries(PERFIS).map(([k,n])=>`<option value="${k}" ${k==='operacao'?'selected':''}>${n}</option>`).join('')}</select><select class="campo" id="acsPes"><option value="">Pessoa da equipe (opcional)</option>${state.pessoas.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select><button class="mbtn" data-a="acsAdd">${ic('i-mais')}Dar acesso</button></div></div>`}
 
 /* ================= cópias de segurança ================= */
@@ -2856,12 +2856,25 @@ const A={
   lgCriar:async()=>{const L=ui.login;const a=document.getElementById('lgS1')?.value||'',b=document.getElementById('lgS2')?.value||'';L.err='';
     if(a.length<6){L.err='A senha precisa ter pelo menos 6 letras ou números.';return render()}if(a!==b){L.err='As duas senhas estão diferentes.';return render()}
     const u=(state.usuarios||[]).find(x=>normEmail(x.email)===normEmail(L.email));if(!u||u.hash)return;u.salt=novoSalt();u.hash=await hashSenha(a,u.salt);save();entrar(u)},
+  sbPasso:d=>{const e=document.getElementById('sbE');ui.sbLogin={passo:d.v,email:e?e.value.trim():ui.sbLogin?.email};render()},
+  sbEntrar:async()=>{const L=ui.sbLogin;L.email=normEmail(document.getElementById('sbE')?.value);const sn=document.getElementById('sbS')?.value||'';L.err='';
+    if(!L.email||!sn){L.err='Escreva o e-mail e a senha.';return render()}const {error}=await SB.c.auth.signInWithPassword({email:L.email,password:sn});if(error){L.err=sbErro(error);return render()}NV.erro='';render();nuvemConectar()},
+  sbCriar:async()=>{const L=ui.sbLogin;L.email=normEmail(document.getElementById('sbE')?.value);const a=document.getElementById('sbS1')?.value||'',b=document.getElementById('sbS2')?.value||'';L.err='';
+    if(!L.email){L.err='Escreva o seu e-mail.';return render()}if(a.length<6){L.err='A senha precisa ter pelo menos 6 letras ou números.';return render()}if(a!==b){L.err='As duas senhas estão diferentes.';return render()}
+    const {data,error}=await SB.c.auth.signUp({email:L.email,password:a,options:{emailRedirectTo:sbVolta()}});if(error){L.err=sbErro(error);return render()}
+    if(data.session){NV.erro='';render();return nuvemConectar()}ui.sbLogin={passo:'enviado',email:L.email,msg:`Mandamos um e-mail para ${L.email}. Abra o e-mail e toque no link para confirmar. Depois volte aqui e entre com a senha que você criou.`};render()},
+  sbEsqueci:async()=>{const L=ui.sbLogin;L.email=normEmail(document.getElementById('sbE')?.value);L.err='';if(!L.email){L.err='Escreva o seu e-mail.';return render()}
+    const {error}=await SB.c.auth.resetPasswordForEmail(L.email,{redirectTo:sbVolta()});if(error){L.err=sbErro(error);return render()}ui.sbLogin={passo:'enviado',email:L.email,msg:`Se ${L.email} tiver acesso, chega em instantes um e-mail com o link para criar uma senha nova.`};render()},
+  sbNova:async()=>{const L=ui.sbLogin;const a=document.getElementById('sbS1')?.value||'',b=document.getElementById('sbS2')?.value||'';L.err='';
+    if(a.length<6){L.err='A senha precisa ter pelo menos 6 letras ou números.';return render()}if(a!==b){L.err='As duas senhas estão diferentes.';return render()}
+    const {error}=await SB.c.auth.updateUser({password:a});if(error){L.err=sbErro(error);return render()}ui.sbLogin={passo:'entrar'};history.replaceState(null,'',sbVolta());NV.erro='';render();nuvemConectar();toast('Senha nova salva',false)},
+  sbSair:()=>{SB.c.auth.signOut().finally(()=>location.reload())},
   lgVoltar:()=>{ui.login={email:ui.login?.email};render()},
   sair:()=>sair(),
   acsAdd:()=>{if(!ehGestao())return;const n=document.getElementById('acsNome').value.trim(),e=normEmail(document.getElementById('acsEmail').value),pf=document.getElementById('acsPerfil').value,ps=document.getElementById('acsPes').value;
     if(!n||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast('Escreva o nome e um e-mail válido',false);return}if(state.usuarios.some(u=>normEmail(u.email)===e)){toast('Esse e-mail já tem acesso',false);return}
     snap();state.usuarios.push({id:uid('u'),email:e,nome:n,perfil:pf,pessoa:ps,hash:null,salt:null});commit();toast(`${n} pode entrar. No primeiro acesso cria a senha.`)},
-  acsReset:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);snap();u.hash=null;u.salt=null;commit();toast(`${u.nome} vai criar uma senha nova no próximo acesso`)},
+  acsReset:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(SB_CFG){SB.c.auth.resetPasswordForEmail(u.email,{redirectTo:sbVolta()}).then(r=>toast(r.error?sbErro(r.error):`Mandamos para ${u.email} um link para criar uma senha nova`,false));return}snap();u.hash=null;u.salt=null;commit();toast(`${u.nome} vai criar uma senha nova no próximo acesso`)},
   acsPerfil:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(u.id===usuarioAtual()?.id&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão',false);return}snap();u.perfil=u.perfil==='gestao'?'operacao':'gestao';commit()},
   acsRm:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);snap();state.usuarios=state.usuarios.filter(x=>x.id!==d.id);commit();toast(`${u.nome} não tem mais acesso`)},
   segAgora:async()=>{toast('Guardando cópia…',false);const ok=await backupNuvem(`${hojeISO()}-manual-${tsHm(now()).replace(':','h')}`);toast(ok?'Cópia guardada na nuvem':'Sem nuvem agora. Use “Baixar cópia em arquivo”.',false)},
@@ -3109,7 +3122,7 @@ document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)re
   if(ok){save();if(!d.est)render();toast('Salvo',true)}});
 function wLerFalta(){const i=document.getElementById('insFQ');if(i&&ui.sheet)ui.sheet.fq=i.value}
 document.addEventListener('input',e=>{if(e.target.id==='pzN'||e.target.id==='dvN'){const b=document.getElementById(e.target.id==='pzN'?'pzResta':'dvResta'),v=parseInt(e.target.value,10);if(b&&!isNaN(v))b.textContent=Math.max(0,(+b.dataset.tot)-v)+' peças';return}if(e.target.id==='insFQ'&&ui.sheet){ui.sheet.fq=e.target.value;return}if(e.target.id==='ajBusca'&&ui.sheet?.t==='ajuda'){ui.sheet.q=e.target.value;const L=document.getElementById('ajRes');if(L)L.innerHTML=ajRes();return}if(e.target.id==='wCli'&&ui.sheet?.w){ui.sheet.w.cliente=e.target.value;ui.sheet.w.cli=null;const L=document.getElementById('wCliSug');if(L)L.innerHTML=sugClientes(e.target.value,null)}if(e.target.id==='estBusca'){ui.eq=e.target.value;const L=document.getElementById('estLista');if(L)L.innerHTML=listaEst()}if(e.target.id==='empBusca'){ui.eqc=e.target.value;const L=document.getElementById('empLista');if(L)L.innerHTML=listaEmpresas()}if(e.target.id==='pedBusca'){ui.pf.q=e.target.value;const L=document.getElementById('pedLista');if(L)L.innerHTML=listaPedidos()}if(e.target.id==='wCnpj'){const v=fmtCnpj(e.target.value);if(v!==e.target.value)e.target.value=v}});
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&['lgE','lgS'].includes(e.target.id)){e.preventDefault();A.lgEntrar();return}if(e.key==='Enter'&&['lgS1','lgS2'].includes(e.target.id)){e.preventDefault();A.lgCriar();return}if(e.key==='Escape'&&ui.sheet)A.fechar();if(e.key==='Enter'&&(['eNome','eObs','pNome','pTec','xNome','wCont','wCnpj','pedBusca','estBusca'].includes(e.target.id)||e.target.closest?.('.card')&&e.target.tagName==='INPUT'))e.preventDefault();if(e.key==='Enter'&&e.target.id==='wCli'){e.preventDefault();A.wNext()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&['sbE','sbS'].includes(e.target.id)&&ui.sbLogin?.passo==='entrar'){e.preventDefault();A.sbEntrar();return}if(e.key==='Enter'&&['lgE','lgS'].includes(e.target.id)){e.preventDefault();A.lgEntrar();return}if(e.key==='Enter'&&['lgS1','lgS2'].includes(e.target.id)){e.preventDefault();A.lgCriar();return}if(e.key==='Escape'&&ui.sheet)A.fechar();if(e.key==='Enter'&&(['eNome','eObs','pNome','pTec','xNome','wCont','wCnpj','pedBusca','estBusca'].includes(e.target.id)||e.target.closest?.('.card')&&e.target.tagName==='INPUT'))e.preventDefault();if(e.key==='Enter'&&e.target.id==='wCli'){e.preventDefault();A.wNext()}});
 function tick(){
   if(MOCK_PEND.size&&NV.modo==='nuvem')mockPendentes();
   document.querySelectorAll('[data-tl]').forEach(el=>{const l=lote(el.dataset.tl),x0=l&&l.steps[el.dataset.ts],x=x0&&el.dataset.tp?(x0.partes||[]).find(p=>String(p.id)===el.dataset.tp):x0;if(x)el.textContent=fDur(tempoUtil(x))});
@@ -3182,9 +3195,62 @@ function soAquiEnviar(){const g=soAqui();if(!g)return;snap();let n=0;g.pedidos.f
   g.clientes.forEach(c=>{if(!(state.clientes||[]).some(x=>x.id===c.id))(state.clientes=state.clientes||[]).push(c)});
   try{localStorage.removeItem('martins-so-aqui')}catch(e){}commit();toast(`${n} ${n>1?'pedidos enviados':'pedido enviado'} para a nuvem`,false)}
 function nuvemAdotar(m,lix){soAquiGuardar(m,lix);NV.pronto=true;NV.erro='';NV.acked=m;NV.last={};Object.entries(m).forEach(([p,v])=>NV.last[p]=stab(v));
-  const st=normalizar(deDocs(m));if(!st.atrib)st.atrib={};state=st;NV.modo='nuvem';syncSt(NV.soLer?'ler':'ok');
+  const st=normalizar(deDocs(m));if(!st.atrib)st.atrib={};state=st;sbSessao();if(SB_CFG&&!SESSAO){render();return}NV.modo='nuvem';syncSt(NV.soLer?'ler':'ok');
   try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}if(!NV.soLer)save();render();tick();nuvemOuvir();mockReparo();setTimeout(backupDiario,4000)}
-async function nuvemConectar(){let db=null;try{db=await window.claude?.use?.('db')}catch(e){}
+/* ================= Supabase (endereço próprio da Martins) =================
+   Quando a página é aberta com window.MARTINS_SB={url,key} (index.html gerado por tools/build.js), o banco e o login
+   passam a ser do Supabase. Sem isso, continua usando o banco do Claude, como antes. */
+const SB_CFG=(typeof window!=='undefined'&&window.MARTINS_SB&&window.MARTINS_SB.url)?window.MARTINS_SB:null;
+const SB={c:null,user:null,ch:null,ouvintes:{}};
+function sbCarrega(){return new Promise((ok,ruim)=>{if(window.supabase?.createClient)return ok();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';s.onload=ok;s.onerror=()=>ruim(new Error('sem supabase'));document.head.appendChild(s)})}
+async function sbCliente(){if(SB.c)return SB.c;await sbCarrega();SB.c=window.supabase.createClient(SB_CFG.url,SB_CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return SB.c}
+function sbDB(c){const T='docs';
+  const dobj=(path,data)=>({id:path.slice(path.indexOf('/')+1),exists:data!=null,data:()=>data==null?undefined:JSON.parse(JSON.stringify(data)),metadata:{}});
+  const falha=e=>{throw {code:/42501|row-level|permission/i.test((e&&(e.code+' '+e.message))||'')?'invalid_argument':'unavailable',message:e&&e.message}};
+  const doc=path=>({id:path.split('/').pop(),path,
+    get:async()=>{const {data,error}=await c.from(T).select('data').eq('path',path).maybeSingle();if(error)falha(error);return dobj(path,data?data.data:null)},
+    set:async d=>{const {error}=await c.from(T).upsert({path,data:d});if(error)falha(error)},
+    update:async d=>{const {data,error}=await c.rpc('doc_update',{p:path,patch:d});if(error)falha(error);if(!data)throw {code:'invalid_argument',message:'documento não existe'}},
+    delete:async()=>{const {error}=await c.from(T).delete().eq('path',path);if(error)falha(error)},
+    acquire:async()=>({acquired:true})});
+  const lista=async col=>{const out=[];for(let de=0;;de+=500){const {data,error}=await c.from(T).select('path,data').eq('col',col).order('path').range(de,de+499);if(error)falha(error);out.push(...data);if(data.length<500)break}return out};
+  const ouvir=()=>{if(SB.ch)return;SB.ch=c.channel('martins-docs').on('postgres_changes',{event:'*',schema:'public',table:T},pl=>{const p=(pl.new&&pl.new.path)||(pl.old&&pl.old.path)||'';const col=p.split('/')[0];(SB.ouvintes[col]||[]).forEach(f=>f());if(!p)Object.values(SB.ouvintes).flat().forEach(f=>f())}).subscribe()};
+  const collection=col=>({path:col,doc:id=>doc(col+'/'+id),
+    get:async()=>{const r=await lista(col);return {docs:r.map(x=>dobj(x.path,x.data)),size:r.length,empty:!r.length}},
+    onSnapshot:(next,onErr)=>{let prev=new Map(),vivo=true,t=null,rodando=false,denovo=false;
+      const puxa=async()=>{if(rodando){denovo=true;return}rodando=true;try{const r=await lista(col);const nm=new Map(r.map(x=>[x.path,x.data]));const ch=[];
+          nm.forEach((d,p)=>{const o=prev.get(p);if(o===undefined)ch.push({type:'added',doc:dobj(p,d)});else if(JSON.stringify(o)!==JSON.stringify(d))ch.push({type:'modified',doc:dobj(p,d)})});
+          prev.forEach((o,p)=>{if(!nm.has(p))ch.push({type:'removed',doc:dobj(p,o)})});prev=nm;if(vivo&&ch.length)next({docs:[...nm].map(([p,d])=>dobj(p,d)),docChanges:()=>ch,metadata:{fromCache:false}})}
+        catch(e){onErr&&onErr(e)}finally{rodando=false;if(denovo){denovo=false;puxa()}}};
+      const f=()=>{clearTimeout(t);t=setTimeout(puxa,200)};(SB.ouvintes[col]=SB.ouvintes[col]||[]).push(f);ouvir();puxa();
+      return ()=>{vivo=false;SB.ouvintes[col]=(SB.ouvintes[col]||[]).filter(x=>x!==f)}}});
+  return {doc,collection}}
+const sbVolta=()=>location.origin+location.pathname;
+async function sbConectar(){let c;try{c=await sbCliente()}catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000);return}
+  if(!SB.auth){SB.auth=true;c.auth.onAuthStateChange(ev=>{if(ev==='PASSWORD_RECOVERY'){ui.sbLogin={passo:'nova'};NV.pronto=false;NV.erro='login';render()}})}
+  let ses=null;try{ses=(await c.auth.getSession()).data.session}catch(e){}
+  if(ui.sbLogin?.passo==='nova'||/type=recovery/.test(location.hash)){ui.sbLogin={passo:'nova'};NV.erro='login';render();return}
+  if(!ses){NV.erro='login';NV.pronto=false;render();return}
+  SB.user=ses.user;NV.db=sbDB(c);NV.erro='';
+  try{const m=await nuvemLer();let lix=[];try{lix=(await NV.db.collection('lixeira').get()).docs.map(d=>d.id.split('~')[0]==='pedidos'?d.id.split('~')[1]:null).filter(Boolean)}catch(e){}
+    if(!Object.keys(m).some(k=>k.startsWith('usuarios/'))){NV.erro='semacesso';render();return}
+    return nuvemAdotar(m,lix)}
+  catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000)}}
+function sbSessao(){if(!SB_CFG||!SB.user)return;const u=(state.usuarios||[]).find(x=>normEmail(x.email)===normEmail(SB.user.email));
+  SESSAO=u?{id:u.id,email:u.email,ts:now()}:null;try{if(SESSAO)localStorage.setItem('martins-sessao',JSON.stringify(SESSAO))}catch(e){}if(!u){NV.pronto=false;NV.erro='semacesso'}}
+const sbErro=e=>{const m=String(e&&e.message||e||'');return /invalid login/i.test(m)?'E-mail ou senha errados. Confira e tente de novo.':/not confirmed/i.test(m)?'Falta confirmar o e-mail: abra o e-mail que mandamos e toque no link.':/already registered|already been registered/i.test(m)?'Esse e-mail já tem senha. Toque em Voltar e entre, ou use "Esqueci a senha".':/at least|weak|short/i.test(m)?'A senha precisa ter pelo menos 6 letras ou números.':/rate|too many|seconds/i.test(m)?'Muitas tentativas seguidas. Espere um minuto e tente de novo.':/fetch|network/i.test(m)?'Sem internet. Confira a conexão e tente de novo.':'Não deu certo: '+m};
+function vLoginSB(){const L=ui.sbLogin=ui.sbLogin||{passo:'entrar'},P=L.passo,campoE=`<label class="rotulo" for="sbE">E-mail</label><input class="campo" id="sbE" type="email" autocomplete="username" inputmode="email" value="${esc(L.email||'')}">`;
+  const erro=L.err?`<div class="aviso">${ic('i-alerta')}${esc(L.err)}</div>`:'',volta=`<button class="x azul" data-a="sbPasso" data-v="entrar">Voltar</button>`;
+  const corpo=P==='primeiro'?`<h1>Primeiro acesso</h1><p class="sub-l">Escreva o e-mail que a gestão cadastrou e crie sua senha (pelo menos 6 letras ou números).</p>${campoE}
+      <label class="rotulo" for="sbS1">Nova senha</label><input class="campo" id="sbS1" type="password" autocomplete="new-password"><label class="rotulo" for="sbS2">Repita a senha</label><input class="campo" id="sbS2" type="password" autocomplete="new-password">${erro}
+      <button class="big go" data-a="sbCriar">${ic('i-check')}Criar minha senha</button>${volta}`
+    :P==='esqueci'?`<h1>Esqueci a senha</h1><p class="sub-l">Mandamos um link para o seu e-mail. Tocando nele, você cria uma senha nova.</p>${campoE}${erro}<button class="big go" data-a="sbEsqueci">${ic('i-check')}Mandar o link</button>${volta}`
+    :P==='nova'?`<h1>Senha nova</h1><p class="sub-l">Crie sua senha nova (pelo menos 6 letras ou números).</p><label class="rotulo" for="sbS1">Nova senha</label><input class="campo" id="sbS1" type="password" autocomplete="new-password"><label class="rotulo" for="sbS2">Repita a senha</label><input class="campo" id="sbS2" type="password" autocomplete="new-password">${erro}<button class="big go" data-a="sbNova">${ic('i-check')}Salvar senha e entrar</button>`
+    :P==='enviado'?`<h1>Confira seu e-mail</h1><p class="sub-l" style="font-size:19px">${esc(L.msg||'')}</p><p class="dica">Não chegou? Olhe a caixa de spam ou lixo eletrônico.</p><button class="big go" data-a="sbPasso" data-v="entrar">Já confirmei, quero entrar</button>`
+    :`<h1>Entrar</h1>${campoE}<label class="rotulo" for="sbS">Senha</label><input class="campo" id="sbS" type="password" autocomplete="current-password">${erro}
+      <button class="big go" data-a="sbEntrar">${ic('i-check')}Entrar</button><div class="linha-dep" style="justify-content:space-between"><button class="x azul" data-a="sbPasso" data-v="primeiro">É meu primeiro acesso</button><button class="x azul" data-a="sbPasso" data-v="esqueci">Esqueci a senha</button></div>`;
+  return `<div class="login">${logoMarca(false)}${corpo}</div>`}
+async function nuvemConectar(){if(SB_CFG)return sbConectar();let db=null;try{db=await window.claude?.use?.('db')}catch(e){}
   if(!db){NV.erro='sem-db';render();return}NV.db=db;NV.erro='';
   try{const u=await window.claude.use('user');if(u){const w=await u.can('data.write');NV.soLer=w===false}}catch(e){}
   try{const m=await nuvemLer();let lix=[];try{lix=(await NV.db.collection('lixeira').get()).docs.map(d=>d.id.split('~')[0]==='pedidos'?d.id.split('~')[1]:null).filter(Boolean)}catch(e){}
@@ -3201,7 +3267,7 @@ async function nuvemRefrescar(){if(NV.modo!=='nuvem'||!NV.db||NV.busy||NV.Q.size
   catch(e){}finally{NV.refr=false}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(NV.pronto)nuvemRefrescar();else if(NV.erro&&NV.erro!=='sem-db')nuvemConectar()}});
 setInterval(nuvemRefrescar,120000);
-function vConectando(){const e=NV.erro;const box=(i,t,p,b)=>`<div class="conect"><span class="m-ic">${ic(i)}</span><h1>${t}</h1>${p}${b||''}</div>`;
+function vConectando(){const e=NV.erro;if(e==='login')return vLoginSB();if(e==='semacesso')return `<div class="conect"><span class="m-ic">${ic('i-cadeado')}</span><h1>Este e-mail ainda não tem acesso</h1><p>${esc(SB.user?.email||'')} entrou, mas não está na lista de acessos do app. Peça para a Helena ou o Roger cadastrarem em Cadastros › Ajustes › Acessos.</p><button class="big go" data-a="sbSair">Entrar com outro e-mail</button></div>`;const box=(i,t,p,b)=>`<div class="conect"><span class="m-ic">${ic(i)}</span><h1>${t}</h1>${p}${b||''}</div>`;
   if(e==='sem-db')return box('i-alerta','Este aparelho não está ligado à nuvem',`<p>Para não trabalhar com dados diferentes dos outros aparelhos, o app só abre ligado à nuvem da Martins.</p><ol><li>Abra o link no navegador <b>Chrome</b>.</li><li>Entre na <b>conta Claude</b> que recebeu acesso ao app.</li><li>Toque em <b>Tentar de novo</b>.</li></ol><p class="dica">Sem conta ou sem acesso? Fale com o Nico.</p>`,`<button class="big go" data-a="reconectar">Tentar de novo</button>`);
   if(e==='rede')return box('i-alerta','Sem internet',`<p>O app precisa da internet para mostrar os dados certos. Tentando de novo sozinho…</p>`,`<button class="big go" data-a="reconectar">Tentar agora</button>`);
   if(e==='vazio')return box('i-alerta','Não achamos os dados da Martins',`<p>Este acesso só consegue ver e a nuvem veio vazia. Fale com o Nico.</p>`,`<button class="big go" data-a="reconectar">Tentar de novo</button>`);

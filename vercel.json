@@ -1,0 +1,8 @@
+{
+  "buildCommand": "",
+  "outputDirectory": "site",
+  "cleanUrls": true,
+  "headers": [
+    { "source": "/(.*)", "headers": [ { "key": "Cache-Control", "value": "no-cache" } ] }
+  ]
+}
