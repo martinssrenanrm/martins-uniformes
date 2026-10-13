@@ -11,7 +11,7 @@
   - **Esqueci a senha:** chega um link por e-mail.
   - **Gestão:** pode mandar o link de senha nova em Ajustes › Acessos.
 - **Quem entra:** só quem tem o e-mail cadastrado em **Cadastros › Ajustes › Acessos**. São os documentos `usuarios/*`, conferidos pela regra `tem_acesso()` do banco. Quem não está na lista entra, mas não vê nem grava nada.
-- **Site:** `site/index.html`, gerado por `tools/build.js` a partir do `app.html`, e publicado pela Vercel a partir deste repositório (`vercel.json`).
+- **Site:** `site/index.html`, gerado por `tools/build.js` a partir do `app.html`. Publicado pelo **GitHub Pages** num repositório público só com o site (`martinssrenanrm/martins-app`), ou pela Vercel a partir deste repositório (`vercel.json`).
 - **Modo Claude:** o mesmo `app.html` continua funcionando no link do Claude enquanto a virada não acontece. Sem `window.MARTINS_SB`, ele usa o banco do Claude.
 
 ## O que precisa vir de fora (uma vez)
@@ -19,9 +19,11 @@
    - Para eu preparar tudo sozinho: um **token de acesso**, criado em supabase.com/dashboard/account/tokens.
    - Guarde o token nas configurações do ambiente como variável **`SUPABASE_ACCESS_TOKEN`**.
    - Me diga o **ref** do projeto: o código do endereço `https://<ref>.supabase.co`.
-2. **Vercel**, na conta do Renan: **Add New › Project › Import** o repositório `martinssrenanrm/martins-uniformes` › Deploy.
-   - Depois disso, cada atualização enviada ao GitHub publica sozinha.
-   - O endereço fica `https://martins-uniformes.vercel.app`, ou um domínio próprio, se quiserem.
+2. **Onde o site fica (escolha um):**
+   - **GitHub Pages (escolhido):** na conta do Renan, crie o repositório **público** `martins-app`, vazio. Em Settings › Collaborators, adicione a conta Leaderei com permissão de escrita. Depois do primeiro envio: Settings › Pages › Source "Deploy from a branch" › `main` / `(root)` › Save.
+     - Endereço: `https://martinssrenanrm.github.io/martins-app/`, ou um domínio próprio.
+     - Por que um repositório separado: Pages em repositório privado exige GitHub pago, e este repositório tem prints com dados reais de clientes, então não pode ficar público. O repositório público tem só o `index.html`, que já é público de qualquer jeito (é o que o navegador baixa). Nenhum dado fica nele: os dados ficam no Supabase, atrás do login.
+   - **Vercel:** **Add New › Project › Import** `martinssrenanrm/martins-uniformes` › Deploy. Endereço `https://martins-uniformes.vercel.app`.
 
 ## Passo a passo da virada (quem executa: Claude)
 1. **Preparar o projeto.** Isso cria a tabela, as regras de acesso, o tempo real e os e-mails em português, e mostra a URL e a chave pública.
@@ -36,11 +38,13 @@
    ```
    SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_KEY=… node tools/migrar.js <pasta-exportada>
    ```
-5. **Gerar o site e enviar ao GitHub.** A Vercel publica sozinha.
+5. **Gerar o site e publicar.**
    ```
    SUPABASE_URL=… SUPABASE_ANON_KEY=… node tools/build.js
    ```
-   Depois, faça o commit de `site/` e o push.
+   - Faça o commit de `site/` neste repositório.
+   - **GitHub Pages:** copie `site/index.html` e `site/manifest.webmanifest` para a raiz de `martins-app` e faça o push. O Pages publica em cerca de 1 minuto.
+   - **Vercel:** o push deste repositório já publica.
 6. **Testar com a Helena:** primeiro acesso, confirmação por e-mail, pedidos e mockups aparecendo.
 7. **Avisar a equipe do endereço novo.** O link do Claude fica parado, como cópia, por 30 dias.
 
