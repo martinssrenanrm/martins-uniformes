@@ -129,3 +129,14 @@ O tempo de cada parte conta para quem fez, no Painel.
 
 - Em **Cadastros › Produtos ›** o produto, a parte **Tecidos** mostra os tecidos dos outros produtos para incluir com um toque.
 - Dá para escrever vários de uma vez, separados por vírgula (ex.: Piquet PV, Piquet dry).
+
+## Ajustes do teste de 14/10
+
+- **Mockup não corta mais a peça.** Peças azul-claras eram confundidas com a faixa de rodapé do mockup e perdiam a metade de baixo.
+- **Ficha de produção colorida** por padrão (cor da peça com bolinha, títulos em azul, entrega em vermelho). Para gastar menos tinta, toque em **Preto e branco** antes de imprimir.
+- **Importar várias fichas = um pedido só**, mesmo com números diferentes (o pedido guarda os dois números, ex.: "6221 / 6222").
+- **"Bord" na ficha = Bordado** (também "Silk" = Estamparia, "Sublim" = Sublimação). Cada lugar pode ter o seu tipo: "Peito esq.: logo bordado".
+- **Outras cores lidas da ficha:** "AZUL CELESTE com gola, punho e peitilho na cor PRETO" já entra com Preta na gola, nos punhos e no peitilho.
+- **Modelo lido da ficha:** "com capuz", "bolso canguru", "com zíper".
+- **Blusa de Agasalho** tem a opção **Bolso canguru**.
+- **Pedido mais limpo:** tecido, cor, outra cor, tipo de personalização, parte e lugar viraram **listas suspensas** (toque e escolha). Na importação, produto e cor também.

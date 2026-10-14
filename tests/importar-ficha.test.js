@@ -55,6 +55,35 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   else await A.evaluate(()=>A.addTec({p:'polo-ams',v:'Piquet PV'})&&A.addTec({p:'polo-ams',v:'Malha dry'}));
   r=await A.evaluate(()=>prod('polo-ams').tecidos);ok(r.includes('Piquet PV')&&r.includes('Malha dry'),'vários tecidos de uma vez (separados por vírgula)');
 
+  console.log('6) Várias fichas = um pedido só; bordado abreviado; cor secundária; opções da peça');
+  await A.evaluate(()=>{const b=prod('blusa');b.opcoes=[{id:'capuz',nome:'Com capuz',aviam:[],steps:[]},{id:'canguru',nome:'Bolso canguru',aviam:[],steps:[]}];ui.sheet=null;render()});
+  await A.setInputFiles('#fImpF',['ficha-teste-3.docx','ficha-teste-4.docx'].map(f=>path.join(FX,f)));
+  await A.waitForFunction(()=>ui.sheet&&ui.sheet.t==='imp',null,{timeout:30000});
+  r=await A.evaluate(()=>{const G=ui.sheet.grupos,g=G[0];return {n:G.length,itens:g.itens.length,av:g.avisos.join(' | '),
+    polo:{cor:g.itens[0].cor,c2:g.itens[0].cores2,tipos:g.itens[0].pers.map(x=>x.tipo&&tipo(x.tipo).nome)},blusa:{prod:g.itens[1].prod,op:g.itens[1].opcoes,tipos:g.itens[1].pers.map(x=>x.tipo&&tipo(x.tipo).nome)}}});
+  ok(r.n===1&&r.itens===2,'duas fichas com números diferentes viram um pedido só');ok(/números diferentes/.test(r.av),'avisa que os números das fichas são diferentes');
+  ok(r.polo.cor==='Azul celeste','cor principal lida mesmo com o resto do texto ("AZUL CELESTE com gola…")');
+  ok(r.polo.c2.length===1&&r.polo.c2[0].cor==='Preta'&&['Gola','Punhos','Peitilho'].every(x=>r.polo.c2[0].partes.some(y=>y.startsWith(x))),'cor secundária e onde ela vai preenchidas sozinhas: '+JSON.stringify(r.polo.c2));
+  ok(r.polo.tipos.every(t=>/^Bordado/.test(t||'')),'"Bord" na ficha = Bordado');
+  ok(r.blusa.prod==='blusa'&&r.blusa.op.includes('capuz')&&r.blusa.op.includes('canguru'),'Blusa com capuz e bolso canguru reconhecidos');
+  const pend=await A.evaluate(()=>{const g=ui.sheet.grupos[0];g.vend=state.pessoas.find(p=>temPapel(p,'vendas')).id;const P=impPend(g);impCriar();return P});await A.waitForTimeout(600);ok(!pend.length,'nada pendente para criar: '+pend.join(', '));
+  r=await A.evaluate(()=>{const p=state.pedidos.find(x=>/9002/.test(x.ficha||''));const ls=lotesDe(p.id);return {ficha:p.ficha,c2:ls[0].cores2,op:ls[1].opcoes}});
+  ok(r.ficha==='9002 / 9003'&&r.c2.length===1&&r.op.includes('canguru'),'pedido criado com as duas fichas, a cor secundária e as opções');
+  console.log('7) Mockup de peça azul-clara não é cortado');
+  r=await A.evaluate(async()=>{const c=document.createElement('canvas');c.width=600;c.height=800;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,600,800);
+    g.fillStyle='#8FD3F5';g.fillRect(150,100,300,640);/* peça azul celeste até perto do pé */const bl=await new Promise(ok=>c.toBlob(ok,'image/png'));
+    const m=await mockDeArquivo(new File([bl],'azul.png',{type:'image/png'}));const im=new Image();im.src=m.g.c;await im.decode();
+    const k=document.createElement('canvas');k.width=im.naturalWidth;k.height=im.naturalHeight;const kg=k.getContext('2d');kg.drawImage(im,0,0);const d=kg.getImageData(0,0,k.width,k.height).data;
+    let y0=k.height,y1=0;for(let y=0;y<k.height;y++)for(let x=0;x<k.width;x+=4){const i=(y*k.width+x)*4;if(d[i]<200){if(y<y0)y0=y;if(y>y1)y1=y}}return (y1-y0)/k.height});
+  ok(r>0.85,`a peça inteira continua no mockup (altura ${Math.round(r*100)}% do quadro)`);
+  console.log('8) Ficha de produção colorida');
+  r=await A.evaluate(()=>{const p=state.pedidos.find(x=>/9002/.test(x.ficha||''));const l=lotesDe(p.id)[0];openSheet({t:'doc',tipo:'prod',id:p.id,cinza:{},vias:2,mocks:true,pb:false});const cor=paginasDoc(ui.sheet)[0];ui.sheet.pb=true;const pb=paginasDoc(ui.sheet)[0];return {cor:/class="a4 fp cor"/.test(cor),pb:/class="a4 fp"/.test(pb)&&!/fp cor/.test(pb),bot:!!document.querySelector('[data-a=docPb]')}});
+  ok(r.cor,'a ficha sai colorida por padrão');ok(r.pb&&r.bot,'preto e branco continua como opção');
+  console.log('9) Listas suspensas no pedido');
+  await A.evaluate(()=>{openSheet({t:'novo',w:{step:2,cliente:'Teste',cli:null,contato:'',cnpj:'',vend:state.pessoas[0].id,entrega:null,err:'',itens:[]}});A.wAdd({p:'polo-vie'})});
+  r=await A.evaluate(()=>({sel:document.querySelectorAll('select.sel').length,botCor:document.querySelectorAll('button.cor[data-a=wCor]').length}));
+  ok(r.sel>=2&&r.botCor===0,'tecido e cor são listas suspensas (sem a grade de botões de cor)');
+  await A.selectOption('select[data-sel=wCor]','Preta');ok(await A.evaluate(()=>ui.sheet.w.itens[0].cor==='Preta'),'escolher na lista suspensa funciona');
   console.log('5) Central de dúvidas');
   for(const [q,esp] of [['ficha em word','Dá para importar ficha em Word?'],['tamanho especial','Como lanço um tamanho especial (G1, EXG…)?'],['observação do pedido','Onde escrevo observações do pedido?'],['tecido novo no produto','Como coloco um tecido novo num produto?']])
     ok(await A.evaluate(([q,esp])=>ajBusca(q)[0]?.f.q===esp,[q,esp]),`"${q}" acha a resposta certa`);
