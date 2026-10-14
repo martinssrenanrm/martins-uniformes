@@ -140,3 +140,11 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Modelo lido da ficha:** "com capuz", "bolso canguru", "com zíper".
 - **Blusa de Agasalho** tem a opção **Bolso canguru**.
 - **Pedido mais limpo:** tecido, cor, outra cor, tipo de personalização, parte e lugar viraram **listas suspensas** (toque e escolha). Na importação, produto e cor também.
+
+## Feriados, data de entrega e pedido mais limpo
+
+- **Feriados de São Paulo, SP** já entram na conta: o "faltam X dias úteis" e os contadores das máquinas descontam os feriados nacionais, o 9 de julho, o 25 de janeiro e o Corpus Christi. Em **Cadastros › Ajustes › Feriados** dá para trocar a cidade, marcar Carnaval, acrescentar emenda ou recesso, ou dizer "Vamos trabalhar" num feriado.
+- **Data de entrega da ficha:** agora é lida também quando vem na linha de baixo ("PRAZO DE ENTREGA:" e a data embaixo), como 06/11, 6 de novembro ou "20 dias úteis".
+- **Peça nova não ganha personalização sozinha.** A personalização de sempre do produto aparece como sugestão: só entra se tocar nela.
+- **Ficha em Word:** leitor novo, que lê também cabeçalho do Word, caixas de texto e células mescladas. Word antigo (.doc) precisa ser salvo como .docx ou PDF.
+- **Tela do pedido mais limpa:** a peça, quem vendeu e a categoria de tamanho são listas suspensas; as quantidades ficam numa grade de quadrinhos.

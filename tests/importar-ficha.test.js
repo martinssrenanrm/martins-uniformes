@@ -84,6 +84,15 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   r=await A.evaluate(()=>({sel:document.querySelectorAll('select.sel').length,botCor:document.querySelectorAll('button.cor[data-a=wCor]').length}));
   ok(r.sel>=2&&r.botCor===0,'tecido e cor são listas suspensas (sem a grade de botões de cor)');
   await A.selectOption('select[data-sel=wCor]','Preta');ok(await A.evaluate(()=>ui.sheet.w.itens[0].cor==='Preta'),'escolher na lista suspensa funciona');
+  console.log('10) Word com cabeçalho, caixa de texto e célula mesclada');
+  await A.evaluate(()=>{ui.sheet=null;render()});await A.setInputFiles('#fImpF',[path.join(FX,'ficha-teste-caixa.docx')]);
+  await A.waitForFunction(()=>ui.sheet&&ui.sheet.t==='imp',null,{timeout:30000});
+  r=await A.evaluate(()=>{const g=ui.sheet.grupos[0],it=g.itens[0];return {cli:g.cliente,num:g.num,ent:g.entrega&&new Date(g.entrega).toISOString().slice(0,10),n:g.itens.length,g:it.g,ok:it.gOk,cor:it.cor,c2:it.cores2,pers:it.pers.map(x=>x.tipo),mock:!!it.mock}});
+  ok(r.cli==='CAIXA DE TEXTO LTDA'&&r.num==='9010','empresa (no cabeçalho do Word) e número (na caixa de texto) lidos');
+  ok(r.ent==='2026-10-20','prazo de entrega lido de dentro da caixa de texto');
+  ok(r.n===1&&r.g.M===7&&r.g.G===3&&r.ok,'tabela de tamanhos lida, com a linha de total mesclada');
+  ok(r.cor==='Verde'&&r.c2.length===1&&r.c2[0].cor==='Branca','cor e outra cor lidas');ok(r.pers.length===1&&r.pers[0]==='bordado','personalização lida uma vez só (sem repetir a caixa de texto)');
+  ok(r.mock,'imagem do Word virou o mockup');
   console.log('5) Central de dúvidas');
   for(const [q,esp] of [['ficha em word','Dá para importar ficha em Word?'],['tamanho especial','Como lanço um tamanho especial (G1, EXG…)?'],['observação do pedido','Onde escrevo observações do pedido?'],['tecido novo no produto','Como coloco um tecido novo num produto?']])
     ok(await A.evaluate(([q,esp])=>ajBusca(q)[0]?.f.q===esp,[q,esp]),`"${q}" acha a resposta certa`);

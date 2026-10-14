@@ -15,7 +15,7 @@ const conta=c=>list(c).length;
     const p=await ctx.newPage();p.on('pageerror',e=>erros.push(n+': '+e.message));pages.push(p);await p.goto(APP);await p.waitForTimeout(1200);const e=await p.$('text=Entendi');if(e)await e.click();return p}
   console.log('1) Começar na nuvem e cadastrar um pedido real');
   const A=await aparelho('A');await A.click('[data-a=inicio][data-v=exemplo]');await A.waitForTimeout(2500);
-  await A.click('[data-a=novo]');await A.fill('#wCli','Cliente Real Ltda');await A.click('[data-a=wVend] >> nth=0');await A.click('[data-a=wNext]');await A.click('[data-a=wAdd][data-p=cam-mc]');
+  await A.click('[data-a=novo]');await A.fill('#wCli','Cliente Real Ltda');await A.selectOption('select[data-sel=wVend]',{index:1});await A.click('[data-a=wNext]');await A.selectOption('select[data-sel=wAdd]','cam-mc');
   await A.evaluate(()=>{const it=ui.sheet.w.itens[0];it.cor='Marinho';it.tecido='Malha PV';it.g={M:10,G:5};ui.sheet.w.step=3;ui.sheet.w.entrega=Date.now()+20*864e5;render()});await A.evaluate(()=>A.wCriar());await A.waitForTimeout(2000);
   const real=await A.evaluate(()=>state.pedidos.find(p=>p.cliente==='Cliente Real Ltda')?.id);ok(!!real&&store.has('pedidos/'+real),'pedido real está na nuvem');
   const antes=new Set(store.keys());
