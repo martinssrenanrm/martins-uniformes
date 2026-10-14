@@ -59,7 +59,7 @@ h2{font-size:24px;margin:0 0 10px;text-wrap:balance}
 .u-warn{background:var(--atn-soft);color:var(--atn-ink)}
 .u-ok{background:var(--go-soft);color:var(--go-dark)}
 .u-pronto{background:var(--blue-soft);color:var(--blue)}
-.u-fim{background:var(--grey-soft);color:var(--muted)}
+.u-fim{background:var(--grey-soft);color:var(--muted)}.u-cancel{background:#FBE9E7;color:#8A1F14}
 .u-warn .dot{background:var(--atn)}
 
 /* equipe */
@@ -1168,6 +1168,11 @@ function acertaPai(l,sid){const x=l.steps[sid];if(!x||!x.partes)return;const rod
   if(rod.length){x.st='and';x.op=rod[0].op;x.maq=rod[0].maq;delete x.fim}
   else if(pecasFeitas(x)>=qtdEf(l)){x.st='ok';x.fim=Math.max(...x.partes.map(p=>p.fim||0));x.util=sum(x.partes.map(p=>p.util||0));x.op=(x.partes.filter(p=>p.st==='ok'&&p.n).slice(-1)[0]||{}).op;delete x.maq}
   else{x.st='pend';delete x.maq;delete x.fim}}
+/* Cancelar pedido: o que estava rodando nas máquinas para (o tempo trabalhado fica registrado) e a máquina fica livre. */
+function pararPed(ped,T){lotesDe(ped.id).forEach(l=>Object.entries(l.steps||{}).forEach(([sid,x])=>{
+  const fecha=y=>{const a=heAtiva(y,T-1);if(a)a.f=T;return Math.round(tempoUtil({...y,fim:T})/MIN)};
+  if(x.partes){let mud=false;x.partes.forEach(pt=>{if(pt.st==='and'){pt.util=fecha(pt);pt.st='ok';pt.fim=T;pt.n=0;mud=true}});if(mud)acertaPai(l,sid)}
+  else if(x.st==='and'){const util=fecha(x);paraPartes(x,0);const pt=x.partes[0];pt.st='ok';pt.fim=T;pt.util=util;acertaPai(l,sid)}}))}
 function paraPartes(x,n){if(x.partes)return;x.partes=[{id:1,n,st:x.st,ini:x.ini,op:x.op,maq:x.maq,he:x.he,manual:x.manual}];delete x.ini;delete x.he;delete x.manual}
 const loteAnd=l=>Object.values(l.steps).some(x=>x.st==='and');
 function topo(p){const m=sMap(p),seen={},out=[];const v=id=>{if(seen[id]||!m[id])return;seen[id]=1;m[id].deps.forEach(v);out.push(m[id])};p.steps.forEach(s=>v(s.id));return out}
@@ -1217,9 +1222,9 @@ function preDias(ped){if(liberado(ped))return 0;let d=0;if(ped.materiais.some(m=
 function info(ped){const ls=lotesDe(ped.id),ab=ls.filter(l=>!loteDone(l)),pre=preDias(ped);let need=0;ab.forEach(l=>need=Math.max(need,remDays(l)+pre));
   let D=0,T=0;ls.filter(l=>!l.rework).forEach(l=>{const[d,t]=minsTot(l);D+=d;T+=t});
   const prog=T?D/T:0,du=wdUntil(ped.entrega),folga=du-prm().margem-need;
-  const u=ped.concluido?'fim':!ab.length?'pronto':folga<-prm().margem?'crit':folga<0?'warn':'ok';
+  const u=ped.cancelado?'cancel':ped.concluido?'fim':!ab.length?'pronto':folga<-prm().margem?'crit':folga<0?'warn':'ok';
   return{ls,ab,prog,du,folga,u,need,score:ped.concluido?1e9:!ab.length?-100:folga-(D>0?3*prog:0)}}
-const ULAB={crit:'Atrasando',warn:'Atenção',ok:'Em dia',pronto:'Pronto',fim:'Entregue'};
+const ULAB={crit:'Atrasando',warn:'Atenção',ok:'Em dia',pronto:'Pronto',fim:'Entregue',cancel:'Cancelado'};
 function prontas(){const out=[];state.pedidos.filter(p=>!p.concluido).forEach(ped=>{const inf=info(ped);lotesDe(ped.id).forEach(l=>{const p=rp(l);
   p.steps.forEach(s=>{if(ready(l,s,ped))out.push({ped,inf,l,p,s,adianta:!s.pers&&fase(p,s)==='antes'&&p.steps.some(x=>x.pers&&!done(l,x.id))})})})});
   return out.sort((a,b)=>a.inf.score-b.inf.score||(b.l.rework?1:0)-(a.l.rework?1:0)||lv(a.p)[a.s.id]-lv(b.p)[b.s.id])}
@@ -1438,7 +1443,7 @@ function shapeSvg(forma,cor,nome){const hx=coresAll()[cor],f=hx||'#B9C0C8',claro
 
 /* ================= peças de tela ================= */
 const upill=u=>`<span class="pill u-${u}"><span class="dot"></span>${ULAB[u]}</span>`;
-function entregaTxt(ped,inf){if(ped.concluido)return `Entregue ${fD(ped.concluido)}`;const d=inf.du;return `Entrega ${fD(ped.entrega)} · ${d>1?`faltam ${d} dias úteis`:d===1?'falta 1 dia útil':d===0?'é hoje':'passou da data'}`}
+function entregaTxt(ped,inf){if(ped.cancelado)return `Cancelado ${fD(ped.cancelado.ts)}`;if(ped.concluido)return `Entregue ${fD(ped.concluido)}`;const d=inf.du;return `Entrega ${fD(ped.entrega)} · ${d>1?`faltam ${d} dias úteis`:d===1?'falta 1 dia útil':d===0?'é hoje':'passou da data'}`}
 function chips(it){const r=[upill(it.inf.u)];if(it.l.rework)r.push(`<span class="pill cons">${ic('i-conserto')}Conserto</span>`);if(it.adianta)r.push(`<span class="pill adi">${ic('i-adiantar')}Adiantar</span>`);return r.join('')}
 function tarefaCard(it,sug){const q=qtdDe(it);
   return `<div class="tarefa ${sug?'sug':''}">${loteSvg(it.l)}<div>
@@ -1536,7 +1541,7 @@ function maqTile(u,P,esp){const t=P.uso[u.id],pl=P.plan[u.id],sp=!t&&!pl?(P.semP
 /* ================= PEDIDOS ================= */
 const soDig=x=>String(x||'').replace(/\D/g,'');
 const fmtCnpj=v=>{const d=soDig(v).slice(0,14);return d.replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3').replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2')};
-const PF_ST=[['todos','Todos'],['crit','Atrasando'],['warn','Atenção'],['ok','Em dia'],['pronto','Prontos'],['fim','Entregues']];
+const PF_ST=[['todos','Todos'],['crit','Atrasando'],['warn','Atenção'],['ok','Em dia'],['pronto','Prontos'],['fim','Entregues'],['cancel','Cancelados']];
 const PF_ORD=[['urg','Mais urgente'],['entrega','Data de entrega'],['emissao','Data do pedido']];
 function listaPedidos(){const f=ui.pf||{},q=(f.q||'').trim().toLowerCase(),qd=soDig(q);
   let ls=state.pedidos.map(p=>({p,i:info(p)}));
@@ -1573,9 +1578,9 @@ function listaEmpresas(){const q=nCli(ui.eqc||''),qd=(ui.eqc||'').replace(/\D/g,
   if(!L.length)return `<div class="vazio-box">${ic('i-lupa')}<b>Nenhuma empresa encontrada</b></div>`;
   return `<div class="eq-l">${L.map(x=>`<button class="eq" data-a="cli" data-id="${x.c.id}"><span class="m-ic">${ic('i-predio')}</span><span class="eq-t"><b>${esc(x.c.nome)}</b><span>${x.ps.length} ${x.ps.length===1?'pedido':'pedidos'} · ${x.ab.length} em aberto · ${nf(x.pecas,0)} peças${x.ult?` · último ${fD(x.ult)}`:''}</span>${x.crit||x.warn?`<span class="emp-al">${x.crit?`<span class="pl-crit"><span class="dot"></span>${x.crit} atrasando</span>`:''}${x.warn?`<span class="pl-warn"><span class="dot"></span>${x.warn} atenção</span>`:''}</span>`:''}</span><span class="eq-go">›</span></button>`).join('')}</div>`}
 function sCli(){const e=ui.sheet,c=cliById(e.id);if(!c)return voltar();const ps=pedsDoCli(c.id).sort((a,b)=>(a.concluido?1:0)-(b.concluido?1:0)||b.chegada-a.chegada);
-  const pecas=sum(ps.map(p=>sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd||0)))),ent=ps.filter(p=>p.concluido),late=ent.filter(p=>p.concluido>p.entrega+12*H);
+  const pecas=sum(ps.map(p=>sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd||0)))),ent=ps.filter(p=>p.concluido&&!p.cancelado),late=ent.filter(p=>p.concluido>p.entrega+12*H),abN=ps.filter(p=>!p.concluido).length;
   return `${voltar()}<div class="card"><div class="imp-h"><span class="m-ic" style="width:64px;height:64px">${ic('i-predio')}</span><div><h1 style="margin:0">${esc(c.nome)}</h1><span class="lido">${c.cnpj?`CNPJ ${esc(c.cnpj)}`:'Sem CNPJ'}${c.contato?` · ${esc(c.contato)}`:''}</span></div></div>
-    <div class="kpis" style="margin:12px 0 0">${[[ps.length,'pedidos'],[ps.length-ent.length,'em aberto'],[nf(pecas,0),'peças'],[ent.length?Math.round((ent.length-late.length)/ent.length*100)+'%':'—','entregues no prazo']].map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('')}</div></div>
+    <div class="kpis" style="margin:12px 0 0">${[[ps.length,'pedidos'],[abN,'em aberto'],[nf(pecas,0),'peças'],[ent.length?Math.round((ent.length-late.length)/ent.length*100)+'%':'—','entregues no prazo']].map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('')}</div></div>
   <div class="card"><h2>Pedidos</h2>${ps.map(p=>{const i=info(p);return `<button class="rk" data-a="pedido" data-id="${p.id}" style="width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0"><span class="pill u-${i.u}"><span class="dot"></span>${ULAB[i.u]}</span><div class="rk-t"><b>Pedido ${esc(p.id)}${p.ficha&&p.ficha!==p.id?` · ficha ${esc(p.ficha)}`:''}</b><span>Feito ${fD(p.chegada)} · entrega ${fD(p.entrega)} · ${nf(sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd||0)),0)} peças</span></div><div class="rk-p">${lotesDe(p.id).filter(l=>!l.rework).slice(0,2).map(loteSvg).join('')}</div></button>`}).join('')||'<p class="dica">Nenhum pedido ainda.</p>'}</div>
   ${secArquivos(c.id)}
   <div class="card"><h2>Dados da empresa</h2>
@@ -1592,8 +1597,13 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     ${!ped.concluido&&i.ab.length?`<div class="ped-ent">${ic('i-relogio')}<span>Trabalho restante ≈ ${nf(i.need)} dias úteis</span></div>`:''}
     <div class="ped-ent">${v?av(v,'s'):''}<span>Vendedora: <b>${esc(pNome(v)||'—')}</b> · Pedido ${esc(ped.id)} feito em ${fD(ped.chegada)}</span></div>
     ${(ped.edicoes||[]).length?`<div class="ped-ent" style="font-size:16px">${ic('i-engr')}<span>Corrigido por ${esc(ped.edicoes[ped.edicoes.length-1].por||'?')} ${haQuanto(ped.edicoes[ped.edicoes.length-1].ts)}${ped.edicoes.length>1?` · ${ped.edicoes.length} correções`:''}</span></div>`:''}
-    <div class="doc-bts"><button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button><button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
+    ${ped.cancelado?`<div class="aviso">${ic('i-alerta')}<span>Pedido cancelado ${fD(ped.cancelado.ts)}${ped.cancelado.por?` por ${esc(ped.cancelado.por)}`:''}.${ped.cancelado.motivo?` Motivo: ${esc(ped.cancelado.motivo)}.`:''} Ele não aparece na produção nem nas tarefas.</span></div><div class="acoes"><button class="mbtn" data-a="pedReativar" data-id="${id}">Voltar o pedido para a produção</button></div>`:''}
+    <div class="doc-bts">${ped.cancelado?'':`<button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button>`}<button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
     ${tEnt?`<div class="acoes"><button class="big go" data-a="entregar" data-id="${id}">${ic('i-caminhao')}${esc(tarTxt(tEnt))}${tEnt.resp?' · '+esc(pNome(tEnt.resp)):''}</button></div>`:''}</div>
+  ${ped.concluido?'':`<div class="card">${ui.cancPed===id?`<h2>Cancelar este pedido?</h2><div class="aviso">${ic('i-alerta')}<span>O pedido de <b>${esc(ped.cliente)}</b> sai da produção, das máquinas e das tarefas do escritório. Ele fica guardado em Pedidos › Filtrar › Cancelados e pode voltar depois.</span></div>
+    <div class="rotulo">Motivo (se quiser)</div><input class="campo" id="cancMot" placeholder="Ex.: cliente desistiu" autocomplete="off">
+    <div class="acoes"><button class="big" style="background:var(--red);color:#fff" data-a="pedCancOk" data-id="${id}">Sim, cancelar pedido</button><button class="big neutro" data-a="pedCancN">Não</button></div>`
+    :`<button class="mbtn neutro2" data-a="pedCancelar" data-id="${id}">${ic('i-alerta')}Cancelar pedido</button>`}</div>`}
   ${ped.concluido?'':`<div class="card"><h2>Antes de cortar</h2><div class="checks">
     ${chk('vias',ped.vias,'i-vias','Vias separadas')}${chk('artePrep',ped.artePrep,'i-arte','Arte preparada')}${chk('arte',ped.arte,'i-arte','Arte aprovada')}
     <button class="chk" data-a="insumos" data-id="${id}" aria-pressed="${ped.materiais.every(m=>m.conf)}">${ic('i-lupa')}Insumos conferidos<span class="box">${ic('i-check')}</span>${ped.materiais.some(m=>!m.conf)?`<span style="font-weight:400;font-size:16px;color:var(--muted)">${ped.materiais.filter(m=>!m.conf).length} para conferir${resp('insumos')?' · '+esc(resp('insumos')):''}</span>`:''}</button>
@@ -2085,14 +2095,16 @@ const FAQ=[
 {c:'esc',q:'O que quer dizer "Chamar app para levar"?',k:'chamar app uber motoboy aplicativo entrega',r:['A pessoa responsável faz levar e buscar chamando um aplicativo de entrega.','Isso se marca no cadastro da pessoa: "Leva e entrega chamando aplicativo".']},
 /* pedidos */
 {c:'ped',q:'Como acho um pedido?',k:'achar buscar procurar pesquisar pedido cliente empresa cnpj número',r:['Toque em Pedidos, na barra de baixo.','Escreva na busca o nome da empresa, do cliente, o CNPJ ou o número.'],ir:'ped'},
-{c:'ped',q:'Como vejo só os atrasados (ou só os entregues)?',k:'filtrar filtro atrasados atrasando atenção em dia prontos entregues',r:['Em Pedidos, toque em Filtrar.','Toque na situação que quer ver. Para ver tudo de novo: Todos.'],ir:'ped'},
+{c:'ped',q:'Como vejo só os atrasados (ou só os entregues)?',k:'filtrar filtro atrasados atrasando atenção em dia prontos entregues cancelados',r:['Em Pedidos, toque em Filtrar.','Toque na situação que quer ver. Para ver tudo de novo: Todos.'],ir:'ped'},
 {c:'ped',q:'Como mudo a ordem da lista de pedidos?',k:'ordenar ordem data entrega urgente mais antigo recente',r:['Em Pedidos, toque em Ordenar.','Escolha Mais urgente, Data de entrega ou Data do pedido.','Tocar de novo na mesma opção inverte a ordem.'],ir:'ped'},
-{c:'ped',q:'O que quer dizer Atrasando, Atenção, Em dia?',k:'atrasando atenção em dia pronto entregue situação cor vermelho amarelo verde',r:['Atrasando (vermelho): pelo trabalho que falta, não dá tempo até a entrega.','Atenção (amarelo): dá, mas está apertado.','Em dia (verde): tudo certo.','Pronto: tudo feito, falta entregar. Entregue: já foi.']},
+{c:'ped',q:'O que quer dizer Atrasando, Atenção, Em dia?',k:'atrasando atenção em dia pronto entregue situação cor vermelho amarelo verde',r:['Atrasando (vermelho): pelo trabalho que falta, não dá tempo até a entrega.','Atenção (amarelo): dá, mas está apertado.','Em dia (verde): tudo certo.','Pronto: tudo feito, falta entregar. Entregue: já foi. Cancelado: o cliente desistiu (fica guardado, fora da produção).']},
 {c:'ped',q:'O que precisa para liberar o corte?',k:'pode cortar liberar produção antes de cortar corte bloqueado',r:['Abra o pedido. Em "Antes de cortar" precisa estar tudo marcado: Vias separadas, Arte preparada, Arte aprovada, Insumos conferidos e Material.','Quando tudo estiver ok aparece "Pode cortar".']},
 {c:'ped',q:'Como vejo em que processo cada peça está?',k:'andamento processo etapa onde está peça acompanhar mapa',r:['Abra o pedido e desça até "Peças e etapas".','Cada peça mostra o que já foi feito e o que falta. Toque numa etapa do mapa para ver os detalhes.'],ir:'ped'},
 {c:'ped',q:'Onde vejo todos os pedidos de uma empresa?',k:'empresa cliente pedidos da empresa histórico',r:['Em Pedidos, toque na chave Empresas (ícone de prédio).','Toque na empresa.'],ir:'emp'},
 {c:'ped',q:'Como corrijo o nome, CNPJ ou contato de uma empresa?',k:'corrigir empresa dados cnpj contato nome cliente',r:['Pedidos › Empresas › toque na empresa.','Mude os dados e toque em Salvar.'],ir:'emp'},
-{c:'ped',q:'Dá para apagar um pedido?',k:'apagar excluir deletar pedido remover',r:['Um pedido real não se apaga: ele termina quando é entregue.','Se foi lançado errado, use Corrigir pedido.','Só os pedidos de exemplo podem ser apagados (Cadastros › Ajustes › Pedidos de exemplo).']},
+{c:'ped',q:'Como cancelo um pedido?',k:'cancelar cancelamento desistiu desistência cliente desistiu parar pedido anular',r:['Abra o pedido e toque em Cancelar pedido (no fim do primeiro quadro).','Se quiser, escreva o motivo. Toque em Sim, cancelar pedido.','O pedido sai da produção, das máquinas e das tarefas. O que estava rodando para, e o tempo já trabalhado fica registrado.','Ele continua guardado em Pedidos › Filtrar › Cancelados.'],ir:'ped'},
+{c:'ped',q:'Cancelei sem querer. Como volto o pedido?',k:'voltar reativar desfazer cancelamento cancelado engano descancelar',r:['Logo depois, toque em Desfazer na mensagem escura.','Se já passou: Pedidos › Filtrar › Cancelados, abra o pedido e toque em Voltar o pedido para a produção.','O que estava rodando volta para a fila.'],ir:'ped'},
+{c:'ped',q:'Dá para apagar um pedido?',k:'apagar excluir deletar pedido remover',r:['Um pedido real não se apaga. Se o cliente desistiu, use Cancelar pedido: ele sai da produção e fica guardado em Cancelados.','Se foi lançado errado, use Corrigir pedido.','Só os pedidos de exemplo podem ser apagados (Cadastros › Ajustes › Pedidos de exemplo).']},
 /* novo e corrigir */
 {c:'novo',q:'Como lanço um pedido novo?',k:'novo pedido lançar cadastrar criar pedido venda',r:['Toque no + Novo, na barra de baixo.','Passo 1: empresa, contato, CNPJ e quem vendeu.','Passo 2: toque na peça e escolha tecido, cor, personalização e as quantidades por tamanho.','Passo 3: a data de entrega. Passo 4: confira e toque em Criar pedido.'],ir:'novo'},
 {c:'novo',q:'Como importo a ficha de produção em PDF?',k:'importar ficha pdf ler ficha automático',r:['Toque no + Novo e depois em Importar fichas.','Escolha o PDF (pode ser mais de um).','Confira o que tem o sinal ⚠ e toque em Criar pedido.'],ir:'novo'},
@@ -2197,7 +2209,7 @@ function gOrg(desde){const L=(state.log||[]).filter(e=>e.ts>=desde);
     <div class="card"><h2>Por pessoa na máquina</h2>${porPes.map(([k,n])=>`<div class="grow"><span style="display:flex;gap:8px;align-items:center">${av(k,'s')}${esc(pNome(k)||k)}</span>${barra(n,porPes[0][1])}<b>${n}</b></div>`).join('')||'<p class="dica">Nada no período.</p>'}</div>
   </div>
   <div class="card"><h2>Últimos ajustes manuais</h2><div class="tw"><table class="gt"><thead><tr><th>Quando</th><th>O quê</th><th>Máquina</th><th>Pessoa</th><th>Tipo</th><th>Registrado por</th></tr></thead><tbody>
-    ${[...man,...L.filter(e=>e.tipo!=='inicio')].sort((a,b)=>b.ts-a.ts).slice(0,15).map(e=>`<tr><td>${fD(e.ts)} ${pad(new Date(e.ts).getHours())}:${pad(new Date(e.ts).getMinutes())}</td><td>${esc(e.step)}${e.prod?' · '+esc(e.prod):''}<br><small>${esc(e.cli||'')}</small></td><td>${esc(e.maq?(unidade(e.maq)?.nome||e.maq):'Escritório')}</td><td>${e.tipo==='troca'?`${esc(pNome(e.de)||'—')} → ${esc(pNome(e.para)||'sistema')}`:esc(pNome(e.op)||'—')}${e.modo==='pessoa'&&e.sug?`<br><small>sugerida: ${esc(pNome(e.sug))}</small>`:''}</td><td>${e.tipo==='inicio'?esc(MODOS[e.modo]):({reserva:'Reserva feita',pausa:`Pausado (${e.n??'?'} prontas)`,divisao:`Dividido (${e.n??'?'} peças)`,edicao:'Pedido corrigido',troca:'Tarefa trocada'})[e.tipo]||'Ajuste'}</td><td>${esc(e.por||'')}</td></tr>`).join('')}
+    ${[...man,...L.filter(e=>e.tipo!=='inicio')].sort((a,b)=>b.ts-a.ts).slice(0,15).map(e=>`<tr><td>${fD(e.ts)} ${pad(new Date(e.ts).getHours())}:${pad(new Date(e.ts).getMinutes())}</td><td>${esc(e.step)}${e.prod?' · '+esc(e.prod):''}<br><small>${esc(e.cli||'')}</small></td><td>${esc(e.maq?(unidade(e.maq)?.nome||e.maq):'Escritório')}</td><td>${e.tipo==='troca'?`${esc(pNome(e.de)||'—')} → ${esc(pNome(e.para)||'sistema')}`:esc(pNome(e.op)||'—')}${e.modo==='pessoa'&&e.sug?`<br><small>sugerida: ${esc(pNome(e.sug))}</small>`:''}</td><td>${e.tipo==='inicio'?esc(MODOS[e.modo]):({reserva:'Reserva feita',pausa:`Pausado (${e.n??'?'} prontas)`,divisao:`Dividido (${e.n??'?'} peças)`,edicao:'Pedido corrigido',troca:'Tarefa trocada',cancelado:'Pedido cancelado',reativado:'Pedido voltou'})[e.tipo]||'Ajuste'}</td><td>${esc(e.por||'')}</td></tr>`).join('')}
   </tbody></table></div><p class="dica">"Registrado por" mostra quem estava usando o aparelho (escolhido tocando no nome, lá em cima).</p></div>
   <p class="dica">Os números deste painel juntam os cliques de todos os aparelhos.</p>`}
 
@@ -2696,7 +2708,7 @@ function gEquipe(desde){const D=gDados(desde),R=D.rank,tot=k=>sum(R.map(r=>r[k])
     ${[...R].sort((a,b)=>b.ocup-a.ocup).map(r=>`<div class="grow"><span style="display:flex;gap:8px;align-items:center">${av(r.p.id,'s')}${esc(r.p.nome)}</span>${barra(r.ocup,1,r.ocup>=.7?'var(--go)':r.ocup>=.4?'var(--atn)':'var(--red)')}<b>${pctTxt(r.ocup)}</b></div>`).join('')}</div>
   <div class="card"><h2>Horas extras</h2>${R.some(r=>r.he>0)?[...R].filter(r=>r.he>0).sort((a,b)=>b.he-a.he).map(r=>`<div class="grow"><span style="display:flex;align-items:center;gap:8px">${av(r.p.id,'s')}${esc(r.p.nome)}</span>${barra(r.he,Math.max(...R.map(x=>x.he)),'#7A3E9D')}<b>${fDur(r.he)}</b></div>`).join('')+`<p class="dica" style="margin:8px 0 0">Total: <b>${fDur(tot('he'))}</b> no período.</p>`:'<p class="dica" style="margin:0">Nenhuma hora extra no período.</p>'}</div>`}
 function gAtrasos(desde){const at=state.pedidos.filter(p=>!p.concluido).map(p=>({p,f:info(p)})).sort((a,b)=>a.f.folga-b.f.folga);
-  const ent=state.pedidos.filter(p=>p.concluido&&p.concluido>=desde),late=ent.filter(p=>p.concluido>p.entrega+12*H);const esc_=tarefasEsc().filter(t=>t.late);
+  const ent=state.pedidos.filter(p=>p.concluido&&!p.cancelado&&p.concluido>=desde),late=ent.filter(p=>p.concluido>p.entrega+12*H);const esc_=tarefasEsc().filter(t=>t.late);
   return `<div class="kpis">${[[ent.length,'pedidos entregues'],[pctTxt(ent.length?(ent.length-late.length)/ent.length:null),'entregues no prazo'],[at.filter(x=>x.f.u==='crit').length,'vão atrasar'],[at.filter(x=>x.f.u==='warn').length,'prazo apertado'],[esc_.length,'terceirizados atrasados']].map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('')}</div>
   <div class="card"><h2>Pedidos em aberto, do mais apertado</h2>${at.map(({p,f})=>`<button class="rk" data-a="pedido" data-id="${p.id}" style="width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0"><span class="pill u-${f.u}"><span class="dot"></span>${ULAB[f.u]}</span><div class="rk-t"><b>${esc(p.cliente)}</b><span>Entrega ${fD(p.entrega)} · ${f.du} dias úteis · falta ~${nf(f.need,0)} de trabalho · folga ${nf(f.folga,0)}</span>${barra(f.prog,1,f.u==='crit'?'var(--red)':f.u==='warn'?'var(--atn)':'var(--go)')}</div><div class="rk-p"><b>${Math.round(f.prog*100)}%</b><small>feito</small></div></button>`).join('')||'<p class="dica">Nenhum pedido em aberto.</p>'}</div>
   ${late.length?`<div class="card"><h2>Entregues com atraso no período</h2>${late.map(p=>`<div class="grow"><span>${esc(p.cliente)}</span><span>prazo ${fD(p.entrega)}, entregue ${fD(p.concluido)}</span><b>+${Math.max(1,-wdUntil(p.concluido)+wdUntil(p.entrega))}d</b></div>`).join('')}</div>`:''}
@@ -3079,6 +3091,11 @@ const A={
     if(w.step===2){if(!w.itens.length)w.err='Toque em uma peça para adicionar';else if(w.itens.some(i=>!i.tecido))w.err='Escolha o tecido de cada peça';else if(w.itens.some(i=>i.pers.some(x=>x.parte==='Mangas'&&!x.lado)))w.err='Diga em qual manga vai a personalização';else if(w.itens.some(i=>!i.cor))w.err='Escolha a cor principal de cada peça';else if(w.itens.some(i=>i.novaC2))w.err='Confirme ou cancele a cor que está adicionando';else if(w.itens.some(i=>!sum(sizesAll().map(s=>i.g[s]||0))))w.err='Coloque a quantidade de cada peça'}
     if(w.step===3&&!w.entrega)w.err='Escolha a data de entrega';
     if(!w.err)w.step++;render();const e=document.querySelector('.sheet');if(e&&!w.err)e.scrollTop=0},
+  pedCancelar:d=>{ui.cancPed=d.id;render()},
+  pedCancN:()=>{ui.cancPed=null;render()},
+  pedCancOk:d=>{const p=pedById(d.id);if(!p||p.concluido)return;const mot=(document.getElementById('cancMot')?.value||'').trim().slice(0,200);snap();const T=now();
+    pararPed(p,T);p.cancelado={ts:T,por:quemNome()||usuarioAtual()?.nome||'',motivo:mot};p.concluido=T;registrar({tipo:'cancelado',ped:p.id,cli:p.cliente,n:0});ui.cancPed=null;commit();toast(`Pedido de ${p.cliente} cancelado`)},
+  pedReativar:d=>{const p=pedById(d.id);if(!p||!p.cancelado)return;snap();p.concluido=null;p.cancelado=null;registrar({tipo:'reativado',ped:p.id,cli:p.cliente,n:0});commit();toast(`Pedido de ${p.cliente} voltou para a produção`)},
   pedEditar:d=>{const p=pedById(d.id);if(!p)return;openSheet({t:'novo',w:wDoPedido(p)})},
   wSalvarEd:()=>salvarEdicao(),
   wCriar:()=>{const w=ui.sheet.w;snap();const id=String(state.seq++).padStart(4,'0');const lines=w.itens.map(it=>({prod:it.prod,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...it.opcoes],pers:it.pers.map((x,j)=>({tipo:x.tipo,parte:x.parte,lado:x.lado,pos:x.pos,id:'pz'+j})),g:{...it.g},qtd:sum(sizesAll().map(s=>it.g[s]||0))}));

@@ -34,6 +34,7 @@ NODE_PATH=$(npm root -g) node tests/mockup-original.test.js
 NODE_PATH=$(npm root -g) node tests/ajuda.test.js
 NODE_PATH=$(npm root -g) node tests/pausar-dividir.test.js
 NODE_PATH=$(npm root -g) node tests/supabase.test.js
+NODE_PATH=$(npm root -g) node tests/cancelar-pedido.test.js
 ```
 
 ## Supabase (endereço próprio)

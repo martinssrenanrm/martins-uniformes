@@ -98,3 +98,10 @@ Toque na máquina que está trabalhando. Embaixo de Terminou e Deu problema tem 
   - As duas trabalham ao mesmo tempo. O processo fica pronto quando as duas tocarem em **Terminou**.
 
 O tempo de cada parte conta para quem fez, no Painel.
+
+## Cancelar pedido
+
+- Abra o pedido e toque em **Cancelar pedido**. Escreva o motivo se quiser (ex.: "cliente desistiu") e toque em **Sim, cancelar pedido**.
+- O pedido sai da produção, das máquinas e das tarefas do escritório. O que estava rodando para, e a máquina fica livre.
+- Ele não some: fica em **Pedidos › Filtrar › Cancelados** e não conta como entregue.
+- Cancelou sem querer? Toque em **Desfazer** na hora, ou abra o pedido em Cancelados e toque em **Voltar o pedido para a produção**.
