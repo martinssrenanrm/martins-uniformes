@@ -105,3 +105,27 @@ O tempo de cada parte conta para quem fez, no Painel.
 - O pedido sai da produção, das máquinas e das tarefas do escritório. O que estava rodando para, e a máquina fica livre.
 - Ele não some: fica em **Pedidos › Filtrar › Cancelados** e não conta como entregue.
 - Cancelou sem querer? Toque em **Desfazer** na hora, ou abra o pedido em Cancelados e toque em **Voltar o pedido para a produção**.
+
+## Importar ficha: mais automático, e agora também em Word
+
+- Em **+ Novo › Importar fichas** dá para escolher **PDF ou Word (.docx)**, e os **mockups junto**, tudo de uma vez.
+- O sistema lê empresa, número, produto, tecido, cor, personalização, tamanhos, datas e **observações**.
+- O **mockup vai sozinho para a peça certa** quando o nome do arquivo tem a cor ou o produto (ex.: "mockup 6218 marinho.png"). Imagem dentro do Word também vira mockup.
+- Tecido que o produto ainda não tem entra como **tecido novo** e fica cadastrado no produto.
+- Só fica faltando escolher **quem vendeu** (não está na ficha) e conferir o que tem ⚠.
+
+## Observações do pedido
+
+- No pedido novo, no passo da data, tem o campo **Observações do pedido**. Na importação, ele já vem com o que estava na ficha.
+- As observações aparecem no pedido e saem na **ficha de produção** do sistema, no quadro OBSERVAÇÕES.
+- Para mudar depois: **✎ Corrigir pedido**.
+
+## Tamanhos especiais
+
+- Em Quantidade por tamanho apareceu **Especiais**: PP, EG, EXG, G1, G2, G3 e G4.
+- Precisa de outro? Escreva em **Outro tamanho** (ex.: G5) e toque em **Incluir tamanho**.
+
+## Tecidos nos produtos
+
+- Em **Cadastros › Produtos ›** o produto, a parte **Tecidos** mostra os tecidos dos outros produtos para incluir com um toque.
+- Dá para escrever vários de uma vez, separados por vírgula (ex.: Piquet PV, Piquet dry).

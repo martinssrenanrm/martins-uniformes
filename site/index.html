@@ -835,7 +835,7 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
   <symbol id="i-engr" viewBox="0 0 48 48"><circle cx="24" cy="24" r="6"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7M10 10l5 5M33 33l5 5M38 10l-5 5M15 33l-5 5"/></symbol>
 </svg>
 
-<input type="file" id="fArq" multiple hidden><input type="file" id="fImpF" accept="application/pdf" multiple hidden><input type="file" id="fImpM" accept="image/*,application/pdf" multiple hidden><input type="file" id="fImpM1" accept="image/*,application/pdf" hidden>
+<input type="file" id="fArq" multiple hidden><input type="file" id="fImpF" accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" multiple hidden><input type="file" id="fImpM" accept="image/*,application/pdf" multiple hidden><input type="file" id="fImpM1" accept="image/*,application/pdf" hidden>
 <main><div class="wrap"><div id="sync" class="sync"></div></div><div class="wrap" id="app"></div></main>
 <nav class="nav" aria-label="Menu"><div class="wrap">
   <button class="nb" data-a="tela" data-t="fabrica"><svg class="ic"><use href="#i-fabrica"/></svg>Fábrica</button>
@@ -957,6 +957,8 @@ const CATS=[{id:'inf',nome:'Infantil',t:['2','4','6','8'],fator:0.6},{id:'juv',n
 /* Consumo de tecido por tamanho em relação ao adulto (estimativa; conferir no encaixe do corte) */
 const fatorTam=t=>state.fatorEsp[t]!=null?state.fatorEsp[t]:(state.cats.find(c=>c.t.includes(t))?.fator??1);
 const sizesAll=()=>state.cats.flatMap(c=>c.t);
+/* Tamanho que ainda não existe entra na categoria Especiais (criada se precisar). */
+function garanteTam(ts){(ts||[]).map(t=>String(t||'').trim().toUpperCase()).filter(Boolean).forEach(t=>{if(sizesAll().some(x=>x.toUpperCase()===t))return;let c=state.cats.find(c=>c.id==='esp');if(!c){c={id:'esp',nome:'Especiais',fator:1.2,t:[]};state.cats.push(c)}c.t.push(t)})}
 const catDe=it=>state.cats.find(c=>c.id===(it.cat||'adu'))||state.cats[state.cats.length-1];
 const CORES={Branca:'#F7F7F5',Preta:'#24272C',Marinho:'#1F2E55',Cinza:'#8E959E',Verde:'#2E7D4F',Royal:'#2449B8',Vermelha:'#C0302A',
   'Cinza mescla':'#B7BBC0',Chumbo:'#4A4F55',Grafite:'#33373C','Azul celeste':'#7FB3E0','Azul turquesa':'#1FA3A8','Azul petróleo':'#1F5F6B',
@@ -1372,7 +1374,7 @@ const chaveNome=n=>String(n||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
 const APELIDO={laiara:'layara',nilda:'anilda',leu:'leo'};
 function aplicaFotos(s){(s.pessoas||[]).forEach(p=>{const k0=chaveNome(p.nome),k=APELIDO[k0]||k0;if(FOTOS0[k]&&!(p.fotoOk||[]).includes(k)){if(!p.foto)p.foto=FOTOS0[k];p.fotoOk=[...(p.fotoOk||[]),k]}})}
 const NOMES_V1={'Léo':'Leu','Layara':'Laiara','Anilda':'Nilda'};
-function normalizar(s){s.usuarios=s.usuarios||[];if(!s.avisosV){s.avisarNovos=s.avisarNovos||['u-helena'];(s.pedidos||[]).forEach(p=>{p.criado=p.criado||{ts:p.chegada||0,antigo:1};p.vistoPor=p.vistoPor||{};s.avisarNovos.forEach(u=>{if(!p.vistoPor[u])p.vistoPor[u]=1})});s.avisosV=1}if(!s.donosV){s.donos={...DONOS0,...(s.donos||{})};s.donosV=1}if(!s.usersV||!s.usuarios.length){if(!s.usuarios.some(u=>u.email===USER0.email)){const h=(s.pessoas||[]).find(p=>/^helena$/i.test((p.nome||'').trim()));s.usuarios.push({...USER0,pessoa:h?h.id:''})}s.usersV=1}if((s.usersV||0)<2){if(!s.usuarios.some(u=>u.email===USER_ROGER.email)){const r=(s.pessoas||[]).find(p=>/^roger$/i.test((p.nome||'').trim()));s.usuarios.push({...USER_ROGER,pessoa:r?r.id:''})}s.usersV=2}
+function normalizar(s){s.usuarios=s.usuarios||[];if(!s.tamEspV&&Array.isArray(s.cats)){const tem=new Set(s.cats.flatMap(c=>c.t).map(x=>String(x).toUpperCase()));if(!s.cats.some(c=>c.id==='esp'))s.cats.push({id:'esp',nome:'Especiais',fator:1.2,t:['PP','EG','EXG','G1','G2','G3','G4'].filter(t=>!tem.has(t))});s.fatorEsp=s.fatorEsp||{};if(s.fatorEsp.PP==null&&!tem.has('PP'))s.fatorEsp.PP=0.9;s.tamEspV=1}if(!s.avisosV){s.avisarNovos=s.avisarNovos||['u-helena'];(s.pedidos||[]).forEach(p=>{p.criado=p.criado||{ts:p.chegada||0,antigo:1};p.vistoPor=p.vistoPor||{};s.avisarNovos.forEach(u=>{if(!p.vistoPor[u])p.vistoPor[u]=1})});s.avisosV=1}if(!s.donosV){s.donos={...DONOS0,...(s.donos||{})};s.donosV=1}if(!s.usersV||!s.usuarios.length){if(!s.usuarios.some(u=>u.email===USER0.email)){const h=(s.pessoas||[]).find(p=>/^helena$/i.test((p.nome||'').trim()));s.usuarios.push({...USER0,pessoa:h?h.id:''})}s.usersV=1}if((s.usersV||0)<2){if(!s.usuarios.some(u=>u.email===USER_ROGER.email)){const r=(s.pessoas||[]).find(p=>/^roger$/i.test((p.nome||'').trim()));s.usuarios.push({...USER_ROGER,pessoa:r?r.id:''})}s.usersV=2}
 if(!s.insV){(s.pedidos||[]).forEach(p=>{const come=(s.lotes||[]).some(l=>l.ped===p.id&&Object.keys(l.steps||{}).length);if(come||p.concluido)(p.materiais||[]).forEach(m=>m.conf=true)});(s.pessoas||[]).forEach(p=>{if((p.funcoes||[]).includes('comprar')&&!(p.funcoes||[]).includes('conferir'))p.funcoes.push('conferir')});s.insV=1}
 s.clientes=s.clientes||[];s.arquivos=s.arquivos||[];if(s.mockups&&s.mockups.length){s.mockups.forEach(m=>{if(m&&m.id&&m.img&&!MOCKG[m.id])guardaMockG(m.id,m.img)})}delete s.mockups;s.apelidos=s.apelidos||{};['tecido','cor','prod','local','serv'].forEach(k=>{if(!s.apelidos[k])s.apelidos[k]={}});
   (s.pedidos||[]).forEach(p=>{if(p.cli&&s.clientes.some(c=>c.id===p.cli))return;const c=acharCliente(s,p.cliente,p.cnpj);if(c){p.cli=c.id;if(!c.cnpj&&p.cnpj)c.cnpj=p.cnpj;if(!c.contato&&p.contato)c.contato=p.contato}else{const n={id:'c-'+(nCli(p.cliente).replace(/\s+/g,'-').slice(0,60)||'sem-nome'),nome:(p.cliente||'').trim(),cnpj:p.cnpj||'',contato:p.contato||'',apelidos:[]};s.clientes.push(n);p.cli=n.id}});if(!s.nomesV){(s.pessoas||[]).forEach(p=>{if(NOMES_V1[p.nome])p.nome=NOMES_V1[p.nome]});s.nomesV=1}if(!s.alexV){if(!(s.pessoas||[]).some(p=>chaveNome(p.nome)==='alexandra'))s.pessoas.push({id:'alexandra',nome:'Alexandra',papeis:['acab'],sabe:['arremate','embalagem'],melhor:[]});s.alexV=1}aplicaFotos(s);if(s.expediente&&!s.expediente.v2){if(!s.expediente.pausas.some(p=>hm(p.h)>=hm('11:00')&&hm(p.h)<=hm('13:00')))s.expediente.pausas.push({nome:'Almoço',h:'12:00',min:60});s.expediente.pausas.sort((a,b)=>hm(a.h)-hm(b.h));s.expediente.v2=true}s.log=s.log||[];s.pessoas=s.pessoas||[];s.consertos=s.consertos||[];s.cores={...CORES,...(s.cores||{})};const EXC={'0402':['Marcos Lima','12.345.678/0001-90'],'0409':['Juliana Prado','23.456.789/0001-01'],'0412':['Paulo Reis','34.567.890/0001-12'],'0415':['Carla Mendes','45.678.901/0001-23'],'0416':['Rafael Souza','56.789.012/0001-34'],'0419':['Renata Alves','78.901.234/0001-56'],'0418':['Teresa Nogueira','67.890.123/0001-45'],'0420':['Fernanda Rocha','89.012.345/0001-67']};s.pedidos.forEach(p=>{const x=EXC[p.id];p.contato=p.contato||(x?x[0]:'');p.cnpj=p.cnpj||(x?x[1]:'')});s.pessoas.forEach(p=>{if(!p.papeis)p.papeis=p.papel?[p.papel]:[];delete p.papel});const mg=x=>{if(x.parte==='Mangas'&&!x.lado)x.lado='esq'};s.produtos.forEach(p=>{(p.persPadrao||[]).forEach(mg);ajustaGola(p)});Object.entries({'Gola polo Marinho':260,'Gola polo Branca':120,'Gola polo Cinza':150,'Gola ribana Branca':300,'Gola ribana Preta':150}).forEach(([k,v])=>{if(s.estoque[k]==null)s.estoque[k]=v});s.lotes.forEach(l=>(l.pers||[]).forEach(mg));cfgDefaults(s);juntaClientes(s);mockNaBib(s);return s}
@@ -1596,6 +1598,7 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     ${ped.contato||ped.cnpj?`<div class="ped-ent">${ic('i-predio')}<span>${ped.contato?`Cliente: <b>${esc(ped.contato)}</b>`:''}${ped.contato&&ped.cnpj?' · ':''}${ped.cnpj?`<span class="nw">CNPJ ${esc(ped.cnpj)}</span>`:''}</span></div>`:''}
     ${!ped.concluido&&i.ab.length?`<div class="ped-ent">${ic('i-relogio')}<span>Trabalho restante ≈ ${nf(i.need)} dias úteis</span></div>`:''}
     <div class="ped-ent">${v?av(v,'s'):''}<span>Vendedora: <b>${esc(pNome(v)||'—')}</b> · Pedido ${esc(ped.id)} feito em ${fD(ped.chegada)}</span></div>
+    ${ped.obs?`<div class="ped-ent">${ic('i-lista')}<span>Observações: <b>${esc(ped.obs)}</b></span></div>`:''}
     ${(ped.edicoes||[]).length?`<div class="ped-ent" style="font-size:16px">${ic('i-engr')}<span>Corrigido por ${esc(ped.edicoes[ped.edicoes.length-1].por||'?')} ${haQuanto(ped.edicoes[ped.edicoes.length-1].ts)}${ped.edicoes.length>1?` · ${ped.edicoes.length} correções`:''}</span></div>`:''}
     ${ped.cancelado?`<div class="aviso">${ic('i-alerta')}<span>Pedido cancelado ${fD(ped.cancelado.ts)}${ped.cancelado.por?` por ${esc(ped.cancelado.por)}`:''}.${ped.cancelado.motivo?` Motivo: ${esc(ped.cancelado.motivo)}.`:''} Ele não aparece na produção nem nas tarefas.</span></div><div class="acoes"><button class="mbtn" data-a="pedReativar" data-id="${id}">Voltar o pedido para a produção</button></div>`:''}
     <div class="doc-bts">${ped.cancelado?'':`<button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button>`}<button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
@@ -1830,7 +1833,8 @@ function sProduto(pid){const p=prod(pid);if(!p)return voltar();const key='P'+p.i
     <div class="rotulo">Desenho</div><div class="linha-dep">${FORMAS.map(([f,n])=>`<button class="depc" data-a="prForma" data-p="${p.id}" data-v="${f}" aria-pressed="${p.forma===f}">${n}</button>`).join('')}</div></div>
   <div class="card"><h2>Tecidos</h2><p class="dica" style="margin:0 0 10px">Em cada pedido é obrigatório escolher um destes.</p>
     <div class="linha-dep">${(p.tecidos||[]).map(x=>`<span class="depc">${ic('i-rolo')}${esc(x)}<button class="x" data-a="rmTec" data-p="${p.id}" data-v="${esc(x)}" aria-label="Tirar ${esc(x)}" style="padding:0 8px;margin-left:4px">×</button></span>`).join('')}</div>
-    <div class="novo-in"><input class="campo" id="novoTec" placeholder="Novo tecido (ex.: Tactel)" autocomplete="off"><button class="mbtn" data-a="addTec" data-p="${p.id}">Adicionar</button></div></div>
+    ${(()=>{const outros=[...new Set(state.produtos.flatMap(q=>q.tecidos||[]))].filter(t=>!(p.tecidos||[]).some(x=>semAc(x)===semAc(t))).sort((a,b)=>a.localeCompare(b));return outros.length?`<div class="rotulo">Tecidos de outros produtos <span style="font-weight:400;color:var(--muted)">(toque para incluir)</span></div><div class="linha-dep">${outros.map(t=>`<button class="depc" data-a="addTec" data-p="${p.id}" data-v="${esc(t)}">${ic('i-mais')}${esc(t)}</button>`).join('')}</div>`:''})()}
+    <div class="rotulo">Tecido novo <span style="font-weight:400;color:var(--muted)">(pode escrever vários separados por vírgula)</span></div><div class="novo-in"><input class="campo" id="novoTec" placeholder="Ex.: Piquet PV, Piquet dry" autocomplete="off"><button class="mbtn" data-a="addTec" data-p="${p.id}">${ic('i-mais')}Adicionar</button></div></div>
   <div class="card"><h2>Aviamentos por peça</h2>
     ${p.golaItem?`<div class="mat">${ic('i-carrinho')}<div><b>${esc(p.golaItem)}</b><span>1 por peça, na cor da gola</span></div><span></span></div>`:''}
     ${p.aviam.map((a,j)=>`<div class="mat">${ic('i-carrinho')}<div><b>${esc(a[0])}</b><span>${nf(a[2],2)} ${a[1]==='m'?'metro(s)':'unidade(s)'} por peça</span></div><button class="x" data-a="rmAv" data-p="${p.id}" data-j="${j}">Tirar</button></div>`).join('')}
@@ -1932,7 +1936,7 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
     <div class="rotulo">CNPJ</div><input class="campo" id="wCnpj" value="${esc(w.cnpj||'')}" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off">
     <div class="rotulo">Número da ficha</div><input class="campo" id="wFicha" value="${esc(w.ficha||'')}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off">
     <div class="rotulo">Quem vendeu?</div><div class="linha-dep">${state.pessoas.filter(p=>temPapel(p,'vendas')||p.id===w.vend).map(p=>`<button class="pchip" data-a="wVend" data-v="${p.id}" aria-pressed="${w.vend===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div>${nav()}`;
-  if(w.step===1)return `${head}<div class="imp-box"><b>Tem a ficha de produção em PDF?</b><span>O sistema lê a ficha e preenche o pedido para você conferir.</span><div class="imp-bar" style="margin:6px 0 0"><button class="mbtn" data-a="impFichas">${ic('i-lista')}Importar fichas</button><button class="mbtn neutro2" data-a="impMocks">${ic('i-camisa')}Importar mockups</button></div></div><h1>Para quem é o pedido?</h1><div class="rotulo" style="margin-top:0">Nome da empresa</div><input class="campo" id="wCli" value="${esc(w.cliente)}" placeholder="Ex.: Hospital Santa Clara" autocomplete="off"><div id="wCliSug" class="linha-dep" style="margin-top:8px">${sugClientes(w.cliente,w.cli)}</div>
+  if(w.step===1)return `${head}<div class="imp-box"><b>Tem a ficha de produção em PDF ou Word?</b><span>O sistema lê a ficha e preenche o pedido para você conferir. Pode escolher as fichas e os mockups juntos.</span><div class="imp-bar" style="margin:6px 0 0"><button class="mbtn" data-a="impFichas">${ic('i-lista')}Importar fichas</button><button class="mbtn neutro2" data-a="impMocks">${ic('i-camisa')}Importar mockups</button></div></div><h1>Para quem é o pedido?</h1><div class="rotulo" style="margin-top:0">Nome da empresa</div><input class="campo" id="wCli" value="${esc(w.cliente)}" placeholder="Ex.: Hospital Santa Clara" autocomplete="off"><div id="wCliSug" class="linha-dep" style="margin-top:8px">${sugClientes(w.cliente,w.cli)}</div>
     <div class="rotulo">Nome do cliente (contato)</div><input class="campo" id="wCont" value="${esc(w.contato||'')}" placeholder="Ex.: Ana Souza" autocomplete="off">
     <div class="rotulo">CNPJ</div><input class="campo" id="wCnpj" value="${esc(w.cnpj||'')}" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off">
     <div class="rotulo">Quem vendeu?</div><div class="linha-dep">${state.pessoas.filter(p=>temPapel(p,'vendas')).map(p=>`<button class="pchip" data-a="wVend" data-v="${p.id}" aria-pressed="${w.vend===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div>${nav()}`;
@@ -1966,29 +1970,32 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
       <div><div class="passo-n">Quantidade por tamanho</div>
         <div class="linha-dep" style="margin-bottom:10px">${state.cats.map(c=>{const n=sum(c.t.map(z=>it.g[z]||0));return `<button class="depc" data-a="wCat" data-k="${k}" data-v="${c.id}" aria-pressed="${catDe(it).id===c.id}">${c.nome} <small style="font-weight:400">${c.t[0]} a ${c.t[c.t.length-1]}</small>${n?` <span class="tagp" style="padding:0 8px">${n}</span>`:''}</button>`}).join('')}</div>
         <div class="tams">${catDe(it).t.map(s=>`<div class="tam"><b>${s}</b><button class="stp" data-a="wQ" data-k="${k}" data-s="${s}" data-d="-10" aria-label="Menos 10 no ${s}">−</button><input id="q${k}${s}" data-q="${k}" data-s="${s}" inputmode="numeric" value="${it.g[s]||0}" aria-label="Quantidade ${s}"><button class="stp" data-a="wQ" data-k="${k}" data-s="${s}" data-d="10" aria-label="Mais 10 no ${s}">+</button></div>`).join('')}</div>
+      <div class="rotulo" style="margin-top:4px">Outro tamanho <span style="font-weight:400;color:var(--muted)">(se não estiver acima)</span></div><div class="novo-in"><input class="campo" id="wTamN${k}" placeholder="Ex.: G5" autocomplete="off" style="max-width:160px"><button class="mbtn neutro2" data-a="wTamAdd" data-k="${k}">${ic('i-mais')}Incluir tamanho</button></div>
       <p style="margin:0;font-weight:700">Total: ${sum(sizesAll().map(s=>it.g[s]||0))} peças</p></div>`).join('')}${w.edit?`<h2 style="margin-top:24px">Adicionar outra peça</h2><p style="color:var(--ink2);margin-top:-6px">Toque na peça para incluir no pedido.</p>${catalogo}`:''}${nav()}`}
   if(w.step===3){const ops=[15,20,30].map(d=>{const dt=new Date(now()+d*DIA);dt.setHours(17,0,0,0);return dt.getTime()});
     const iso=w.entrega?(()=>{const d=new Date(w.entrega);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`})():'';
     return `${head}<h1>Para quando?</h1><div class="datas">${ops.map((t,k)=>`<button class="data-op" data-a="wData" data-t="${t}" aria-pressed="${w.entrega===t}"><b>Daqui ${[15,20,30][k]} dias</b><span>${DOW[new Date(t).getDay()]}, ${new Date(t).getDate()} de ${MES[new Date(t).getMonth()]}</span></button>`).join('')}</div>
-      <p class="passo-n" style="margin-top:18px">Ou escolha outra data</p><input class="campo" type="date" id="wDt" value="${iso}">${nav()}`}
+      <p class="passo-n" style="margin-top:18px">Ou escolha outra data</p><input class="campo" type="date" id="wDt" value="${iso}">
+      <div class="rotulo" style="margin-top:22px">Observações do pedido <span style="font-weight:400;color:var(--muted)">(se tiver: vão na ficha de produção)</span></div><textarea class="campo" id="wObs" rows="3" placeholder="Ex.: entregar dobradas, uma por saquinho">${esc(w.obs||'')}</textarea>${nav()}`}
   const tot=sum(w.itens.map(it=>sum(sizesAll().map(s=>it.g[s]||0))));
   const mats=calcMat(w.itens.map(it=>({prod:it.prod,cor:it.cor,qtd:sum(sizesAll().map(s=>it.g[s]||0))}))).filter(m=>m.st==='comprar');
   const md=w.edit?mudancasPed(w):[];
   return `${head}<h1>${w.edit?'Confira a correção':'Está certo?'}</h1>${w.edit?`<div class="card" style="border-color:var(--blue)"><h2>O que vai mudar</h2>${md.length?`<ul class="mudou">${md.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="dica">Nada mudou ainda. Volte e corrija o que precisar.</p>'}${pedById(w.edit)?.aprov&&md.length?`<div class="instr" style="margin:10px 0 0">${ic('i-alerta')}<span>O cliente já tinha aprovado este pedido. Depois de salvar, gere o <b>Pedido</b> de novo e peça uma nova aprovação.</span></div>`:''}</div>`:''}<div class="card"><h2>${esc(w.cliente)}</h2>${w.contato||w.cnpj?`<div class="ped-ent">${esc(w.contato||'')}${w.contato&&w.cnpj?' · ':''}${w.cnpj?'CNPJ '+esc(w.cnpj):''}</div>`:''}<div class="ped-ent">${av(w.vend,'s')}<span>Vendedora: <b>${esc(pNome(w.vend))}</b></span></div>
     ${w.itens.map(it=>`<div class="resumo-item">${prodSvg(it.prod,it.cor,it.cores2)}<div><b>${esc(prod(it.prod).nome)}</b><div style="color:var(--ink2)">${esc(modeloTxt(it))}</div><div style="color:var(--ink2)">${sizesAll().filter(s=>it.g[s]).map(s=>`${s}: ${it.g[s]}`).join(' · ')}</div><div style="color:var(--ink2)">${it.pers.map(x=>`${esc(tNome(x.tipo))} na ${esc(localTxt(x).toLowerCase())}`).join(' · ')||'Sem personalização'}</div></div></div>`).join('')}
+    ${(w.obs||'').trim()?`<div class="resumo-item">${ic('i-lista')}<div><b>Observações</b><div style="color:var(--ink2)">${esc(w.obs.trim())}</div></div></div>`:''}
     <div class="resumo-item">${ic('i-caminhao')}<b>Entrega ${DOW[new Date(w.entrega).getDay()]}, ${new Date(w.entrega).getDate()} de ${MES[new Date(w.entrega).getMonth()]} · ${tot} peças</b></div></div>
     <div class="card"><h2>${mats.length?'Provavelmente vai precisar comprar':'Pelo cadastro, tem o material'}</h2>${mats.length?mats.map(m=>`<div class="mat">${ic('i-carrinho')}<div><b>${esc(m.item)}</b><span>${qtdTxt(m.nec-m.est,m.un)}</span></div><span></span></div>`).join(''):`<div class="lib u-ok">${ic('i-check')}Pode seguir</div>`}${avisoEst()}<p class="dica">Consumo de tecido por tamanho: ${state.cats.map(c=>`${esc(c.nome.toLowerCase())} ${Math.round(c.fator*100)}%`).join(', ')}${Object.entries(state.fatorEsp).map(([t,f])=>`, ${esc(t)} ${Math.round(f*100)}%`).join('')}. Dá para mudar em Cadastros → Ajustes.</p></div>
     ${w.edit?`<div class="acoes"><button class="big go" data-a="wSalvarEd" ${md.length?'':'disabled'}>${ic('i-check')}Salvar correção</button></div>`:`<div class="acoes"><button class="big go" data-a="wCriar">${ic('i-check')}Criar pedido</button></div>`}`}
 /* Corrigir pedido já lançado: abre o mesmo passo a passo do Novo pedido, preenchido. */
 function wDoPedido(ped){const ls=lotesDe(ped.id).filter(l=>!l.rework);
-  return {step:1,edit:ped.id,cliente:ped.cliente,cli:ped.cli,contato:ped.contato||'',cnpj:ped.cnpj||'',ficha:ped.ficha||'',vend:ped.vendedor,entrega:ped.entrega,err:'',
+  return {step:1,edit:ped.id,cliente:ped.cliente,cli:ped.cli,contato:ped.contato||'',cnpj:ped.cnpj||'',ficha:ped.ficha||'',vend:ped.vendedor,entrega:ped.entrega,obs:ped.obs||'',err:'',
     itens:ls.map(l=>({lote:l.id,travado:Object.keys(l.steps||{}).length>0||(state.lotes||[]).some(x=>x.parent===l.id),prod:l.prod,cor:l.cor,cores2:JSON.parse(JSON.stringify(l.cores2||[])),novaC2:null,tecido:l.tecido||'',opcoes:[...(l.opcoes||[])],
       g:{...(l.grade||l.g||{})},qtd0:l.qtd,pers:JSON.parse(JSON.stringify(l.pers||[])),novaP:null,mock:l.mock||null}))}}
 const gradeTxt=g=>sizesAll().filter(s=>g[s]).map(s=>`${s} ${g[s]}`).join(', ')||'0';
 function mudancasPed(w){const ped=pedById(w.edit);if(!ped)return[];const m=[],d=(a,b)=>String(a||'').trim()!==String(b||'').trim();
   if(d(ped.cliente,w.cliente))m.push(`Empresa: ${ped.cliente} → ${w.cliente.trim()}`);if(d(ped.contato,w.contato))m.push(`Contato: ${ped.contato||'—'} → ${w.contato.trim()||'—'}`);
   if(d(soDig(ped.cnpj),soDig(w.cnpj)))m.push(`CNPJ: ${ped.cnpj||'—'} → ${w.cnpj.trim()||'—'}`);if(d(ped.ficha,w.ficha))m.push(`Ficha: ${ped.ficha||'—'} → ${w.ficha.trim()||'—'}`);
-  if(ped.vendedor!==w.vend)m.push(`Vendedora: ${pNome(ped.vendedor)||'—'} → ${pNome(w.vend)}`);if(sod(ped.entrega).getTime()!==sod(w.entrega).getTime())m.push(`Entrega: ${fD(ped.entrega)} → ${fD(w.entrega)}`);
+  if(ped.vendedor!==w.vend)m.push(`Vendedora: ${pNome(ped.vendedor)||'—'} → ${pNome(w.vend)}`);if(sod(ped.entrega).getTime()!==sod(w.entrega).getTime())m.push(`Entrega: ${fD(ped.entrega)} → ${fD(w.entrega)}`);if(d(ped.obs,w.obs))m.push(`Observações: ${(ped.obs||'').trim()||'—'} → ${(w.obs||'').trim()||'—'}`);
   const ls=lotesDe(ped.id).filter(l=>!l.rework);
   w.itens.forEach(it=>{const l=it.lote&&lote(it.lote),n=prod(it.prod).nome;if(!l){m.push(`Nova peça: ${n} · ${modeloTxt(it)} · ${sum(sizesAll().map(s=>it.g[s]||0))} peças`);return}
     if(l.prod!==it.prod)m.push(`${prod(l.prod).nome} → ${n}`);if(modeloTxt(l)!==modeloTxt({...it}))m.push(`${n}: ${modeloTxt(l)} → ${modeloTxt(it)}`);
@@ -2000,7 +2007,7 @@ function mudancasPed(w){const ped=pedById(w.edit);if(!ped)return[];const m=[],d=
 function salvarEdicao(){const w=ui.sheet.w,ped=pedById(w.edit);if(!ped)return;const md=mudancasPed(w);if(!md.length)return;snap();
   const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);
   Object.assign(ped,{cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim(),vendedor:w.vend,entrega:w.entrega});
-  if((w.ficha||'').trim())ped.ficha=w.ficha.trim();else delete ped.ficha;
+  if((w.ficha||'').trim())ped.ficha=w.ficha.trim();else delete ped.ficha;if((w.obs||'').trim())ped.obs=w.obs.trim();else delete ped.obs;
   const ids=new Set(w.itens.map(it=>it.lote).filter(Boolean));
   state.lotes=state.lotes.filter(l=>l.ped!==ped.id||l.rework||ids.has(l.id)||Object.keys(l.steps||{}).length);
   let n=Math.max(0,...state.lotes.filter(l=>l.ped===ped.id).map(l=>parseInt(String(l.id).split('-')[1],10)||0));
@@ -2107,14 +2114,18 @@ const FAQ=[
 {c:'ped',q:'Dá para apagar um pedido?',k:'apagar excluir deletar pedido remover',r:['Um pedido real não se apaga. Se o cliente desistiu, use Cancelar pedido: ele sai da produção e fica guardado em Cancelados.','Se foi lançado errado, use Corrigir pedido.','Só os pedidos de exemplo podem ser apagados (Cadastros › Ajustes › Pedidos de exemplo).']},
 /* novo e corrigir */
 {c:'novo',q:'Como lanço um pedido novo?',k:'novo pedido lançar cadastrar criar pedido venda',r:['Toque no + Novo, na barra de baixo.','Passo 1: empresa, contato, CNPJ e quem vendeu.','Passo 2: toque na peça e escolha tecido, cor, personalização e as quantidades por tamanho.','Passo 3: a data de entrega. Passo 4: confira e toque em Criar pedido.'],ir:'novo'},
-{c:'novo',q:'Como importo a ficha de produção em PDF?',k:'importar ficha pdf ler ficha automático',r:['Toque no + Novo e depois em Importar fichas.','Escolha o PDF (pode ser mais de um).','Confira o que tem o sinal ⚠ e toque em Criar pedido.'],ir:'novo'},
+{c:'novo',q:'Como importo a ficha de produção em PDF?',k:'importar ficha pdf ler ficha automático mockup junto',r:['Toque no + Novo e depois em Importar fichas.','Escolha as fichas (PDF ou Word) e, se quiser, os mockups junto. Pode escolher vários arquivos de uma vez.','O sistema lê empresa, número, produto, tecido, cor, personalização, tamanhos, prazo e observações. O mockup vai sozinho para a peça cuja cor ou produto está no nome do arquivo.','Confira o que tem o sinal ⚠, escolha quem vendeu e toque em Criar pedido.'],ir:'novo'},
+{c:'novo',q:'Dá para importar ficha em Word?',k:'word docx doc ficha word importar arquivo do word',r:['Sim. Em Importar fichas, escolha o arquivo do Word (.docx), do mesmo jeito que o PDF.','A imagem que estiver dentro do Word vira o mockup da peça.','Se o arquivo for .doc (Word antigo), abra no Word e salve como .docx ou PDF.'],ir:'novo'},
+{c:'novo',q:'Onde escrevo observações do pedido?',k:'observação observações obs anotação recado pedido ficha produção',r:['No pedido novo: no passo 3 (a data), embaixo, em Observações do pedido.','Na importação: o campo Observações já vem com o que estava escrito na ficha. Dá para mudar.','Num pedido já lançado: ✎ Corrigir pedido, passo 3.','As observações saem na ficha de produção do sistema, no quadro OBSERVAÇÕES.'],ir:'novo'},
 {c:'novo',q:'Errei um pedido já lançado. Como corrijo?',k:'corrigir pedido editar alterar mudar errado lançado',r:['Abra o pedido e toque em ✎ Corrigir pedido.','Mude o que precisar nos passos (dados, peças, quantidades, entrega).','No fim aparece "O que vai mudar". Confira e toque em Salvar correção.','Peça que já começou a produção só muda quantidade e personalização.'],ir:'ped'},
 {c:'novo',q:'Como mudo só a data de entrega?',k:'data entrega prazo mudar adiar antecipar',r:['Abra o pedido e toque em ✎ Corrigir pedido.','Toque em Próximo até o passo 3, escolha a nova data e siga até Salvar correção.'],ir:'ped'},
 {c:'novo',q:'A cor que preciso não está na lista',k:'cor nova não tem cor cadastrar cor',r:['No passo 2 do pedido, embaixo das cores, toque em Nova cor.','Escreva o nome, escolha a cor e toque em Salvar. Ela fica para os próximos pedidos.']},
-{c:'novo',q:'O tecido que preciso não está na lista',k:'tecido novo não tem tecido cadastrar tecido',r:['No passo 2 do pedido, em Tecido, toque em Novo tecido.','Escreva o nome e toque em Salvar. Ele fica cadastrado naquela peça.']},
+{c:'novo',q:'O tecido que preciso não está na lista',k:'tecido novo não tem tecido cadastrar tecido',r:['No passo 2 do pedido, em Tecido, toque em Novo tecido.','Escreva o nome e toque em Salvar. Ele fica cadastrado naquela peça.','Na importação, tecido que o produto ainda não tem entra sozinho como tecido novo.']},
+{c:'cad',q:'Como coloco um tecido novo num produto?',k:'tecido novo produto cadastrar tecido piquet malha pv dry algodão incluir tecido',r:['Cadastros › Produtos › toque no produto.','Em Tecidos: toque num tecido de outro produto para incluir, ou escreva um novo. Dá para escrever vários separados por vírgula (ex.: Piquet PV, Piquet dry).','Toque em Adicionar.'],ir:'cad:produtos',g:1},
 {c:'novo',q:'A peça tem mais de uma cor (gola de outra cor, por exemplo)',k:'duas cores segunda cor gola outra cor detalhe cor',r:['No passo 2, em "Outras cores na peça", toque em Adicionar segunda cor.','Escolha a cor e as partes (Gola, Mangas…).','Toque em Confirmar cor.']},
 {c:'novo',q:'Como coloco personalização (bordado, estampa) no pedido?',k:'personalização bordado estampa silk dtf sublimação logo posição',r:['No passo 2, em "Personalização: o quê e onde", toque em Adicionar.','Escolha o tipo, a parte da peça e onde exatamente (peito esquerdo, centro…).','Esquerdo e direito são de quem veste.']},
-{c:'novo',q:'Como coloco as quantidades por tamanho?',k:'quantidade tamanhos grade p m g gg infantil adulto',r:['No passo 2, em "Quantidade por tamanho", escolha a categoria (adulto, infantil…).','Use − e + (de 10 em 10) ou toque no número e digite.']},
+{c:'novo',q:'Como coloco as quantidades por tamanho?',k:'quantidade tamanhos grade p m g gg infantil adulto',r:['No passo 2, em "Quantidade por tamanho", escolha a categoria (adulto, infantil, especiais…).','Use − e + (de 10 em 10) ou toque no número e digite.']},
+{c:'novo',q:'Como lanço um tamanho especial (G1, EXG…)?',k:'tamanho especial especiais g1 g2 g3 g4 exg eg pp plus outro tamanho grande',r:['No passo 2, em Quantidade por tamanho, toque em Especiais (PP, EG, EXG, G1 a G4).','Não achou o tamanho? Escreva em "Outro tamanho" (ex.: G5) e toque em Incluir tamanho. Ele fica cadastrado em Especiais.','Na importação, tamanho especial da ficha entra sozinho.','Para mudar a lista ou quanto tecido cada um gasta: Cadastros › Ajustes › Tamanhos.']},
 /* arte e documentos */
 {c:'arte',q:'Como coloco a arte ou o arquivo de bordado no pedido?',k:'arte arquivo bordado dst pes logo imagem colocar anexar',r:['Abra o pedido, bloco "Arte para quem aplica".','Em cada personalização, toque em Pôr arte (ou Pôr arquivo de bordado).','Escolha uma que já está guardada (Usar este) ou toque em Enviar um arquivo novo.','Os arquivos ficam guardados na empresa para os próximos pedidos.'],ir:'ped'},
 {c:'arte',q:'Como reaproveito uma arte de um pedido antigo?',k:'reaproveitar arte antiga mesma arte arquivo guardado',r:['No pedido, toque em Pôr arte: aparece a lista do que já está guardado na empresa.','Toque em Usar este.','Para ver tudo o que a empresa tem: Pedidos › Empresas › toque na empresa › Arquivos da empresa.']},
@@ -2226,40 +2237,73 @@ function lerData(txt,depoisDe){const t=semAc(txt);let d,m,y;let r=t.match(/(\d{1
   if(!(d>=1&&d<=31&&m>=0&&m<=11))return null;const deduz=y==null;
   if(y==null){const hoje=new Date();y=hoje.getFullYear();if(depoisDe){const a=new Date(depoisDe);y=a.getFullYear();if(new Date(y,m,d,17).getTime()<depoisDe)y++}else if(new Date(y,m,d).getTime()>now()+7*DIA)y--}
   const dt=new Date(y,m,d,17,0,0,0);if(dt.getDate()!==d)return null;return {ts:dt.getTime(),deduz}}
-async function lerFicha(file){const pdf=await pdfLib();const buf=await lerArq(file);const doc=await pdf.getDocument({data:new Uint8Array(buf),isEvalSupported:false}).promise;
-  const pg=await doc.getPage(1);const tc=await pg.getTextContent();const it=tc.items.filter(t=>t.str.trim()).map(t=>({x:t.transform[4],y:t.transform[5],s:t.str.trim()}));
-  const linhas=[];[...it].sort((a,b)=>b.y-a.y||a.x-b.x).forEach(t=>{const l=linhas.find(l=>Math.abs(l.y-t.y)<=3);l?l.it.push(t):linhas.push({y:t.y,it:[t]})});
-  linhas.forEach(l=>{l.it.sort((a,b)=>a.x-b.x);l.t=l.it.map(x=>x.s).join(' ').replace(/\s+/g,' ')});
-  const F={arquivo:file.name,avisos:[]};const achaI=re=>linhas.findIndex(l=>re.test(semAc(l.t)));const depois=(l,re)=>l.t.replace(re,'').trim();
-  const i0=achaI(/^ficha de producao/);if(i0>=0){const l=linhas[i0];const pag=l.it.find(x=>/^\d+\s*\/\s*\d+$/.test(x.s));if(pag)F.pag=pag.s.replace(/\s/g,'');F.cliente=l.it.filter(x=>x!==pag&&!/ficha de produ/i.test(semAc(x.s))).map(x=>x.s).join(' ').trim()||null}
+const MAMMOTH='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+async function wordLib(){if(!window.mammoth)await carregaScript(MAMMOTH);return window.mammoth}
+const ehWord=f=>/\.docx$/i.test(f.name||'')||/wordprocessingml/.test(f.type||'');
+const ehPdf=f=>/pdf$/i.test(f.type||'')||/\.pdf$/i.test(f.name||'');
+/* Tamanhos que a ficha pode trazer: os cadastrados mais os especiais conhecidos. */
+const TAM_ESP=['PP','EG','EXG','XGG','G1','G2','G3','G4','G5','EGG'];
+const tamSet=()=>new Set([...sizesAll(),...TAM_ESP].map(x=>x.toUpperCase()));
+const ehTam=s=>{const t=String(s||'').trim().toUpperCase();return tamSet().has(t)||/^(G\d|EX?G+|X+G+|BL ?(PP|P|M|G|GG))$/.test(t)};
+/* Lê a ficha (PDF ou Word). Devolve uma lista: cada página/arquivo que é ficha vira um item; o resto é tratado como mockup. */
+async function lerFicha(file){
+  if(ehWord(file))return [await lerFichaWord(file)];
+  const pdf=await pdfLib();const buf=await lerArq(file);const doc=await pdf.getDocument({data:new Uint8Array(buf),isEvalSupported:false}).promise;const out=[];
+  for(let n=1;n<=doc.numPages;n++){const pg=await doc.getPage(n);const tc=await pg.getTextContent();const it=tc.items.filter(t=>t.str.trim()).map(t=>({x:t.transform[4],y:t.transform[5],s:t.str.trim()}));
+    const linhas=[];[...it].sort((a,b)=>b.y-a.y||a.x-b.x).forEach(t=>{const l=linhas.find(l=>Math.abs(l.y-t.y)<=3);l?l.it.push(t):linhas.push({y:t.y,it:[t]})});
+    linhas.forEach(l=>{l.it.sort((a,b)=>a.x-b.x);l.t=l.it.map(x=>x.s).join(' ').replace(/\s+/g,' ')});
+    const F={arquivo:file.name,pagArq:doc.numPages>1?n:null,avisos:[],linhas:[],tabOk:false};textoFicha(F,linhas);
+    if(!F.ehFicha){if(n===1)out.push({arquivo:file.name,naoFicha:true});continue}
+    tabelaPdf(F,it);if(!F.linhas.length)F.avisos.push('Não consegui ler a tabela de tamanhos.');out.push(F)}
+  return out.length?out:[{arquivo:file.name,naoFicha:true}]}
+/* Parte de texto, igual para PDF e Word. */
+function textoFicha(F,linhas){const achaI=re=>linhas.findIndex(l=>re.test(semAc(l.t)));const depois=(l,re)=>l.t.replace(re,'').trim();
+  const i0=achaI(/^ficha de producao/);F.ehFicha=i0>=0||achaI(/pedido n\S*\s*\d/)>=0&&achaI(/^produto\s*:?/)>=0;
+  if(i0>=0){const t=linhas[i0].t.replace(/^ficha de produ\S*\s*:?/i,'').trim();const m=t.match(/(\d+)\s*\/\s*(\d+)\s*$/);if(m)F.pag=m[1]+'/'+m[2];F.cliente=(m?t.slice(0,m.index):t).trim()||null}
   const ip=achaI(/pedido n/);if(ip>=0){const m=linhas[ip].t.match(/pedido\s*n\S*\s*(\d+)/i);if(m)F.num=m[1]}
-  const iP=achaI(/^produto\s*:?/),iC=achaI(/^obs do corte/),iPz=achaI(/^obs personaliza/),iF=achaI(/^fechou/),iE=achaI(/^prazo de entrega/);
-  if(iP>=0){const fim=[iC,iPz,iF].filter(x=>x>iP).sort((a,b)=>a-b)[0]??iP+3;F.produto=[depois(linhas[iP],/^produto\s*:?/i),...linhas.slice(iP+1,fim).map(l=>l.t)].join(' ').replace(/^\s*[.\-•]\s*/,'').replace(/\s+/g,' ').trim()}
+  const iP=achaI(/^produto\s*:?/),iC=achaI(/^obs do corte/),iPz=achaI(/^obs personaliza/),iF=achaI(/^fechou/),iE=achaI(/^prazo de entrega/),iO=achaI(/^(obs|observac\S*)\s*(gerais?|do pedido)?\s*:/);
+  const proximo=(i,lim)=>[iC,iPz,iF,iE,iO,...lim].filter(x=>x>i).sort((a,b)=>a-b)[0];
+  if(iP>=0){const fim=proximo(iP,[])??iP+3;F.produto=[depois(linhas[iP],/^produto\s*:?/i),...linhas.slice(iP+1,fim).map(l=>l.t)].join(' ').replace(/^\s*[.\-•]\s*/,'').replace(/\s+/g,' ').trim()}
   if(iC>=0)F.obsCorte=depois(linhas[iC],/^obs do corte\s*:?/i);
-  if(iPz>=0){F.persTxt=depois(linhas[iPz],/^obs personaliza\S*\s*:?/i);const fim=[iF,iE].filter(x=>x>iPz).sort((a,b)=>a-b)[0]??iPz+1;
+  if(iPz>=0){F.persTxt=depois(linhas[iPz],/^obs personaliza\S*\s*:?/i);const fim=proximo(iPz,[])??iPz+1;
     F.locais=linhas.slice(iPz+1,fim).map(l=>{const m=l.t.match(/^([^:]{2,30}):\s*(.*)$/);return m?{rot:m[1].trim(),txt:m[2].trim()}:null}).filter(Boolean)}
-  if(iF>=0){F.fechouTxt=depois(linhas[iF],/^fechou\s*:?/i);F.fechou=lerData(F.fechouTxt)}
-  if(iE>=0){F.prazoTxt=depois(linhas[iE],/^prazo de entrega\s*:?/i);F.prazo=lerData(F.prazoTxt,F.fechou?.ts)}
-  if(F.produto){const m=F.produto.match(/^(.*?)\s+em\s+(.+?)\s+na\s+cor\s+(.+)$/i);if(m){F.modeloTxt=m[1].trim();F.tecidoTxt=m[2].trim();F.corTxt=m[3].trim()}else{const c=F.produto.match(/na\s+cor\s+(.+)$/i);if(c)F.corTxt=c[1].trim()}}
-  // tabela de tamanhos
-  const qd=it.find(x=>/^qdade/i.test(x.s)||/^quantidade/i.test(x.s));const SZ=new Set([...sizesAll(),'PP','EXG','EG','G1','G2','G3','XGG'].map(x=>x.toUpperCase()));
-  F.linhas=[];F.tabOk=false;
-  if(qd){const hdr=it.filter(x=>Math.abs(x.y-qd.y)<=20&&x.x<qd.x-10&&SZ.has(x.s.toUpperCase())).sort((a,b)=>a.x-b.x);
-    const tot=it.find(x=>/^total$/i.test(x.s)&&x.y<qd.y-30);const baseY=tot?tot.y+5:-1e9;
-    const nums=it.filter(x=>/^\d+$/.test(x.s)&&x.y<qd.y-25&&x.y>baseY);const rot=it.filter(x=>!/^\d+$/.test(x.s)&&x.y<qd.y-25&&x.y>baseY&&x.x<(hdr[0]?hdr[0].x:qd.x)-40);
-    const rows=[];nums.sort((a,b)=>b.y-a.y).forEach(n=>{const r=rows.find(r=>Math.abs(r.y-n.y)<=6);r?r.n.push(n):rows.push({y:n.y,n:[n],rot:[]})});
-    rot.forEach(t=>{const c=rows.filter(r=>r.y>=t.y-6).sort((a,b)=>(a.y-t.y)-(b.y-t.y))[0];if(c)c.rot.push(t)});
-    const w=hdr.length>1?(hdr[hdr.length-1].x-hdr[0].x)/(hdr.length-1):null;
-    rows.forEach(r=>{r.n.sort((a,b)=>a.x-b.x);const totN=r.n.filter(n=>n.x>=qd.x-40),sz=r.n.filter(n=>n.x<qd.x-40);const g={};let certo=true;
-      if(sz.length===hdr.length)sz.forEach((n,i)=>g[hdr[i].s.toUpperCase()]=+n.s);
-      else if(w){sz.forEach(n=>{const i=hdr.findIndex(h=>n.x>=h.x-w/2-8&&n.x<h.x+w/2-8);if(i<0||g[hdr[i].s.toUpperCase()]!=null)certo=false;else g[hdr[i].s.toUpperCase()]=+n.s})}else certo=false;
-      const soma=sum(Object.values(g)),total=totN.length?+totN[totN.length-1].s:null;
-      F.linhas.push({rot:r.rot.sort((a,b)=>b.y-a.y||a.x-b.x).map(x=>x.s).join(' '),g,total,ok:certo&&soma>0&&(total==null||total===soma)})});
-    const tg=tot?it.filter(x=>/^\d+$/.test(x.s)&&x.y<=tot.y+5&&x.y>=tot.y-30).map(x=>+x.s)[0]:null;F.totalGeral=tg??null;
-    if(tg!=null&&tg!==sum(F.linhas.map(l=>sum(Object.values(l.g)))))F.linhas.forEach(l=>l.ok=false);
-    F.tabOk=F.linhas.length>0&&F.linhas.every(l=>l.ok)}
-  if(!F.linhas.length)F.avisos.push('Não consegui ler a tabela de tamanhos.');
-  return F}
+  if(iO>=0&&iO!==iC&&iO!==iPz){const fim=proximo(iO,[])??iO+1;F.obs=[depois(linhas[iO],/^[^:]*:/),...linhas.slice(iO+1,Math.min(fim,iO+4)).map(l=>l.t)].join(' ').trim()}
+  if(iF>=0){F.fechouTxt=depois(linhas[iF],/^fechou\s*:?/i);F.prazoNaMesma=/prazo de entrega/i.test(F.fechouTxt);if(F.prazoNaMesma){const k=F.fechouTxt.search(/prazo de entrega/i);F.prazoTxt=F.fechouTxt.slice(k).replace(/^prazo de entrega\s*:?/i,'').trim();F.fechouTxt=F.fechouTxt.slice(0,k).trim()}F.fechou=lerData(F.fechouTxt)}
+  if(iE>=0)F.prazoTxt=depois(linhas[iE],/^prazo de entrega\s*:?/i);if(F.prazoTxt)F.prazo=lerData(F.prazoTxt,F.fechou?.ts);
+  if(F.produto){const m=F.produto.match(/^(.*?)\s+em\s+(.+?)\s+na\s+cor\s+(.+)$/i);if(m){F.modeloTxt=m[1].trim();F.tecidoTxt=m[2].trim();F.corTxt=m[3].trim()}else{const c=F.produto.match(/^(.*?)\s*na\s+cor\s+(.+)$/i);if(c){F.modeloTxt=c[1].trim();F.corTxt=c[2].trim()}const t=(c?c[1]:F.produto).match(/^(.*?)\s+em\s+(.+)$/i);if(t){F.modeloTxt=t[1].trim();F.tecidoTxt=t[2].trim()}}}}
+/* Tabela de tamanhos do PDF, pela posição de cada número. */
+function tabelaPdf(F,it){const qd=it.find(x=>/^qdade/i.test(x.s)||/^quantidade/i.test(x.s));if(!qd)return;
+  const hdr=it.filter(x=>Math.abs(x.y-qd.y)<=20&&x.x<qd.x-10&&ehTam(x.s)).sort((a,b)=>a.x-b.x);
+  const tot=it.find(x=>/^total$/i.test(x.s)&&x.y<qd.y-30);const baseY=tot?tot.y+5:-1e9;
+  const nums=it.filter(x=>/^\d+$/.test(x.s)&&x.y<qd.y-25&&x.y>baseY);const rot=it.filter(x=>!/^\d+$/.test(x.s)&&x.y<qd.y-25&&x.y>baseY&&x.x<(hdr[0]?hdr[0].x:qd.x)-40);
+  const rows=[];nums.sort((a,b)=>b.y-a.y).forEach(n=>{const r=rows.find(r=>Math.abs(r.y-n.y)<=6);r?r.n.push(n):rows.push({y:n.y,n:[n],rot:[]})});
+  rot.forEach(t=>{const c=rows.filter(r=>r.y>=t.y-6).sort((a,b)=>(a.y-t.y)-(b.y-t.y))[0];if(c)c.rot.push(t)});
+  const w=hdr.length>1?(hdr[hdr.length-1].x-hdr[0].x)/(hdr.length-1):null;
+  rows.forEach(r=>{r.n.sort((a,b)=>a.x-b.x);const totN=r.n.filter(n=>n.x>=qd.x-40),sz=r.n.filter(n=>n.x<qd.x-40);const g={};let certo=true;
+    if(sz.length===hdr.length)sz.forEach((n,i)=>g[hdr[i].s.toUpperCase()]=+n.s);
+    else if(w){sz.forEach(n=>{const i=hdr.findIndex(h=>n.x>=h.x-w/2-8&&n.x<h.x+w/2-8);if(i<0||g[hdr[i].s.toUpperCase()]!=null)certo=false;else g[hdr[i].s.toUpperCase()]=+n.s})}else certo=false;
+    const soma=sum(Object.values(g)),total=totN.length?+totN[totN.length-1].s:null;
+    F.linhas.push({rot:r.rot.sort((a,b)=>b.y-a.y||a.x-b.x).map(x=>x.s).join(' '),g,total,ok:certo&&soma>0&&(total==null||total===soma)})});
+  const tg=tot?it.filter(x=>/^\d+$/.test(x.s)&&x.y<=tot.y+5&&x.y>=tot.y-30).map(x=>+x.s)[0]:null;F.totalGeral=tg??null;
+  if(tg!=null&&tg!==sum(F.linhas.map(l=>sum(Object.values(l.g)))))F.linhas.forEach(l=>l.ok=false);
+  F.tabOk=F.linhas.length>0&&F.linhas.every(l=>l.ok)}
+/* Ficha em Word (.docx): o texto sai na ordem do documento; a tabela de tamanhos é lida pelas colunas. */
+async function lerFichaWord(file){const mm=await wordLib();const buf=await lerArq(file);
+  const r=await mm.convertToHtml({arrayBuffer:buf},{convertImage:mm.images.imgElement(im=>im.read('base64').then(b=>({src:`data:${im.contentType};base64,${b}`})))});
+  const dom=new DOMParser().parseFromString('<div>'+r.value+'</div>','text/html');const raiz=dom.body.firstChild;const linhas=[],tabelas=[];
+  const txt=e=>(e.textContent||'').replace(/\s+/g,' ').trim();
+  const anda=el=>{[...el.children].forEach(c=>{const tag=c.tagName;if(tag==='TABLE'){const rows=[...c.querySelectorAll(':scope > tbody > tr, :scope > tr, :scope > thead > tr')].map(tr=>{const cs=[];[...tr.children].forEach(td=>{const n=+(td.getAttribute('colspan')||1);const ps=[...td.querySelectorAll('p')].map(txt).filter(Boolean);for(let i=0;i<n;i++)cs.push(i?'':(ps.length?ps:[txt(td)].filter(Boolean)))});return cs});tabelas.push(rows);
+        rows.forEach(cs=>{const vivos=cs.filter(x=>x&&x.length);if(vivos.length<=1)(vivos[0]||[]).forEach(t=>linhas.push({t}));else linhas.push({t:vivos.map(x=>x.join(' ')).join(' ')})})}
+      else if(/^(P|H\d|LI)$/.test(tag)){const t=txt(c);if(t)linhas.push({t})}else anda(c)})};anda(raiz);
+  const F={arquivo:file.name,avisos:[],linhas:[],tabOk:false,imgs:[...raiz.querySelectorAll('img')].map(i=>i.getAttribute('src')).filter(s=>/^data:image/.test(s||''))};
+  textoFicha(F,linhas);if(!F.ehFicha)return {arquivo:file.name,naoFicha:true,imgs:F.imgs};
+  for(const rows of tabelas){const hi=rows.findIndex(cs=>cs.some(x=>x&&/^(qdade|quantidade)/i.test(x.join(' '))));if(hi<0)continue;
+    const H=rows[hi].map(x=>x?x.join(' '):'');const qi=H.findIndex(x=>/^(qdade|quantidade)/i.test(x));const cols=H.map((x,i)=>i!==qi&&ehTam(x)?i:-1).filter(i=>i>=0);
+    for(const cs of rows.slice(hi+1)){const C=cs.map(x=>x?x.join(' '):'');if(/^total/i.test(C[0]||'')){const n=C.slice(1).map(x=>parseInt(x,10)).find(x=>!isNaN(x));F.totalGeral=n??null;break}
+      const g={};cols.forEach(i=>{const n=parseInt(C[i],10);if(n>0)g[H[i].toUpperCase()]=n});const total=parseInt(C[qi],10);const soma=sum(Object.values(g));if(!soma&&isNaN(total))continue;
+      F.linhas.push({rot:C.slice(0,cols[0]??1).filter(Boolean).join(' '),g,total:isNaN(total)?null:total,ok:soma>0&&(isNaN(total)||total===soma)})}
+    if(F.totalGeral!=null&&F.totalGeral!==sum(F.linhas.map(l=>sum(Object.values(l.g)))))F.linhas.forEach(l=>l.ok=false);break}
+  F.tabOk=F.linhas.length>0&&F.linhas.every(l=>l.ok);if(!F.linhas.length)F.avisos.push('Não consegui ler a tabela de tamanhos.');return F}
 // só marca como certo quando o texto bate exatamente com o cadastro
 const casaExato=(txt,lista)=>{const t=semAc(txt);const r=lista.filter(x=>semAc(x)===t);return r.length===1?r[0]:null};
 function prodPorApelido(txt){const id=state.apelidos?.prod?.[semAc(txt)];return id&&prod(id)?id:null}
@@ -2273,15 +2317,30 @@ function lerLocal(rot,p){const t=semAc(rot).replace(/\s+/g,' ');{const ex=semAc(
   const ex=semAc(expAbrev(rot));const sp=sug?posDe(sug).find(v=>semAc(v)===ex||(ex.includes('peito')&&semAc(v).includes('peito')&&((/esq/.test(ex)&&/esq/.test(semAc(v)))||(/dir/.test(ex)&&/dir/.test(semAc(v)))))):null;
   return {parte:null,sug,sugPos:sp||null,lado:sug==='Mangas'?lado:null,certo:false}}
 function montaItem(F,L){const txt=[F.modeloTxt,L.rot].filter(Boolean).join(' ');const it={fonte:F.arquivo,pag:F.pag,txt:F.produto+(L.rot?' · '+L.rot:''),prod:null,sugP:sugereProd(txt),tecido:null,tecTxt:F.tecidoTxt||'',cor:null,corTxt:F.corTxt||'',
-    g:{...L.g},total:L.total,gOk:L.ok,gConf:false,pers:[],obs:(F.obsCorte&&!/^[x\-–—]$/i.test(F.obsCorte.trim()))?'Corte: '+F.obsCorte:'',mock:null};
-  it.chaveP=semAc(txt);it.prod=prodPorApelido(txt);if(it.prod)it.prodAp=true;
-  it.cor=F.corTxt?(casaExato(F.corTxt,Object.keys(state.cores))||(state.cores[state.apelidos.cor[semAc(F.corTxt)]]?state.apelidos.cor[semAc(F.corTxt)]:null)):null;if(it.cor&&semAc(it.cor)!==semAc(F.corTxt))it.corAp=true;
-  const ext=state.tipos.filter(t=>t.externo||t.grupo==='pers');const tipoTxt=(F.persTxt||'').trim();const tipoOk=tipoTxt?casaExato(tipoTxt,ext.map(t=>t.nome)):null;const apS=state.apelidos.serv[semAc(tipoTxt)];const tId=tipoOk?ext.find(t=>t.nome===tipoOk).id:(apS&&tipo(apS)?apS:null);
+    g:{...L.g},total:L.total,gOk:L.ok,gConf:false,pers:[],obs:(F.obsCorte&&!/^[x\-–—]$/i.test(F.obsCorte.trim()))?'Corte: '+F.obsCorte:'',mock:null,fIdx:F.idx};
+  it.chaveP=semAc(txt);it.prod=prodPorApelido(txt);if(it.prod)it.prodAp=true;else if(it.sugP){it.prod=it.sugP;it.prodAuto=true}
+  it.cor=F.corTxt?(casaExato(F.corTxt,Object.keys(state.cores))||(state.cores[state.apelidos.cor[semAc(F.corTxt)]]?state.apelidos.cor[semAc(F.corTxt)]:null)||casaParecido(F.corTxt,Object.keys(state.cores))):null;if(it.cor&&semAc(it.cor)!==semAc(F.corTxt))it.corAp=true;
+  const ext=state.tipos.filter(t=>t.externo||t.grupo==='pers');const tipoTxt=(F.persTxt||'').trim();const tipoOk=tipoTxt?(casaExato(tipoTxt,ext.map(t=>t.nome))||casaParecido(tipoTxt,ext.map(t=>t.nome))):null;const apS=state.apelidos.serv[semAc(tipoTxt)];const tId=tipoOk?ext.find(t=>t.nome===tipoOk).id:(apS&&tipo(apS)?apS:null);
   it.pers=(F.locais||[]).map(x=>({rot:x.rot,desc:x.txt,tipo:tId,tipoTxt,parte:null,lado:null,sug:null,conf:false}));if(it.prod)ajustaItemProd(it);return it}
-function ajustaItemProd(it){const p=prod(it.prod);if(!p)return;it.tecido=it.tecTxt?casaExato(it.tecTxt,p.tecidos||[]):null;it.tecNovo=false;it.tecAp=false;if(!it.tecido&&it.tecTxt){const a=state.apelidos.tecido[semAc(it.tecTxt)];if(a&&(p.tecidos||[]).includes(a)){it.tecido=a;it.tecAp=true}}if(!it.tecido&&(p.tecidos||[]).length===1&&!it.tecTxt)it.tecido=p.tecidos[0];
-  it.pers.forEach(x=>{const al=state.apelidos.local[semAc(x.rot)];if(al&&(p.partes||[]).includes(al.parte)){x.parte=al.parte;x.lado=al.lado||null;x.pos=al.pos||null;x.sug=null;x.conf=true;x.ap=true;return}const r=lerLocal(x.rot,p);x.parte=r.certo?r.parte:null;x.lado=r.certo?(r.lado||null):null;x.pos=r.certo?(r.pos||null):null;x.sug=r.certo?null:r.sug;x.sugPos=r.sugPos||null;x.sugLado=r.lado||null;x.conf=r.certo})}
-async function importarFichas(files){toast('Lendo as fichas…',false);let fichas=[];
-  try{for(const f of files)fichas.push(await lerFicha(f))}catch(e){toast('Não consegui abrir o leitor de PDF. Verifique a internet e tente de novo.',false);return}
+function ajustaItemProd(it){const p=prod(it.prod);if(!p)return;it.tecido=it.tecTxt?casaExato(it.tecTxt,p.tecidos||[]):null;it.tecNovo=false;it.tecAp=false;if(!it.tecido&&it.tecTxt){const a=state.apelidos.tecido[semAc(it.tecTxt)];if(a&&(p.tecidos||[]).includes(a)){it.tecido=a;it.tecAp=true}}if(!it.tecido&&it.tecTxt){const pa=casaParecido(it.tecTxt,p.tecidos||[],true);if(pa){it.tecido=pa;it.tecAp=true}else{it.tecNovo=true;it.tecido=titulo(it.tecTxt)}}if(!it.tecido&&(p.tecidos||[]).length===1&&!it.tecTxt)it.tecido=p.tecidos[0];
+  it.pers.forEach(x=>{const al=state.apelidos.local[semAc(x.rot)];if(al&&(p.partes||[]).includes(al.parte)){x.parte=al.parte;x.lado=al.lado||null;x.pos=al.pos||null;x.sug=null;x.conf=true;x.ap=true;return}const r=lerLocal(x.rot,p);x.parte=r.certo?r.parte:null;x.lado=r.certo?(r.lado||null):null;x.pos=r.certo?(r.pos||null):null;x.sug=r.certo?null:r.sug;x.sugPos=r.sugPos||null;x.sugLado=r.lado||null;x.conf=r.certo;
+    if(!r.certo&&r.sug){x.parte=r.sug;x.pos=r.sugPos||null;x.lado=r.sug==='Mangas'?(r.lado||null):null;x.auto=true}})}
+/* Nome parecido: as palavras de um estão todas no outro (ex.: "AZUL ROYAL" = Royal). Com igual=true (tecidos), só aceita as mesmas palavras em outra ordem ("PV PIQUET" = Piquet PV), porque Piquet não é Piquet dry. Só aceita se houver um único candidato. */
+function casaParecido(txt,lista,igual){const w=new Set(semAc(txt).split(/[^a-z0-9%]+/).filter(Boolean));if(!w.size)return null;
+  const c=lista.filter(x=>{const xw=semAc(x).split(/[^a-z0-9%]+/).filter(Boolean);if(!xw.length)return false;if(igual)return xw.length===w.size&&xw.every(y=>w.has(y));return xw.every(y=>w.has(y))||[...w].every(y=>xw.includes(y))});
+  if(c.length===1)return c[0];const mx=Math.max(...c.map(x=>semAc(x).length));const top=c.filter(x=>semAc(x).length===mx);return top.length===1?top[0]:null}
+/* Liga um mockup solto à peça certa pelo nome do arquivo: cor, produto, pedido e página (1_2, 2-2…). */
+function casaMockItem(nome,cands){if(!cands.length)return null;if(cands.length===1)return cands[0];const t=' '+semAc(String(nome).replace(/\.[a-z0-9]{2,5}$/i,'').replace(/[._\-]+/g,' ')).replace(/[^a-z0-9]+/g,' ')+' ';
+  const pg=(semAc(nome).match(/\b(\d)\s*[_\-\/ de]+\s*(\d)\b/)||[]);const sc=cands.map(x=>{let s=0;const it=x.it;
+    [it.cor,it.corTxt].filter(Boolean).forEach(c=>{if(t.includes(' '+semAc(c)+' '))s+=5});if(it.pag&&pg[1]&&it.pag===pg[1]+'/'+pg[2])s+=3;
+    if(x.g.num&&t.includes(' '+x.g.num+' '))s+=1;semAc(it.txt||'').split(/[^a-z0-9]+/).filter(w=>w.length>3).forEach(w=>{if(t.includes(' '+w+' '))s+=0.5});return {x,s}}).sort((a,b)=>b.s-a.s);
+  return sc[0].s>=3&&(sc.length<2||sc[0].s>sc[1].s)?sc[0].x:null}
+async function importarFichas(files){toast('Lendo as fichas…',false);let fichas=[];const soltos=[];
+  for(const f of files){if(!ehPdf(f)&&!ehWord(f)){soltos.push(f);continue}
+    try{const r=await lerFicha(f);r.forEach(F=>{if(F.naoFicha){if(ehWord(f))(F.imgs||[]).forEach((src,i)=>soltos.push({src,name:f.name+(i?' '+(i+1):'')}));else soltos.push(f)}else fichas.push(F)})}
+    catch(e){console.error(e);const rede=/script/.test(String(e&&e.message));toast(rede?'Não consegui abrir o leitor de arquivos. Verifique a internet e tente de novo.':`Não consegui ler ${f.name}. Se for Word antigo (.doc), salve como .docx ou PDF.`,false);return}}
+  if(!fichas.length){document.getElementById('toast').innerHTML='';toast('Nenhuma ficha de produção encontrada nos arquivos. Para pôr só mockups, use Pôr mockups.',false);return}
+  fichas.forEach((F,i)=>F.idx=i);
   const G={};fichas.forEach(F=>{const k=F.num||('?'+(F.cliente||F.arquivo));(G[k]=G[k]||[]).push(F)});
   const grupos=Object.entries(G).map(([k,fs])=>{fs.sort((a,b)=>(a.pag||'').localeCompare(b.pag||''));const F0=fs[0];const tot=fs.map(F=>+(F.pag||'').split('/')[1]||0).find(Boolean);
     const pags=fs.map(F=>F.pag).filter(Boolean);const falta=tot?Array.from({length:tot},(_,i)=>`${i+1}/${tot}`).filter(p=>!pags.includes(p)):[];
@@ -2293,14 +2352,22 @@ async function importarFichas(files){toast('Lendo as fichas…',false);let ficha
     const ce=acharCliente(state,g.cliente,'');g.cliId=ce?ce.id:null;g.cliCerto=!!ce;g.cliNovo=false;
     if(!ce){const w=nCli(g.cliente).split(' ').filter(x=>x.length>=3);g.cliSug=state.clientes.filter(c=>{const cw=nCli(c.nome).split(' ');return w.some(x=>cw.includes(x))}).map(c=>c.id).slice(0,5);if(!g.cliSug.length)g.cliNovo=true}
     if(g.num&&state.pedidos.some(p=>p.ficha===g.num&&(!g.cliId||p.cli===g.cliId)))g.avisos.push(`A ficha ${g.num} já foi importada antes. Confira para não duplicar.`);
+    g.obs=[...new Set(fs.map(F=>(F.obs||'').trim()).filter(Boolean))].join(' · ');g.obsLido=!!g.obs;
     return g});
+  // mockups: imagens dentro da ficha em Word e arquivos soltos (casados pelo nome do arquivo)
+  const itens=grupos.flatMap(g=>g.itens.map(it=>({g,it})));
+  for(const F of fichas)for(const src of (F.imgs||[]).slice(0,1)){const alvo=itens.filter(x=>x.it.fIdx===F.idx);if(!alvo.length)continue;try{const bl=await (await fetch(src)).blob();const m=await mockDeArquivo(new File([bl],F.arquivo+'.png',{type:bl.type}));alvo.forEach(x=>{x.it.mock=m.p;x.it.mockG=m.g;x.it.mockAuto=true})}catch(e){}}
+  const semMock=()=>itens.filter(x=>!x.it.mock);let naoCasou=0;
+  for(const f of soltos){const nome=f.name||'';const alvo=casaMockItem(nome,semMock());if(!alvo){naoCasou++;continue}
+    try{const file=f instanceof File?f:new File([await (await fetch(f.src)).blob()],nome+'.png',{type:'image/png'});const m=await mockDeArquivo(file);alvo.it.mock=m.p;alvo.it.mockG=m.g;alvo.it.mockAuto=true}catch(e){naoCasou++}}
+  if(naoCasou)grupos[0].avisos.push(`${naoCasou} mockup${naoCasou>1?'s':''} não ${naoCasou>1?'foram ligados':'foi ligado'} a nenhuma peça (o nome do arquivo não diz a cor ou o produto). Use Pôr mockup desta peça.`);
   document.getElementById('toast').innerHTML='';openSheet({t:'imp',gi:0,grupos})}
 function impPend(g){const P=[];if(!g.cliente.trim())P.push('empresa');else if(!g.cliId&&!g.cliNovo)P.push('empresa: nova ou já cadastrada?');if(g.num&&state.pedidos.some(p=>p.ficha===g.num&&g.cliId&&p.cli===g.cliId))P.push('ficha já importada');if(!g.entrega)P.push('prazo de entrega');if(!g.vend)P.push('quem vendeu');
   g.itens.forEach((it,i)=>{const n=`peça ${i+1}`;if(!it.prod)P.push(`${n}: produto`);else if(!it.tecido)P.push(`${n}: tecido`);if(!it.cor)P.push(`${n}: cor`);
     if(!sum(Object.values(it.g)))P.push(`${n}: quantidades`);else if(!it.gOk&&!it.gConf)P.push(`${n}: confirmar quantidades`);
     it.pers.forEach((x,j)=>{if(!x.tipo)P.push(`${n}: tipo da personalização ${j+1}`);if(!x.parte)P.push(`${n}: onde vai a personalização ${j+1}`)})});return P}
 const okTag=(ok,txt)=>ok?`<span class="imp-ok">${ic('i-check')}${txt||'Lido da ficha'}</span>`:`<span class="imp-q">${ic('i-alerta')}${txt||'Confirme'}</span>`;
-const titulo=x=>String(x||'').toLowerCase().replace(/(^|\s)\S/g,m=>m.toUpperCase());
+const titulo=x=>String(x||'').trim().split(/\s+/).map(w=>/^[A-Z]{1,2}$/.test(w)||/\d|%/.test(w)?w:w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
 function sImp(){const e=ui.sheet,g=e.grupos[e.gi];const pend=impPend(g),ext=state.tipos.filter(t=>t.externo||t.grupo==='pers');
   const dIn=ts=>ts?new Date(ts-new Date(ts).getTimezoneOffset()*6e4).toISOString().slice(0,10):'';
   return `${voltar('Cancelar')}<h1>Importar ficha</h1>
@@ -2316,11 +2383,12 @@ function sImp(){const e=ui.sheet,g=e.grupos[e.gi];const pend=impPend(g),ext=stat
     <div class="imp-2"><div><div class="rotulo">Fechou ${g.chegada?okTag(true,g.chDeduz?'Lido (ano deduzido)':''):okTag(false,'Escolha')}</div><input class="campo" type="date" data-imp="chegada" value="${dIn(g.chegada)}">${g.chTxt?`<small class="lido">Na ficha: “${esc(g.chTxt)}”</small>`:''}</div>
       <div><div class="rotulo">Prazo de entrega ${g.entrega?okTag(true,g.enDeduz?'Lido (ano deduzido)':''):okTag(false,'Escolha')}</div><input class="campo" type="date" data-imp="entrega" value="${dIn(g.entrega)}">${g.enTxt?`<small class="lido">Na ficha: “${esc(g.enTxt)}”</small>`:''}</div></div>
     <div class="rotulo">Quem vendeu? ${okTag(!!g.vend,g.vend?'Escolhido':'Não está na ficha')}</div><div class="linha-dep">${state.pessoas.filter(p=>temPapel(p,'vendas')).map(p=>`<button class="pchip" data-a="impVend" data-v="${p.id}" aria-pressed="${g.vend===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div>
-    <div class="imp-2"><div><div class="rotulo">Contato (opcional)</div><input class="campo" data-imp="contato" value="${esc(g.contato)}"></div><div><div class="rotulo">CNPJ (opcional)</div><input class="campo" data-imp="cnpj" value="${esc(g.cnpj)}" inputmode="numeric"></div></div></div>
+    <div class="imp-2"><div><div class="rotulo">Contato (opcional)</div><input class="campo" data-imp="contato" value="${esc(g.contato)}"></div><div><div class="rotulo">CNPJ (opcional)</div><input class="campo" data-imp="cnpj" value="${esc(g.cnpj)}" inputmode="numeric"></div></div>
+    <div class="rotulo">Observações do pedido ${g.obsLido?okTag(true):'<span style="font-weight:400;color:var(--muted)">(se tiver: vão na ficha de produção)</span>'}</div><textarea class="campo" data-imp="obs" rows="3" placeholder="Ex.: entregar dobradas">${esc(g.obs||'')}</textarea></div>
   ${g.itens.map((it,k)=>{const p=prod(it.prod);return `<div class="card imp-it"><div class="imp-h">${it.mock?mockSvg(it.mock,'I:'+k):it.prod?prodSvg(it.prod,it.cor||'',[]):`<span class="m-ic">${ic('i-camisa')}</span>`}
       <div><h2 style="margin:0">Peça ${k+1}${it.pag?` <small class="lido">(ficha ${esc(it.pag)})</small>`:''}</h2><small class="lido">Na ficha: “${esc(it.txt||'')}”</small><br>
       <button class="x azul" data-a="impMock" data-k="${k}" style="margin-top:6px">${ic('i-camisa')}${it.mock?'Trocar mockup':'Pôr mockup desta peça'}</button></div></div>
-    <div class="rotulo">Produto ${okTag(!!it.prod,it.prodAp?'Lido (nome já ensinado)':it.prod?'Confirmado':'Escolha')}</div>${!it.prod?`<div class="pergunta">Qual produto é esse? O sistema vai lembrar para as próximas fichas.</div>`:''}
+    <div class="rotulo">Produto ${okTag(!!it.prod,it.prodAp?'Lido (nome já ensinado)':it.prodAuto?'Reconhecido pelo nome: confira':it.prod?'Confirmado':'Escolha')}</div>${!it.prod?`<div class="pergunta">Qual produto é esse? O sistema vai lembrar para as próximas fichas.</div>`:''}
     ${it.sugP&&!it.prod?`<button class="sug" data-a="impProd" data-k="${k}" data-v="${it.sugP}">Parece ser <b>${esc(prod(it.sugP).nome)}</b>. Toque para confirmar</button>`:''}
     <div class="linha-dep">${state.produtos.map(q=>`<button class="depc" data-a="impProd" data-k="${k}" data-v="${q.id}" aria-pressed="${it.prod===q.id}">${esc(q.nome)}</button>`).join('')}</div>
     ${p?(()=>{const conhecido=it.tecTxt&&(p.tecidos||[]).some(t=>semAc(t)===semAc(it.tecTxt));const outros=[...new Set(state.produtos.flatMap(q=>q.tecidos||[]))].filter(t=>!(p.tecidos||[]).includes(t));
@@ -2351,8 +2419,9 @@ function impCriar(){const e=ui.sheet,g=e.grupos[e.gi];if(impPend(g).length)retur
     it.pers.forEach(x=>{if(!x.conf||x.ap===false)Ap.local[semAc(x.rot)]={parte:x.parte,lado:x.parte==='Mangas'?x.lado:null,pos:x.pos||null};if(x.tipoTxt&&!state.tipos.some(t=>semAc(t.nome)===semAc(x.tipoTxt)))Ap.serv[semAc(x.tipoTxt)]=x.tipo})});
   const cl=g.cliNovo?garanteCliente(g.cliente,g.cnpj.trim(),g.contato.trim(),null):garanteCliente(g.cliente,g.cnpj.trim(),g.contato.trim(),g.cliId);
   const num=/^\d+$/.test(g.num)&&!pedById(g.num)?g.num:String(state.seq++).padStart(4,'0');if(/^\d+$/.test(num))state.seq=Math.max(state.seq,+num+1);
+  garanteTam(g.itens.flatMap(it=>Object.keys(it.g)));
   const lines=g.itens.map(it=>({prod:it.prod,cor:it.cor,cores2:[],tecido:it.tecido,opcoes:[],pers:it.pers.map((x,j)=>({tipo:x.tipo,parte:x.parte,lado:x.parte==='Mangas'?x.lado:undefined,pos:x.pos||undefined,desc:x.desc||undefined,rot:x.rot||undefined,id:'pz'+j})),g:{...it.g},qtd:sum(Object.values(it.g)),mock:it.mock,mockG:it.mockG,obs:it.obs}));
-  state.pedidos.push({id:num,cli:cl.id,ficha:g.num||undefined,cliente:cl.nome,contato:g.contato.trim(),cnpj:g.cnpj.trim()||cl.cnpj||'',vendedor:g.vend,chegada:g.chegada||now(),entrega:g.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null,fonte:'ficha'});
+  state.pedidos.push({id:num,cli:cl.id,ficha:g.num||undefined,cliente:cl.nome,contato:g.contato.trim(),cnpj:g.cnpj.trim()||cl.cnpj||'',vendedor:g.vend,chegada:g.chegada||now(),entrega:g.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null,fonte:'ficha',obs:(g.obs||'').trim()||undefined});
   lines.forEach((x,i)=>state.lotes.push({id:`${num}-${i+1}`,ped:num,prod:x.prod,cor:x.cor,cores2:[],tecido:x.tecido,opcoes:[],pers:x.pers,qtd:x.qtd,grade:x.g,desm:0,steps:{},rework:false,parent:null,mock:x.mock||undefined,obs:x.obs||undefined}));lines.forEach((x,i)=>{if(x.mockG)guardaMockG(`${num}-${i+1}`,x.mockG)});
   e.grupos.splice(e.gi,1);if(e.grupos.length){e.gi=0;commit();toast(`Pedido ${num} criado. Falta ${e.grupos.length}`)}else{ui.sheet={t:'pedido',id:num};ui.tela='pedidos';commit();toast(`Pedido ${num} criado`)}}
 // mockup: tira o fundo branco e a faixa de baixo, deixa quadrado
@@ -2460,7 +2529,7 @@ function docFicha(l,ped,via,n,N,gray){const p=prod(l.prod),G=gradeOrd(l),tot=sum
   <div class="fp-sec">PERSONALIZAÇÃO</div>${pz.length?`<table class="fp-t"><tr><th>#</th><th>TÉCNICA</th><th>ONDE</th><th>ARTE</th><th>TAMANHO</th></tr>${pz.map((x,i)=>{const tm=tamTxt(x);return `<tr><td>${i+1}</td><td><b>${esc(tNome(x.tipo))}</b></td><td>${esc(posTxt(x))}</td><td>${esc(x.desc||'—')}${x.bord&&arqById(x.bord)?`<br><small>Bordado: ${esc(arqById(x.bord).nome)}</small>`:''}</td><td>${tm?esc(tm.t)+(tm.aprox?' <small>aprox.</small>':''):'—'}</td></tr>`}).join('')}</table>`:'<p class="fp-nada">Sem personalização</p>'}
   <div class="fp-sec">TAMANHOS</div><table class="fp-g"><tr>${G.map(([z])=>`<th>${z}</th>`).join('')}<th class="tt">TOTAL</th></tr><tr>${G.map(([,q])=>`<td>${q}</td>`).join('')}<td class="tt">${tot}</td></tr></table>
   <div class="fp-bx"><div class="fp-sec">ETAPAS <small>marque ao terminar</small></div><div class="fp-et">${st.map((s,i)=>`<span>☐ ${i+1}. ${esc(s.nome)}</span>`).join('')}</div></div>
-  <div class="fp-bx"><div class="fp-sec">OBSERVAÇÕES</div><div class="fp-obs">${l.obs?esc(l.obs):''}</div></div>
+  <div class="fp-bx"><div class="fp-sec">OBSERVAÇÕES</div><div class="fp-obs">${[ped.obs,l.obs].filter(Boolean).map(x=>esc(x)).join('<br>')}</div></div>
   <div class="fp-rod"><span>${esc(marca().nome)} · Pedido ${esc(ped.id)} · ${esc(p.nome)} ${esc(l.cor)}</span><span>Gerado em ${dataCurta(now())} · ${via}ª via</span></div></div>`}
 function docMockPag(l,ped,n,N){const p=prod(l.prod);return `<div class="a4 fm"><div class="fp-top"><div><div class="fp-k">MOCKUP · PEÇA ${n} DE ${N}</div><div class="fp-cli">${esc(ped.cliente)}</div></div><div class="fm-id">PEDIDO<br><b>${esc(ped.id)}</b></div></div>
   <div class="fm-sub">${esc(p.nome)} · ${esc(l.cor)} · ${esc(l.tecido||'')} · ${qtdEf(l)} peças</div>
@@ -2751,7 +2820,7 @@ function commit(){save();render()}
 function openSheet(s){ui.sheet=s;render();const e=document.querySelector('.sheet');if(e)e.scrollTop=0}
 function wRead(){const w=ui.sheet?.w;if(!w)return;const fi=document.getElementById('wFicha');if(fi)w.ficha=fi.value;const c=document.getElementById('wCli');if(c)w.cliente=c.value;const ct=document.getElementById('wCont');if(ct)w.contato=ct.value;const cj=document.getElementById('wCnpj');if(cj)w.cnpj=cj.value;
   document.querySelectorAll('[data-q]').forEach(i=>{w.itens[+i.dataset.q].g[i.dataset.s]=Math.max(0,parseInt(i.value)||0)});
-  const d=document.getElementById('wDt');if(d&&d.value){const[y,m,dd]=d.value.split('-').map(Number);w.entrega=new Date(y,m-1,dd,17).getTime()}}
+  const ob=document.getElementById('wObs');if(ob)w.obs=ob.value;const d=document.getElementById('wDt');if(d&&d.value){const[y,m,dd]=d.value.split('-').map(Number);w.entrega=new Date(y,m-1,dd,17).getTime()}}
 const togl=(a,v)=>{const i=a.indexOf(v);i<0?a.push(v):a.splice(i,1)};
 const A={
   menu:()=>openSheet({t:'menu'}),
@@ -3030,7 +3099,8 @@ const A={
   addPapel:()=>{const n=(document.getElementById('papN')?.value||'').trim();if(!n)return;snap();state.papeis[uid('c')]=n;commit()},
   ff:d=>{ui.ff=d.v;render()},
   fz:d=>{ui.fz=d.v;render();scrollTo(0,0)},
-  addTec:d=>{const i=document.getElementById('novoTec'),v=(i?.value||'').trim();if(!v)return;const p=prod(d.p);p.tecidos=p.tecidos||[];if(!p.tecidos.includes(v)){snap();p.tecidos.push(v);commit();toast(`Tecido ${v} adicionado`)}},
+  addTec:d=>{const i=document.getElementById('novoTec');const vs=(d.v!=null?[d.v]:(i?.value||'').split(',')).map(x=>x.trim().replace(/\s+/g,' ')).filter(Boolean);if(!vs.length)return;const p=prod(d.p);p.tecidos=p.tecidos||[];
+    const novos=vs.filter((v,j)=>!p.tecidos.some(t=>semAc(t)===semAc(v))&&vs.findIndex(x=>semAc(x)===semAc(v))===j);if(!novos.length){toast('Esse tecido já está no produto',false);return}snap();p.tecidos.push(...novos);commit();toast(novos.length===1?`Tecido ${novos[0]} adicionado`:`${novos.length} tecidos adicionados`)},
   addParte:d=>{const i=document.getElementById('novaParte'),v=(i?.value||'').trim();if(!v)return;const p=prod(d.p);p.partes=p.partes||[];if(!p.partes.includes(v)){snap();p.partes.push(v);commit();toast(`Parte ${v} adicionada`)}},
   eP:d=>{eRead();ui.sheet.posto=d.v;render()},
   eD:d=>{eRead();togl(ui.sheet.deps,d.v);render()},
@@ -3062,6 +3132,8 @@ const A={
   wSalvaCor:d=>{const v=(document.getElementById('nc'+d.k)?.value||'').trim(),h=document.getElementById('nh'+d.k)?.value||'#888888';wRead();const w=ui.sheet.w,it=w.itens[+d.k];if(!v){w.err='Escreva o nome da cor';return render()}
     const ex=Object.keys(state.cores).find(c=>c.toLowerCase()===v.toLowerCase());if(!ex)state.cores[v]=h;it.cor=ex||v;it.novaCor=false;w.err='';save();render();toast(ex?`${ex} já existia e foi escolhida`:`Cor ${v} cadastrada`,false)},
   wCat:d=>{wRead();ui.sheet.w.itens[+d.k].cat=d.v;render()},
+  wTamAdd:d=>{wRead();const i=document.getElementById('wTamN'+d.k),v=(i?.value||'').trim().toUpperCase().slice(0,8);if(!v)return;const ja=sizesAll().find(x=>x.toUpperCase()===v);snap();garanteTam([v]);
+    const c=state.cats.find(c=>c.t.some(x=>x.toUpperCase()===v));ui.sheet.w.itens[+d.k].cat=c.id;save();render();toast(ja?`O tamanho ${v} já existia (${c.nome})`:`Tamanho ${v} incluído em ${c.nome}`,false)},
   wC2add:d=>{wRead();ui.sheet.w.itens[+d.k].novaC2={cor:null,partes:[]};render()},
   wC2x:d=>{wRead();const it=ui.sheet.w.itens[+d.k];it.novaC2=null;it.novaCor2=false;render()},
   wC2cor:d=>{wRead();ui.sheet.w.itens[+d.k].novaC2.cor=d.c;render()},
@@ -3100,7 +3172,7 @@ const A={
   wSalvarEd:()=>salvarEdicao(),
   wCriar:()=>{const w=ui.sheet.w;snap();const id=String(state.seq++).padStart(4,'0');const lines=w.itens.map(it=>({prod:it.prod,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...it.opcoes],pers:it.pers.map((x,j)=>({tipo:x.tipo,parte:x.parte,lado:x.lado,pos:x.pos,id:'pz'+j})),g:{...it.g},qtd:sum(sizesAll().map(s=>it.g[s]||0))}));
     const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);
-    state.pedidos.push({id,cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim()||cl.cnpj||'',vendedor:w.vend,chegada:now(),entrega:w.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null});
+    state.pedidos.push({id,cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim()||cl.cnpj||'',vendedor:w.vend,chegada:now(),entrega:w.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null,obs:(w.obs||'').trim()||undefined});
     w.itens.forEach((it,i)=>{if(it.mockG)guardaMockG(`${id}-${i+1}`,it.mockG)});lines.forEach((x,i)=>state.lotes.push({id:`${id}-${i+1}`,ped:id,mock:w.itens[i].mock||undefined,prod:x.prod,cor:x.cor,cores2:x.cores2,tecido:x.tecido,opcoes:x.opcoes,pers:x.pers,qtd:x.qtd,grade:x.g,desm:0,steps:{},rework:false,parent:null}));
     ui.tela='pedidos';ui.sheet={t:'pedido',id};commit();toast('Pedido criado')},
 };
