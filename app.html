@@ -587,6 +587,27 @@ svg.prod.mock{cursor:zoom-in}
 .mk-logo{max-height:64px;max-width:220px;object-fit:contain}.mk-word{display:grid;line-height:1.05}.mk-word b{font-size:26px;letter-spacing:.02em}.mk-word span{font-size:12px;letter-spacing:.2em;text-transform:uppercase;opacity:.8}.mk-word.cl{color:#fff}
 .docs{display:grid;gap:18px;margin-top:8px}.a4wrap{width:100%;max-width:794px;overflow:hidden;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.14);border-radius:4px;background:#fff}
 .a4wrap>.a4{transform-origin:0 0;position:absolute;top:0;left:0}
+.tq-mesa{display:flex;flex-wrap:wrap;gap:14px}.tq-wrap{width:100mm;height:80mm;max-width:100%;box-shadow:0 2px 10px rgba(0,0,0,.18);border-radius:6px;overflow:hidden;flex:none}
+.tq{width:100mm;height:80mm;background:#fff;color:#000;box-sizing:border-box;overflow:hidden;font-family:'Atkinson Hyperlegible',Arial,sans-serif;display:flex;flex-direction:column;gap:1.1mm;padding:0 3mm 2.2mm;page:etiqueta;break-after:page;page-break-after:always;--k:1}
+.tq.ap1{--k:.9}.tq.ap2{--k:.82}.tq.ap3{--k:.72}.tq.ap3 .tq-qr{width:16mm;height:16mm}
+.tq-bar{display:flex;justify-content:space-between;align-items:center;gap:3mm;background:#000;color:#fff;margin:0 -3mm;padding:1.3mm 3mm;font-weight:700;font-size:max(3.6mm,calc(4.4mm*var(--k)));line-height:1;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.tq-top{display:flex;gap:2.5mm;align-items:flex-start}.tq-txt{flex:1;min-width:0}
+.tq-cli{font-weight:700;font-size:max(3.6mm,calc(5mm*var(--k)));line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tq-prod{font-weight:700;font-size:max(3.6mm,calc(6.2mm*var(--k)));line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tq-parte{font-weight:700;font-size:max(3.6mm,calc(11mm*var(--k)));line-height:.95;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tq-qr{width:19mm;height:19mm;flex:none}.tq-qr svg{width:100%;height:100%;display:block}
+.tq-gen{display:inline-block;font-weight:700;font-size:max(3.6mm,calc(4.6mm*var(--k)));line-height:1;letter-spacing:.08em;padding:.9mm 2mm;border:.7mm solid #000;margin-top:1mm;white-space:nowrap}.tq-gen.F{background:#000;color:#fff}
+.tq-peca .tq-gen{margin:0 0 0 1mm;font-size:max(3.6mm,calc(4mm*var(--k)));padding:.6mm 1.6mm}
+.tq-l{font-size:max(3.6mm,calc(4.2mm*var(--k)));line-height:1.18;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tq-l i{font-style:normal;font-weight:700;font-size:3.4mm;text-transform:uppercase;letter-spacing:.04em}
+.tq-pz{font-size:max(3.6mm,calc(5mm*var(--k)));line-height:1.18;border-left:1mm solid #000;padding-left:2mm;display:grid;gap:.5mm}.tq-pz>div{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tq-grade{display:flex;flex-wrap:wrap;gap:.8mm;margin-top:auto}
+.tq-grade span{display:inline-grid;text-align:center;border:.4mm solid #000;min-width:max(3.6mm,calc(8.2mm*var(--k)));font-weight:700;font-size:max(3.6mm,calc(4.4mm*var(--k)));line-height:1}
+.tq-grade i{font-style:normal;background:#000;color:#fff;padding:.7mm .9mm}.tq-grade em{font-style:normal;padding:.9mm .9mm}
+.tq-grade .tq-tt{border-width:.7mm;margin-left:auto}.tq-grade .tq-tt em{font-size:max(3.6mm,calc(6mm*var(--k)))}
+.tq-rod{display:flex;justify-content:space-between;align-items:center;gap:2mm;flex-wrap:wrap;font-size:3.8mm;line-height:1.15;border-top:.4mm solid #000;padding-top:1mm}
+.tq-chk{display:inline-flex;gap:3mm}.tq-chk span::before{content:"";display:inline-block;width:3mm;height:3mm;border:.4mm solid #000;margin-right:1mm;vertical-align:-.4mm}
+@page etiqueta{size:100mm 80mm;margin:0}
 #docRender{position:fixed;left:-10000px;top:0;width:794px}
 .a4{width:794px;height:1123px;background:#fff;color:#000;box-sizing:border-box;overflow:hidden;font-family:'Atkinson Hyperlegible',Arial,sans-serif;position:relative}
 /* ficha de produção (colorida; .cor tira para preto e branco) */
@@ -1628,7 +1649,7 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     ${ped.obs?`<div class="ped-ent">${ic('i-lista')}<span>Observações: <b>${esc(ped.obs)}</b></span></div>`:''}
     ${(ped.edicoes||[]).length?`<div class="ped-ent" style="font-size:16px">${ic('i-engr')}<span>Corrigido por ${esc(ped.edicoes[ped.edicoes.length-1].por||'?')} ${haQuanto(ped.edicoes[ped.edicoes.length-1].ts)}${ped.edicoes.length>1?` · ${ped.edicoes.length} correções`:''}</span></div>`:''}
     ${ped.cancelado?`<div class="aviso">${ic('i-alerta')}<span>Pedido cancelado ${fD(ped.cancelado.ts)}${ped.cancelado.por?` por ${esc(ped.cancelado.por)}`:''}.${ped.cancelado.motivo?` Motivo: ${esc(ped.cancelado.motivo)}.`:''} Ele não aparece na produção nem nas tarefas.</span></div><div class="acoes"><button class="mbtn" data-a="pedReativar" data-id="${id}">Voltar o pedido para a produção</button></div>`:''}
-    <div class="doc-bts">${ped.cancelado?'':`<button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button>`}<button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
+    <div class="doc-bts">${ped.cancelado?'':`<button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button>`}<button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button><button class="mbtn neutro2" data-a="docEtq" data-id="${id}">${ic('i-lista')}Etiquetas</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
     ${tEnt?`<div class="acoes"><button class="big go" data-a="entregar" data-id="${id}">${ic('i-caminhao')}${esc(tarTxt(tEnt))}${tEnt.resp?' · '+esc(pNome(tEnt.resp)):''}</button></div>`:''}</div>
   ${ped.concluido?'':`<div class="card">${ui.cancPed===id?`<h2>Cancelar este pedido?</h2><div class="aviso">${ic('i-alerta')}<span>O pedido de <b>${esc(ped.cliente)}</b> sai da produção, das máquinas e das tarefas do escritório. Ele fica guardado em Pedidos › Filtrar › Cancelados e pode voltar depois.</span></div>
     <div class="rotulo">Motivo (se quiser)</div><input class="campo" id="cancMot" placeholder="Ex.: cliente desistiu" autocomplete="off">
@@ -2157,6 +2178,7 @@ const FAQ=[
 {c:'cad',q:'Onde marco cobre gola e segunda barra da polo?',k:'cobre gola segunda barra peitilho polo detalhe cor secundária punho manga gola',r:['Na polo, a cor do detalhe vai no peitilho, no cobre gola e na segunda barra da manga.','No novo pedido, em Outras cores na peça, escolha a cor e toque nessas partes.','Na importação, quando a ficha da polo diz “gola” ou “manga” no detalhe, o sistema já entende como cobre gola e segunda barra.'],ir:'ped'},
 {c:'cad',q:'Como cadastro variações como manga longa e manga curta?',k:'variação variações manga longa manga curta modelo versão produto camisa social',r:['Vá em Cadastros › Produtos e abra o produto.','No quadro Variações, escreva a variação (ex.: Manga longa) e toque em Adicionar.','No novo pedido, cada peça desse produto escolhe a variação. Ela aparece no pedido e na ficha de produção.'],ir:'cad:produtos'},
 {c:'cad',q:'Posso fazer qualquer peça em qualquer tecido?',k:'qualquer tecido tecidos lista geral tecido novo cadastrar tecido malha piquet',r:['Sim. No pedido, o tecido sai de uma lista geral, com todos os tecidos cadastrados.','Para cadastrar um tecido novo: no pedido, escolha Novo tecido na lista. Ou vá em Cadastros › Ajustes › Tecidos.','O mesmo tecido não entra duas vezes, mesmo escrito com letras diferentes.'],ir:'cad:ajustes#Tecidos'},
+{c:'ped',q:'Como imprimo as etiquetas do corte?',k:'etiqueta etiquetas térmica impressora corte cortador paninho escrever pacote personalização qr code adesivo',r:['Abra o pedido e toque em Etiquetas, ao lado de PDF de produção.','Saem dois tipos, em 10 × 8 cm: uma de pacote para cada peça (vai com ela para a costura) e uma de personalização para cada parte que sai para bordar, estampar ou aplicar DTF.','Toque em Imprimir (impressora térmica) ou em Baixar PDF.','O QR code de cada etiqueta abre a ficha de produção daquela peça no celular.'],ir:'ped'},
 {c:'cad',q:'Como o sistema conta os feriados?',k:'feriado feriados dia útil dias úteis prazo carnaval corpus christi emenda recesso cidade',r:['Feriado não conta como dia útil: os prazos ("faltam 12 dias úteis") e os contadores das máquinas já descontam.','A empresa está em São Paulo, SP: entram os feriados nacionais, o 9 de julho e os municipais (25 de janeiro e Corpus Christi).','Para mudar: Cadastros › Ajustes › Feriados. Lá dá para marcar Carnaval, acrescentar emenda ou recesso, ou tocar em "Vamos trabalhar" num feriado em que a fábrica abre.'],ir:'cad:ajustes#Feriados',g:1},
 {c:'arte',q:'Dá para tirar a ficha em preto e branco?',k:'preto e branco colorida colorido cinza tinta economizar',r:['A ficha de produção sai colorida.','Para gastar menos tinta: no PDF de produção, toque em Preto e branco (gasta menos tinta) antes de baixar ou imprimir.']},
 {c:'novo',q:'A importação preenche as outras cores da peça?',k:'outras cores cor secundária segunda cor gola punho peitilho detalhe importar',r:['Sim. Se a ficha diz, por exemplo, "AZUL CELESTE com gola, punho e peitilho na cor PRETO", o sistema põe Preta em Outras cores, na gola, nos punhos e no peitilho.','Confira em Outras cores na peça. Se estiver errado, toque no × e acerte depois em ✎ Corrigir pedido.']},
@@ -2683,28 +2705,67 @@ function docPedido(ped){const m=marca(),ls=lotesDe(ped.id).filter(l=>!l.rework),
   return pags}
 async function paraCinza(src){if(!src)return '';const im=new Image();im.src=src;await im.decode();const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const g=c.getContext('2d');g.drawImage(im,0,0);const d=g.getImageData(0,0,c.width,c.height),a=d.data;
   for(let i=0;i<a.length;i+=4){const v=a[i]*.3+a[i+1]*.59+a[i+2]*.11;a[i]=a[i+1]=a[i+2]=v}g.putImageData(d,0,0);return c.toDataURL('image/jpeg',.85)}
-async function abreDoc(tipoDoc,id){const ped=pedById(id),ls=lotesDe(id).filter(l=>!l.rework);const cinza={};toast('Carregando as imagens…',false);await Promise.all(ls.map(pegaMock));document.getElementById('toast').innerHTML='';
-  openSheet({t:'doc',tipo:tipoDoc,id,cinza,vias:2,mocks:true,pb:false})}
-function paginasDoc(e){const ped=pedById(e.id),ls=lotesDe(e.id).filter(l=>!l.rework);
-  if(e.tipo==='pedido')return docPedido(ped);const P=[];
-  ls.forEach((l,i)=>{for(let v=1;v<=e.vias;v++)P.push(docFicha(l,ped,v,i+1,ls.length,e.cinza[l.id],e.pb))});
+async function abreDoc(tipoDoc,id,so){const ped=pedById(id),ls=lotesDe(id).filter(l=>!l.rework);const cinza={};toast(tipoDoc==='etq'?'Montando as etiquetas…':'Carregando as imagens…',false);
+  if(tipoDoc==='etq'){if(!window.qrcode)try{await carregaScript(LIBS.qr)}catch(e){}}else await Promise.all(ls.map(pegaMock));document.getElementById('toast').innerHTML='';
+  openSheet({t:'doc',tipo:tipoDoc,id,cinza,vias:so?1:2,mocks:!so,pb:false,so:so||null})}
+function paginasDoc(e){const ped=pedById(e.id),ls=lotesDe(e.id).filter(l=>!l.rework&&(!e.so||l.id===e.so));
+  if(e.tipo==='pedido')return docPedido(ped);if(e.tipo==='etq')return etiquetasDe(ped);const P=[];
+  ls.forEach((l,i)=>{const n=e.so?lotesDe(e.id).filter(x=>!x.rework).findIndex(x=>x.id===l.id)+1:i+1,N=e.so?lotesDe(e.id).filter(x=>!x.rework).length:ls.length;for(let v=1;v<=e.vias;v++)P.push(docFicha(l,ped,v,n,N,e.cinza[l.id],e.pb))});
   if(e.mocks)ls.forEach((l,i)=>{if(l.mock)P.push(docMockPag(l,ped,i+1,ls.length))});return P}
 function sDoc(){const e=ui.sheet,ped=pedById(e.id),P=paginasDoc(e);
+  if(e.tipo==='etq'){const np=P.filter(h=>h.includes('tq-pac')).length;return `${voltar()}<h1>Etiquetas do corte</h1>
+  <p class="sub-l">Pedido ${esc(ped.id)} · ${esc(ped.cliente)}. Etiqueta térmica de 10 × 8 cm. Uma de <b>pacote</b> para cada peça (vai com ela para a costura) e uma de <b>personalização</b> para cada parte que sai para bordar, estampar ou aplicar DTF.</p>
+  <div class="linha-dep" style="margin-bottom:10px"><span class="depc">${np} de pacote</span><span class="depc">${P.length-np} de personalização</span></div>
+  <div class="acoes" style="margin-top:0"><button class="big go" data-a="docPdf">${ic('i-lista')}Baixar PDF (${P.length} ${P.length===1?'etiqueta':'etiquetas'})</button><button class="big neutro" data-a="docPrint">Imprimir</button></div>
+  <p class="dica">O QR code de cada etiqueta abre a ficha de produção daquela peça, pronta para baixar em PDF.</p>
+  <div class="tq-mesa">${P.map(h=>`<div class="tq-wrap">${h}</div>`).join('')}</div>`}
   return `${voltar()}<h1>${e.tipo==='pedido'?'Pedido para o cliente':'PDF de produção'}</h1>
-  <p class="sub-l">${e.tipo==='pedido'?'Envie para o cliente conferir e aprovar. Colorido, com todas as informações das peças.':'Fichas de produção (uma por peça) e os mockups, prontos para imprimir em A4.'}</p>
+  <p class="sub-l">${e.tipo==='pedido'?'Envie para o cliente conferir e aprovar. Colorido, com todas as informações das peças.':e.so?`Ficha de produção da peça ${esc(e.so)}.`:'Fichas de produção (uma por peça) e os mockups, prontos para imprimir em A4.'}</p>
   ${e.tipo==='prod'?`<div class="linha-dep" style="margin-bottom:10px"><button class="depc" data-a="docVias" data-v="2" aria-pressed="${e.vias===2}">1ª e 2ª via</button><button class="depc" data-a="docVias" data-v="1" aria-pressed="${e.vias===1}">Só 1ª via</button><button class="depc" data-a="docMocks" aria-pressed="${e.mocks}">${ic('i-camisa')}Incluir mockups</button><button class="depc" data-a="docPb" aria-pressed="${!!e.pb}">Preto e branco (gasta menos tinta)</button></div>`:''}
   <div class="acoes" style="margin-top:0"><button class="big go" data-a="docPdf">${ic('i-lista')}Baixar PDF (${P.length} ${P.length===1?'página':'páginas'})</button><button class="big neutro" data-a="docPrint">Imprimir</button></div>
   ${e.tipo==='pedido'?`<div class="linha-dep" style="margin:4px 0 12px">${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span><button class="x" data-a="docAprov" data-id="${ped.id}">Desfazer</button>`:`<button class="depc" data-a="docAprov" data-id="${ped.id}">${ic('i-check')}Cliente aprovou este pedido</button>`}</div>`:''}
   <div class="docs">${P.map(h=>`<div class="a4wrap">${h}</div>`).join('')}</div>`}
 
-function ajustaA4(){document.querySelectorAll('.a4wrap').forEach(w=>{const k=w.clientWidth/794;const a=w.firstElementChild;if(a){a.style.transform=`scale(${k})`;w.style.height=(1123*k)+'px'}})}
+/* Etiquetas do corte (pedido de 10/2026): o cortador não escreve mais o paninho à mão. 10 × 8 cm, preto e branco (impressora térmica). */
+const LADO_ETQ={dir:'direita',esq:'esquerda',ambas:'as duas'};
+const qrSvg=t=>{try{if(!window.qrcode)return '';const q=qrcode(0,'M');q.addData(t);q.make();return q.createSvgTag({cellSize:2,margin:0,scalable:true})}catch(e){return ''}};
+const linkFicha=l=>location.origin+location.pathname+'#ficha='+encodeURIComponent(l.id);
+function gruposPers(l){const G=[];(l.pers||[]).forEach(x=>{let g=G.find(y=>y.parte===x.parte&&y.tipo===x.tipo);if(!g)G.push(g={parte:x.parte,tipo:x.tipo,itens:[]});g.itens.push(x)});return G}
+const ORD_LETRA=['PP','P','M','G','GG','XG','XXG','EG','EXG','G1','G2','G3','G4','G5','ESP'];
+const chaveTam=z=>/^\d+$/.test(z)?+z:ORD_LETRA.includes(z)?1000+ORD_LETRA.indexOf(z):2000;
+const gradeEtq=l=>{const G=gradeOrd(l).slice().sort((a,b)=>chaveTam(a[0])-chaveTam(b[0]));return `<div class="tq-grade">${G.map(([z,q])=>`<span><i>${esc(z)}</i><em>${q}</em></span>`).join('')}<span class="tq-tt"><i>TOTAL</i><em>${sum(G.map(x=>x[1]))}</em></span></div>`};
+const genEtq=l=>GEN[l.gen]&&l.gen!=='U'?`<span class="tq-gen ${l.gen}">${GEN[l.gen].toUpperCase()}</span>`:'';
+function fornEtq(tipoId){const fs=(state.forn||[]).filter(f=>f.servico===tipoId);const t=tipo(tipoId);
+  const nomes=fs.length>1?`<span class="tq-chk">${fs.map(f=>`<span>${esc(f.nome)}</span>`).join('')}</span>`:fs.length?`<b>${esc(fs[0].nome)}</b>`:`<span>${t&&t.externo?'Fornecedor: ________':'Interno'}</span>`;
+  const pz=fs.length?Math.max(...fs.map(f=>f.prazo||0)):0;return nomes+(pz?`<span>Volta em <b>${pz} ${pz===1?'dia útil':'dias úteis'}</b></span>`:'')}
+function etqPacote(l,ped,k,N){const G=gruposPers(l),c2=(l.cores2||[]).map(c=>`${esc(c.cor)}: ${esc((c.partes||[]).join(', ').toLowerCase())}`).join(' · ');
+  return `<div class="tq tq-pac"><div class="tq-bar"><span>Pacote · costura</span><span>${esc(ped.id)} · ${k}/${N}</span></div>
+  <div class="tq-top"><div class="tq-txt"><div class="tq-cli">${esc(ped.cliente)}</div><div class="tq-prod">${esc(nomePeca(l))}</div>${genEtq(l)}</div><div class="tq-qr">${qrSvg(linkFicha(l))}</div></div>
+  <div class="tq-l"><i>Cor</i> <b>${esc(l.cor||'—')}</b>${c2?` · ${c2}`:''}</div>
+  <div class="tq-l"><i>Tecido</i> ${esc(l.tecido||'—')}</div>
+  <div class="tq-l"><i>Personalização</i> ${G.length?G.map(g=>`${esc(g.parte)} (${esc(tNome(g.tipo))})`).join(' · '):'nenhuma'}</div>
+  ${gradeEtq(l)}
+  <div class="tq-rod"><span>Entrega <b>${dataCurta(ped.entrega).slice(0,5)}</b></span><span>${esc(pNome(ped.vendedor)||'')}</span><span>Peça <b>${esc(l.id)}</b></span></div></div>`}
+function etqPers(l,ped,g,n,N){const linhas=g.itens.map(x=>{const onde=[x.parte==='Mangas'&&x.lado?'Manga '+(LADO_ETQ[x.lado]||''):'',x.pos].filter(Boolean).join(' · ');return `<div>${onde?`<b>${esc(onde)}</b>${x.desc?': '+esc(x.desc):''}`:`<b>${esc(x.desc||'Ver mockup na ficha')}</b>`}</div>`}).join('');
+  return `<div class="tq tq-pers"><div class="tq-bar"><span>${esc(tNome(g.tipo))}</span><span>${esc(ped.id)} · ${n}/${N}</span></div>
+  <div class="tq-top"><div class="tq-txt"><div class="tq-parte">${esc(g.parte)}</div><div class="tq-cli">${esc(ped.cliente)}</div></div><div class="tq-qr">${qrSvg(linkFicha(l))}</div></div>
+  <div class="tq-l tq-peca"><b>${esc(nomePeca(l))}</b> · ${esc(l.cor||'')} ${genEtq(l)}</div>
+  <div class="tq-pz">${linhas}</div>
+  ${gradeEtq(l)}
+  <div class="tq-rod">${fornEtq(g.tipo)}<span>Entrega <b>${dataCurta(ped.entrega).slice(0,5)}</b></span></div></div>`}
+function etiquetasDe(ped){const ls=lotesDe(ped.id).filter(l=>!l.rework);const P=ls.map((l,i)=>etqPacote(l,ped,i+1,ls.length));
+  const PZ=ls.flatMap(l=>gruposPers(l).map(g=>[l,g]));PZ.forEach(([l,g],i)=>P.push(etqPers(l,ped,g,i+1,PZ.length)));return P}
+/* Se o texto não couber, a etiqueta aperta a letra um pouco (nunca abaixo do legível) */
+function ajustaEtq(raiz){(raiz||document).querySelectorAll('.tq').forEach(el=>{el.classList.remove('ap1','ap2','ap3');for(const c of ['ap1','ap2','ap3']){if(el.scrollHeight<=el.clientHeight+1)break;el.classList.remove('ap1','ap2');el.classList.add(c)}})}
+function ajustaA4(){document.querySelectorAll('.tq-wrap').forEach(w=>{const tq=w.firstElementChild;if(!tq)return;const k=Math.min(1,(w.parentElement.clientWidth||378)/378);w.style.width=(378*k)+'px';w.style.height=(302*k)+'px';tq.style.transform=k<1?`scale(${k})`:'';tq.style.transformOrigin='0 0'});if(document.querySelector('.tq-wrap .tq:not(.fit)')){ajustaEtq(document);document.querySelectorAll('.tq-wrap .tq').forEach(x=>x.classList.add('fit'))}
+  document.querySelectorAll('.a4wrap').forEach(w=>{const k=w.clientWidth/794;const a=w.firstElementChild;if(a){a.style.transform=`scale(${k})`;w.style.height=(1123*k)+'px'}})}
 window.addEventListener('resize',ajustaA4);
-const LIBS={h2c:'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',pdf:'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'};
-async function gerarPdf(P,nome){if(!window.html2canvas)await carregaScript(LIBS.h2c);if(!window.jspdf)await carregaScript(LIBS.pdf);
-  const R=document.getElementById('docRender');const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true});
+const LIBS={h2c:'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',pdf:'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',qr:'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'};
+async function gerarPdf(P,nome,f){if(!window.html2canvas)await carregaScript(LIBS.h2c);if(!window.jspdf)await carregaScript(LIBS.pdf);f=f||{w:210,h:297,pw:794,ph:1123};
+  const R=document.getElementById('docRender');const doc=new window.jspdf.jsPDF(f.w===210?{unit:'mm',format:'a4',compress:true}:{unit:'mm',format:[f.w,f.h],orientation:f.w>f.h?'landscape':'portrait',compress:true});
   for(let i=0;i<P.length;i++){R.innerHTML=P[i];const el=R.firstElementChild;await Promise.all([...el.querySelectorAll('img')].map(im=>im.complete?1:new Promise(r=>{im.onload=im.onerror=r})));
-    toast(`Gerando PDF… página ${i+1} de ${P.length}`,false);const c=await window.html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false,width:794,height:1123,windowWidth:794});
-    if(i)doc.addPage();doc.addImage(c.toDataURL('image/jpeg',.9),'JPEG',0,0,210,297)}
+    if(el.classList.contains('tq'))ajustaEtq(R);toast(`Gerando PDF… página ${i+1} de ${P.length}`,false);const c=await window.html2canvas(el,{scale:f.w===210?2:4,backgroundColor:'#ffffff',useCORS:true,logging:false,width:f.pw,height:f.ph,windowWidth:f.pw});
+    if(i)doc.addPage(f.w===210?undefined:[f.w,f.h],f.w>f.h?'landscape':undefined);doc.addImage(c.toDataURL(f.w===210?'image/jpeg':'image/png',.9),f.w===210?'JPEG':'PNG',0,0,f.w,f.h)}
   R.innerHTML='';const blob=doc.output('blob');let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
   if(dl){try{await dl.save({filename:nome,data:blob});toast('PDF pronto',false);return}catch(e){if(e&&e.code==='declined'){document.getElementById('toast').innerHTML='';return}}}
   const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);toast('PDF pronto',false)}
@@ -2911,7 +2972,9 @@ function vGestor(){const aba=ui.gt||'agora',desde=gDesde(),per=ui.gp||7;
 
 /* ================= render ================= */
 const sheetId=s=>s.t+':'+(s.id||s.p||s.m||'');
-function render(){RC={};
+/* Link do QR code da etiqueta: #ficha=<peça> abre a ficha de produção dessa peça */
+let LINK_FICHA=(()=>{try{const m=location.hash.match(/ficha=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
+function render(){RC={};if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){const l=(state.lotes||[]).find(x=>x.id===LINK_FICHA);LINK_FICHA=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(l){setTimeout(()=>abreDoc('prod',l.ped,l.id),0)}}
   document.querySelectorAll('.nb[data-t]').forEach(b=>b.setAttribute('aria-current',b.dataset.t===ui.tela?'page':'false'));
   if(!NV.pronto){document.body.classList.add('sem-login');document.getElementById('app').innerHTML=vConectando();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());
@@ -3010,13 +3073,14 @@ const A={
   cliApRm:d=>{const c=cliById(ui.sheet.id);snap();c.apelidos.splice(+d.j,1);commit()},
   apRm:d=>{snap();delete state.apelidos[d.k][d.v];commit()},
   docProd:d=>abreDoc('prod',d.id),
+  docEtq:d=>abreDoc('etq',d.id),
   docPed:d=>abreDoc('pedido',d.id),
   docVias:d=>{ui.sheet.vias=+d.v;render()},
   docMocks:()=>{ui.sheet.mocks=!ui.sheet.mocks;render()},
   docPb:async()=>{const e=ui.sheet;e.pb=!e.pb;if(e.pb){const ls=lotesDe(e.id).filter(l=>!l.rework&&l.mock&&!e.cinza[l.id]);if(ls.length){toast('Montando as fichas…',false);for(const l of ls)try{e.cinza[l.id]=await paraCinza(mockGrande(l))}catch(er){}document.getElementById('toast').innerHTML=''}}render()},
   docPdf:async()=>{const e=ui.sheet,ped=pedById(e.id);const b=document.querySelector('[data-a=docPdf]');if(b)b.disabled=true;
-    try{await gerarPdf(paginasDoc(e),nomeArq(`${e.tipo==='pedido'?'Pedido':'Producao'} ${ped.id} - ${ped.cliente}.pdf`))}catch(er){toast('Não consegui gerar o PDF. Verifique a internet e tente de novo, ou use Imprimir.',false)}finally{if(b)b.disabled=false}},
-  docPrint:()=>{const R=document.getElementById('docRender');R.innerHTML=paginasDoc(ui.sheet).join('');document.body.classList.add('imprimindo');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('imprimindo');R.innerHTML=''},500)},150)},
+    try{await gerarPdf(paginasDoc(e),nomeArq(`${e.tipo==='pedido'?'Pedido':e.tipo==='etq'?'Etiquetas':'Producao'} ${ped.id} - ${ped.cliente}${e.so?' - peca '+e.so:''}.pdf`),e.tipo==='etq'?{w:100,h:80,pw:378,ph:302}:null)}catch(er){toast('Não consegui gerar o PDF. Verifique a internet e tente de novo, ou use Imprimir.',false)}finally{if(b)b.disabled=false}},
+  docPrint:()=>{const R=document.getElementById('docRender');R.innerHTML=paginasDoc(ui.sheet).join('');document.body.classList.add('imprimindo');if(ui.sheet.tipo==='etq')ajustaEtq(R);setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('imprimindo');R.innerHTML=''},500)},150)},
   docAprov:d=>{const p=pedById(d.id);snap();p.aprov=p.aprov?undefined:{ts:now(),por:quemNome()||''};commit();toast(p.aprov?'Aprovação registrada':'Aprovação desfeita')},
   logoRm:()=>{snap();state.marca={...marca(),logo:''};commit()},
   termoAdd:()=>{snap();state.termos=[...(state.termos||TERMOS0).map(x=>[...x]),['Nova informação','Escreva aqui']];commit()},

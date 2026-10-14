@@ -162,3 +162,18 @@ O tempo de cada parte conta para quem fez, no Painel.
 
 **O que NÃO mudou:**
 - Os pedidos que já estavam no sistema ficam como estão.
+
+---
+
+## Etiquetas do corte
+
+**O que mudou:**
+- No pedido, ao lado de **PDF de produção**, tem o botão **Etiquetas**.
+- Saem etiquetas de **10 × 8 cm**, em preto e branco, para a impressora térmica:
+  - **Pacote:** uma para cada peça do pedido. Vai com a peça para a costura: cliente, peça, MASCULINA ou FEMININA, cor e detalhes, tecido, tamanhos e total, entrega.
+  - **Personalização:** uma para cada parte que sai para bordar, estampar ou aplicar DTF (FRENTE, COSTAS, MANGAS…): onde vai, a arte, tamanhos e total, fornecedor e prazo de volta.
+- O **QR code** de cada etiqueta abre no celular a ficha de produção daquela peça, pronta para baixar em PDF.
+- O Fábio não precisa mais escrever o paninho à mão. A etiqueta de tamanho de cada parte continua como sempre.
+
+**O que NÃO mudou:**
+- A ficha de produção e o PDF de produção continuam iguais.

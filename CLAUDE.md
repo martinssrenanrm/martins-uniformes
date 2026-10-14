@@ -38,6 +38,7 @@ NODE_PATH=$(npm root -g) node tests/cancelar-pedido.test.js
 NODE_PATH=$(npm root -g) node tests/importar-ficha.test.js
 NODE_PATH=$(npm root -g) node tests/feriados-entrega.test.js
 NODE_PATH=$(npm root -g) node tests/modelagem-tecidos.test.js
+NODE_PATH=$(npm root -g) node tests/etiquetas.test.js
 ```
 
 ## Supabase (endereço próprio)
