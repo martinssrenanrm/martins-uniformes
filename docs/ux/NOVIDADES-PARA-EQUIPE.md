@@ -148,3 +148,17 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Peça nova não ganha personalização sozinha.** A personalização de sempre do produto aparece como sugestão: só entra se tocar nela.
 - **Ficha em Word:** leitor novo, que lê também cabeçalho do Word, caixas de texto e células mescladas. Word antigo (.doc) precisa ser salvo como .docx ou PDF.
 - **Tela do pedido mais limpa:** a peça, quem vendeu e a categoria de tamanho são listas suspensas; as quantidades ficam numa grade de quadrinhos.
+
+---
+
+## Masculina e feminina, cobre gola, variações e tecidos
+
+**O que mudou:**
+- **Masculina ou feminina:** no novo pedido, cada peça pergunta a modelagem. A ficha de produção mostra **MASCULINA** ou **FEMININA** bem grande, para a costura não confundir. Se o pedido tem as duas, a peça entra duas vezes, uma de cada.
+- **Polo:** a cor do detalhe vai no **peitilho**, no **cobre gola** e na **segunda barra da manga**. Quando a ficha da polo diz "gola" ou "manga" no detalhe, o sistema já entende assim.
+- **Variações:** um produto pode ter variações, como **Manga curta** e **Manga longa** (Cadastros › Produtos › Variações). No pedido, cada peça escolhe a sua.
+- **Tecidos:** agora é uma **lista geral**. Qualquer peça pode ser feita em qualquer tecido. Para cadastrar: escolha "Novo tecido" no pedido ou vá em Cadastros › Ajustes › Tecidos. O mesmo tecido não entra duas vezes.
+- **Tamanhos:** entrou o tamanho **0** (antes do 2) e o **ESP**. Ficha com tamanho americano (S, L, XL, 2XL) é convertida sozinha: S = P, L = G, XL = GG, 2XL = XG.
+
+**O que NÃO mudou:**
+- Os pedidos que já estavam no sistema ficam como estão.

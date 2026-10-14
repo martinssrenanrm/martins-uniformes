@@ -63,7 +63,7 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
     polo:{cor:g.itens[0].cor,c2:g.itens[0].cores2,tipos:g.itens[0].pers.map(x=>x.tipo&&tipo(x.tipo).nome)},blusa:{prod:g.itens[1].prod,op:g.itens[1].opcoes,tipos:g.itens[1].pers.map(x=>x.tipo&&tipo(x.tipo).nome)}}});
   ok(r.n===1&&r.itens===2,'duas fichas com números diferentes viram um pedido só');ok(/números diferentes/.test(r.av),'avisa que os números das fichas são diferentes');
   ok(r.polo.cor==='Azul celeste','cor principal lida mesmo com o resto do texto ("AZUL CELESTE com gola…")');
-  ok(r.polo.c2.length===1&&r.polo.c2[0].cor==='Preta'&&['Gola','Punhos','Peitilho'].every(x=>r.polo.c2[0].partes.some(y=>y.startsWith(x))),'cor secundária e onde ela vai preenchidas sozinhas: '+JSON.stringify(r.polo.c2));
+  ok(r.polo.c2.length===1&&r.polo.c2[0].cor==='Preta'&&['Cobre gola','Punhos','Peitilho'].every(x=>r.polo.c2[0].partes.includes(x)),'cor secundária e onde ela vai preenchidas sozinhas (na polo, gola = cobre gola): '+JSON.stringify(r.polo.c2));
   ok(r.polo.tipos.every(t=>/^Bordado/.test(t||'')),'"Bord" na ficha = Bordado');
   ok(r.blusa.prod==='blusa'&&r.blusa.op.includes('capuz')&&r.blusa.op.includes('canguru'),'Blusa com capuz e bolso canguru reconhecidos');
   const pend=await A.evaluate(()=>{const g=ui.sheet.grupos[0];g.vend=state.pessoas.find(p=>temPapel(p,'vendas')).id;const P=impPend(g);impCriar();return P});await A.waitForTimeout(600);ok(!pend.length,'nada pendente para criar: '+pend.join(', '));
