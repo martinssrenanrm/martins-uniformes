@@ -20,12 +20,14 @@
    - Guarde o token nas configurações do ambiente como variável **`SUPABASE_ACCESS_TOKEN`**.
    - Me diga o **ref** do projeto: o código do endereço `https://<ref>.supabase.co`.
 2. **Onde o site fica (escolha um):**
-   - **GitHub Pages (escolhido):** na conta do Renan, crie o repositório **público** `martins-app`, vazio. Em Settings › Collaborators, adicione a conta Leaderei com permissão de escrita. Depois do primeiro envio: Settings › Pages › Source "Deploy from a branch" › `main` / `(root)` › Save.
-     - Endereço: `https://martinssrenanrm.github.io/martins-app/`, ou um domínio próprio.
-     - Por que um repositório separado: Pages em repositório privado exige GitHub pago, e este repositório tem prints com dados reais de clientes, então não pode ficar público. O repositório público tem só o `index.html`, que já é público de qualquer jeito (é o que o navegador baixa). Nenhum dado fica nele: os dados ficam no Supabase, atrás do login.
+   - **GitHub Pages (escolhido):** este repositório publica sozinho pela automação `.github/workflows/pages.yml` sempre que `site/` muda.
+     - Uma vez só, o dono faz: Settings › Pages › Source **GitHub Actions**.
+     - Se o GitHub pedir upgrade: Pages em repositório privado exige GitHub Pro (cerca de US$ 4/mês). Não torne este repositório público, porque ele tem prints com dados reais de clientes.
+     - Endereço: `https://martinssrenanrm.github.io/martins-uniformes/`, ou um domínio próprio.
    - **Vercel:** **Add New › Project › Import** `martinssrenanrm/martins-uniformes` › Deploy. Endereço `https://martins-uniformes.vercel.app`.
 
 ## Passo a passo da virada (quem executa: Claude)
+0. **Sem token, se possível:** com o conector Supabase ligado no Claude (claude.ai/customize/connectors), rode o `supabase/schema.sql` e pegue a URL e a chave pública por ele. O passo 1 abaixo é o caminho com token.
 1. **Preparar o projeto.** Isso cria a tabela, as regras de acesso, o tempo real e os e-mails em português, e mostra a URL e a chave pública.
    ```
    SUPABASE_ACCESS_TOKEN=… SUPABASE_REF=<ref> APP_URL=https://<endereço-da-vercel> node tools/supabase.js
@@ -43,7 +45,7 @@
    SUPABASE_URL=… SUPABASE_ANON_KEY=… node tools/build.js
    ```
    - Faça o commit de `site/` neste repositório.
-   - **GitHub Pages:** copie `site/index.html` e `site/manifest.webmanifest` para a raiz de `martins-app` e faça o push. O Pages publica em cerca de 1 minuto.
+   - **GitHub Pages:** o push de `site/` publica sozinho em cerca de 1 minuto.
    - **Vercel:** o push deste repositório já publica.
 6. **Testar com a Helena:** primeiro acesso, confirmação por e-mail, pedidos e mockups aparecendo.
 7. **Avisar a equipe do endereço novo.** O link do Claude fica parado, como cópia, por 30 dias.
