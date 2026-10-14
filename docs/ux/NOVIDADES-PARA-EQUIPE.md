@@ -172,7 +172,8 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Saem etiquetas de **10 × 8 cm**, em preto e branco, para a impressora térmica:
   - **Pacote:** uma para cada peça do pedido. Vai com a peça para a costura: cliente, peça, MASCULINA ou FEMININA, cor e detalhes, tecido, tamanhos e total, entrega.
   - **Personalização:** uma para cada parte que sai para bordar, estampar ou aplicar DTF (FRENTE, COSTAS, MANGAS…): onde vai, a arte, tamanhos e total, fornecedor e prazo de volta.
-- O **QR code** de cada etiqueta abre no celular a ficha de produção daquela peça, pronta para baixar em PDF.
+- O **QR code** de cada etiqueta abre a ficha de produção daquela peça em **qualquer celular, sem login** (serve para o bordado e o silk também). Ele só mostra aquela ficha: o resto do sistema continua fechado.
+- Corrigido: a ficha de produção estava com **bolinhas soltas** em cima dos títulos (PEDIDO, FECHOU, PRODUTO…).
 - O Fábio não precisa mais escrever o paninho à mão. A etiqueta de tamanho de cada parte continua como sempre.
 
 **O que NÃO mudou:**

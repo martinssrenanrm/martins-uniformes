@@ -77,7 +77,7 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
     let y0=k.height,y1=0;for(let y=0;y<k.height;y++)for(let x=0;x<k.width;x+=4){const i=(y*k.width+x)*4;if(d[i]<200){if(y<y0)y0=y;if(y>y1)y1=y}}return (y1-y0)/k.height});
   ok(r>0.85,`a peça inteira continua no mockup (altura ${Math.round(r*100)}% do quadro)`);
   console.log('8) Ficha de produção colorida');
-  r=await A.evaluate(()=>{const p=state.pedidos.find(x=>/9002/.test(x.ficha||''));const l=lotesDe(p.id)[0];openSheet({t:'doc',tipo:'prod',id:p.id,cinza:{},vias:2,mocks:true,pb:false});const cor=paginasDoc(ui.sheet)[0];ui.sheet.pb=true;const pb=paginasDoc(ui.sheet)[0];return {cor:/class="a4 fp cor"/.test(cor),pb:/class="a4 fp"/.test(pb)&&!/fp cor/.test(pb),bot:!!document.querySelector('[data-a=docPb]')}});
+  r=await A.evaluate(()=>{const p=state.pedidos.find(x=>/9002/.test(x.ficha||''));const l=lotesDe(p.id)[0];openSheet({t:'doc',tipo:'prod',id:p.id,cinza:{},vias:2,mocks:true,pb:false});const cor=paginasDoc(ui.sheet)[0];ui.sheet.pb=true;const pb=paginasDoc(ui.sheet)[0];return {cor:/class="a4 fp colorida"/.test(cor),pb:/class="a4 fp"/.test(pb)&&!/fp colorida/.test(pb),bot:!!document.querySelector('[data-a=docPb]')}});
   ok(r.cor,'a ficha sai colorida por padrão');ok(r.pb&&r.bot,'preto e branco continua como opção');
   console.log('9) Listas suspensas no pedido');
   await A.evaluate(()=>{openSheet({t:'novo',w:{step:2,cliente:'Teste',cli:null,contato:'',cnpj:'',vend:state.pessoas[0].id,entrega:null,err:'',itens:[]}});A.wAdd({p:'polo-vie'})});

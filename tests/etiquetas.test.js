@@ -4,7 +4,8 @@ const { chromium } = require('playwright');const fs=require('fs'),path=require('
 const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=(c,m)=>{console.log((c?'  ✔ ':'  ✘ ')+m);if(!c)falhas++};
 const store=new Map();
 async function dbop(o,p,data){if(o==='get')return {data:store.get(p)||null};if(o==='list')return [...store.entries()].filter(([k])=>k.split('/')[0]===p).map(([k,d])=>({id:k.split('/')[1],data:d}));if(o==='acquire')return {acquired:true};
-  if(o==='set')store.set(p,JSON.parse(JSON.stringify(data)));if(o==='delete')store.delete(p);return {}}
+  if(o==='set')store.set(p,JSON.parse(JSON.stringify(data)));if(o==='update'){if(!store.has(p))return {err:'invalid_argument'};merge(store.get(p),JSON.parse(JSON.stringify(data)))}if(o==='delete')store.delete(p);return {}}
+const merge=(a,b)=>{for(const k of Object.keys(b)){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])&&a[k]&&typeof a[k]==='object')merge(a[k],b[k]);else a[k]=b[k]}return a};
 const cache=path.join(os.tmpdir(),'martins-cdn');fs.mkdirSync(cache,{recursive:true});
 const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs.existsSync(f))execFileSync('curl',['-sfL','-o',f,url]);return fs.readFileSync(f)};
 (async()=>{const b=await chromium.launch();const fake=fs.readFileSync(path.join(__dirname,'fakedb.js'),'utf8');const erros=[];
@@ -41,12 +42,20 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   ok(/Etiquetas/.test(dl.suggestedFilename()),'o arquivo se chama Etiquetas …');ok(Math.abs(box[0]-283.46)<1&&Math.abs(box[1]-226.77)<1,`cada página tem 100 × 80 mm (${box.join(' × ')} pt)`);
   ok((pdf.match(/\/Type\s*\/Page[^s]/g)||[]).length===await A.evaluate(()=>document.querySelectorAll('.tq').length),'uma página por etiqueta');
 
-  console.log('4) O QR code abre a ficha daquela peça');
-  const lid=await A.evaluate(id=>lotesDe(id)[0].id,id);const link=await A.evaluate(()=>linkFicha(lotesDe(ui.sheet.id)[0]));
-  ok(link.endsWith('#ficha='+encodeURIComponent(lid)),'o QR aponta para a ficha da peça');
-  const B=await ctx.newPage();B.on('pageerror',e=>erros.push(e.message));await B.goto(APP+'#ficha='+encodeURIComponent(lid));await B.waitForFunction(()=>ui.sheet&&ui.sheet.t==='doc',null,{timeout:20000});
-  r=await B.evaluate(()=>({tipo:ui.sheet.tipo,so:ui.sheet.so,fichas:paginasDoc(ui.sheet).length,pdf:!!document.querySelector('[data-a=docPdf]'),hash:location.hash}));
-  ok(r.tipo==='prod'&&r.so===lid&&r.fichas===1,'abre só a ficha de produção daquela peça');ok(r.pdf,'com o botão de baixar o PDF');ok(!r.hash,'o endereço volta ao normal');
+  console.log('4) O QR code abre a ficha daquela peça, para qualquer pessoa');
+  r=await A.evaluate(id=>{const ls=lotesDe(id).filter(l=>!l.rework);return {qr:ls.map(l=>l.qr),link:linkFicha(ls[0]),lid:ls[0].id}},id);
+  ok(r.qr.every(q=>/^[0-9a-f]{30}$/.test(q))&&new Set(r.qr).size===r.qr.length,'cada peça ganhou um código secreto diferente');
+  ok(r.link.endsWith('#f='+r.qr[0])&&!r.link.includes(r.lid),'o QR leva o código secreto, não o número da peça');
+  await A.waitForTimeout(1500);ok(store.get('lotes/'+r.lid)?.qr===r.qr[0],'o código fica guardado na nuvem');
+  const C=await b.newContext({viewport:{width:390,height:800}});await C.exposeFunction('__dbop',dbop);await C.addInitScript(fake);
+  await C.route(/cdnjs\.cloudflare\.com/,q=>q.fulfill({body:cdn(q.request().url()),contentType:'application/javascript'}));
+  const st=await A.evaluate(()=>localStorage.getItem(KEY));await C.addInitScript(s=>{try{localStorage.setItem('martins-v8',s)}catch(e){}},st);
+  const B=await C.newPage();B.on('pageerror',e=>erros.push(e.message));await B.goto(APP+'#f='+r.qr[0]);await B.waitForSelector('.pub-f',{timeout:20000});
+  let s=await B.evaluate(()=>({sessao:localStorage.getItem('martins-sessao'),fichas:document.querySelectorAll('.pub-f .a4').length,pdf:!!document.querySelector('.pub-f [data-a=docPdf]'),login:!!document.querySelector('#lgEmail,.login'),nav:getComputedStyle(document.querySelector('.nav')||document.body).display}));
+  ok(!s.sessao&&!s.login,'abre sem login');ok(s.fichas===1,'mostra só a ficha de produção daquela peça');ok(s.pdf,'com o botão de baixar o PDF');
+  ok(await B.evaluate(()=>[...document.querySelectorAll('.a4 span:not(.fp-bol)')].every(x=>getComputedStyle(x).borderRadius!=='50%')),'a ficha não tem bolinhas soltas nos rótulos');
+  await B.goto('about:blank');await B.goto(APP+'#f='+'0'.repeat(30));await B.waitForSelector('.conect',{timeout:20000});await B.waitForTimeout(500);
+  ok(/não encontrada/.test(await B.textContent('#app')),'código errado não mostra nada do sistema');await C.close();
 
   console.log('5) Central de dúvidas');
   ok(await A.evaluate(()=>ajBusca('etiqueta')[0]?.f.q==='Como imprimo as etiquetas do corte?'),'"etiqueta" acha a resposta certa');
