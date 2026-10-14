@@ -1,5 +1,12 @@
 # Mudança para o Supabase: endereço próprio da Martins
 
+**Situação (14/10/2026): feita.**
+- **Endereço:** https://martinssrenanrm.github.io/martins-uniformes/
+- **Projeto Supabase:** `fmiyrnkzsurjlunfgwjq` ("Martins Uniformes App").
+- **Dados levados:** 135 documentos, conferidos por coleção.
+- **Para publicar uma mudança:** rode `tools/build.js` com a URL e a chave pública do projeto, faça o commit de `site/` e o push. A automação publica em cerca de 1 minuto.
+- **Pendência:** apagar a função desligada `public.importar_docs`, usada só na migração. Ela não tem permissão para ninguém.
+
 **Objetivo:** abrir o app em qualquer navegador, só com o e-mail e a senha do app, sem conta Claude.
 
 ## Como fica
