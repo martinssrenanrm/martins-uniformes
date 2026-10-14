@@ -1,0 +1,9 @@
+{
+ "name": "Martins Pro",
+ "short_name": "Martins",
+ "start_url": "./",
+ "display": "standalone",
+ "background_color": "#EEF1F5",
+ "theme_color": "#16202C",
+ "lang": "pt-BR"
+}
