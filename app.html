@@ -969,16 +969,16 @@ const TIPOS0=[
 ];
 const PAPEIS={costura:'Costureira',corte:'Cortador',vendas:'Vendedora',compras:'Compras e entregas',pers:'Personalização',acab:'Acabamento'};
 const PESSOAS0=[
-  {id:'leo',nome:'Leu',papeis:['costura'],sabe:['reta','overlock','galoneira','cobregola','caseadeira','botoneira'],melhor:['reta']},
-  {id:'zeze',nome:'Zezé',papeis:['costura'],sabe:['overlock','galoneira'],melhor:[]},
+  {id:'leo',nome:'Lúcia',papeis:['costura'],sabe:['reta','overlock','galoneira','cobregola','caseadeira','botoneira'],melhor:['reta']},
+  {id:'zeze',nome:'Rosa',papeis:['costura'],sabe:['overlock','galoneira'],melhor:[]},
   {id:'ana',nome:'Ana',papeis:['costura'],sabe:['overlock','galoneira','cobregola'],melhor:['Pregar gola','galoneira']},
-  {id:'anilda',nome:'Nilda',papeis:['costura'],sabe:['reta','cobregola'],melhor:['reta']},
-  {id:'dalva',nome:'Dalva',papeis:['costura'],sabe:['galoneira','overlock','reta'],melhor:['overlock']},
-  {id:'fabio',nome:'Fábio',papeis:['corte'],sabe:['corte'],melhor:['corte']},
-  {id:'layara',nome:'Laiara',papeis:['vendas'],sabe:[],funcoes:['vias','arte_prep','arte_aprov','arte_env','levar','entregar'],viaApp:true,melhor:['arte_prep','arte_env']},
-  {id:'paula',nome:'Paula',papeis:['vendas'],sabe:[],funcoes:['vias','arte_prep','arte_aprov','arte_env'],melhor:[]},
-  {id:'roger',nome:'Roger',papeis:['compras','vendas'],sabe:[],funcoes:['vias','arte_prep','arte_aprov','arte_env','conferir','comprar','levar','entregar'],melhor:['comprar','levar','entregar']},
-  {id:'alexandra',nome:'Alexandra',papeis:['acab'],sabe:['arremate','embalagem'],melhor:[]},
+  {id:'anilda',nome:'Marta',papeis:['costura'],sabe:['reta','cobregola'],melhor:['reta']},
+  {id:'dalva',nome:'Vera',papeis:['costura'],sabe:['galoneira','overlock','reta'],melhor:['overlock']},
+  {id:'fabio',nome:'Carlos',papeis:['corte'],sabe:['corte'],melhor:['corte']},
+  {id:'layara',nome:'Bianca',papeis:['vendas'],sabe:[],funcoes:['vias','arte_prep','arte_aprov','arte_env','levar','entregar'],viaApp:true,melhor:['arte_prep','arte_env']},
+  {id:'paula',nome:'Júlia',papeis:['vendas'],sabe:[],funcoes:['vias','arte_prep','arte_aprov','arte_env'],melhor:[]},
+  {id:'roger',nome:'Marcos',papeis:['compras','vendas'],sabe:[],funcoes:['vias','arte_prep','arte_aprov','arte_env','conferir','comprar','levar','entregar'],melhor:['comprar','levar','entregar']},
+  {id:'alexandra',nome:'Sônia',papeis:['acab'],sabe:['arremate','embalagem'],melhor:[]},
 ];
 const FUNCOES=[
   {id:'vias',nome:'Separar vias',i:'i-vias'},
@@ -1188,7 +1188,7 @@ const PROBS=[{k:'Gola torta',i:'i-gola',alvo:['gola','prepgola','cobregola']},{k
 
 /* ================= estado ================= */
 /* Cliente desta instalação: vem do build (clientes/<id>.json). Sem build = demonstração/testes, com acessos fictícios. */
-const CLIENTE=(typeof window!=='undefined'&&window.CLIENTE)||{id:'demo',nome:'Demonstração',admins:[{id:'u-helena',email:'helena@exemplo.test',nome:'Helena'},{id:'u-roger',email:'roger@exemplo.test',nome:'Roger'}]};
+const CLIENTE=(typeof window!=='undefined'&&window.CLIENTE)||{id:'demo',nome:'Demonstração',admins:[{id:'u-helena',email:'helena@exemplo.test',nome:'Regina'},{id:'u-roger',email:'roger@exemplo.test',nome:'Marcos'}]};
 const SUPORTE=()=>CLIENTE.suporte||'o suporte';
 const NOME_EMP=()=>(typeof state!=='undefined'&&state&&state.marca&&state.marca.nome)||CLIENTE.nome||'empresa';
 const gestoresTxt=()=>{const n=((typeof state!=='undefined'&&state&&state.usuarios)||[]).filter(u=>u.perfil==='gestao').map(u=>u.nome).filter(Boolean);return n.length?n.slice(0,3).join(' ou '):'alguém da gestão'};
@@ -1375,11 +1375,11 @@ function logExemplo(T){state.log=[];{const combos=[['Polo Amsterdã','Pregar man
     const clis=['Construtora Horizonte','Rede Farma Vida','Academia Pulse','Transportes Rota Sul','Hospital São Lucas'];
     for(let i=0;i<56;i++){const c=combos[Math.floor(rnd()*combos.length)],ap=aptos(c[2]);if(!ap.length)continue;const op=pick(ap.map(x=>x.id)),r=rnd();
       let modo='sugerido';if(c[1]==='Pregar mangas'&&r<.55)modo='fora';else if(c[2]==='overlock'&&r<.25)modo='pessoa';else if(r<.07)modo='outro';else if(r<.1)modo='reserva';
-      const ts=T-(i<44?rnd()*6.5:7+rnd()*20)*DIA;state.log.push({ts,por:'Helena',tipo:'inicio',modo,maq:c[2]+'-'+(1+Math.floor(rnd()*Math.min(3,tipo(c[2]).qtd||1))),maqTipo:c[2],op,sug:modo==='pessoa'?pick(ap.filter(x=>x.id!==op).map(x=>x.id))||op:op,ped:'',cli:pick(clis),prod:c[0],step:c[1]})}
-    [[1.2,'fora'],[2.1,'fora'],[3.4,'fora'],[4.6,'fora'],[5.3,'fora']].forEach(([d,m])=>state.log.push({ts:T-d*DIA,por:'Helena',tipo:'inicio',modo:m,maq:'overlock-1',maqTipo:'overlock',op:'dalva',sug:'dalva',ped:'',cli:'Construtora Horizonte',prod:'Polo Amsterdã',step:'Pregar mangas'}));
-    [[0.8,'zeze'],[2.7,'zeze'],[4.1,'dalva']].forEach(([d,op])=>state.log.push({ts:T-d*DIA,por:'Helena',tipo:'inicio',modo:'pessoa',maq:'overlock-2',maqTipo:'overlock',op,sug:'ana',ped:'',cli:'Rede Farma Vida',prod:'Polo Viena',step:'Pregar gola'}));
-    state.log.push({ts:T-1.5*DIA,por:'Helena',tipo:'reserva',maq:'reta-1',maqTipo:'reta',op:'leo',ped:'0416',cli:'Academia Pulse',prod:'Calça Helanca',step:'Pregar bolsos'});
-    state.log.push({ts:T-2*DIA,por:'Helena',tipo:'troca',f:'levar',de:'roger',para:'layara',ped:'0412',cli:'Construtora Horizonte',step:'Levar para Parceiro DTF'});
+      const ts=T-(i<44?rnd()*6.5:7+rnd()*20)*DIA;state.log.push({ts,por:'Regina',tipo:'inicio',modo,maq:c[2]+'-'+(1+Math.floor(rnd()*Math.min(3,tipo(c[2]).qtd||1))),maqTipo:c[2],op,sug:modo==='pessoa'?pick(ap.filter(x=>x.id!==op).map(x=>x.id))||op:op,ped:'',cli:pick(clis),prod:c[0],step:c[1]})}
+    [[1.2,'fora'],[2.1,'fora'],[3.4,'fora'],[4.6,'fora'],[5.3,'fora']].forEach(([d,m])=>state.log.push({ts:T-d*DIA,por:'Regina',tipo:'inicio',modo:m,maq:'overlock-1',maqTipo:'overlock',op:'dalva',sug:'dalva',ped:'',cli:'Construtora Horizonte',prod:'Polo Amsterdã',step:'Pregar mangas'}));
+    [[0.8,'zeze'],[2.7,'zeze'],[4.1,'dalva']].forEach(([d,op])=>state.log.push({ts:T-d*DIA,por:'Regina',tipo:'inicio',modo:'pessoa',maq:'overlock-2',maqTipo:'overlock',op,sug:'ana',ped:'',cli:'Rede Farma Vida',prod:'Polo Viena',step:'Pregar gola'}));
+    state.log.push({ts:T-1.5*DIA,por:'Regina',tipo:'reserva',maq:'reta-1',maqTipo:'reta',op:'leo',ped:'0416',cli:'Academia Pulse',prod:'Calça Helanca',step:'Pregar bolsos'});
+    state.log.push({ts:T-2*DIA,por:'Regina',tipo:'troca',f:'levar',de:'roger',para:'layara',ped:'0412',cli:'Construtora Horizonte',step:'Levar para Parceiro DTF'});
     state.log.sort((a,b)=>a.ts-b.ts)}}
 const TESC0={conferir:30,vias:15,arte_prep:60,arte_aprov:240,arte_env:10,comprar:30,levar:60,entregar:60};
 const CFG0=()=>({feriados:FER0(),usersV:1,posicoes:JSON.parse(JSON.stringify(POS0)),insV:1,marca:{...MARCA0},termos:TERMOS0.map(x=>[...x]),tamPadrao:{...TAM0},apelidos:{tecido:{},cor:{},prod:{},local:{},serv:{}},nomesV:1,alexV:1,expediente:JSON.parse(JSON.stringify(EXP0)),params:{...PAR},tEsc:{...TESC0},cats:JSON.parse(JSON.stringify(CATS)),fatorEsp:{XXG:1.15},pesos:{...PESO_PARTE},probs:JSON.parse(JSON.stringify(PROBS)),papeis:{...PAPEIS},partesExtra:[...PARTES_COR_EXTRA]});
@@ -1396,7 +1396,7 @@ function seed(){seedN=7;const T=now();
     {prod:'polo-ams',cor:'Marinho',cores2:[{cor:'Branca',partes:['Gola']}],qtd:180,done:['corte','pz0','pz1','peitilho','pregpeit','prepgola','barramanga','ombro','gola','cobregola','manga','fechar','etiqueta']},
     {prod:'calca-hel',cor:'Preta',qtd:180,done:['corte']}]});
   mk({id:'0415',contato:'Carla Mendes',cnpj:'45.678.901/0001-23',cliente:'Rede Farma Vida',vend:'paula',chegada:addWD(T,-9),entrega:addWD(T,14),lib:addWD(T,-6),linhas:[{prod:'polo-vie',cor:'Branca',qtd:240,done:['corte','pz0','peitilho']}]});
-  mk({id:'0416',contato:'Rafael Souza',cnpj:'56.789.012/0001-34',cliente:'Academia Pulse',vend:'roger',chegada:addWD(T,-8),entrega:addWD(T,9),lib:addWD(T,-6),linhas:[{prod:'calca-hel',cor:'Cinza',qtd:120,done:['corte','pz0','prepbolso','prepcos']}]});
+  mk({id:'0416',contato:'Ricardo Souza',cnpj:'56.789.012/0001-34',cliente:'Academia Pulse',vend:'roger',chegada:addWD(T,-8),entrega:addWD(T,9),lib:addWD(T,-6),linhas:[{prod:'calca-hel',cor:'Cinza',qtd:120,done:['corte','pz0','prepbolso','prepcos']}]});
   mk({id:'0419',contato:'Renata Alves',cnpj:'78.901.234/0001-56',cliente:'Hospital São Lucas',vend:'paula',chegada:addWD(T,-4),entrega:addWD(T,18),lib:addWD(T,-1),linhas:[{prod:'jaleco',cor:'Branca',tecido:'Gabardine',qtd:80},{prod:'brim-ziper',cor:'Marinho',tecido:'Brim',qtd:80}]});
   mk({id:'0418',contato:'Teresa Nogueira',cnpj:'67.890.123/0001-45',cliente:'Colégio São Bento',vend:'paula',chegada:addWD(T,-3),entrega:addWD(T,22),arte:false,env:false,linhas:[{prod:'polo-ams',cor:'Branca',qtd:320},{prod:'calca-hel',cor:'Marinho',qtd:320}]});
   mk({id:'0420',contato:'Fernanda Rocha',cnpj:'89.012.345/0001-67',cliente:'Clínica Vitta',vend:'layara',chegada:T-2*H,entrega:addWD(T,20),prep:false,arte:false,vias:false,env:false,linhas:[{prod:'polo-ams',cor:'Verde',qtd:60}]});
@@ -2212,7 +2212,7 @@ const FAQ=[
 /* escritório */
 {c:'esc',q:'Onde vejo as tarefas do escritório?',k:'tarefas escritório pendências fazer lista afazeres',r:['Na Fábrica, toque na aba Escritório.','As tarefas ficam por setor: Pedidos, Artes, Lista de compras e Logística.','Cada tarefa mostra o pedido, quem faz e o botão para marcar.'],ir:'fab:esc'},
 {c:'esc',q:'Como passo uma tarefa para outra pessoa?',k:'trocar pessoa responsável atribuir passar tarefa quem faz',r:['Na aba Escritório, toque na foto de quem faz, embaixo da tarefa.','Toque em quem vai fazer.','Para voltar ao automático: Deixar o sistema escolher.'],ir:'fab:esc'},
-{c:'esc',q:'Como deixo um setor sempre com a mesma pessoa?',k:'responsável fixo setor sempre dono automático roger compras',r:['Na aba Escritório, toque no botão redondo no canto do setor (foto ou bonequinhos).','Para cada tipo de tarefa, toque na pessoa (ou Automático, para o sistema dividir).'],ir:'fab:esc'},
+{c:'esc',q:'Como deixo um setor sempre com a mesma pessoa?',k:'responsável fixo setor sempre dono automático compras',r:['Na aba Escritório, toque no botão redondo no canto do setor (foto ou bonequinhos).','Para cada tipo de tarefa, toque na pessoa (ou Automático, para o sistema dividir).'],ir:'fab:esc'},
 {c:'esc',q:'Alguém saiu (médico, rua). Como tiro as tarefas dela?',k:'pessoa saiu fora ausente faltou redistribuir',r:['No fim da aba Escritório, em "No escritório agora", toque no nome da pessoa.','Ela fica "fora" e as tarefas vão para outras pessoas. Toque de novo quando voltar.'],ir:'fab:esc'},
 {c:'esc',q:'Como marco que as fichas e os mockups (vias) foram separados?',k:'vias separar fichas mockups separei',r:['Escritório › Pedidos: tarefa "Separar as vias" → toque em Separei.','Ou abra o pedido e toque em Vias separadas, em "Antes de cortar".'],ir:'fab:esc'},
 {c:'esc',q:'Como confiro os tecidos e aviamentos (insumos) de um pedido?',k:'conferir insumos tecidos aviamentos estoque material conferência',r:['Escritório › Lista de compras: "Conferir insumos" → toque em Conferir (ou abra o pedido e toque em Insumos conferidos).','Vá até o estoque e, em cada item, toque em Tem ou Falta.','No Falta, escreva quanto falta, escolha a unidade (unidade, metro ou Kg) e toque em Pôr na lista de compras.','A lista de compras mostra exatamente o que falta.','Ao lado de cada quantidade aparece para quantas peças ela é (ex.: ≈ 14 metros para 15 Blusa de Agasalho). Assim dá para conferir a conta sem abrir a ficha.','Ao tocar em Falta, aparece também quanto dá por peça (ex.: ≈ 0,93 m por peça), para ver se a quantidade está dentro do normal.']},

@@ -14,17 +14,17 @@ const dbop=modo=>async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null}
     if(semDb)await ctx.addInitScript(()=>{window.claude={use:async()=>null}});
     await ctx.addInitScript(([s,l])=>{try{if(s&&!localStorage.getItem('martins-sessao'))localStorage.setItem('martins-sessao',JSON.stringify({id:s,email:s==='u-helena'?'helena@exemplo.test':'roger@exemplo.test'}));if(l&&!localStorage.getItem('martins-v8'))localStorage.setItem('martins-v8',l)}catch(e){}},[sessao,local]);
     const p=await ctx.newPage();p.on('pageerror',e=>erros.push(n+': '+e.message));pages.push(p);await p.goto(APP);await p.waitForTimeout(1500);await p.evaluate(()=>{ui.sheet=null;render()});return p}
-  console.log('1) Aparelho principal começa a nuvem e a Helena cria a senha');
+  console.log('1) Aparelho principal começa a nuvem e a Regina cria a senha');
   const A=await aparelho('A');await A.click('[data-a=inicio][data-v=exemplo]');await A.waitForTimeout(2500);
   await A.evaluate(async()=>{const u=state.usuarios.find(x=>x.id==='u-helena');u.salt=novoSalt();u.hash=await hashSenha('martins123',u.salt);save()});await A.waitForTimeout(1500);
-  ok(!!store.get('usuarios/u-helena')?.hash,'senha da Helena está na nuvem');
+  ok(!!store.get('usuarios/u-helena')?.hash,'senha da Regina está na nuvem');
   const localVelho=await A.evaluate(()=>{const s=JSON.parse(JSON.stringify(state));s.usuarios.forEach(u=>{u.hash=null;u.salt=null});s.pedidos.push({...s.pedidos[0],id:'7777',exemplo:false,cliente:'Pedido Só Do Celular'});return JSON.stringify(s)});
 
-  console.log('2) Celular com cópia antiga guardada (caso da Helena)');
+  console.log('2) Celular com cópia antiga guardada (caso da Regina)');
   const C=await aparelho('C',{sessao:null,local:localVelho});
   ok(await C.evaluate(()=>!!document.getElementById('lgS')&&!document.getElementById('lgS1')),'login pede a SENHA (não pede para criar de novo)');
   await C.fill('#lgE','helena@exemplo.test');await C.fill('#lgS','martins123');await C.click('[data-a=lgEntrar]');await C.waitForTimeout(1200);
-  ok(await C.evaluate(()=>!!usuarioAtual()),'Helena entra com a senha que já tinha');
+  ok(await C.evaluate(()=>!!usuarioAtual()),'Regina entra com a senha que já tinha');
   ok(await C.evaluate(()=>!!soAqui()&&soAqui().pedidos.some(p=>p.id==='7777')),'pedido que só existia no celular foi guardado para enviar');
   ok(await C.evaluate(()=>!pedById('7777')),'a tela mostra só o que está na nuvem');
   await C.evaluate(()=>{ui.tela='fabrica';render()});ok(await C.$('[data-a=soAquiEnviar]')!==null,'aparece o aviso para enviar o pedido esquecido');
@@ -49,7 +49,7 @@ const dbop=modo=>async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null}
 
   console.log('6) Escritório por setor e responsáveis');
   const T=await A.evaluate(()=>tarefasEsc().map(t=>({f:t.f,r:t.resp,c:t.como})));
-  ok(T.filter(t=>t.f==='comprar'||t.f==='levar').every(t=>t.r==='roger'),'compras e buscar/levar no terceiro vão para o Roger');
+  ok(T.filter(t=>t.f==='comprar'||t.f==='levar').every(t=>t.r==='roger'),'compras e buscar/levar no terceiro vão para o Marcos');
   ok(T.every(t=>t.r),'toda tarefa tem responsável');
   await A.evaluate(()=>{state.pessoas.forEach(p=>{p.funcoes=(p.funcoes||[]).filter(f=>f!=='vias')});save()});await A.waitForTimeout(800);
   const vias=await A.evaluate(()=>tarefasEsc().filter(t=>t.f==='vias').map(t=>[t.resp,t.como]));
@@ -57,11 +57,11 @@ const dbop=modo=>async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null}
   await A.evaluate(()=>{ui.sheet=null;ui.tela='fabrica';ui.fz='esc';render()});
   ok(await A.evaluate(()=>['Pedidos','Artes','Lista de compras','Logística'].every(n=>[...document.querySelectorAll('.setor-t b')].some(b=>b.textContent===n))),'Escritório mostra os setores');
 
-  console.log('7) Aviso de pedido novo para a Helena');
+  console.log('7) Aviso de pedido novo para a Regina');
   const R=await aparelho('R',{sessao:'u-roger'});await R.evaluate(()=>{const u=state.usuarios.find(x=>x.id==='u-roger');SESSAO={id:u.id,email:u.email}});
   await R.evaluate(()=>{A.novo();const w=ui.sheet.w;w.cliente='Cliente Aviso';w.vend=state.pessoas[0].id;w.step=2;render();A.wAdd({p:state.produtos[0].id});const it=ui.sheet.w.itens[0];it.cor='Marinho';it.tecido='Malha PV';it.g={M:10};ui.sheet.w.step=3;ui.sheet.w.entrega=Date.now()+20*864e5;A.wCriar()});await R.waitForTimeout(2000);
-  const novo=list('pedidos').find(x=>x.data.cliente==='Cliente Aviso');ok(!!novo&&novo.data.criado&&/Roger/.test(novo.data.criado.por||''),'pedido novo guarda quem cadastrou');
-  ok(await C.evaluate(()=>avisos().some(p=>p.cliente==='Cliente Aviso')),'Helena recebe o aviso');
+  const novo=list('pedidos').find(x=>x.data.cliente==='Cliente Aviso');ok(!!novo&&novo.data.criado&&/Marcos/.test(novo.data.criado.por||''),'pedido novo guarda quem cadastrou');
+  ok(await C.evaluate(()=>avisos().some(p=>p.cliente==='Cliente Aviso')),'Regina recebe o aviso');
   ok(await C.evaluate(()=>{ui.sheet=null;ui.tela='fabrica';render();return document.querySelector('.sino em')?.textContent==='1'}),'sininho com número no alto da tela');
   ok(await R.evaluate(()=>avisos().length===0),'quem não recebe avisos não vê');
   await C.evaluate(id=>A.pedido({id}),novo.id);await C.waitForTimeout(1200);

@@ -28,7 +28,7 @@ async function dbop(o,p,data){if(o==='get')return {data:store.get(p)||null};if(o
   ok(P.cliente==='Clínica Certa'&&P.ficha==='9001'&&P.entrega===nova,'empresa, ficha e entrega corrigidas na nuvem');
   ok(L.cor==='Preto'&&L.qtd===20&&L.grade.GG===3,'peça corrigida na nuvem (cor e grade)');
   ok(P.materiais.some(m=>/Preto/.test(m.item))&&!P.materiais.some(m=>/Marinho/.test(m.item)),'lista de material recalculada');
-  ok(P.edicoes?.length===1&&/Helena/.test(P.edicoes[0].por),'fica registrado quem corrigiu');
+  ok(P.edicoes?.length===1&&/Regina/.test(P.edicoes[0].por),'fica registrado quem corrigiu');
   ok(await A.evaluate(()=>ui.sheet.t==='pedido'&&/Corrigido por/.test(document.querySelector('.sheet').innerText)),'volta para o pedido mostrando "Corrigido por"');
   console.log('2) Peça com produção começada: só quantidade e personalização');
   await A.evaluate(i=>{const l=lote(i+'-1');l.steps[rp(l).steps[0].id]={st:'ok',fim:now(),op:'fabio'};save()},id);await A.waitForTimeout(800);

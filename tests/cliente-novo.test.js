@@ -7,6 +7,8 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   console.log('1) O código não traz dados da Martins');
   ok(!/helenanenimga|martinsuniformes|@gmail\.com/i.test(src),'nenhum e-mail real no código');
   ok(!/FOTOS0|aplicaFotos|EXEMPLO_IDS|NOMES_V1|USER_ROGER/.test(src),'sem fotos da equipe, sem lista fixa de exemplos, sem acessos fixos');
+  const nomes=src.replace(/(id|op|vend|leva|r|f|v)\s*:\s*'[a-z]+'/g,'').replace(/u-(helena|roger)/g,'');
+  ok(!/\b(Leu|Zezé|Nilda|Dalva|Fábio|Laiara|Layara|Paula|Roger|Alexandra|Helena|Priscila|Rafael)\b/.test(nomes),'nenhum nome da equipe ou de fornecedor da Martins nas telas e na demonstração');
   const norm=src.slice(src.indexOf('function normalizar('),src.indexOf('const nCli='));
   ok(norm.length>100&&!/helena|roger|alexandra|layara|laiara|rafael|'0402'|Gola polo Marinho/i.test(norm),'as migrações não citam pessoas, pedidos ou estoque da Martins');
 
