@@ -188,3 +188,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Quando o mesmo item serve para mais de uma peça, aparece a divisão: "para 53 peças (15 Blusa de Agasalho, 38 Polo Amsterdã)".
 - Assim dá para conferir a conta ali mesmo, sem sair da tela para abrir a ficha.
 - Ao tocar em **Falta**, junto com a quantidade sugerida aparece **para quantas peças** ela é e **quanto dá por peça** (ex.: "Para 15 Blusa de Agasalho · Sugestão ≈ 14 metros = ≈ 0,93 m por peça"). O comprador bate o olho e vê se está dentro do normal.
+
+---
+
+## Cortar junto
+
+**O que mudou:**
+- Na tarefa de **Corte** aparece o quadro **Dá para cortar junto**: as outras peças com o **mesmo tecido e a mesma cor** que ainda não foram cortadas, de qualquer pedido e com qualquer prazo, mesmo de modelo diferente (ex.: Polo Viena e Polo Amsterdã).
+- Cada uma mostra cliente, pedido, peça, quantidade, entrega e se já está **liberada para cortar**. Um toque abre o pedido.
+- Quem decide se corta junto é a equipe do corte.

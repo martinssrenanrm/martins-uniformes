@@ -52,6 +52,20 @@ async function dbop(o,p,data){if(o==='get')return {data:store.get(p)||null};if(o
   ok(JSON.stringify(r.us)===JSON.stringify({P:1,M:2,G:3,GG:4,XG:5}),'americano vira brasileiro sem criar tamanho novo (S=P, L=G, XL=GG, 2XL=XG)');
   ok(JSON.stringify(r.br)===JSON.stringify({P:1,G:2}),'tamanho brasileiro fica como está');
 
+  console.log('5) Cortar junto');
+  r=await A.evaluate(()=>{const ped=state.pedidos.find(p=>p.cliente==='Teste Modelagem');const [l1,l2]=lotesDe(ped.id);
+    // outro pedido, mesmo tecido e cor, modelo diferente, entrega bem mais para frente; e um de outra cor
+    const mk=(id,prod,cor,dias)=>{state.pedidos.push({id,cli:ped.cli,cliente:'Cliente '+id,vendedor:ped.vendedor,chegada:now(),entrega:now()+dias*864e5,vias:false,artePrep:false,arte:false,artes:{},materiais:[],concluido:null});state.lotes.push({id:id+'-1',ped:id,prod,cor,cores2:[],tecido:'Malha fria PV',opcoes:[],pers:[],qtd:40,grade:{G:40},desm:0,steps:{},rework:false,parent:null})};
+    mk('9901','polo-ams','Marinho',90);mk('9902','polo-ams','Preta',5);save();
+    const J=cortarJunto(l1).map(x=>x.l.id);const s=rp(l1).steps.find(x=>x.posto==='corte');const html=tarefaCard({l:l1,s,p:prod(l1.prod),ped,inf:info(ped)});
+    return {J,box:/Dá para cortar junto/.test(html),cli:/Cliente 9901/.test(html)}});
+  ok(r.J.includes('9901-1'),'acha peça de outro pedido com o mesmo tecido e cor, mesmo de outro modelo e com entrega longe');
+  ok(r.J.length===2&&!r.J.includes('9902-1'),'não mistura outra cor (e inclui a outra peça do mesmo pedido)');
+  ok(r.box&&r.cli,'a tarefa de corte mostra o quadro Dá para cortar junto');
+  r=await A.evaluate(()=>{const l=lote('9901-1');const s=rp(l).steps.find(x=>x.posto==='corte');l.steps[s.id]={st:'ok'};return cortarJunto(lotesDe(state.pedidos.find(p=>p.cliente==='Teste Modelagem').id)[0]).map(x=>x.l.id)});
+  ok(!r.includes('9901-1'),'peça já cortada sai da lista');
+  ok(await A.evaluate(()=>ajBusca('cortar junto mesmo tecido')[0]?.f.q==='Dá para cortar pedidos juntos?'),'"cortar junto mesmo tecido" acha a resposta certa');
+
   console.log('5) Central de dúvidas');
   ok(await A.evaluate(()=>ajBusca('feminina')[0]?.f.q==='Como separo peça masculina e feminina?'),'"feminina" acha a resposta certa');
   ok(await A.evaluate(()=>ajBusca('cobre gola')[0]?.f.q==='Onde marco cobre gola e segunda barra da polo?'),'"cobre gola" acha a resposta certa');
