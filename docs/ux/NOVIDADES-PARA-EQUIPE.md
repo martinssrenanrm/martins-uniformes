@@ -305,3 +305,10 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Em **Cadastros › Ajustes › Partes do app** dá para desligar o que a fábrica não usa: personalização, etiquetas, cortar junto, hora extra, importar fichas e o painel do ciclo.
 - O que é desligado some da tela e da ajuda. **Nada é apagado**: ligando de novo, volta tudo.
 - **Na Martins está tudo ligado. Nada muda para a equipe.**
+
+---
+
+## Palavras da fábrica (só para a gestão)
+
+- Em **Cadastros › Ajustes › Palavras da fábrica** dá para trocar uma palavra do app pela que a equipe usa (ex.: "vias" → "ficha"). Vale para todas as telas e a ajuda.
+- **Na Martins a lista está vazia: as palavras continuam as de sempre.**

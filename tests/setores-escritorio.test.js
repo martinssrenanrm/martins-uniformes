@@ -66,5 +66,12 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
     ['etq','pers','ciclo','hora','imp','junto'].forEach(v=>A.modLiga({v}));return {antes,depois,ciclo,busca,volta:!(state.modOff||[]).length,dados:state.pedidos.length>0}});
   ok(r.antes.etq&&!r.depois.etq,'desligar Etiquetas some o botão');ok(!r.ciclo,'desligar Ciclo some a aba do painel');
   ok(!r.busca,'ajuda não mostra perguntas de parte desligada');ok(r.volta&&r.dados,'religando, tudo volta; nenhum dado apagado');
+  console.log('9) Palavras da fábrica');
+  r=await A.evaluate(()=>{ui.sheet=null;ui.tela='fabrica';ui.fz='esc';render();const antes=/\bvias\b/i.test(document.getElementById('app').innerText);
+    ui.tela='cadastros';ui.cad='ajustes';render();document.getElementById('vocDe').value='vias';document.getElementById('vocPara').value='ficha';A.vocAdd();
+    const campo=document.getElementById('vocDe');campo.value='vias';render();const campoOk=document.getElementById('vocDe').value==='';
+    ui.tela='fabrica';ui.fz='esc';render();const txt=document.getElementById('app').innerText;const depois=!/\bvias\b/i.test(txt)&&/\bficha\b/i.test(txt);const maiusc=!/\bficha\b/.test(txt)||/Ficha|ficha/.test(txt);
+    A.vocRm({k:0});render();const volta=/\bvias\b/i.test(document.getElementById('app').innerText);return {antes,depois,volta,maiusc}});
+  ok(r.antes&&r.depois,'"vias" aparece como "ficha" nas telas');ok(r.volta,'tirando a troca, volta a palavra do app');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

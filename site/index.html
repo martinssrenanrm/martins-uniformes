@@ -1914,7 +1914,7 @@ const campoN=(lab,attr,val,suf)=>`<label class="aj-row"><span>${lab}</span><span
 function cAjustes(){const pr=state.params;
   return `${state.pedidos.some(ehExemplo)?`<div class="card" style="border-color:var(--atn)"><h2>Pedidos de exemplo</h2><p style="margin:0 0 12px;color:var(--ink2)">Antes de começar com dados reais, apague os ${state.pedidos.filter(ehExemplo).length} pedidos de exemplo (e as empresas de exemplo). Pedidos reais, como os importados de fichas, continuam. Máquinas, equipe, produtos e estoque continuam.</p>
     ${ui.apagaEx?`<div class="aviso">${ic('i-alerta')}Isso apaga só os pedidos de exemplo, em todos os aparelhos. Antes, uma cópia de segurança é guardada. Tem certeza?</div><div class="acoes"><button class="big" style="background:var(--red);color:#fff" data-a="apagaEx" data-ok="1">Sim, apagar</button><button class="big neutro" data-a="apagaExN">Não</button></div>`:`<button class="mbtn" data-a="apagaEx">Apagar pedidos de exemplo</button>`}</div>`:''}
-  ${cardAcessos()}${cardAvisos()}${cardSeguranca()}${cardModulos()}${cardEscritorio()}${cardModelo()}<div class="card"><h2>Este aparelho</h2><div class="aj-row"><span>Conectado como: <b>${esc(usuarioAtual()?.nome||'')}</b><br><small class="lido">${esc(usuarioAtual()?.email||'')}</small></span><button class="mbtn" data-a="sair">Sair</button></div>
+  ${cardAcessos()}${cardAvisos()}${cardSeguranca()}${cardModulos()}${cardEscritorio()}${cardVocab()}${cardModelo()}<div class="card"><h2>Este aparelho</h2><div class="aj-row"><span>Conectado como: <b>${esc(usuarioAtual()?.nome||'')}</b><br><small class="lido">${esc(usuarioAtual()?.email||'')}</small></span><button class="mbtn" data-a="sair">Sair</button></div>
     <div class="aj-row"><span>Dúvidas sobre o app</span><button class="mbtn" data-a="ajuda">${ic('i-duvida')}Como usar</button></div></div>
   <div class="card"><h2>Onde ficam os dados</h2><p style="margin:0;color:var(--ink2)">${NV.modo==='nuvem'?'Na nuvem: todos os aparelhos veem as mesmas informações ao mesmo tempo.':'Só neste aparelho. Abra pelo link do sistema para usar a nuvem.'}</p></div>
   <div class="card"><h2>Sua empresa nos documentos</h2><p class="dica" style="margin:-4px 0 8px">Aparece no Pedido enviado ao cliente e nas fichas.</p>
@@ -2355,6 +2355,7 @@ const FAQ=[
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
 {c:'maq',q:'Como crio um setor novo, como lavanderia ou passadoria?',k:'setor novo criar lavanderia passadoria acabamento renomear ordem função setores',r:['Cadastros › Máquinas › Setores da fábrica: escreva o nome e toque em Adicionar setor.','Escolha a função do setor: abre o lote (corte), personalização, montagem/costura ou acabamento.','Depois, nas máquinas desse setor, toque em ✎ editar e escolha o setor novo.','Use ↑ e ↓ para pôr na ordem do caminho da peça.'],ir:'cad:maquinas#Setores da fábrica',g:1},
+{c:'cad',q:'A equipe chama as coisas de outro jeito. Dá para trocar as palavras?',k:'palavra vocabulário nome trocar termo vias ficha terceirizado prestador como a equipe fala',r:['Cadastros › Ajustes › Palavras da fábrica.','Escreva a palavra do app e como a fábrica fala, e toque em Trocar palavra. Vale para todas as telas e a ajuda.'],ir:'cad:ajustes#Palavras da fábrica',g:1},
 {c:'cad',q:'Como escondo partes do app que a fábrica não usa?',k:'desligar módulo esconder parte personalização etiqueta hora extra importar ciclo cortar junto não uso',r:['Cadastros › Ajustes › Partes do app: toque no que a fábrica não usa para desligar.','Some da tela e da ajuda. Nada é apagado: ligando de novo, volta tudo.'],ir:'cad:ajustes#Partes do app',g:1},
 {c:'cad',q:'Por onde começo a configurar o app para a minha fábrica?',k:'configurar começar primeiro uso passo a passo implantação nova fábrica checklist',r:['Cadastros › Configurar: são 10 passos, do nome da empresa ao estoque inicial.','Cada passo mostra se está pronto ou o que falta. Toque em Abrir para ir direto ao lugar certo.'],ir:'cad:config',g:1},
 {c:'cad',q:'Como mudo o nome de uma etapa do escritório ou quem faz ela?',k:'nome etapa escritório renomear cargo vendedora quem faz arte vias compras preferência',r:['Cadastros › Ajustes › Etapas do escritório: toque em ✎ Ajustar na etapa.','Escreva o nome que a equipe usa e escolha quais cargos recebem essa etapa.','Marque se a vendedora do próprio pedido tem preferência.'],ir:'cad:ajustes#Etapas do escritório',g:1},
@@ -3029,7 +3030,7 @@ async function restaurar(obj){if(!obj||!Array.isArray(obj.pedidos)||!Array.isArr
   const {_app,_ts,...st}=obj;snap();state=normalizar(st);RC={};save();render();tick()}
 async function sSeg(){}
 /* Modelo de fábrica: a configuração sem os dados do dia a dia. Serve para começar outra confecção a partir desta. */
-const MODELO_CFG=['modOff','setores','escOff','liberaCom','escNomes','cargoFun','vendFaz','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
+const MODELO_CFG=['vocab','modOff','setores','escOff','liberaCom','escNomes','cargoFun','vendFaz','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
 function modeloFabrica(){const c=x=>JSON.parse(JSON.stringify(x??null));const cfg={};MODELO_CFG.forEach(k=>{if(state[k]!=null)cfg[k]=c(state[k])});
   cfg.feriados={local:state.feriados?.local||FER0().local,facult:c(state.feriados?.facult||{}),extras:[],trabalha:[]};
   return {_modelo:1,_ts:now(),nome:marca().nome||'',tipos:c(state.tipos),produtos:c(state.produtos),cfg}}
@@ -3180,7 +3181,8 @@ function vGestor(){const aba=(ui.gt==='ciclo'&&!modOn('ciclo')?'agora':ui.gt)||'
 const sheetId=s=>s.t+':'+(s.id||s.p||s.m||'');
 /* Link do QR code da etiqueta: #ficha=<peça> abre a ficha de produção dessa peça */
 let LINK_FICHA=(()=>{try{const m=location.hash.match(/ficha=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
-function render(){RC={};if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){const l=(state.lotes||[]).find(x=>x.id===LINK_FICHA);LINK_FICHA=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(l){setTimeout(()=>abreDoc('prod',l.ped,l.id),0)}}
+function render(){renderTela();aplicaVocab()}
+function renderTela(){RC={};if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){const l=(state.lotes||[]).find(x=>x.id===LINK_FICHA);LINK_FICHA=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(l){setTimeout(()=>abreDoc('prod',l.ped,l.id),0)}}
   document.querySelectorAll('.nb[data-t]').forEach(b=>b.setAttribute('aria-current',b.dataset.t===ui.tela?'page':'false'));
   if(!NV.pronto){document.body.classList.add('sem-login');document.getElementById('app').innerHTML=vConectando();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());MODULOS.forEach(([k])=>document.body.classList.toggle('sem-'+k,!modOn(k)));
@@ -3365,6 +3367,9 @@ const A={
   setPorMaq:d=>{snap();state.setores=SETORES().map(g=>g.id===d.g?{...g,porMaquina:!g.porMaquina}:{...g});commit()},
   setMov:d=>{const S=SETORES().map(g=>({...g})),i=S.findIndex(g=>g.id===d.g),j=i+(+d.d);if(i<0||j<0||j>=S.length)return;[S[i],S[j]]=[S[j],S[i]];snap();state.setores=S;commit()},
   setRm:d=>{if(state.tipos.some(t=>t.grupo===d.g))return toast('Esse setor ainda tem máquinas');if(SETORES().length<2)return;snap();state.setores=SETORES().filter(g=>g.id!==d.g).map(g=>({...g}));commit()},
+  vocAdd:()=>{const a=(document.getElementById('vocDe')?.value||'').trim(),b=(document.getElementById('vocPara')?.value||'').trim();if(!a||!b)return toast('Escreva as duas palavras');
+    snap();state.vocab=[...(state.vocab||[]).filter(([x])=>semAc(x)!==semAc(a)),[a,b]];commit();toast(`“${a}” agora aparece como “${b}”`)},
+  vocRm:d=>{snap();state.vocab=(state.vocab||[]).filter((_,k)=>k!==+d.k);commit()},
   modLiga:d=>{snap();const o=new Set(state.modOff||[]);o.has(d.v)?o.delete(d.v):o.add(d.v);state.modOff=[...o];if(o.has('ciclo')&&ui.gt==='ciclo')ui.gt='agora';commit();toast(`${MODULOS.find(m=>m[0]===d.v)[1]}: ${o.has(d.v)?'desligado':'ligado'}`)},
   escEt:d=>{const CF=cargoFun();openSheet({t:'escEt',f:d.f,nome:fNome(d.f),cargos:Object.keys(CF).filter(k=>(CF[k]||[]).includes(d.f)),vend:vendFaz().includes(d.f)})},
   escCargo:d=>{const e=ui.sheet;e.nome=document.getElementById('escNome')?.value??e.nome;togl(e.cargos,d.v);render()},
@@ -3812,6 +3817,17 @@ function vInicio(){return `<div class="inicio"><span class="m-ic" style="width:7
   <button class="big go" data-a="inicio" data-v="vazia">${ic('i-check')}Começar a usar (máquinas e produtos de modelo; a equipe você cadastra)</button>
   <button class="big neutro" data-a="inicio" data-v="exemplo">${ic('i-lista')}Treinar com os pedidos de exemplo</button>
   <p class="sub-l">Dá para apagar os pedidos de exemplo depois, em Cadastros › Ajustes. Para usar as máquinas e os produtos de outra fábrica: Cadastros › Ajustes › Modelo de fábrica.</p></div>`}
+/* Palavras da fábrica: troca, na tela, a palavra do app pela que a equipe usa (state.vocab = [[do app, da fábrica]]).
+   Palavra inteira, sem diferenciar maiúscula; mantém a primeira letra maiúscula quando o app escreve assim. Não mexe em campos digitados. */
+function aplicaVocab(){const V=((state&&state.vocab)||[]).filter(([a,b])=>a&&b);if(!V.length)return;
+  const RX=V.map(([a,b])=>[new RegExp('(?<![\\p{L}\\p{N}])'+a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![\\p{L}\\p{N}])','giu'),b]);
+  const troca=t=>RX.reduce((x,[r,b])=>x.replace(r,m=>m[0]===m[0].toUpperCase()&&m[0]!==m[0].toLowerCase()?b[0].toUpperCase()+b.slice(1):b),t);
+  ['app','sheet','pop'].forEach(id=>{const raiz=document.getElementById(id);if(!raiz)return;const w=document.createTreeWalker(raiz,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement&&n.parentElement.closest('input,textarea,select,script,style,[contenteditable]')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+    const L=[];while(w.nextNode())L.push(w.currentNode);L.forEach(n=>{const t=troca(n.nodeValue);if(t!==n.nodeValue)n.nodeValue=t})})}
+function cardVocab(){if(!ehGestao())return '';const V=state.vocab||[];
+  return `<div class="card" id="Vocab"><h2>Palavras da fábrica</h2><p class="dica" style="margin:-4px 0 8px">Se a equipe chama algo de outro jeito, troque aqui. Ex.: "vias" → "ficha", "terceirizado" → "prestador". Vale para todas as telas e a ajuda.</p>
+  ${V.map(([a,b],k)=>`<div class="aj-row"><span>“${esc(a)}” → <b>“${esc(b)}”</b></span><button class="x" data-a="vocRm" data-k="${k}" aria-label="Tirar">×</button></div>`).join('')}
+  <div class="set-row"><input class="campo" id="vocDe" placeholder="Palavra do app (ex.: vias)" autocomplete="off"><input class="campo" id="vocPara" placeholder="Como a fábrica fala (ex.: ficha)" autocomplete="off"><button class="mbtn" data-a="vocAdd">${ic('i-mais')}Trocar palavra</button></div></div>`}
 const QR_PUB=(()=>{try{const m=location.hash.match(/[#&]f=([0-9a-f]{20,})/);return m?m[1]:null}catch(e){return null}})();
 async function buscaFichaPub(tok){if(SB_CFG){const r=await fetch(SB_CFG.url+'/rest/v1/rpc/ficha_publica',{method:'POST',headers:{apikey:SB_CFG.key,Authorization:'Bearer '+SB_CFG.key,'Content-Type':'application/json'},body:JSON.stringify({tok})});if(!r.ok)throw new Error('rede');return await r.json()}
   load();const l=(state.lotes||[]).find(x=>x.qr===tok);if(!l)return null;const m=paraDocs(state);return {docs:m,mock:mockGrande(l)||await pegaMock(l)||null,mockId:mockChave(l)}}
