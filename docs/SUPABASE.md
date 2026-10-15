@@ -5,7 +5,8 @@
 - **Projeto Supabase:** `fmiyrnkzsurjlunfgwjq` ("Martins Uniformes App").
 - **Dados levados:** 135 documentos, conferidos por coleção.
 - **Para publicar uma mudança:** rode `tools/build.js` com a URL e a chave pública do projeto, faça o commit de `site/` e o push. A automação publica em cerca de 1 minuto.
-- **Pendência:** apagar a função desligada `public.importar_docs`, usada só na migração. Ela não tem permissão para ninguém.
+- **Pendência:** apagar as funções desligadas `public.importar_docs` e `public.exportar_docs`, usadas só na migração. Ninguém tem permissão de usá-las. O conector do Claude não roda `drop` sem confirmação; apague pelo SQL Editor do Supabase.
+- **Banco versionado:** tudo o que existe no banco está em `supabase/migrations/` (001 tabela e regras, 002 ficha pública do QR, 003 permissões). Mudança nova no banco = arquivo novo numerado.
 
 **Objetivo:** abrir o app em qualquer navegador, só com o e-mail e a senha do app, sem conta Claude.
 
@@ -34,7 +35,7 @@
    - **Vercel:** **Add New › Project › Import** `martinssrenanrm/martins-uniformes` › Deploy. Endereço `https://martins-uniformes.vercel.app`.
 
 ## Passo a passo da virada (quem executa: Claude)
-0. **Sem token, se possível:** com o conector Supabase ligado no Claude (claude.ai/customize/connectors), rode o `supabase/schema.sql` e pegue a URL e a chave pública por ele. O passo 1 abaixo é o caminho com token.
+0. **Sem token, se possível:** com o conector Supabase ligado no Claude (claude.ai/customize/connectors), rode os arquivos de `supabase/migrations/` em ordem (001, 002, …) e pegue a URL e a chave pública por ele. O passo 1 abaixo é o caminho com token.
 1. **Preparar o projeto.** Isso cria a tabela, as regras de acesso, o tempo real e os e-mails em português, e mostra a URL e a chave pública.
    ```
    SUPABASE_ACCESS_TOKEN=… SUPABASE_REF=<ref> APP_URL=https://<endereço-da-vercel> node tools/supabase.js
@@ -73,4 +74,4 @@ O teste usa um Supabase simulado e confere:
 ## Atenção
 - **Senhas:** as senhas atuais não passam para o Supabase (ficam guardadas de outro jeito). Cada pessoa faz o **primeiro acesso uma vez** no endereço novo.
 - **E-mail:** o envio padrão do Supabase permite poucos e-mails por hora. Para uma equipe pequena basta. Se crescer, configure um SMTP próprio.
-- **Permissões:** o perfil Operação continua sendo uma separação de telas. Pelo banco, quem tem acesso lê e grava tudo. Permissão fina por perfil é um passo futuro.
+- **Permissões:** só a gestão cria, muda ou apaga acessos, e isso vale no banco, não só na tela (`003_permissoes.sql`). Fora isso, quem tem acesso lê e grava os dados da fábrica; o perfil Operação separa as telas.
