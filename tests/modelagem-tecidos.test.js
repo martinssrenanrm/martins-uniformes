@@ -36,6 +36,7 @@ async function dbop(o,p,data){if(o==='get')return {data:store.get(p)||null};if(o
   await A.evaluate(()=>{const ped=state.pedidos.find(p=>p.cliente==='Teste Modelagem');openSheet({t:'ins',id:ped.id})});await A.waitForTimeout(300);
   const ins=await A.evaluate(()=>[...document.querySelectorAll('.ins')].map(e=>e.textContent).find(t=>/Malha fria PV Marinho/.test(t))||'');
   ok(/para 6 peças/.test(ins)&&/3 Polo Viena masculina/.test(ins)&&/3 Polo Viena · Manga longa feminina/.test(ins),'conferir insumos mostra para quantas peças é cada tecido: '+ins.replace(/\s+/g,' ').slice(0,140));
+  ok(await A.evaluate(()=>{const h=[...document.querySelectorAll('.card')].find(c=>/^Linhas/.test(c.querySelector('h2')?.textContent||''));return !!h&&/Fio de costura Marinho/.test(h.textContent)&&/Linha de costura Marinho/.test(h.textContent)}),'Linhas tem linha e fio de costura');
   const ref=await A.evaluate(()=>{const ped=pedById(ui.sheet.id);const k=ped.materiais.findIndex(m=>m.item==='Malha fria PV Marinho');A.insFalta({id:ped.id,k:String(k)});return document.querySelector('.ins-ref')?.textContent||''});
   ok(/Para 6 peças/.test(ref)&&/por peça/.test(ref),'ao marcar Falta, mostra quantas peças tem o pedido e quanto dá por peça: '+ref.trim().slice(0,120));
   console.log('3) Cadastro: variações do produto e lista de tecidos');

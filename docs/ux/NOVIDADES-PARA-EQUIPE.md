@@ -197,3 +197,11 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Na tarefa de **Corte** aparece o quadro **Dá para cortar junto**: as outras peças com o **mesmo tecido e a mesma cor** que ainda não foram cortadas, de qualquer pedido e com qualquer prazo, mesmo de modelo diferente (ex.: Polo Viena e Polo Amsterdã).
 - Cada uma mostra cliente, pedido, peça, quantidade, entrega e se já está **liberada para cortar**. Um toque abre o pedido.
 - Quem decide se corta junto é a equipe do corte.
+
+---
+
+## Fio de costura nos insumos
+
+**O que mudou:**
+- Em **Conferir insumos › Linhas** agora aparece o **fio de costura** de cada cor, além da linha. Vale também para os pedidos que já estavam abertos.
+- A estimativa é **1 cone para cada 30 peças**. Dá para mudar em **Cadastros › Ajustes** ("Peças por cone de fio de costura").
