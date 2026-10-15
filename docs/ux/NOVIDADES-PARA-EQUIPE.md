@@ -221,3 +221,17 @@ O tempo de cada parte conta para quem fez, no Painel.
 - A maior barra é o **gargalo**.
 - Embaixo, **pedido por pedido**: toque para ver quando cada fase começou e terminou.
 - O sistema passa a guardar a data em que os insumos de cada pedido ficaram todos prontos.
+
+---
+
+## Ciclo: fila e trabalho em cada fase
+
+**O que mudou:**
+- Cada fase agora tem 3 momentos guardados no pedido: **liberada** (a fase anterior terminou), **começou** (alguém iniciou) e **terminou**.
+- O Ciclo mostra, em cada fase, quanto tempo o pedido ficou **na fila** (liberado, esperando alguém começar) e quanto tempo foi **trabalho**.
+- O corte é liberado quando o último insumo do pedido fica pronto (marcado como Tem ou Chegou). A costura é liberada quando o corte e a personalização terminam.
+- Cada insumo guarda quando foi **conferido**, quando **faltou**, quando foi **comprado** e quando **chegou**.
+
+**O que NÃO mudou:**
+- Ninguém precisa fazer nada diferente: as datas são anotadas sozinhas, nos mesmos botões de sempre.
+- O que foi feito antes desta mudança fica sem a data de liberação (aparece "—").

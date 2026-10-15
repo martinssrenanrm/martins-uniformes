@@ -1400,7 +1400,24 @@ function seed(){seedN=7;const T=now();
   const r=makeRework(lote('0402-1'),'arremate','etiqueta',5,'Etiqueta errada',addWD(T,-6),'leo');rp(r).steps.forEach(s=>r.steps[s.id]={st:'ok',herdado:true});
   return state}
 /* Ciclo de produção: guarda quando os insumos do pedido ficaram todos prontos (conferidos e na fábrica) */
-function carimbaInsumos(){(state.pedidos||[]).forEach(p=>{const M=p.materiais||[];const ok=M.length>0&&M.every(m=>m.conf&&(m.st==='ok'||m.st==='recebido'));if(ok&&!p.insOk)p.insOk=now();else if(!ok&&p.insOk&&!p.concluido)delete p.insOk})}
+const tv=x=>x>0?x:null;
+function carimbaInsumos(){const T=now();
+  /* Primeira vez com as datas de insumos: o que já estava conferido antes fica com data desconhecida (-1), para não falsear as médias */
+  if(!state.tsInsV){(state.pedidos||[]).forEach(p=>{const M=p.materiais||[];M.forEach(m=>{if(m.conf&&!m.tConf)m.tConf=-1;if(m.st==='comprar'&&!m.tFalta)m.tFalta=-1;if(m.st==='pedido'&&!m.tComprado)m.tComprado=-1;if(m.st==='recebido'&&!m.tChegou)m.tChegou=-1});if(M.length&&M.every(m=>m.tConf===-1&&(m.st==='ok'||m.st==='recebido')))p.insOk=-1});state.tsInsV=1}
+  (state.pedidos||[]).forEach(p=>{const M=p.materiais||[];
+  M.forEach(m=>{if(m.conf&&!m.tConf)m.tConf=T;if(m.st==='comprar'&&!m.tFalta)m.tFalta=T;if(m.st==='pedido'&&!m.tComprado)m.tComprado=T;if(m.st==='recebido'&&!m.tChegou)m.tChegou=T});
+  const ok=M.length>0&&M.every(m=>m.conf&&(m.st==='ok'||m.st==='recebido'));if(ok&&!p.insOk)p.insOk=T;else if(!ok&&p.insOk&&!p.concluido)delete p.insOk;
+  if(!p.cancelado)gravaMarcos(p)})}
+/* Esteira da produção (pedido de 10/2026): cada fase guarda 3 marcos no pedido.
+   lib = liberada (a fase anterior terminou) · ini = alguém começou · fim = terminou. Fila = ini - lib; trabalho = fim - ini. */
+const FASES=[['desp','Despacho para produção','Do fechamento com o cliente até o pedido entrar no sistema','#6C7A89'],['ins','Insumos e compras','Do pedido no sistema até todos os insumos estarem na fábrica','#B7791F'],['corte','Corte','Dos insumos prontos até as peças cortadas','#2B6CB0'],['pers','Personalização','Das peças cortadas até voltarem personalizadas','#9F3A8A'],['cost','Costura','De tudo liberado (corte e personalização) até o fim da costura','#2F855A'],['emb','Embalagem','Da peça costurada até embalada','#C05621']];
+function marcosAgora(p){const ls=lotesDe(p.id).filter(l=>!l.rework);const grp=s=>s.pers?'pers':(tipo(s.posto)?.grupo||'');
+  const G=g=>{let ini=0,fim=0,tem=false,todo=true;for(const l of ls){for(const s of rp(l).steps.filter(s=>grp(s)===g)){tem=true;const x=stOf(l,s.id);if(x.herdado)continue;const i=x.ini||x.saiu||(x.partes||[]).map(q=>q.ini||0).filter(Boolean).sort((a,b)=>a-b)[0]||0;if(i&&(!ini||i<ini))ini=i;if(x.st!=='ok')todo=false;else fim=Math.max(fim,x.fim||0)}}return {tem,ini:ini||null,fim:tem&&todo?(fim||null):null}};
+  const real=p.criado&&!p.criado.antigo&&p.fonte!=='trello'?p.criado.ts:null;const M=p.materiais||[];const conf=M.map(m=>tv(m.tConf)).filter(Boolean).sort((a,b)=>a-b)[0]||null;
+  const C=G('corte'),PZ=G('pers'),CO=G('costura'),EM=G('acab');const pers=PZ.tem;
+  return {desp:{lib:p.chegada||null,fim:real},ins:{lib:real,ini:conf,fim:tv(p.insOk)},corte:{lib:tv(p.insOk),ini:C.ini,fim:C.fim},pers:pers?{lib:C.fim,ini:PZ.ini,fim:PZ.fim}:{na:true},
+    cost:{lib:pers?(C.fim&&PZ.fim?Math.max(C.fim,PZ.fim):null):C.fim,ini:CO.ini,fim:CO.fim},emb:{lib:CO.fim,ini:EM.ini,fim:EM.fim||(p.concluido&&!p.cancelado?p.concluido:null)}}}
+function gravaMarcos(p){const A=marcosAgora(p);const R=p.marcos=p.marcos||{};FASES.forEach(([k])=>{const a=A[k];if(a.na){R[k]={na:true};return}const r=R[k]=R[k]&&!R[k].na?R[k]:{};['lib','ini','fim'].forEach(q=>{if(a[q]&&!r[q])r[q]=a[q]})})}
 function save(){RC={};if(NV.soLer&&NV.modo==='nuvem'){soLeituraVolta();return}carimbaNovos();carimbaInsumos();try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}nuvemSalvar()}
 /* Acesso só de leitura: nada muda neste aparelho sem ir para a nuvem. Volta ao que está na nuvem e avisa. */
 /* Pedido novo: guarda quando e quem cadastrou. Quem cadastrou já conta como visto. */
@@ -2926,34 +2943,34 @@ function sSegLista(){const e=ui.sheet;return `${voltar()}<h1>Cópias e lixeira</
 
 /* ================= painel do gestor ================= */
 const PERIODOS=[[1,'Hoje'],[7,'7 dias'],[30,'30 dias']];
-/* ===== Ciclo de produção (pedido de 10/2026): quanto tempo os pedidos ficam em cada fase, em dias úteis ===== */
-const FASES=[['desp','Despacho para produção','Do fechamento com o cliente até o pedido entrar no sistema','#6C7A89'],['ins','Insumos e compras','Do pedido no sistema até todos os insumos estarem na fábrica','#B7791F'],['corte','Corte','Dos insumos prontos até as peças cortadas (prontas para personalizar ou costurar)','#2B6CB0'],['pers','Personalização','Das peças cortadas até voltarem personalizadas para a fábrica','#9F3A8A'],['cost','Costura','De tudo liberado (corte e personalização) até o fim da costura','#2F855A'],['emb','Embalagem','Da peça costurada até embalada','#C05621']];
+/* ===== Ciclo de produção (pedido de 10/2026): tempo de cada fase em dias úteis, separando fila e trabalho ===== */
 function diasUteis(a,b){if(!a||!b||b<=a)return 0;let t=0,d=sod(a).getTime();while(d<b){const fim=d+DIA,ini=Math.max(d,a),f=Math.min(fim,b);if(f>ini&&isWD(new Date(d+12*36e5)))t+=(f-ini)/DIA;d=fim}return t}
-function cicloPed(p){const ls=lotesDe(p.id).filter(l=>!l.rework);const grp=s=>s.pers?'pers':(tipo(s.posto)?.grupo||'');
-  const fimG=g=>{let fim=0,tem=false;for(const l of ls){const ss=rp(l).steps.filter(s=>grp(s)===g);if(!ss.length)continue;tem=true;for(const s of ss){const x=stOf(l,s.id);if(x.st!=='ok')return {tem,fim:null};if(!x.herdado)fim=Math.max(fim,x.fim||0)}}return {tem,fim:tem?(fim||null):null}};
-  const iniG=g=>{let ini=0;ls.forEach(l=>rp(l).steps.filter(s=>grp(s)===g).forEach(s=>{const x=stOf(l,s.id);const v=x.ini||(x.partes||[]).map(q=>q.ini||0).filter(Boolean).sort()[0]||0;if(v&&(!ini||v<ini))ini=v}));return ini||null};
-  const real=p.criado&&!p.criado.antigo&&p.fonte!=='trello'?p.criado.ts:null;
-  const C=fimG('corte'),PZ=fimG('pers'),CO=fimG('costura'),EM=fimG('acab');
-  const T={fechou:p.chegada||null,sistema:real,insumos:p.insOk||iniG('corte')||null,corte:C.fim,pers:PZ.tem?PZ.fim:C.fim,costura:CO.fim,emb:EM.fim||(p.concluido&&!p.cancelado?p.concluido:null)};
-  const F={desp:[T.fechou,T.sistema],ins:[T.sistema,T.insumos],corte:[T.insumos,T.corte],pers:PZ.tem?[T.corte,T.pers]:null,cost:[T.pers,T.costura],emb:[T.costura,T.emb]};
-  const ordem=FASES.map(([k])=>k),depois=k=>ordem.slice(ordem.indexOf(k)+1).some(j=>F[j]&&(F[j][0]||F[j][1]));
-  const out={};FASES.forEach(([k])=>{const f=F[k];if(!f){out[k]={na:true};return}const [a,b]=f;out[k]=a&&b?{ini:a,fim:b,d:diasUteis(a,b)}:a&&!b&&k!=='desp'&&!depois(k)&&!p.concluido?{ini:a,and:true,d:diasUteis(a,now())}:{}});return out}
+function cicloPed(p){const A=marcosAgora(p),R=p.marcos||{},out={};const ordem=FASES.map(([k])=>k);
+  FASES.forEach(([k])=>{const a=A[k],r=R[k]||{};if(a.na||r.na){out[k]={na:true};return}const m={lib:r.lib||a.lib||null,ini:r.ini||a.ini||null,fim:r.fim||a.fim||null};
+    if(m.lib&&m.fim&&m.lib>m.fim)m.lib=null;if(m.ini&&m.lib&&m.ini<m.lib)m.ini=m.lib;const o={...m};
+    if(m.lib&&m.fim){o.d=diasUteis(m.lib,m.fim);if(m.ini){o.fila=diasUteis(m.lib,m.ini);o.trab=diasUteis(m.ini,m.fim)}}
+    else if(m.fim&&m.ini){o.trab=diasUteis(m.ini,m.fim);o.d=o.trab;o.semLib=true}
+    else if(m.lib&&!m.fim&&k!=='desp'&&!p.concluido){const depois=ordem.slice(ordem.indexOf(k)+1).some(j=>A[j]&&!A[j].na&&(A[j].ini||A[j].fim));if(!depois){o.and=true;o.ondeAgora=m.ini?'fazendo':'na fila';o.d=diasUteis(m.lib,now());if(m.ini){o.fila=diasUteis(m.lib,m.ini);o.trab=diasUteis(m.ini,now())}else o.fila=o.d}}
+    out[k]=o});return out}
 const dTxt=d=>d==null?'—':(d<0.1?'< 0,1':d.toLocaleString('pt-BR',{maximumFractionDigits:1}))+(d>=0.95&&d<1.05?' dia':' dias');
 function gCiclo(){const per=ui.gc||90,desde=per==='tudo'?0:now()-per*DIA;const peds=state.pedidos.filter(p=>!p.cancelado&&((p.concluido||now())>=desde));
-  const C=peds.map(p=>({p,c:cicloPed(p)}));const med={};FASES.forEach(([k])=>{const v=C.map(x=>x.c[k]).filter(x=>x&&x.fim&&x.fim>=desde).map(x=>x.d);med[k]={n:v.length,m:v.length?sum(v)/v.length:null,and:C.filter(x=>x.c[k]&&x.c[k].and).length}});
+  const C=peds.map(p=>({p,c:cicloPed(p)}));const med={};const avg=v=>v.length?sum(v)/v.length:null;
+  FASES.forEach(([k])=>{const fe=C.map(x=>x.c[k]).filter(x=>x&&x.fim&&x.fim>=desde&&x.d!=null);const cl=fe.filter(x=>x.fila!=null&&x.trab!=null);
+    med[k]={n:fe.length,m:avg(fe.map(x=>x.d)),fila:avg(cl.map(x=>x.fila)),trab:avg(cl.map(x=>x.trab)),agoraFila:C.filter(x=>x.c[k]&&x.c[k].and&&x.c[k].ondeAgora==='na fila').length,agoraFaz:C.filter(x=>x.c[k]&&x.c[k].and&&x.c[k].ondeAgora==='fazendo').length}});
   const mx=Math.max(0.5,...FASES.map(([k])=>med[k].m||0));const gar=FASES.filter(([k])=>med[k].m!=null).sort((a,b)=>med[b[0]].m-med[a[0]].m)[0];
   const tot=sum(FASES.map(([k])=>med[k].m||0));
   const linhas=C.filter(x=>FASES.some(([k])=>x.c[k]&&x.c[k].d!=null)).sort((a,b)=>(b.p.chegada||0)-(a.p.chegada||0));
   const maxT=Math.max(1,...linhas.map(x=>sum(FASES.map(([k])=>x.c[k]?.d||0))));
+  const barra=(k,cor)=>{const m=med[k];if(m.m==null)return '';const w=m.m/mx*100;if(m.fila!=null&&m.trab!=null&&m.fila+m.trab>0){const f=m.fila/(m.fila+m.trab);return `<i style="width:${w*f}%;background:${cor};opacity:.35"></i><i style="width:${w*(1-f)}%;background:${cor}"></i>`}return `<i style="width:${Math.max(2,w)}%;background:${cor}"></i>`};
   return `<div class="linha-dep" style="margin:0 0 14px">${[[30,'30 dias'],[90,'90 dias'],['tudo','Tudo']].map(([v,n])=>`<button class="depc" data-a="gc" data-v="${v}" aria-pressed="${per===v}">${n}</button>`).join('')}</div>
-  <div class="card ciclo"><h2>Tempo médio em cada fase</h2><p class="dica" style="margin:0 0 12px">Em dias úteis (sem fim de semana e feriado). Conta os pedidos que terminaram a fase no período.</p>
-    ${gar?`<div class="ciclo-gar">${ic('i-alerta')}<span>Maior gargalo agora: <b>${esc(gar[1])}</b>, em média ${dTxt(med[gar[0]].m)}.</span></div>`:''}
-    <div class="ciclo-barras">${FASES.map(([k,n,dsc,cor])=>{const m=med[k];return `<div class="cb"><div class="cb-t"><b>${n}</b><span>${dsc}</span></div><div class="cb-b"><i style="width:${m.m!=null?Math.max(2,m.m/mx*100):0}%;background:${cor}"></i></div><div class="cb-v"><b>${m.m!=null?dTxt(m.m):'sem dados'}</b><span>${m.n} ${m.n===1?'pedido':'pedidos'}${m.and?` · ${m.and} agora`:''}</span></div></div>`}).join('')}</div>
+  <div class="card ciclo"><h2>Tempo médio em cada fase</h2><p class="dica" style="margin:0 0 12px">Em dias úteis. Cada fase começa quando é <b>liberada</b> (a anterior terminou) e acaba quando termina. Parte clara = <b>na fila</b> esperando alguém começar; parte escura = <b>trabalhando</b>.</p>
+    ${gar?`<div class="ciclo-gar">${ic('i-alerta')}<span>Maior gargalo agora: <b>${esc(gar[1])}</b>, em média ${dTxt(med[gar[0]].m)}${med[gar[0]].fila!=null?`, sendo ${dTxt(med[gar[0]].fila)} na fila`:''}.</span></div>`:''}
+    <div class="ciclo-barras">${FASES.map(([k,n,dsc,cor])=>{const m=med[k];return `<div class="cb"><div class="cb-t"><b>${n}</b><span>${dsc}</span></div><div class="cb-b">${barra(k,cor)}</div><div class="cb-v"><b>${m.m!=null?dTxt(m.m):'sem dados'}</b><span>${m.fila!=null?`fila ${dTxt(m.fila)} · trabalho ${dTxt(m.trab)}<br>`:''}${m.n} ${m.n===1?'pedido':'pedidos'}${m.agoraFila||m.agoraFaz?` · agora: ${m.agoraFila} na fila, ${m.agoraFaz} fazendo`:''}</span></div></div>`}).join('')}</div>
     <p class="ciclo-tot">Ciclo completo médio: <b>${dTxt(tot)}</b> <span>(soma das médias de cada fase)</span></p></div>
-  <div class="card ciclo"><h2>Pedido por pedido</h2><p class="dica" style="margin:0 0 10px">Cada cor é uma fase. Toque no pedido para ver as datas.</p>
+  <div class="card ciclo"><h2>Pedido por pedido</h2><p class="dica" style="margin:0 0 10px">Cada cor é uma fase. Toque no pedido para ver quando cada fase foi liberada, começou e terminou.</p>
     <div class="ciclo-leg">${FASES.map(([k,n,,cor])=>`<span><i style="background:${cor}"></i>${n}</span>`).join('')}</div>
-    ${linhas.map(({p,c})=>{const T=sum(FASES.map(([k])=>c[k]?.d||0));return `<details class="cp"><summary><span class="cp-n"><b>${esc(p.cliente)}</b> · ${esc(p.id)}${p.concluido?'':' · <em>em produção</em>'}</span><span class="cp-bar">${FASES.map(([k,,,cor])=>c[k]&&c[k].d?`<i style="width:${c[k].d/maxT*100}%;background:${cor}${c[k].and?';opacity:.45':''}" title="${esc(k)}"></i>`:'').join('')}</span><span class="cp-t">${dTxt(T)}</span></summary>
-      <table class="cp-tab"><tr><th>Fase</th><th>Começou</th><th>Terminou</th><th>Dias úteis</th></tr>${FASES.map(([k,n])=>{const f=c[k]||{};return `<tr><td>${n}</td>${f.na?'<td colspan="3">não tem</td>':`<td>${f.ini?dataCurta(f.ini).slice(0,5):'—'}</td><td>${f.fim?dataCurta(f.fim).slice(0,5):f.and?'<em>em andamento</em>':'—'}</td><td>${f.d!=null?dTxt(f.d):'—'}</td>`}</tr>`}).join('')}</table></details>`}).join('')||'<p class="dica">Ainda não há pedidos com fases registradas.</p>'}</div>`}
+    ${linhas.map(({p,c})=>{const T=sum(FASES.map(([k])=>c[k]?.d||0));const h=x=>x?`${dataCurta(x).slice(0,5)} ${new Date(x).toTimeString().slice(0,5)}`:'—';return `<details class="cp"><summary><span class="cp-n"><b>${esc(p.cliente)}</b> · ${esc(p.id)}${p.concluido?'':' · <em>em produção</em>'}</span><span class="cp-bar">${FASES.map(([k,,,cor])=>c[k]&&c[k].d?`<i style="width:${c[k].d/maxT*100}%;background:${cor}${c[k].and?';opacity:.45':''}" title="${esc(k)}"></i>`:'').join('')}</span><span class="cp-t">${dTxt(T)}</span></summary>
+      <div class="fx-wrap"><table class="cp-tab"><tr><th>Fase</th><th>Liberada</th><th>Começou</th><th>Terminou</th><th>Fila</th><th>Trabalho</th><th>Total</th></tr>${FASES.map(([k,n])=>{const f=c[k]||{};return `<tr><td>${n}</td>${f.na?'<td colspan="6">não tem</td>':`<td>${k==='desp'?'fechou '+(f.lib?dataCurta(f.lib).slice(0,5):'—'):h(f.lib)}</td><td>${k==='desp'?'—':h(f.ini)}</td><td>${f.fim?h(f.fim):f.and?`<em>${f.ondeAgora}</em>`:'—'}</td><td>${f.fila!=null?dTxt(f.fila):'—'}</td><td>${f.trab!=null?dTxt(f.trab):'—'}</td><td>${f.d!=null?dTxt(f.d):'—'}</td>`}</tr>`}).join('')}</table></div></details>`}).join('')||'<p class="dica">Ainda não há pedidos com fases registradas.</p>'}</div>`}
 function gDesde(){const d=ui.gp||7;return d===1?sod(now()).getTime():now()-d*DIA}
 function util2(ini,fim,he){if(!ini||fim<=ini)return 0;let t=0;const d=sod(ini);let n=0;while(d.getTime()<=fim&&n++<400){janelasDia(d).forEach(([a,b])=>t+=sobre(ini,fim,a,b));d.setDate(d.getDate()+1)}
   (he||[]).forEach(h=>t+=sobre(h.i,h.f,ini,fim));return t}
