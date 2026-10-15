@@ -42,6 +42,7 @@ A Martins é o primeiro cliente, não o produto. O mesmo código vai servir outr
 Textos que citam quem procurar usam `SUPORTE()`, `gestoresTxt()` e `NOME_EMP()`. Dados de demonstração ficam só em `seed()` e são marcados com `exemplo:true`.
 
 ## Testes
+Todos de uma vez: `NODE_PATH=$(npm root -g) bash tests/rodar-todos.sh`. O GitHub roda todos a cada envio para a main e **só publica se passarem** (e se `site/` foi gerado do `app.html` atual).
 
 ```
 NODE_PATH=$(npm root -g) node tests/sincronia.test.js

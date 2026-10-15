@@ -1,9 +1,9 @@
-# Publica o app (pasta site/, gerada por tools/build.js) no GitHub Pages a cada envio para a main.
+# A cada envio para a main: roda todos os testes e, só se passarem, publica o app (pasta site/) no GitHub Pages.
 name: Publicar app
 on:
   push:
     branches: [main]
-    paths: ['site/**', '.github/workflows/pages.yml']
+    paths: ['site/**', 'app.html', 'tests/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,7 +14,25 @@ concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instala o navegador de teste
+        run: |
+          npm i -g playwright@1.56.1
+          npx -y playwright@1.56.1 install --with-deps chromium
+      - name: Roda os testes
+        run: NODE_PATH=$(npm root -g) bash tests/rodar-todos.sh
+      - name: site/ está atualizado com o app.html
+        run: |
+          node -e "const a=require('fs').readFileSync('app.html','utf8'),s=require('fs').readFileSync('site/index.html','utf8');if(!s.includes(a)){console.error('site/index.html está velho: rode tools/build.js');process.exit(1)}"
   publicar:
+    needs: testes
     runs-on: ubuntu-latest
     environment:
       name: github-pages
