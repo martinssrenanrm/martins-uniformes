@@ -205,3 +205,19 @@ O tempo de cada parte conta para quem fez, no Painel.
 **O que mudou:**
 - Em **Conferir insumos › Linhas** agora aparece o **fio de costura** de cada cor, além da linha. Vale também para os pedidos que já estavam abertos.
 - A estimativa é **1 cone para cada 30 peças**. Dá para mudar em **Cadastros › Ajustes** ("Peças por cone de fio de costura").
+
+---
+
+## Painel do gestor › Ciclo
+
+**O que mudou:**
+- Nova aba **Ciclo** no Painel do gestor: o **tempo médio**, em dias úteis, de cada fase da produção:
+  1. **Despacho para produção** (do fechamento com o cliente até o pedido entrar no sistema)
+  2. **Insumos e compras** (até todos os insumos estarem na fábrica)
+  3. **Corte** (até as peças estarem prontas para personalizar ou costurar)
+  4. **Personalização** (até voltarem personalizadas)
+  5. **Costura** (de tudo liberado até o fim da costura)
+  6. **Embalagem**
+- A maior barra é o **gargalo**.
+- Embaixo, **pedido por pedido**: toque para ver quando cada fase começou e terminou.
+- O sistema passa a guardar a data em que os insumos de cada pedido ficaram todos prontos.

@@ -630,6 +630,14 @@ svg.prod.mock{cursor:zoom-in}
 .fp-bx{border:2px solid #000;border-radius:10px;padding:8px 12px}.fp-et{display:grid;grid-template-columns:repeat(3,1fr);gap:3px 12px;font-size:14px;margin-top:4px}
 .fp.colorida .fp-top{border-bottom-color:#1E5BB8}.fp.colorida .fp-k{color:#1E5BB8}.fp.colorida .fp-via{border-color:#1E5BB8;color:#1E5BB8}.fp.colorida .fp-ent{background:#C62828;border-color:#C62828}
 .fp.colorida .fp-sec{color:#1E5BB8}.fp.colorida .fp-t th,.fp.colorida .fp-g th{background:#E3EDFB}.fp.colorida .fp-g .tt{background:#1E5BB8}.fp.colorida .fp-img,.fp.colorida .fp-bx{border-color:#1E5BB8}
+.ciclo h2{margin-bottom:4px}.ciclo-gar{display:flex;gap:8px;align-items:center;background:var(--atn-bg,#fff1dc);color:var(--atn-ink,#7a4a00);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:17px}.ciclo-gar svg{flex:none;width:22px;height:22px}
+.ciclo-barras{display:grid;gap:12px}.cb{display:grid;grid-template-columns:minmax(150px,1.2fr) 2fr minmax(110px,auto);gap:12px;align-items:center}.cb-t b{display:block;font-size:17px}.cb-t span{font-size:13px;color:var(--ink2,#5d6878)}.cb-b{height:22px;background:var(--bg,#eef1f5);border-radius:6px;overflow:hidden}.cb-b i{display:block;height:100%;border-radius:6px}.cb-v b{display:block;font-size:18px;font-variant-numeric:tabular-nums}.cb-v span{font-size:13px;color:var(--ink2,#5d6878)}
+@media (max-width:640px){.cb{grid-template-columns:1fr auto}.cb-b{grid-column:1/-1;order:3}}
+.ciclo-tot{margin:14px 0 0;font-size:16px}.ciclo-tot span{color:var(--ink2,#5d6878);font-size:13px}
+.ciclo-leg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:8px;font-size:13px}.ciclo-leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.cp{border-top:1px solid var(--line,#d5dae2)}.cp summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:10px;align-items:center;padding:10px 2px;cursor:pointer;list-style:none}.cp summary::-webkit-details-marker{display:none}.cp-n{font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cp-n em{color:var(--blue,#2449B8);font-style:normal}.cp-bar{display:flex;height:16px;background:var(--bg,#eef1f5);border-radius:5px;overflow:hidden}.cp-bar i{display:block;height:100%}.cp-t{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media (max-width:640px){.cp summary{grid-template-columns:1fr auto}.cp-bar{grid-column:1/-1}}
+.cp-tab{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 12px}.cp-tab th,.cp-tab td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line,#d5dae2)}.cp-tab td:last-child,.cp-tab th:last-child{text-align:right;font-variant-numeric:tabular-nums}
 .junto{margin-top:12px;border:2px solid var(--blue,#2449B8);border-radius:14px;padding:12px;background:var(--card,#fff);display:grid;gap:8px}.junto-h{display:flex;gap:10px;align-items:flex-start}.junto-h svg{flex:none;width:26px;height:26px;color:var(--blue,#2449B8)}.junto-h b{font-size:19px;display:block}.junto-s{font-size:16px}.junto-s strong{font-weight:800}
 .junto-i{display:grid;gap:2px;text-align:left;width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1.5px solid var(--line,#cfd6df);border-radius:10px;background:var(--bg,#f4f6f9);color:inherit;cursor:pointer}.junto-i em{font-style:normal;font-weight:700;font-size:15px}.junto-i em.ok{color:var(--ok,#1d7a4a)}.junto-i em.esp{color:var(--atn-ink,#a35a00)}
 .ins-ref{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:10px;background:#fff;border:1.5px solid var(--line,#cfd6df);font-size:17px;line-height:1.35}.ins-ref svg{flex:none;width:22px;height:22px;margin-top:2px}.ins-ref-t{display:grid;gap:2px;min-width:0}.ins-ref-a{font-size:19px}.ins-ref strong{font-weight:800}.ins-ref small{font-size:15px;opacity:.85}
@@ -1391,7 +1399,9 @@ function seed(){seedN=7;const T=now();
   logExemplo(T);
   const r=makeRework(lote('0402-1'),'arremate','etiqueta',5,'Etiqueta errada',addWD(T,-6),'leo');rp(r).steps.forEach(s=>r.steps[s.id]={st:'ok',herdado:true});
   return state}
-function save(){RC={};if(NV.soLer&&NV.modo==='nuvem'){soLeituraVolta();return}carimbaNovos();try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}nuvemSalvar()}
+/* Ciclo de produção: guarda quando os insumos do pedido ficaram todos prontos (conferidos e na fábrica) */
+function carimbaInsumos(){(state.pedidos||[]).forEach(p=>{const M=p.materiais||[];const ok=M.length>0&&M.every(m=>m.conf&&(m.st==='ok'||m.st==='recebido'));if(ok&&!p.insOk)p.insOk=now();else if(!ok&&p.insOk&&!p.concluido)delete p.insOk})}
+function save(){RC={};if(NV.soLer&&NV.modo==='nuvem'){soLeituraVolta();return}carimbaNovos();carimbaInsumos();try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}nuvemSalvar()}
 /* Acesso só de leitura: nada muda neste aparelho sem ir para a nuvem. Volta ao que está na nuvem e avisa. */
 /* Pedido novo: guarda quando e quem cadastrou. Quem cadastrou já conta como visto. */
 function carimbaNovos(){if(!state||!state.avisosV)return;const u=usuarioAtual();(state.pedidos||[]).forEach(p=>{if(p.criado)return;p.criado={ts:now(),por:quemNome()||u?.nome||'',u:u?.id||''};p.vistoPor=p.vistoPor||{};if(u)p.vistoPor[u.id]=now()})}
@@ -2195,6 +2205,7 @@ const FAQ=[
 {c:'cad',q:'Posso fazer qualquer peça em qualquer tecido?',k:'qualquer tecido tecidos lista geral tecido novo cadastrar tecido malha piquet',r:['Sim. No pedido, o tecido sai de uma lista geral, com todos os tecidos cadastrados.','Para cadastrar um tecido novo: no pedido, escolha Novo tecido na lista. Ou vá em Cadastros › Ajustes › Tecidos.','O mesmo tecido não entra duas vezes, mesmo escrito com letras diferentes.'],ir:'cad:ajustes#Tecidos'},
 {c:'ped',q:'Como imprimo as etiquetas do corte?',k:'etiqueta etiquetas térmica impressora corte cortador paninho escrever pacote personalização qr code adesivo',r:['Abra o pedido e toque em Etiquetas, ao lado de PDF de produção.','Saem dois tipos, em 10 × 8 cm: uma de pacote para cada peça (vai com ela para a costura) e uma de personalização para cada parte que sai para bordar, estampar ou aplicar DTF.','Toque em Imprimir (impressora térmica) ou em Baixar PDF.','O QR code de cada etiqueta abre a ficha de produção daquela peça em qualquer celular, sem precisar entrar no app. Só mostra aquela ficha: o resto do sistema continua fechado.'],ir:'ped'},
 {c:'esc',q:'Dá para cortar pedidos juntos?',k:'cortar junto corte junto mesmo tecido mesma cor enfesto aproveitar outras fichas pretas juntar corte',r:['Sim. Na tarefa de Corte aparece o quadro Dá para cortar junto.','Ele mostra as peças de outros pedidos com o mesmo tecido e a mesma cor que ainda não foram cortadas, mesmo que o modelo seja outro (ex.: Polo Viena e Polo Amsterdã) e mesmo que a entrega seja mais para frente.','Cada uma diz se já está liberada para cortar. Toque nela para abrir o pedido. Quem decide se corta junto é a equipe.'],ir:'ped'},
+{c:'gestor',q:'Como vejo quanto tempo os pedidos ficam em cada etapa?',k:'ciclo gargalo tempo médio etapa fase demora quanto tempo produção eficiência despacho insumos corte personalização costura embalagem',r:['Painel do gestor › Ciclo.','Mostra o tempo médio, em dias úteis, de cada fase: despacho para produção, insumos e compras, corte, personalização, costura e embalagem. A maior barra é o gargalo.','Embaixo, pedido por pedido: toque em um para ver quando cada fase começou e terminou.'],ir:'gest:ciclo'},
 {c:'cad',q:'Como o sistema conta os feriados?',k:'feriado feriados dia útil dias úteis prazo carnaval corpus christi emenda recesso cidade',r:['Feriado não conta como dia útil: os prazos ("faltam 12 dias úteis") e os contadores das máquinas já descontam.','A empresa está em São Paulo, SP: entram os feriados nacionais, o 9 de julho e os municipais (25 de janeiro e Corpus Christi).','Para mudar: Cadastros › Ajustes › Feriados. Lá dá para marcar Carnaval, acrescentar emenda ou recesso, ou tocar em "Vamos trabalhar" num feriado em que a fábrica abre.'],ir:'cad:ajustes#Feriados',g:1},
 {c:'arte',q:'Dá para tirar a ficha em preto e branco?',k:'preto e branco colorida colorido cinza tinta economizar',r:['A ficha de produção sai colorida.','Para gastar menos tinta: no PDF de produção, toque em Preto e branco (gasta menos tinta) antes de baixar ou imprimir.']},
 {c:'novo',q:'A importação preenche as outras cores da peça?',k:'outras cores cor secundária segunda cor gola punho peitilho detalhe importar',r:['Sim. Se a ficha diz, por exemplo, "AZUL CELESTE com gola, punho e peitilho na cor PRETO", o sistema põe Preta em Outras cores, na gola, nos punhos e no peitilho.','Confira em Outras cores na peça. Se estiver errado, toque no × e acerte depois em ✎ Corrigir pedido.']},
@@ -2915,6 +2926,34 @@ function sSegLista(){const e=ui.sheet;return `${voltar()}<h1>Cópias e lixeira</
 
 /* ================= painel do gestor ================= */
 const PERIODOS=[[1,'Hoje'],[7,'7 dias'],[30,'30 dias']];
+/* ===== Ciclo de produção (pedido de 10/2026): quanto tempo os pedidos ficam em cada fase, em dias úteis ===== */
+const FASES=[['desp','Despacho para produção','Do fechamento com o cliente até o pedido entrar no sistema','#6C7A89'],['ins','Insumos e compras','Do pedido no sistema até todos os insumos estarem na fábrica','#B7791F'],['corte','Corte','Dos insumos prontos até as peças cortadas (prontas para personalizar ou costurar)','#2B6CB0'],['pers','Personalização','Das peças cortadas até voltarem personalizadas para a fábrica','#9F3A8A'],['cost','Costura','De tudo liberado (corte e personalização) até o fim da costura','#2F855A'],['emb','Embalagem','Da peça costurada até embalada','#C05621']];
+function diasUteis(a,b){if(!a||!b||b<=a)return 0;let t=0,d=sod(a).getTime();while(d<b){const fim=d+DIA,ini=Math.max(d,a),f=Math.min(fim,b);if(f>ini&&isWD(new Date(d+12*36e5)))t+=(f-ini)/DIA;d=fim}return t}
+function cicloPed(p){const ls=lotesDe(p.id).filter(l=>!l.rework);const grp=s=>s.pers?'pers':(tipo(s.posto)?.grupo||'');
+  const fimG=g=>{let fim=0,tem=false;for(const l of ls){const ss=rp(l).steps.filter(s=>grp(s)===g);if(!ss.length)continue;tem=true;for(const s of ss){const x=stOf(l,s.id);if(x.st!=='ok')return {tem,fim:null};if(!x.herdado)fim=Math.max(fim,x.fim||0)}}return {tem,fim:tem?(fim||null):null}};
+  const iniG=g=>{let ini=0;ls.forEach(l=>rp(l).steps.filter(s=>grp(s)===g).forEach(s=>{const x=stOf(l,s.id);const v=x.ini||(x.partes||[]).map(q=>q.ini||0).filter(Boolean).sort()[0]||0;if(v&&(!ini||v<ini))ini=v}));return ini||null};
+  const real=p.criado&&!p.criado.antigo&&p.fonte!=='trello'?p.criado.ts:null;
+  const C=fimG('corte'),PZ=fimG('pers'),CO=fimG('costura'),EM=fimG('acab');
+  const T={fechou:p.chegada||null,sistema:real,insumos:p.insOk||iniG('corte')||null,corte:C.fim,pers:PZ.tem?PZ.fim:C.fim,costura:CO.fim,emb:EM.fim||(p.concluido&&!p.cancelado?p.concluido:null)};
+  const F={desp:[T.fechou,T.sistema],ins:[T.sistema,T.insumos],corte:[T.insumos,T.corte],pers:PZ.tem?[T.corte,T.pers]:null,cost:[T.pers,T.costura],emb:[T.costura,T.emb]};
+  const ordem=FASES.map(([k])=>k),depois=k=>ordem.slice(ordem.indexOf(k)+1).some(j=>F[j]&&(F[j][0]||F[j][1]));
+  const out={};FASES.forEach(([k])=>{const f=F[k];if(!f){out[k]={na:true};return}const [a,b]=f;out[k]=a&&b?{ini:a,fim:b,d:diasUteis(a,b)}:a&&!b&&k!=='desp'&&!depois(k)&&!p.concluido?{ini:a,and:true,d:diasUteis(a,now())}:{}});return out}
+const dTxt=d=>d==null?'—':(d<0.1?'< 0,1':d.toLocaleString('pt-BR',{maximumFractionDigits:1}))+(d>=0.95&&d<1.05?' dia':' dias');
+function gCiclo(){const per=ui.gc||90,desde=per==='tudo'?0:now()-per*DIA;const peds=state.pedidos.filter(p=>!p.cancelado&&((p.concluido||now())>=desde));
+  const C=peds.map(p=>({p,c:cicloPed(p)}));const med={};FASES.forEach(([k])=>{const v=C.map(x=>x.c[k]).filter(x=>x&&x.fim&&x.fim>=desde).map(x=>x.d);med[k]={n:v.length,m:v.length?sum(v)/v.length:null,and:C.filter(x=>x.c[k]&&x.c[k].and).length}});
+  const mx=Math.max(0.5,...FASES.map(([k])=>med[k].m||0));const gar=FASES.filter(([k])=>med[k].m!=null).sort((a,b)=>med[b[0]].m-med[a[0]].m)[0];
+  const tot=sum(FASES.map(([k])=>med[k].m||0));
+  const linhas=C.filter(x=>FASES.some(([k])=>x.c[k]&&x.c[k].d!=null)).sort((a,b)=>(b.p.chegada||0)-(a.p.chegada||0));
+  const maxT=Math.max(1,...linhas.map(x=>sum(FASES.map(([k])=>x.c[k]?.d||0))));
+  return `<div class="linha-dep" style="margin:0 0 14px">${[[30,'30 dias'],[90,'90 dias'],['tudo','Tudo']].map(([v,n])=>`<button class="depc" data-a="gc" data-v="${v}" aria-pressed="${per===v}">${n}</button>`).join('')}</div>
+  <div class="card ciclo"><h2>Tempo médio em cada fase</h2><p class="dica" style="margin:0 0 12px">Em dias úteis (sem fim de semana e feriado). Conta os pedidos que terminaram a fase no período.</p>
+    ${gar?`<div class="ciclo-gar">${ic('i-alerta')}<span>Maior gargalo agora: <b>${esc(gar[1])}</b>, em média ${dTxt(med[gar[0]].m)}.</span></div>`:''}
+    <div class="ciclo-barras">${FASES.map(([k,n,dsc,cor])=>{const m=med[k];return `<div class="cb"><div class="cb-t"><b>${n}</b><span>${dsc}</span></div><div class="cb-b"><i style="width:${m.m!=null?Math.max(2,m.m/mx*100):0}%;background:${cor}"></i></div><div class="cb-v"><b>${m.m!=null?dTxt(m.m):'sem dados'}</b><span>${m.n} ${m.n===1?'pedido':'pedidos'}${m.and?` · ${m.and} agora`:''}</span></div></div>`}).join('')}</div>
+    <p class="ciclo-tot">Ciclo completo médio: <b>${dTxt(tot)}</b> <span>(soma das médias de cada fase)</span></p></div>
+  <div class="card ciclo"><h2>Pedido por pedido</h2><p class="dica" style="margin:0 0 10px">Cada cor é uma fase. Toque no pedido para ver as datas.</p>
+    <div class="ciclo-leg">${FASES.map(([k,n,,cor])=>`<span><i style="background:${cor}"></i>${n}</span>`).join('')}</div>
+    ${linhas.map(({p,c})=>{const T=sum(FASES.map(([k])=>c[k]?.d||0));return `<details class="cp"><summary><span class="cp-n"><b>${esc(p.cliente)}</b> · ${esc(p.id)}${p.concluido?'':' · <em>em produção</em>'}</span><span class="cp-bar">${FASES.map(([k,,,cor])=>c[k]&&c[k].d?`<i style="width:${c[k].d/maxT*100}%;background:${cor}${c[k].and?';opacity:.45':''}" title="${esc(k)}"></i>`:'').join('')}</span><span class="cp-t">${dTxt(T)}</span></summary>
+      <table class="cp-tab"><tr><th>Fase</th><th>Começou</th><th>Terminou</th><th>Dias úteis</th></tr>${FASES.map(([k,n])=>{const f=c[k]||{};return `<tr><td>${n}</td>${f.na?'<td colspan="3">não tem</td>':`<td>${f.ini?dataCurta(f.ini).slice(0,5):'—'}</td><td>${f.fim?dataCurta(f.fim).slice(0,5):f.and?'<em>em andamento</em>':'—'}</td><td>${f.d!=null?dTxt(f.d):'—'}</td>`}</tr>`}).join('')}</table></details>`}).join('')||'<p class="dica">Ainda não há pedidos com fases registradas.</p>'}</div>`}
 function gDesde(){const d=ui.gp||7;return d===1?sod(now()).getTime():now()-d*DIA}
 function util2(ini,fim,he){if(!ini||fim<=ini)return 0;let t=0;const d=sod(ini);let n=0;while(d.getTime()<=fim&&n++<400){janelasDia(d).forEach(([a,b])=>t+=sobre(ini,fim,a,b));d.setDate(d.getDate()+1)}
   (he||[]).forEach(h=>t+=sobre(h.i,h.f,ini,fim));return t}
@@ -2986,11 +3025,11 @@ function gTempos(desde){const E=gDados(desde).porEt.filter(e=>e.n>=2).map(e=>({.
 function gConsertos(desde){const C=(state.consertos||[]).filter(c=>c.ts>=desde);if(!C.length)return '';const pm={};C.forEach(c=>pm[c.motivo]=(pm[c.motivo]||0)+c.n);const L=Object.entries(pm).sort((a,b)=>b[1]-a[1]);
   return `<div class="card"><h2>Consertos no período</h2>${L.map(([m,n])=>`<div class="grow"><span>${esc(m)}</span>${barra(n,L[0][1],'var(--red)')}<b>${n}</b></div>`).join('')}<p class="dica" style="margin:8px 0 0">${sum(L.map(x=>x[1]))} peças voltaram. O mesmo motivo repetido indica treino ou ajuste de máquina.</p></div>`}
 function vGestor(){const aba=ui.gt||'agora',desde=gDesde(),per=ui.gp||7;
-  const abas=[['agora','Agora','i-alerta'],['equipe','Equipe','i-pessoas'],['atrasos','Atrasos','i-relogio'],['org','Organização','i-engr']];
+  const abas=[['agora','Agora','i-alerta'],['ciclo','Ciclo','i-grafico'],['equipe','Equipe','i-pessoas'],['atrasos','Atrasos','i-relogio'],['org','Organização','i-engr']];
   return `<div class="topo"><h1>Painel do gestor</h1>${sino()}</div>
   <div class="zonas g-abas">${abas.map(([k,n,i])=>`<button class="zona" data-a="gt" data-v="${k}" aria-pressed="${aba===k}">${ic(i)}<span>${n}</span></button>`).join('')}</div>
-  ${aba==='agora'?'':`<div class="linha-dep" style="margin:0 0 14px">${PERIODOS.map(([d,n])=>`<button class="depc" data-a="gp" data-v="${d}" aria-pressed="${per===d}">${n}</button>`).join('')}</div>`}
-  ${aba==='agora'?gAgora():aba==='equipe'?gEquipe(desde):aba==='atrasos'?gAtrasos(desde):gOrg(desde)}
+  ${aba==='agora'||aba==='ciclo'?'':`<div class="linha-dep" style="margin:0 0 14px">${PERIODOS.map(([d,n])=>`<button class="depc" data-a="gp" data-v="${d}" aria-pressed="${per===d}">${n}</button>`).join('')}</div>`}
+  ${aba==='agora'?gAgora():aba==='ciclo'?gCiclo():aba==='equipe'?gEquipe(desde):aba==='atrasos'?gAtrasos(desde):gOrg(desde)}
   <p class="dica">Os números juntam o que foi registrado em todos os aparelhos.</p>`}
 
 /* ================= render ================= */
@@ -3044,6 +3083,7 @@ const A={
   pfAbre:d=>{ui.pfAb=ui.pfAb===d.v?null:d.v;render()},
   pfOrd:d=>{if(ui.pf.ord===d.v&&d.v!=='urg')ui.pf.inv=!ui.pf.inv;else{ui.pf.ord=d.v;ui.pf.inv=false;ui.pfAb=null}render()},
   gt:d=>{ui.gt=d.v;render();scrollTo(0,0)},
+  gc:d=>{ui.gc=d.v==='tudo'?'tudo':+d.v;render()},
   gp:d=>{ui.gp=+d.v;render()},
   mSel:d=>{ui.sheet.sel=d.v;ui.sheet.p=null;render();document.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'})},
   mRes:d=>{snap();{const l=lote(d.l);registrar({tipo:'reserva',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:sMap(rp(l))[d.s].nome})}state.reservas=state.reservas||{};Object.keys(state.reservas).forEach(k=>{const r=state.reservas[k];if(r.l===d.l&&r.s===d.s)delete state.reservas[k]});state.reservas[d.m]={l:d.l,s:d.s,p:d.p||''};ui.sheet.sel=null;commit();toast(`Reservado para ${unidade(d.m)?.nome}`)},
