@@ -286,4 +286,5 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Em **Cadastros › Ajustes** apareceu o quadro **Etapas do escritório**.
 - Dá para desligar o que a fábrica não faz (ex.: arte). Etapa desligada não vira tarefa e conta como feita.
 - Logo abaixo: **o que precisa estar pronto para o corte começar** (vias, arte aprovada, insumos).
-- **Na Martins está tudo ligado, como sempre foi. Nada muda para a equipe.**
+- Em cada etapa, **✎ Ajustar**: mudar o nome que a equipe usa, escolher quais cargos recebem a etapa e se a vendedora do próprio pedido tem preferência.
+- **Na Martins está tudo ligado e com os nomes de sempre. Nada muda para a equipe.**

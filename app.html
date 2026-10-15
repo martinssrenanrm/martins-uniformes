@@ -999,6 +999,12 @@ const FUNCOES=[
 const FN=Object.fromEntries(FUNCOES.map(f=>[f.id,f]));
 const CARGO_FUN={vendas:['vias','arte_prep','arte_aprov','arte_env'],compras:['conferir','comprar','levar','entregar']};
 const DO_VENDEDOR=['vias','arte_prep','arte_aprov','arte_env'];
+/* Configuráveis por fábrica (padrão = constantes acima): nome de cada etapa do escritório, que etapas cada cargo recebe
+   e em quais a vendedora do próprio pedido tem preferência. */
+const tN=(f,padrao)=>((typeof state!=='undefined'&&state&&state.escNomes)||{})[f]||padrao;
+const fNome=f=>tN(f,FN[f]?.nome||f);
+const cargoFun=()=>(state&&state.cargoFun)||CARGO_FUN;
+const vendFaz=()=>(state&&state.vendFaz)||DO_VENDEDOR;
 /* Escritório organizado por setor (não por pessoa). Cada tipo de tarefa pode ter um dono fixo. */
 const SETORES_ESC=[
   {id:'pedidos',nome:'Pedidos',i:'i-vias',fs:['vias']},
@@ -1332,18 +1338,18 @@ function plano(){const uso={},ocup=new Set();
 const capazes=f=>state.pessoas.filter(p=>(p.funcoes||[]).includes(f));
 function tarefasEsc(){const out=[];
   state.pedidos.filter(p=>!p.concluido).forEach(ped=>{const inf=info(ped),T=o=>{if(escOn(o.f))out.push({ped,inf,...o,key:[o.a,ped.id,o.k??'',o.l||'',o.s||''].join(':')})};
-    if(!ped.vias)T({f:'vias',i:'i-vias',t:'Separar as vias',sub:'Ficha, tecido e produção',a:'vias'});
-    if(!ped.artePrep)T({f:'arte_prep',i:'i-arte',t:'Preparar a arte',a:'artePrep'});
-    else if(!ped.arte)T({f:'arte_aprov',i:'i-arte',t:'Aprovar a arte com o cliente',a:'arte'});
-    {const nc=ped.materiais.filter(m=>!m.conf).length;if(nc)T({f:'conferir',i:'i-lupa',t:'Conferir insumos',sub:`${nc} ${nc===1?'item':'itens'}: tecido, linhas e aviamentos`,a:'insumos'})}
+    if(!ped.vias)T({f:'vias',i:'i-vias',t:tN('vias','Separar as vias'),sub:'Ficha, tecido e produção',a:'vias'});
+    if(!ped.artePrep)T({f:'arte_prep',i:'i-arte',t:tN('arte_prep','Preparar a arte'),a:'artePrep'});
+    else if(!ped.arte)T({f:'arte_aprov',i:'i-arte',t:tN('arte_aprov','Aprovar a arte com o cliente'),a:'arte'});
+    {const nc=ped.materiais.filter(m=>!m.conf).length;if(nc)T({f:'conferir',i:'i-lupa',t:tN('conferir','Conferir insumos'),sub:`${nc} ${nc===1?'item':'itens'}: tecido, linhas e aviamentos`,a:'insumos'})}
     ped.materiais.forEach((m,k)=>{if(m.conf&&m.st==='comprar')T({f:'comprar',i:'i-carrinho',t:`Comprar ${m.item}`,sub:m.falta!=null?'Faltam '+faltaTxt(m)+' (conferido no estoque)':qtdTxt(m.nec-m.est,m.un)+' · estimativa, confira o estoque',a:'comprei',k});
       if(m.st==='pedido')T({f:'comprar',i:'i-caminhao',t:`Receber ${m.item}`,sub:'Comprado, esperando chegar',a:'chegou',k})});
     lotesDe(ped.id).filter(l=>!l.rework).forEach(l=>rp(l).steps.filter(z=>z.pers&&!done(l,z.id)&&!arteOk(ped,l,z)).forEach(z=>{if(!arteAprovada(ped))return;const fo=isExt(z)?fornEtapa(l,z):null;
-      T({f:'arte_env',i:'i-arte',t:`Enviar arte: ${z.nome}`,sub:`${prod(l.prod).nome} ${modeloTxt(l)} → ${fo?fo.nome:tipo(z.posto).nome}`,a:'arteEnv',l:l.id,s:z.id})}));
+      T({f:'arte_env',i:'i-arte',t:`${tN('arte_env','Enviar arte')}: ${z.nome}`,sub:`${prod(l.prod).nome} ${modeloTxt(l)} → ${fo?fo.nome:tipo(z.posto).nome}`,a:'arteEnv',l:l.id,s:z.id})}));
     lotesDe(ped.id).forEach(l=>{const p=rp(l);p.steps.filter(isExt).forEach(z=>{const x=stOf(l,z.id),fo=fornById(x.forn)||fornEtapa(l,z);
       if(x.st==='fora'){const d=diasDesde(x.saiu);T({f:'levar',forn:fo,i:'i-caminhao',t:`Buscar no ${fo?.nome||tNome(z.posto)}`,sub:`${z.nome} · ${qtdEf(l)} peças · lá ${haQuanto(x.saiu)}`,late:d>(fo?.prazo||3),a:'buscou',l:l.id,s:z.id})}
       else if(ready(l,z,ped))T({f:'levar',forn:fo,i:'i-caminhao',t:`Levar para ${fo?.nome||tNome(z.posto)}`,sub:`${z.nome} · ${qtdEf(l)} peças`,a:'levei',l:l.id,s:z.id})})});
-    if(!inf.ab.length)T({f:'entregar',i:'i-caminhao',t:'Entregar ao cliente',sub:`${sum(lotesDe(ped.id).filter(l=>!l.rework).map(l=>l.qtd))} peças prontas`,a:'entregar'});
+    if(!inf.ab.length)T({f:'entregar',i:'i-caminhao',t:tN('entregar','Entregar ao cliente'),sub:`${sum(lotesDe(ped.id).filter(l=>!l.rework).map(l=>l.qtd))} peças prontas`,a:'entregar'});
   });
   return atribuir(out.sort((a,b)=>a.inf.score-b.inf.score))}
 /* Quem faz cada tarefa: pode fazer a função e está disponível; prefere a vendedora do próprio pedido
@@ -1351,7 +1357,7 @@ function tarefasEsc(){const out=[];
 function atribuir(ts){const carga={};ts.forEach(t=>{const cs=capazes(t.f),fix=state.atrib[t.key];let r=fix&&pessoa(fix)?fix:null;t.como=r?'mao':'';
   if(!r&&donoDe(t.f)){r=donoDe(t.f);t.como='dono'}
   if(!r){const disp=cs.filter(p=>p.disp!==false),pool=disp.length?disp:cs;
-    const sc=p=>(DO_VENDEDOR.includes(t.f)&&t.ped.vendedor===p.id?20:0)+((p.melhor||[]).includes(t.f)?10:0)+(t.f==='levar'&&t.forn?.leva===p.id?4:0)-(carga[p.id]||0)*3-(p.disp===false?50:0);
+    const sc=p=>(vendFaz().includes(t.f)&&t.ped.vendedor===p.id?20:0)+((p.melhor||[]).includes(t.f)?10:0)+(t.f==='levar'&&t.forn?.leva===p.id?4:0)-(carga[p.id]||0)*3-(p.disp===false?50:0);
     r=[...pool].sort((a,b)=>sc(b)-sc(a))[0]?.id||null;if(!r){r=reservaResp();t.como='reserva'}}
   t.resp=r;t.fixo=!!fix;if(r)carga[r]=(carga[r]||0)+1});return ts}
 const viaApp=(t)=>['levar','entregar'].includes(t.f)&&pessoa(t.resp)?.viaApp;
@@ -1604,7 +1610,7 @@ function vEscritorio(esc_){const D=state.donos||{};
 function sSetor(){const z=SETORES_ESC.find(x=>x.id===ui.sheet.v);if(!z)return voltar();const D=state.donos||{};
   return `${voltar('Pronto')}<h1>${ic(z.i)} ${z.nome}</h1><p class="sub-l">Escolha quem cuida de cada tarefa deste setor. <b>Automático</b> divide entre quem sabe fazer. Dá para trocar uma tarefa só, tocando no nome dela.</p>
   ${z.fs.filter(escOn).map(f=>{const c0=capazes(f),ps=[...c0,...state.pessoas.filter(p=>!c0.includes(p)&&(state.usuarios||[]).some(u=>u.pessoa===p.id))];
-    return `<div class="card"><h2 style="font-size:19px">${esc(FN[f].nome)}</h2><div class="linha-dep"><button class="pchip" data-a="donoSel" data-f="${f}" data-v="" aria-pressed="${!D[f]}">Automático</button>${ps.map(p=>`<button class="pchip" data-a="donoSel" data-f="${f}" data-v="${p.id}" aria-pressed="${D[f]===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div></div>`}).join('')}`}
+    return `<div class="card"><h2 style="font-size:19px">${esc(fNome(f))}</h2><div class="linha-dep"><button class="pchip" data-a="donoSel" data-f="${f}" data-v="" aria-pressed="${!D[f]}">Automático</button>${ps.map(p=>`<button class="pchip" data-a="donoSel" data-f="${f}" data-v="${p.id}" aria-pressed="${D[f]===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div></div>`}).join('')}`}
 /* Sininho de avisos: sempre no canto de cima, à direita. Abre uma janelinha com os avisos. */
 function sino(){const u=usuarioAtual();if(!u)return '';const n=avisos().length;return `${euBtn(u)}<button class="sino" data-a="sinoAbre" aria-expanded="${!!ui.sino}" aria-label="${n?n+(n>1?' avisos novos':' aviso novo'):'Avisos'}" title="Avisos">${ic('i-sino')}${n?`<em>${n>9?'9+':n}</em>`:''}</button>`}
 function euBtn(u){const pid=u.pessoa&&pessoa(u.pessoa)?u.pessoa:null;return `<button class="eu" data-a="euAbre" aria-expanded="${!!ui.eu}" aria-label="Você: ${esc(quemNome()||u.nome)}. Como usar e Sair" title="${esc(quemNome()||u.nome)}">${pid?av(pid,'s'):`<span class="eu-i">${esc((u.nome||'?')[0].toUpperCase())}</span>`}</button>`}
@@ -1763,14 +1769,14 @@ function ndStatus(l,s,ped){const x=stOf(l,s.id),m=sMap(rp(l));
   return['pend',f.length?`Espera: ${esc(m[f[0]].nome)}${f.length>1?` e mais ${f.length-1}`:''}`:'Espera liberar o corte']}
 function rotaV(l,ped){const R=rp(l);if(l.rework)return R;const c0=R.steps[0];
   const V=(id,nome,icon,deps,f)=>({id,nome,posto:'_esc',deps,min:0,virt:true,icon,f,partes:[]});
-  const vs=[V('v_vias','Separar vias','i-vias',[],'vias'),V('v_prep','Preparar arte','i-arte',[],'arte_prep'),V('v_aprov','Aprovar arte','i-arte',['v_prep'],'arte_aprov'),V('v_mat','Material','i-carrinho',[],'comprar')];
-  const envs=R.steps.filter(z=>z.pers).map(z=>V('v_env_'+z.id,'Enviar arte','i-arte',['v_aprov'],'arte_env'));
+  const vs=[V('v_vias',tN('vias','Separar vias'),'i-vias',[],'vias'),V('v_prep',tN('arte_prep','Preparar arte'),'i-arte',[],'arte_prep'),V('v_aprov',tN('arte_aprov','Aprovar arte'),'i-arte',['v_prep'],'arte_aprov'),V('v_mat',tN('comprar','Material'),'i-carrinho',[],'comprar')];
+  const envs=R.steps.filter(z=>z.pers).map(z=>V('v_env_'+z.id,tN('arte_env','Enviar arte'),'i-arte',['v_aprov'],'arte_env'));
   const fim=R.steps.filter(z=>!R.steps.some(x=>x.deps.includes(z.id))).map(z=>z.id);
   /* etapas desligadas do escritório não aparecem; o corte só espera o que libera o corte */
   const on=v=>escOn(v.f)||(v.id==='v_mat'&&escOn('conferir'));const vsOn=vs.filter(on).map(v=>({...v,deps:v.deps.filter(d=>vs.some(x=>x.id===d&&on(x)))})),envOn=envs.filter(on).map(v=>({...v,deps:v.deps.filter(d=>vsOn.some(x=>x.id===d))}));
   const tem=id=>vsOn.some(v=>v.id===id),pre=[libCom('vias')&&tem('v_vias')&&'v_vias',libCom('arte')&&tem('v_aprov')&&'v_aprov',libCom('insumos')&&tem('v_mat')&&'v_mat'].filter(Boolean);
   const steps=R.steps.map(z=>z===c0?{...z,deps:[...z.deps,...pre]}:z.pers&&envOn.some(v=>v.id==='v_env_'+z.id)?{...z,deps:[...z.deps,'v_env_'+z.id]}:z);
-  return{...R,steps:[...vsOn,...envOn,...steps,...(escOn('entregar')?[V('v_ent','Entregar ao cliente','i-caminhao',fim,'entregar')]:[])]}}
+  return{...R,steps:[...vsOn,...envOn,...steps,...(escOn('entregar')?[V('v_ent',tN('entregar','Entregar ao cliente'),'i-caminhao',fim,'entregar')]:[])]}}
 function vDone(l,ped,id){if(id==='v_vias')return!!ped.vias;if(id==='v_prep')return!!ped.artePrep;if(id==='v_aprov')return!!ped.arte;
   if(id==='v_mat')return ped.materiais.every(m=>m.st==='ok'||m.st==='recebido');if(id==='v_ent')return!!ped.concluido;
   if(id.startsWith('v_env_'))return arteOk(ped,l,{id:id.slice(6)});return done(l,id)}
@@ -1813,7 +1819,7 @@ function fxInfo(p,s,key,l){const m=sMap(p),fil=filhos(p,s.id),podeTirar=!l&&!fil
     ${l&&s.pers?ondeBox(l,s):''}
     <div style="display:flex;gap:10px;flex-wrap:wrap">${!l&&!s.id.startsWith('pz')&&!s.opt?`<button class="x azul" data-a="edEtapa" data-p="${p.id}" data-s="${s.id}">✎ Editar etapa</button>`:''}${podeTirar&&!s.opt?`<button class="x" data-a="rmEtapa" data-p="${p.id}" data-s="${s.id}">Tirar esta etapa</button>`:''}<button class="x azul" data-a="fxSel" data-k="${key}" data-s="${s.id}">Fechar</button></div></div>`}
 function vInfo(p,s,key,l,ped){const t=vTask(l,ped,s),cs=capazes(s.f);
-  return `<div class="fx-info"><div class="t">${ic(s.icon)}${esc(s.nome)}</div><div>${esc(FN[s.f].nome)} · ${vDone(l,ped,s.id)?'feito':'a fazer'} · tempo estimado ≈ ${minTxt(state.tEsc[s.f]||0)}</div>
+  return `<div class="fx-info"><div class="t">${ic(s.icon)}${esc(s.nome)}</div><div>${esc(fNome(s.f))} · ${vDone(l,ped,s.id)?'feito':'a fazer'} · tempo estimado ≈ ${minTxt(state.tEsc[s.f]||0)}</div>
     ${t?`<div class="lin"><b>Responsável agora:</b><span class="tagp">${esc(pNome(t.resp)||'ninguém')}</span></div>`:''}
     <div class="lin"><b>Quem pode fazer:</b>${cs.length?cs.map(x=>`<span class="tagp">${esc(x.nome)}${(x.melhor||[]).includes(s.f)?' ★':''}</span>`).join(''):'<span style="color:var(--red);font-weight:700">ninguém cadastrado</span>'}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="x azul" data-a="fxSel" data-k="${key}" data-s="${s.id}">Fechar</button></div></div>`}
@@ -1947,7 +1953,7 @@ function sPesEd(){const e=ui.sheet,internos=state.tipos.filter(t=>!t.externo);
   ${e.sabe.length?`<div class="rotulo">Faz melhor ★ <span style="font-weight:400;color:var(--muted)">(o sistema dá preferência)</span></div>
   <div class="linha-dep">${e.sabe.map(t=>`<button class="depc" data-a="xMelhor" data-v="${t}" aria-pressed="${e.melhor.includes(t)}">${ic(tipo(t).i)}${esc(tNome(t))}</button>`).join('')}</div>
   <div class="rotulo" style="font-size:17px">Ou uma etapa específica</div><div class="linha-dep">${nomesEtapas.map(n=>`<button class="depc" data-a="xMelhor" data-v="${esc(n)}" aria-pressed="${e.melhor.includes(n)}">${esc(n)}</button>`).join('')}</div>`:''}
-  <div class="rotulo">Tarefas de escritório e logística</div><div class="escolhe">${FUNCOES.map(f=>`<button class="opc" data-a="xFun" data-v="${f.id}" aria-pressed="${e.funcoes.includes(f.id)}">${ic(f.i)}${esc(f.nome)}</button>`).join('')}</div>
+  <div class="rotulo">Tarefas de escritório e logística</div><div class="escolhe">${FUNCOES.map(f=>`<button class="opc" data-a="xFun" data-v="${f.id}" aria-pressed="${e.funcoes.includes(f.id)}">${ic(f.i)}${esc(fNome(f.id))}</button>`).join('')}</div>
   ${e.funcoes.some(f=>['levar','entregar'].includes(f))?`<div class="linha-dep" style="margin-top:10px"><button class="depc" data-a="xApp" aria-pressed="${!!e.viaApp}">${ic('i-caminhao')}Leva e entrega chamando aplicativo</button></div>`:''}
   ${e.funcoes.length?`<div class="rotulo">Faz melhor nas tarefas ★</div><div class="linha-dep">${e.funcoes.map(f=>`<button class="depc" data-a="xMelhor" data-v="${f}" aria-pressed="${e.melhor.includes(f)}">${ic(FN[f].i)}${esc(FN[f].nome)}</button>`).join('')}</div>`:''}
   ${e.err?`<div class="aviso">${ic('i-alerta')}${esc(e.err)}</div>`:''}
@@ -2317,6 +2323,7 @@ const FAQ=[
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
 {c:'maq',q:'Como crio um setor novo, como lavanderia ou passadoria?',k:'setor novo criar lavanderia passadoria acabamento renomear ordem função setores',r:['Cadastros › Máquinas › Setores da fábrica: escreva o nome e toque em Adicionar setor.','Escolha a função do setor: abre o lote (corte), personalização, montagem/costura ou acabamento.','Depois, nas máquinas desse setor, toque em ✎ editar e escolha o setor novo.','Use ↑ e ↓ para pôr na ordem do caminho da peça.'],ir:'cad:maquinas#Setores da fábrica',g:1},
+{c:'cad',q:'Como mudo o nome de uma etapa do escritório ou quem faz ela?',k:'nome etapa escritório renomear cargo vendedora quem faz arte vias compras preferência',r:['Cadastros › Ajustes › Etapas do escritório: toque em ✎ Ajustar na etapa.','Escreva o nome que a equipe usa e escolha quais cargos recebem essa etapa.','Marque se a vendedora do próprio pedido tem preferência.'],ir:'cad:ajustes#Etapas do escritório',g:1},
 {c:'cad',q:'Esta fábrica não faz arte (ou vias). Como tiro essa etapa?',k:'desligar etapa escritório arte vias conferir comprar liberar corte começar sem arte personalização',r:['Cadastros › Ajustes › Etapas do escritório: toque na etapa para desligar. Ela some das tarefas e conta como feita.','Logo abaixo, escolha o que precisa estar pronto para o corte começar: vias, arte aprovada e insumos.'],ir:'cad:ajustes#Etapas do escritório',g:1},
 {c:'cad',q:'Como levo as máquinas e os produtos desta fábrica para outra?',k:'modelo fábrica configuração copiar outra confecção começar máquinas produtos exportar importar',r:['Cadastros › Ajustes › Modelo de fábrica: Baixar o modelo desta fábrica.','O modelo leva máquinas, produtos, tamanhos, cores, tecidos, horário e prazos. Não leva pedidos, empresas, equipe, fornecedores, estoque nem acessos.','Na outra fábrica, enquanto não há pedidos de verdade: Começar com um modelo.'],ir:'cad:ajustes#Modelo de fábrica',g:1},
 {c:'cad',q:'Como faço uma cópia de segurança? E como recupero?',k:'cópia segurança backup recuperar restaurar lixeira apagado',r:['O app já faz uma cópia sozinho todo dia (guarda 14 dias).','Cadastros › Ajustes › Cópias de segurança: Fazer uma cópia agora ou Baixar cópia em arquivo.','Para recuperar algo apagado: Ver cópias e lixeira.'],ir:'cad:ajustes#Cópias de segurança',g:1},
@@ -2988,7 +2995,7 @@ async function restaurar(obj){if(!obj||!Array.isArray(obj.pedidos)||!Array.isArr
   const {_app,_ts,...st}=obj;snap();state=normalizar(st);RC={};save();render();tick()}
 async function sSeg(){}
 /* Modelo de fábrica: a configuração sem os dados do dia a dia. Serve para começar outra confecção a partir desta. */
-const MODELO_CFG=['setores','escOff','liberaCom','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
+const MODELO_CFG=['setores','escOff','liberaCom','escNomes','cargoFun','vendFaz','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
 function modeloFabrica(){const c=x=>JSON.parse(JSON.stringify(x??null));const cfg={};MODELO_CFG.forEach(k=>{if(state[k]!=null)cfg[k]=c(state[k])});
   cfg.feriados={local:state.feriados?.local||FER0().local,facult:c(state.feriados?.facult||{}),extras:[],trabalha:[]};
   return {_modelo:1,_ts:now(),nome:marca().nome||'',tipos:c(state.tipos),produtos:c(state.produtos),cfg}}
@@ -3000,10 +3007,17 @@ async function aplicarModelo(m){if(!m||m._modelo!==1||!Array.isArray(m.tipos)||!
   state=normalizar(state);RC={};commit()}
 function cardEscritorio(){if(!ehGestao())return '';
   return `<div class="card" id="Escritorio"><h2>Etapas do escritório</h2><p class="dica" style="margin:-4px 0 8px">Desligue o que esta fábrica não faz. Etapa desligada não vira tarefa e conta como feita.</p>
-  <div class="linha-dep">${FUNCOES.map(f=>`<button class="depc" data-a="escLiga" data-f="${f.id}" aria-pressed="${escOn(f.id)}">${ic(f.i)}${esc(f.nome)}</button>`).join('')}</div>
+  ${FUNCOES.map(f=>`<div class="set-row"><button class="depc" data-a="escLiga" data-f="${f.id}" aria-pressed="${escOn(f.id)}">${ic(f.i)}${esc(fNome(f.id))}</button><button class="x azul" data-a="escEt" data-f="${f.id}">✎ Ajustar</button></div>`).join('')}
   <div class="rotulo" style="margin-top:14px">O corte só começa quando estiver pronto:</div>
   <div class="linha-dep">${LIBERA.map(([k,n])=>`<button class="depc" data-a="libCom" data-v="${k}" aria-pressed="${libCom(k)}">${esc(n)}</button>`).join('')}</div>
   ${LIBERA.every(([k])=>!libCom(k))?'<p class="dica" style="margin:8px 0 0">Sem nada marcado, o corte começa assim que o pedido entra.</p>':''}</div>`}
+function sEscEt(){const e=ui.sheet,f=FN[e.f];if(!f)return voltar();const P=state.papeis||PAPEIS;
+  return `${voltar('Cancelar')}<h1>${ic(f.i)} Etapa do escritório</h1>
+  <div class="rotulo">Nome que a equipe usa</div><input class="campo" id="escNome" value="${esc(e.nome)}" placeholder="${esc(f.nome)}" autocomplete="off">
+  <div class="rotulo">Quem recebe esta etapa ao ganhar o cargo</div><div class="linha-dep">${Object.keys(P).map(k=>`<button class="depc" data-a="escCargo" data-v="${k}" aria-pressed="${e.cargos.includes(k)}">${esc(P[k])}</button>`).join('')}</div>
+  <p class="dica" style="margin:4px 0 0">Vale para quem for marcado com o cargo daqui em diante. Quem já está cadastrado continua como está (ajuste em Equipe).</p>
+  <div class="linha-dep" style="margin-top:14px"><button class="depc" data-a="escVend" aria-pressed="${e.vend}">Preferência para a vendedora do próprio pedido</button></div>
+  <div class="acoes"><button class="big go" data-a="escEtOk">${ic('i-check')}Salvar</button></div>`}
 function cardModelo(){if(!ehGestao())return '';const pode=!temPedidoReal();return `<div class="card" id="Modelo"><h2>Modelo de fábrica</h2>
   <p class="dica" style="margin:-4px 0 8px">O modelo leva máquinas, produtos com as etapas, tamanhos, cores, tecidos, posições, horário e prazos. <b>Não leva</b> pedidos, empresas, equipe, fornecedores, estoque nem acessos.</p>
   <div class="linha-dep"><button class="mbtn neutro2" data-a="modBaixar">${ic('i-lista')}Baixar o modelo desta fábrica</button>
@@ -3140,7 +3154,7 @@ function render(){RC={};if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){const l
   const sh=document.getElementById('sheet');const s=ui.sheet;
   if(!s){sh.innerHTML='';document.body.style.overflow='';return}
   const old=sh.querySelector('.sheet'),keep=old&&old.dataset.id===sheetId(s)?{top:old.scrollTop,x:[...old.querySelectorAll('.fx-wrap')].map(e=>[e.dataset.k,e.scrollLeft])}:null;
-  const html=({tipo:sTipoEd,troca:sTroca,maq:sMaq,pedido:()=>sPedido(s.id),prob:sProblema,novo:sNovo,ajuda:sAjuda,produto:()=>sProduto(s.p),etapa:sEtapa,nprod:sNovoProd,pes:sPesEd,forn:sFornEd,quem:sQuem,he:sHE,setor:sSetor,pausa:sPausa,div:sDiv,menu:sMenu,imp:sImp,mock:sMock,cli:sCli,doc:sDoc,ins:sIns,arqPick:sArqPick,seg:sSegLista}[s.t]||(()=>''))();
+  const html=({tipo:sTipoEd,troca:sTroca,maq:sMaq,pedido:()=>sPedido(s.id),prob:sProblema,novo:sNovo,ajuda:sAjuda,produto:()=>sProduto(s.p),etapa:sEtapa,nprod:sNovoProd,pes:sPesEd,forn:sFornEd,quem:sQuem,he:sHE,setor:sSetor,escEt:sEscEt,pausa:sPausa,div:sDiv,menu:sMenu,imp:sImp,mock:sMock,cli:sCli,doc:sDoc,ins:sIns,arqPick:sArqPick,seg:sSegLista}[s.t]||(()=>''))();
   sh.innerHTML=`<div class="sheet ${['pedido','produto'].includes(s.t)?'largo':''}" data-id="${esc(sheetId(s))}" role="dialog" aria-modal="true"><div class="wrap">${html}</div></div>`;document.body.style.overflow='hidden';
   if(keep){const n=sh.querySelector('.sheet');n.scrollTop=keep.top;keep.x.forEach(([k,x])=>{const e=n.querySelector(`.fx-wrap[data-k="${k}"]`);if(e)e.scrollLeft=x})}
   document.querySelectorAll('[aria-label]:not([title])').forEach(el=>el.title=el.getAttribute('aria-label'));
@@ -3303,7 +3317,7 @@ const A={
   acsRm:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);snap();state.usuarios=state.usuarios.filter(x=>x.id!==d.id);commit();toast(`${u.nome} não tem mais acesso`)},
   segAgora:async()=>{toast('Guardando cópia…',false);const ok=await backupNuvem(`${hojeISO()}-manual-${tsHm(now()).replace(':','h')}`);toast(ok?'Cópia guardada na nuvem':'Sem nuvem agora. Use “Baixar cópia em arquivo”.',false)},
   setor:d=>openSheet({t:'setor',v:d.v}),
-  donoSel:d=>{snap();state.donos={...(state.donos||{})};if(d.v)state.donos[d.f]=d.v;else delete state.donos[d.f];commit();toast(d.v?`${FN[d.f].nome}: sempre com ${pNome(d.v)}`:`${FN[d.f].nome}: automático`)},
+  donoSel:d=>{snap();state.donos={...(state.donos||{})};if(d.v)state.donos[d.f]=d.v;else delete state.donos[d.f];commit();toast(d.v?`${fNome(d.f)}: sempre com ${pNome(d.v)}`:`${fNome(d.f)}: automático`)},
   reconectar:()=>{NV.erro='';render();nuvemConectar()},
   soAquiEnviar:()=>soAquiEnviar(),
   soAquiDescartar:d=>{if(!d.ok){ui.soAquiConf=true;return render()}ui.soAquiConf=false;try{localStorage.removeItem('martins-so-aqui')}catch(e){}render();toast('Descartado',false)},
@@ -3315,7 +3329,14 @@ const A={
   setPorMaq:d=>{snap();state.setores=SETORES().map(g=>g.id===d.g?{...g,porMaquina:!g.porMaquina}:{...g});commit()},
   setMov:d=>{const S=SETORES().map(g=>({...g})),i=S.findIndex(g=>g.id===d.g),j=i+(+d.d);if(i<0||j<0||j>=S.length)return;[S[i],S[j]]=[S[j],S[i]];snap();state.setores=S;commit()},
   setRm:d=>{if(state.tipos.some(t=>t.grupo===d.g))return toast('Esse setor ainda tem máquinas');if(SETORES().length<2)return;snap();state.setores=SETORES().filter(g=>g.id!==d.g).map(g=>({...g}));commit()},
-  escLiga:d=>{snap();const o=new Set(state.escOff||[]);o.has(d.f)?o.delete(d.f):o.add(d.f);state.escOff=[...o];RC={};commit();toast(`${FN[d.f].nome}: ${o.has(d.f)?'desligada':'ligada'}`)},
+  escEt:d=>{const CF=cargoFun();openSheet({t:'escEt',f:d.f,nome:fNome(d.f),cargos:Object.keys(CF).filter(k=>(CF[k]||[]).includes(d.f)),vend:vendFaz().includes(d.f)})},
+  escCargo:d=>{const e=ui.sheet;e.nome=document.getElementById('escNome')?.value??e.nome;togl(e.cargos,d.v);render()},
+  escVend:()=>{const e=ui.sheet;e.nome=document.getElementById('escNome')?.value??e.nome;e.vend=!e.vend;render()},
+  escEtOk:()=>{const e=ui.sheet,f=e.f,n=(document.getElementById('escNome')?.value||'').trim();snap();
+    const N={...(state.escNomes||{})};if(n&&n!==FN[f].nome)N[f]=n;else delete N[f];state.escNomes=N;
+    const CF=JSON.parse(JSON.stringify(cargoFun()));Object.keys({...CF,...(state.papeis||PAPEIS)}).forEach(k=>{const L=(CF[k]||[]).filter(x=>x!==f);if(e.cargos.includes(k))L.push(f);if(L.length)CF[k]=L;else delete CF[k]});state.cargoFun=CF;
+    const V=vendFaz().filter(x=>x!==f);if(e.vend)V.push(f);state.vendFaz=V;ui.sheet=null;commit();toast('Etapa ajustada')},
+  escLiga:d=>{snap();const o=new Set(state.escOff||[]);o.has(d.f)?o.delete(d.f):o.add(d.f);state.escOff=[...o];RC={};commit();toast(`${fNome(d.f)}: ${o.has(d.f)?'desligada':'ligada'}`)},
   libCom:d=>{snap();const L=new Set(state.liberaCom||LIBERA.map(x=>x[0]));L.has(d.v)?L.delete(d.v):L.add(d.v);state.liberaCom=LIBERA.map(x=>x[0]).filter(k=>L.has(k));RC={};commit()},
   modAplicar:async()=>{const m=ui.modPend;ui.modPend=null;try{await aplicarModelo(m);toast('Modelo aplicado. Agora cadastre a equipe e os fornecedores.',false)}catch(e){render();toast(e.message==='tem pedidos'?'Já há pedidos de verdade: o modelo não foi aplicado':'Esse arquivo não é um modelo de fábrica',false)}},
   modCancelar:()=>{ui.modPend=null;render()},
@@ -3418,7 +3439,7 @@ const A={
   /* cadastros */
   tQtd:d=>{const t=tipo(d.t),n=Math.max(0,(t.qtd||0)+(+d.d));if(n<t.qtd&&plano().uso[`${t.id}-${t.qtd}`]){toast(`A ${t.nome} ${t.qtd} está em uso agora`,false);return}snap();t.qtd=n;commit()},
   pesEd:d=>{const p=pessoa(d.id);openSheet(p?{t:'pes',id:p.id,nome:p.nome,foto:p.foto||'',papeis:[...(p.papeis||[])],sabe:[...p.sabe],melhor:[...p.melhor],funcoes:[...(p.funcoes||[])],viaApp:!!p.viaApp,disp:p.disp!==false,err:''}:{t:'pes',id:null,nome:'',papeis:['costura'],sabe:[],melhor:[],funcoes:[],viaApp:false,disp:true,err:''})},
-  xPapel:d=>{eRead();const e=ui.sheet;togl(e.papeis,d.v);if(e.papeis.includes(d.v)){(CARGO_FUN[d.v]||[]).forEach(f=>{if(!e.funcoes.includes(f))e.funcoes.push(f)});if(d.v==='corte'&&!e.sabe.includes('corte'))e.sabe.push('corte')}render()},
+  xPapel:d=>{eRead();const e=ui.sheet;togl(e.papeis,d.v);if(e.papeis.includes(d.v)){(cargoFun()[d.v]||[]).filter(escOn).forEach(f=>{if(!e.funcoes.includes(f))e.funcoes.push(f)});if(d.v==='corte')state.tipos.filter(t=>faseT(t.id)==='corte'&&!t.externo).forEach(t=>{if(!e.sabe.includes(t.id))e.sabe.push(t.id)})}render()},
   xSabe:d=>{eRead();const e=ui.sheet;togl(e.sabe,d.v);if(!e.sabe.includes(d.v))e.melhor=e.melhor.filter(x=>x!==d.v);render()},
   xMelhor:d=>{eRead();togl(ui.sheet.melhor,d.v);render()},
   xFotoRm:()=>{eRead();ui.sheet.foto='';render()},

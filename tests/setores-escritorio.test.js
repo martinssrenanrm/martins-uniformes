@@ -50,5 +50,13 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
     ui.tela='cadastros';ui.cad='ajustes';render();const card=!!document.getElementById('Escritorio');
     A.libCom({v:'insumos'});['arte_prep','arte_aprov','arte_env'].forEach(f=>A.escLiga({f}));return {antes,depois,card,volta:!(state.escOff||[]).length&&state.liberaCom.length===3}},pid);
   ok(!r.antes&&r.depois,'tirando "insumos", material a comprar não segura o corte');ok(r.card,'quadro Etapas do escritório em Ajustes');ok(r.volta,'religar volta ao padrão');
+  console.log('7) Nome das etapas e quem faz');
+  r=await A.evaluate(()=>{ui.tela='cadastros';ui.cad='ajustes';render();A.escEt({f:'vias'});document.getElementById('escNome').value='Imprimir ficha';A.escCargo({v:'vendas'});A.escCargo({v:'compras'});A.escVend();A.escEtOk();
+    const ped=state.pedidos.find(p=>!p.concluido&&!p.vias)||(()=>{const p=state.pedidos.find(p=>!p.concluido);p.vias=false;return p})();
+    const t=tarefasEsc().find(x=>x.f==='vias'&&x.ped===ped);ui.sheet={t:'pes',id:'',nome:'Teste',papeis:[],sabe:[],funcoes:[],melhor:[]};A.xPapel({v:'compras'});const ganhou=ui.sheet.funcoes.includes('vias');ui.sheet=null;
+    const vendSai=!vendFaz().includes('vias');A.escEt({f:'vias'});document.getElementById('escNome').value='';A.escCargo({v:'vendas'});A.escCargo({v:'compras'});A.escVend();A.escEtOk();
+    return {titulo:t&&t.t,ganhou,vendSai,volta:fNome('vias')==='Separar vias'&&(o=>JSON.stringify(Object.keys(o).sort().map(k=>[k,[...o[k]].sort()])))(cargoFun())===(o=>JSON.stringify(Object.keys(o).sort().map(k=>[k,[...o[k]].sort()])))(CARGO_FUN)&&vendFaz().includes('vias')}});
+  ok(r.titulo==='Imprimir ficha','a tarefa usa o nome que a fábrica escolheu');ok(r.ganhou,'cargo Compras passa a receber a etapa');ok(r.vendSai,'preferência da vendedora desligada');
+  ok(r.volta,'apagando o nome e voltando os cargos, fica como o padrão');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();
