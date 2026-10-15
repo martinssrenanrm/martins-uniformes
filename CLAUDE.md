@@ -36,7 +36,7 @@ A Martins é o primeiro cliente, não o produto. O mesmo código vai servir outr
 
 **Nunca no código (o teste `cliente-novo` confere):**
 - nome de pessoa, e-mail real, id de pedido ou de produto de um cliente na lógica;
-- migração em `normalizar()` que mude conteúdo (só formato) ou que rode a cada abertura re-impondo dado apagado;
+- atualização de dados que mude conteúdo (só formato) ou que rode a cada abertura re-impondo dado apagado. Atualização nova = novo item no fim de `MIGRACOES` (v = último + 1); roda uma vez por banco e fica registrada em `schema`;
 - acesso fixo. Os primeiros acessos vêm de `clientes/<id>.json` (`admins`), só quando o banco não tem nenhum usuário.
 
 Textos que citam quem procurar usam `SUPORTE()`, `gestoresTxt()` e `NOME_EMP()`. Dados de demonstração ficam só em `seed()` e são marcados com `exemplo:true`.

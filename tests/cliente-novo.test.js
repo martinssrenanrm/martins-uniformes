@@ -30,5 +30,11 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   console.log('4) Exemplos são marcados, não escolhidos pelo número');
   r=await A.evaluate(()=>({ex:state.pedidos.filter(ehExemplo).length,real:ehExemplo(state.pedidos.find(p=>p.cliente==='Cliente Real'))}));
   ok(r.ex>0&&!r.real,'pedido de exemplo tem marca; pedido real com o mesmo número não é exemplo');
+  console.log('5) Atualizações dos dados em ordem, uma vez só');
+  r=await A.evaluate(()=>{const vs=MIGRACOES.map(m=>m.v);const a=JSON.stringify(normalizar(JSON.parse(JSON.stringify(state))));const b=JSON.stringify(normalizar(JSON.parse(a)));
+    let roda=0;const velho={...JSON.parse(a),schema:SCHEMA};const m0=MIGRACOES.map(m=>m.fn);MIGRACOES.forEach(m=>{const f=m.fn;m.fn=s=>{roda++;f(s)}});normalizar(velho);MIGRACOES.forEach((m,i)=>m.fn=m0[i]);
+    return {ord:vs.every((v,i)=>v===i+1),schema:state.schema===SCHEMA,igual:a===b,roda}});
+  ok(r.ord,'atualizações numeradas 1, 2, 3… sem pular');ok(r.schema,'o banco guarda a versão das atualizações');
+  ok(r.igual,'abrir de novo não muda nada (atualizações não se repetem)');ok(r.roda===0,'banco já atualizado não roda nenhuma atualização');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();
