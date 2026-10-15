@@ -278,3 +278,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Em **Cadastros › Máquinas**, no topo, apareceu o quadro **Setores da fábrica**: Corte, Personalização, Costura e Acabamento.
 - Dá para mudar o nome, mudar a ordem (↑ ↓) e criar setor novo (ex.: Lavanderia). Cada setor tem uma **função**, que diz ao app o que ele faz.
 - **Para a equipe, nada muda.** Única diferença: na barra de etapas da peça, "Embalar" agora aparece como "Embalagem" (o nome da mesa).
+
+---
+
+## Etapas do escritório (só para a gestão)
+
+- Em **Cadastros › Ajustes** apareceu o quadro **Etapas do escritório**.
+- Dá para desligar o que a fábrica não faz (ex.: arte). Etapa desligada não vira tarefa e conta como feita.
+- Logo abaixo: **o que precisa estar pronto para o corte começar** (vias, arte aprovada, insumos).
+- **Na Martins está tudo ligado, como sempre foi. Nada muda para a equipe.**

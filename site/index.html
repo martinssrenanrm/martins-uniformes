@@ -1288,8 +1288,16 @@ function fase(p,s){if(s.pers)return 'pers';const a=anc(p,s.id);return p.steps.so
 /* ================= motor ================= */
 const prm=()=>state.params;
 const loteDone=l=>rp(l).steps.every(s=>done(l,s.id));
-const arteOk=(ped,l,s)=>!!(ped.artes||{})[(l.parent||l.id)+':'+s.id];
-const liberado=ped=>ped.vias&&ped.arte&&ped.materiais.every(m=>m.conf&&m.st!=='comprar'&&m.st!=='pedido');
+const arteOk=(ped,l,s)=>!escOn('arte_env')||!!(ped.artes||{})[(l.parent||l.id)+':'+s.id];
+/* Escritório configurável: cada etapa liga/desliga (state.escOff) e a gestão escolhe o que libera o corte (state.liberaCom).
+   Etapa desligada conta como feita. Padrão = tudo ligado, corte liberado com vias + arte aprovada + insumos. */
+const LIBERA=[['vias','Vias separadas'],['arte','Arte aprovada pelo cliente'],['insumos','Insumos conferidos e na fábrica']];
+const escOn=f=>!((typeof state!=='undefined'&&state&&state.escOff)||[]).includes(f);
+const libCom=k=>((state&&state.liberaCom)||LIBERA.map(x=>x[0])).includes(k);
+const viasOk=ped=>!escOn('vias')||!!ped.vias;
+const arteAprovada=ped=>!!ped.arte||(!escOn('arte_prep')&&!escOn('arte_aprov'));
+const insumosOk=ped=>ped.materiais.every(m=>(!escOn('conferir')||m.conf)&&(!escOn('comprar')||(m.st!=='comprar'&&m.st!=='pedido')));
+const liberado=ped=>(!libCom('vias')||viasOk(ped))&&(!libCom('arte')||arteAprovada(ped))&&(!libCom('insumos')||insumosOk(ped));
 function ready(l,s,ped){{const x=stOf(l,s.id);if(x.st!=='pend'&&!(x.partes&&x.st==='and'&&restante(l,s.id)>0))return false}if(!s.deps.every(d=>done(l,d)))return false;if(!s.deps.length&&!liberado(ped))return false;
   if(s.pers&&!arteOk(ped,l,s))return false;           // a arte precisa ter sido enviada a quem aplica
   if(isExt(s)){const R=rp(l);   // só leva se a parte não estiver numa máquina
@@ -1327,14 +1335,14 @@ function plano(){const uso={},ocup=new Set();
   return{uso,ocup,plan,espera,semPessoa,us,usados,resEspera}}
 const capazes=f=>state.pessoas.filter(p=>(p.funcoes||[]).includes(f));
 function tarefasEsc(){const out=[];
-  state.pedidos.filter(p=>!p.concluido).forEach(ped=>{const inf=info(ped),T=o=>out.push({ped,inf,...o,key:[o.a,ped.id,o.k??'',o.l||'',o.s||''].join(':')});
+  state.pedidos.filter(p=>!p.concluido).forEach(ped=>{const inf=info(ped),T=o=>{if(escOn(o.f))out.push({ped,inf,...o,key:[o.a,ped.id,o.k??'',o.l||'',o.s||''].join(':')})};
     if(!ped.vias)T({f:'vias',i:'i-vias',t:'Separar as vias',sub:'Ficha, tecido e produção',a:'vias'});
     if(!ped.artePrep)T({f:'arte_prep',i:'i-arte',t:'Preparar a arte',a:'artePrep'});
     else if(!ped.arte)T({f:'arte_aprov',i:'i-arte',t:'Aprovar a arte com o cliente',a:'arte'});
     {const nc=ped.materiais.filter(m=>!m.conf).length;if(nc)T({f:'conferir',i:'i-lupa',t:'Conferir insumos',sub:`${nc} ${nc===1?'item':'itens'}: tecido, linhas e aviamentos`,a:'insumos'})}
     ped.materiais.forEach((m,k)=>{if(m.conf&&m.st==='comprar')T({f:'comprar',i:'i-carrinho',t:`Comprar ${m.item}`,sub:m.falta!=null?'Faltam '+faltaTxt(m)+' (conferido no estoque)':qtdTxt(m.nec-m.est,m.un)+' · estimativa, confira o estoque',a:'comprei',k});
       if(m.st==='pedido')T({f:'comprar',i:'i-caminhao',t:`Receber ${m.item}`,sub:'Comprado, esperando chegar',a:'chegou',k})});
-    lotesDe(ped.id).filter(l=>!l.rework).forEach(l=>rp(l).steps.filter(z=>z.pers&&!done(l,z.id)&&!arteOk(ped,l,z)).forEach(z=>{if(!ped.arte)return;const fo=isExt(z)?fornEtapa(l,z):null;
+    lotesDe(ped.id).filter(l=>!l.rework).forEach(l=>rp(l).steps.filter(z=>z.pers&&!done(l,z.id)&&!arteOk(ped,l,z)).forEach(z=>{if(!arteAprovada(ped))return;const fo=isExt(z)?fornEtapa(l,z):null;
       T({f:'arte_env',i:'i-arte',t:`Enviar arte: ${z.nome}`,sub:`${prod(l.prod).nome} ${modeloTxt(l)} → ${fo?fo.nome:tipo(z.posto).nome}`,a:'arteEnv',l:l.id,s:z.id})}));
     lotesDe(ped.id).forEach(l=>{const p=rp(l);p.steps.filter(isExt).forEach(z=>{const x=stOf(l,z.id),fo=fornById(x.forn)||fornEtapa(l,z);
       if(x.st==='fora'){const d=diasDesde(x.saiu);T({f:'levar',forn:fo,i:'i-caminhao',t:`Buscar no ${fo?.nome||tNome(z.posto)}`,sub:`${z.nome} · ${qtdEf(l)} peças · lá ${haQuanto(x.saiu)}`,late:d>(fo?.prazo||3),a:'buscou',l:l.id,s:z.id})}
@@ -1591,7 +1599,7 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
     <div class="forns">${state.forn.map(f=>fornCard(f,esc_)).join('')}</div></section>`:''}
   ${z==='esc'?vEscritorio(esc_):''}<div class="fim-ajuda"><button class="x azul" data-a="ajuda" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px">${ic('i-duvida')}Como usar o app</button></div>`}
 function vEscritorio(esc_){const D=state.donos||{};
-  const setores=SETORES_ESC.map(z=>{const ts=esc_.filter(t=>z.fs.includes(t.f)),ds=[...new Set(z.fs.map(f=>D[f]).filter(id=>id&&pessoa(id)))];
+  const setores=SETORES_ESC.filter(z=>z.fs.some(escOn)).map(z=>{const ts=esc_.filter(t=>z.fs.includes(t.f)),ds=[...new Set(z.fs.map(f=>D[f]).filter(id=>id&&pessoa(id)))];
     const dn='Quem cuida deste setor: '+(!ds.length?'o sistema divide':ds.map(pNome).join(', ')+(z.fs.every(f=>D[f])?'':' e o sistema'));
     return `<section class="setor${ts.length?'':' vazio-set'}" id="set-${z.id}"><header class="setor-h"><span class="m-ic">${ic(z.i)}</span><div class="setor-t"><b>${z.nome}</b><span>${ts.length?`${ts.length} ${ts.length>1?'pendentes':'pendente'}`:'Nada pendente'}</span></div>
       <button class="setor-dono2" data-a="setor" data-v="${z.id}" title="${esc(dn)}" aria-label="${esc(dn)}. Toque para mudar">${ds.length?av(ds[0],'s'):ic('i-pessoas')}${ds.length>1?`<em>+${ds.length-1}</em>`:''}</button></header>${ts.map(tarRow).join('')}</section>`}).join('');
@@ -1599,7 +1607,7 @@ function vEscritorio(esc_){const D=state.donos||{};
   return `<div class="setores">${setores}</div>${gente.length?`<div class="disp-l"><span class="t">No escritório agora (toque para marcar quem saiu):</span><div class="linha-dep">${gente.map(p=>`<button class="pchip" data-a="disp" data-id="${p.id}" aria-pressed="${p.disp!==false}">${av(p.id,'s')}${esc(p.nome)}${p.disp===false?' <small>· fora</small>':''}</button>`).join('')}</div></div>`:''}`}
 function sSetor(){const z=SETORES_ESC.find(x=>x.id===ui.sheet.v);if(!z)return voltar();const D=state.donos||{};
   return `${voltar('Pronto')}<h1>${ic(z.i)} ${z.nome}</h1><p class="sub-l">Escolha quem cuida de cada tarefa deste setor. <b>Automático</b> divide entre quem sabe fazer. Dá para trocar uma tarefa só, tocando no nome dela.</p>
-  ${z.fs.map(f=>{const c0=capazes(f),ps=[...c0,...state.pessoas.filter(p=>!c0.includes(p)&&(state.usuarios||[]).some(u=>u.pessoa===p.id))];
+  ${z.fs.filter(escOn).map(f=>{const c0=capazes(f),ps=[...c0,...state.pessoas.filter(p=>!c0.includes(p)&&(state.usuarios||[]).some(u=>u.pessoa===p.id))];
     return `<div class="card"><h2 style="font-size:19px">${esc(FN[f].nome)}</h2><div class="linha-dep"><button class="pchip" data-a="donoSel" data-f="${f}" data-v="" aria-pressed="${!D[f]}">Automático</button>${ps.map(p=>`<button class="pchip" data-a="donoSel" data-f="${f}" data-v="${p.id}" aria-pressed="${D[f]===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div></div>`}).join('')}`}
 /* Sininho de avisos: sempre no canto de cima, à direita. Abre uma janelinha com os avisos. */
 function sino(){const u=usuarioAtual();if(!u)return '';const n=avisos().length;return `${euBtn(u)}<button class="sino" data-a="sinoAbre" aria-expanded="${!!ui.sino}" aria-label="${n?n+(n>1?' avisos novos':' aviso novo'):'Avisos'}" title="Avisos">${ic('i-sino')}${n?`<em>${n>9?'9+':n}</em>`:''}</button>`}
@@ -1663,7 +1671,7 @@ function listaPedidos(){const f=ui.pf||{},q=(f.q||'').trim().toLowerCase(),qd=so
   const dir=f.inv?-1:1,o=f.ord||'urg';
   ls.sort((a,b)=>dir*(o==='entrega'?a.p.entrega-b.p.entrega:o==='emissao'?b.p.chegada-a.p.chegada:a.i.score-b.i.score));
   if(!ls.length)return `<div class="vazio-box">${ic('i-lupa')}<b>Nenhum pedido encontrado</b><span>Mude o filtro ou a busca.</span></div>`;
-  return `<div class="peds">${ls.map(({p,i})=>{const falta=[];if(!p.vias)falta.push('vias');if(!p.arte)falta.push('arte');if(p.materiais.some(m=>m.st==='comprar'||m.st==='pedido'))falta.push('material');
+  return `<div class="peds">${ls.map(({p,i})=>{const falta=[];if(!viasOk(p))falta.push('vias');if(!arteAprovada(p))falta.push('arte');if(p.materiais.some(m=>m.st==='comprar'||m.st==='pedido'))falta.push('material');
     const fora=i.ls.some(loteFora);
     return `<button class="ped" data-a="pedido" data-id="${p.id}"><div class="ped-st u-${i.u}"><span class="dot"></span>${ULAB[i.u]}</div>
       <h3>${esc(p.cliente)}</h3>${p.contato||p.cnpj?`<div class="ped-ent" style="font-size:16px;color:var(--muted)">${esc(p.contato)}${p.contato&&p.cnpj?' · ':''}${p.cnpj?`<span style="white-space:nowrap">CNPJ ${esc(p.cnpj)}</span>`:''}</div>`:''}
@@ -1727,7 +1735,7 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     <div class="lib ${lib?'u-ok':'u-warn'}">${ic(lib?'i-check':'i-cadeado')}${lib?'Pode cortar':'Ainda não pode cortar'}</div></div>
   ${envs.length?`<div class="card"><h2>Arte para quem aplica</h2><p style="margin:0 0 6px;color:var(--ink2)">Cada personalização só começa quando a arte chegou em quem aplica.</p>${(()=>{const L=arqsDoPedido(ped);return L.length?`<button class="mbtn neutro2" data-a="arqsPed" data-id="${id}" style="margin:4px 0 8px">${ic('i-lista')}Baixar todos os arquivos (${L.length})</button>`:''})()}
     ${envs.map(e=>{const fo=isExt(e.z)?fornEtapa(e.l,e.z):null;const r=resp('arteEnv',{l:e.l.id,s:e.z.id});return `<div class="mat">${ic(tipo(e.z.posto).i)}<div><b>${esc(e.z.nome)} · ${esc(prod(e.l.prod).nome)} ${esc(e.l.cor)}</b><span>Para ${esc(fo?fo.nome:tipo(e.z.posto).nome)}${!e.ok&&r?' · '+esc(r):''}${(e.l.pers||[]).find(x=>x.id===e.z.id)?.desc?`<br>Arte: ${esc((e.l.pers||[]).find(x=>x.id===e.z.id).desc)}`:''}${(()=>{const x=(e.l.pers||[]).find(x=>x.id===e.z.id);if(!x)return '';const tm=tamTxt(x);return `<label class="tam-in">Posição: <select class="campo" data-pos="${e.l.id}|${x.id}"><option value="">${esc(x.parte==='Mangas'?(LADOS[x.lado]||'Mangas'):x.parte)} (sem detalhe)</option>${[...new Set([...posDe(x.parte),...(x.pos?[x.pos]:[])])].map(v=>`<option ${x.pos===v?'selected':''}>${esc(v)}</option>`).join('')}</select></label><label class="tam-in">Tamanho: <input class="campo" data-tam="${e.l.id}|${x.id}" value="${esc(x.tam||'')}" placeholder="${esc(tm?tm.t:'ex.: 8 × 8 cm')}"></label>${pzArquivos(e.l,x)}`})()}</span></div>
-      ${e.ok?`<span class="pill u-ok">${ic('i-check')}Enviada</span>`:`<button class="mbtn" data-a="arteEnv" data-id="${id}" data-l="${e.l.id}" data-s="${e.z.id}" ${ped.arte?'':'disabled style="opacity:.4"'}>Enviei</button>`}</div>`}).join('')}</div>`:''}`}
+      ${e.ok?`<span class="pill u-ok">${ic('i-check')}Enviada</span>`:`<button class="mbtn" data-a="arteEnv" data-id="${id}" data-l="${e.l.id}" data-s="${e.z.id}" ${arteAprovada(ped)?'':'disabled style="opacity:.4"'}>Enviei</button>`}</div>`}).join('')}</div>`:''}`}
   <div class="card"><h2>Peças e etapas</h2>${legendaStatus()}${i.ls.filter(l=>!l.rework).map(l=>prodLine(l,ped)+i.ls.filter(r=>r.parent===l.id&&!loteDone(r)).map(r=>prodLine(r,ped)).join('')).join('')}</div>`}
 /* Barra de etapas da peça: um item por setor; setor marcado "por máquina" mostra cada máquina (ex.: Arremate e Embalagem). */
 const ETAPAS_DE=()=>SETORES().flatMap(g=>g.porMaquina?state.tipos.filter(t=>t.grupo===g.id&&!t.externo).map(t=>({nome:t.curto||t.nome,i:t.i,t:[t.id]})):[{nome:g.nome,i:g.i,g:[g.id]}]);
@@ -1762,8 +1770,11 @@ function rotaV(l,ped){const R=rp(l);if(l.rework)return R;const c0=R.steps[0];
   const vs=[V('v_vias','Separar vias','i-vias',[],'vias'),V('v_prep','Preparar arte','i-arte',[],'arte_prep'),V('v_aprov','Aprovar arte','i-arte',['v_prep'],'arte_aprov'),V('v_mat','Material','i-carrinho',[],'comprar')];
   const envs=R.steps.filter(z=>z.pers).map(z=>V('v_env_'+z.id,'Enviar arte','i-arte',['v_aprov'],'arte_env'));
   const fim=R.steps.filter(z=>!R.steps.some(x=>x.deps.includes(z.id))).map(z=>z.id);
-  const steps=R.steps.map(z=>z===c0?{...z,deps:[...z.deps,'v_vias','v_aprov','v_mat']}:z.pers?{...z,deps:[...z.deps,'v_env_'+z.id]}:z);
-  return{...R,steps:[...vs,...envs,...steps,V('v_ent','Entregar ao cliente','i-caminhao',fim,'entregar')]}}
+  /* etapas desligadas do escritório não aparecem; o corte só espera o que libera o corte */
+  const on=v=>escOn(v.f)||(v.id==='v_mat'&&escOn('conferir'));const vsOn=vs.filter(on).map(v=>({...v,deps:v.deps.filter(d=>vs.some(x=>x.id===d&&on(x)))})),envOn=envs.filter(on).map(v=>({...v,deps:v.deps.filter(d=>vsOn.some(x=>x.id===d))}));
+  const tem=id=>vsOn.some(v=>v.id===id),pre=[libCom('vias')&&tem('v_vias')&&'v_vias',libCom('arte')&&tem('v_aprov')&&'v_aprov',libCom('insumos')&&tem('v_mat')&&'v_mat'].filter(Boolean);
+  const steps=R.steps.map(z=>z===c0?{...z,deps:[...z.deps,...pre]}:z.pers&&envOn.some(v=>v.id==='v_env_'+z.id)?{...z,deps:[...z.deps,'v_env_'+z.id]}:z);
+  return{...R,steps:[...vsOn,...envOn,...steps,...(escOn('entregar')?[V('v_ent','Entregar ao cliente','i-caminhao',fim,'entregar')]:[])]}}
 function vDone(l,ped,id){if(id==='v_vias')return!!ped.vias;if(id==='v_prep')return!!ped.artePrep;if(id==='v_aprov')return!!ped.arte;
   if(id==='v_mat')return ped.materiais.every(m=>m.st==='ok'||m.st==='recebido');if(id==='v_ent')return!!ped.concluido;
   if(id.startsWith('v_env_'))return arteOk(ped,l,{id:id.slice(6)});return done(l,id)}
@@ -1869,7 +1880,7 @@ const campoN=(lab,attr,val,suf)=>`<label class="aj-row"><span>${lab}</span><span
 function cAjustes(){const pr=state.params;
   return `${state.pedidos.some(ehExemplo)?`<div class="card" style="border-color:var(--atn)"><h2>Pedidos de exemplo</h2><p style="margin:0 0 12px;color:var(--ink2)">Antes de começar com dados reais, apague os ${state.pedidos.filter(ehExemplo).length} pedidos de exemplo (e as empresas de exemplo). Pedidos reais, como os importados de fichas, continuam. Máquinas, equipe, produtos e estoque continuam.</p>
     ${ui.apagaEx?`<div class="aviso">${ic('i-alerta')}Isso apaga só os pedidos de exemplo, em todos os aparelhos. Antes, uma cópia de segurança é guardada. Tem certeza?</div><div class="acoes"><button class="big" style="background:var(--red);color:#fff" data-a="apagaEx" data-ok="1">Sim, apagar</button><button class="big neutro" data-a="apagaExN">Não</button></div>`:`<button class="mbtn" data-a="apagaEx">Apagar pedidos de exemplo</button>`}</div>`:''}
-  ${cardAcessos()}${cardAvisos()}${cardSeguranca()}${cardModelo()}<div class="card"><h2>Este aparelho</h2><div class="aj-row"><span>Conectado como: <b>${esc(usuarioAtual()?.nome||'')}</b><br><small class="lido">${esc(usuarioAtual()?.email||'')}</small></span><button class="mbtn" data-a="sair">Sair</button></div>
+  ${cardAcessos()}${cardAvisos()}${cardSeguranca()}${cardEscritorio()}${cardModelo()}<div class="card"><h2>Este aparelho</h2><div class="aj-row"><span>Conectado como: <b>${esc(usuarioAtual()?.nome||'')}</b><br><small class="lido">${esc(usuarioAtual()?.email||'')}</small></span><button class="mbtn" data-a="sair">Sair</button></div>
     <div class="aj-row"><span>Dúvidas sobre o app</span><button class="mbtn" data-a="ajuda">${ic('i-duvida')}Como usar</button></div></div>
   <div class="card"><h2>Onde ficam os dados</h2><p style="margin:0;color:var(--ink2)">${NV.modo==='nuvem'?'Na nuvem: todos os aparelhos veem as mesmas informações ao mesmo tempo.':'Só neste aparelho. Abra pelo link do sistema para usar a nuvem.'}</p></div>
   <div class="card"><h2>Sua empresa nos documentos</h2><p class="dica" style="margin:-4px 0 8px">Aparece no Pedido enviado ao cliente e nas fichas.</p>
@@ -2310,6 +2321,7 @@ const FAQ=[
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
 {c:'maq',q:'Como crio um setor novo, como lavanderia ou passadoria?',k:'setor novo criar lavanderia passadoria acabamento renomear ordem função setores',r:['Cadastros › Máquinas › Setores da fábrica: escreva o nome e toque em Adicionar setor.','Escolha a função do setor: abre o lote (corte), personalização, montagem/costura ou acabamento.','Depois, nas máquinas desse setor, toque em ✎ editar e escolha o setor novo.','Use ↑ e ↓ para pôr na ordem do caminho da peça.'],ir:'cad:maquinas#Setores da fábrica',g:1},
+{c:'cad',q:'Esta fábrica não faz arte (ou vias). Como tiro essa etapa?',k:'desligar etapa escritório arte vias conferir comprar liberar corte começar sem arte personalização',r:['Cadastros › Ajustes › Etapas do escritório: toque na etapa para desligar. Ela some das tarefas e conta como feita.','Logo abaixo, escolha o que precisa estar pronto para o corte começar: vias, arte aprovada e insumos.'],ir:'cad:ajustes#Etapas do escritório',g:1},
 {c:'cad',q:'Como levo as máquinas e os produtos desta fábrica para outra?',k:'modelo fábrica configuração copiar outra confecção começar máquinas produtos exportar importar',r:['Cadastros › Ajustes › Modelo de fábrica: Baixar o modelo desta fábrica.','O modelo leva máquinas, produtos, tamanhos, cores, tecidos, horário e prazos. Não leva pedidos, empresas, equipe, fornecedores, estoque nem acessos.','Na outra fábrica, enquanto não há pedidos de verdade: Começar com um modelo.'],ir:'cad:ajustes#Modelo de fábrica',g:1},
 {c:'cad',q:'Como faço uma cópia de segurança? E como recupero?',k:'cópia segurança backup recuperar restaurar lixeira apagado',r:['O app já faz uma cópia sozinho todo dia (guarda 14 dias).','Cadastros › Ajustes › Cópias de segurança: Fazer uma cópia agora ou Baixar cópia em arquivo.','Para recuperar algo apagado: Ver cópias e lixeira.'],ir:'cad:ajustes#Cópias de segurança',g:1},
 {c:'cad',q:'Como mudo o horário da fábrica, as pausas e os dias?',k:'horário expediente pausa almoço dias sábado entrada saída',r:['Cadastros › Ajustes › Horário da fábrica.','Mude Começa, Para, as pausas e os dias de trabalho. Salva sozinho.'],ir:'cad:ajustes#Horário da fábrica',g:1},
@@ -2980,7 +2992,7 @@ async function restaurar(obj){if(!obj||!Array.isArray(obj.pedidos)||!Array.isArr
   const {_app,_ts,...st}=obj;snap();state=normalizar(st);RC={};save();render();tick()}
 async function sSeg(){}
 /* Modelo de fábrica: a configuração sem os dados do dia a dia. Serve para começar outra confecção a partir desta. */
-const MODELO_CFG=['setores','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
+const MODELO_CFG=['setores','escOff','liberaCom','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
 function modeloFabrica(){const c=x=>JSON.parse(JSON.stringify(x??null));const cfg={};MODELO_CFG.forEach(k=>{if(state[k]!=null)cfg[k]=c(state[k])});
   cfg.feriados={local:state.feriados?.local||FER0().local,facult:c(state.feriados?.facult||{}),extras:[],trabalha:[]};
   return {_modelo:1,_ts:now(),nome:marca().nome||'',tipos:c(state.tipos),produtos:c(state.produtos),cfg}}
@@ -2990,6 +3002,12 @@ async function aplicarModelo(m){if(!m||m._modelo!==1||!Array.isArray(m.tipos)||!
   const c=x=>JSON.parse(JSON.stringify(x));state.tipos=c(m.tipos);state.produtos=c(m.produtos);MODELO_CFG.forEach(k=>{if(m.cfg[k]!=null)state[k]=c(m.cfg[k])});if(m.cfg.feriados)state.feriados=c(m.cfg.feriados);
   state.pedidos=[];state.lotes=[];state.consertos=[];state.log=[];state.atrib={};state.reservas={};state.estoque={};state.pessoas=[];state.forn=[];state.donos={};state.clientes=[];state.exemplo=false;
   state=normalizar(state);RC={};commit()}
+function cardEscritorio(){if(!ehGestao())return '';
+  return `<div class="card" id="Escritorio"><h2>Etapas do escritório</h2><p class="dica" style="margin:-4px 0 8px">Desligue o que esta fábrica não faz. Etapa desligada não vira tarefa e conta como feita.</p>
+  <div class="linha-dep">${FUNCOES.map(f=>`<button class="depc" data-a="escLiga" data-f="${f.id}" aria-pressed="${escOn(f.id)}">${ic(f.i)}${esc(f.nome)}</button>`).join('')}</div>
+  <div class="rotulo" style="margin-top:14px">O corte só começa quando estiver pronto:</div>
+  <div class="linha-dep">${LIBERA.map(([k,n])=>`<button class="depc" data-a="libCom" data-v="${k}" aria-pressed="${libCom(k)}">${esc(n)}</button>`).join('')}</div>
+  ${LIBERA.every(([k])=>!libCom(k))?'<p class="dica" style="margin:8px 0 0">Sem nada marcado, o corte começa assim que o pedido entra.</p>':''}</div>`}
 function cardModelo(){if(!ehGestao())return '';const pode=!temPedidoReal();return `<div class="card" id="Modelo"><h2>Modelo de fábrica</h2>
   <p class="dica" style="margin:-4px 0 8px">O modelo leva máquinas, produtos com as etapas, tamanhos, cores, tecidos, posições, horário e prazos. <b>Não leva</b> pedidos, empresas, equipe, fornecedores, estoque nem acessos.</p>
   <div class="linha-dep"><button class="mbtn neutro2" data-a="modBaixar">${ic('i-lista')}Baixar o modelo desta fábrica</button>
@@ -3301,6 +3319,8 @@ const A={
   setPorMaq:d=>{snap();state.setores=SETORES().map(g=>g.id===d.g?{...g,porMaquina:!g.porMaquina}:{...g});commit()},
   setMov:d=>{const S=SETORES().map(g=>({...g})),i=S.findIndex(g=>g.id===d.g),j=i+(+d.d);if(i<0||j<0||j>=S.length)return;[S[i],S[j]]=[S[j],S[i]];snap();state.setores=S;commit()},
   setRm:d=>{if(state.tipos.some(t=>t.grupo===d.g))return toast('Esse setor ainda tem máquinas');if(SETORES().length<2)return;snap();state.setores=SETORES().filter(g=>g.id!==d.g).map(g=>({...g}));commit()},
+  escLiga:d=>{snap();const o=new Set(state.escOff||[]);o.has(d.f)?o.delete(d.f):o.add(d.f);state.escOff=[...o];RC={};commit();toast(`${FN[d.f].nome}: ${o.has(d.f)?'desligada':'ligada'}`)},
+  libCom:d=>{snap();const L=new Set(state.liberaCom||LIBERA.map(x=>x[0]));L.has(d.v)?L.delete(d.v):L.add(d.v);state.liberaCom=LIBERA.map(x=>x[0]).filter(k=>L.has(k));RC={};commit()},
   modAplicar:async()=>{const m=ui.modPend;ui.modPend=null;try{await aplicarModelo(m);toast('Modelo aplicado. Agora cadastre a equipe e os fornecedores.',false)}catch(e){render();toast(e.message==='tem pedidos'?'Já há pedidos de verdade: o modelo não foi aplicado':'Esse arquivo não é um modelo de fábrica',false)}},
   modCancelar:()=>{ui.modPend=null;render()},
   modBaixar:async()=>{const n=`${semAc(marca().nome||'fabrica').replace(/[^a-z0-9]+/gi,'-')} - modelo de fabrica ${hojeISO()}.json`;await baixarBlob(n,new Blob([JSON.stringify(modeloFabrica())],{type:'application/json'}))},
