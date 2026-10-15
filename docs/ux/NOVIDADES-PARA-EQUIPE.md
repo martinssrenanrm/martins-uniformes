@@ -348,3 +348,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Nada sumiu e nenhum botão mudou de lugar dentro dos blocos.**
 
 **Para mandar no grupo:** "No pedido, alguns blocos agora abrem e fecham. Toque no título para ver."
+
+---
+
+## Onda 5b: a tela da máquina ficou mais simples
+
+- À vista ficam só o trabalho, quem vai fazer e os botões **Começar** ou **Terminou** / **Deu problema**.
+- **Reservar, Pausar, Dividir e as outras opções** ficam no bloco **"Mais opções"**, logo abaixo. Toque nele para abrir.
+
+**Para mandar no grupo:** "Na máquina, Pausar, Dividir e Reservar agora ficam em Mais opções."

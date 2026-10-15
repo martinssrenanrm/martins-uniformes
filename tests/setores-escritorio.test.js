@@ -104,5 +104,11 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
   const antes=r.bl.find(x=>x[0]==='antes'),pecas=r.bl.find(x=>x[0]==='pecas');
   ok(antes&&antes[1]===!r.lib,'"Antes de cortar" abre sozinho só quando falta liberar');ok(pecas&&pecas[1],'"Peças e etapas" vem aberto');
   ok(!r.mapa0&&r.mapa1,'mapa de processos só aparece ao tocar em "Ver mapa de processos"');
+  console.log('13) Onda 5b: tela da máquina');
+  r=await A.evaluate(()=>{const P=plano();const livre=Object.keys(P.plan)[0];ui.blk={};ui.sheet={t:'maq',m:livre};render();
+    const vis=sel=>{const e=document.querySelector(sel);return !!e&&e.offsetParent!==null};
+    const a={comecar:vis('#sheet [data-a=comecar]'),reservar:vis('#sheet [data-a=mRes]'),mais:!!document.querySelector('#sheet details.blk[data-blk^=maqmais]:not([open])')};
+    ui.blk['maqmais'+livre]=true;render();a.reservar2=vis('#sheet [data-a=mRes]');ui.sheet=null;render();return a});
+  ok(r.comecar&&!r.reservar&&r.mais,'à vista só o essencial; Reservar fica em Mais opções');ok(r.reservar2,'abrindo Mais opções, Reservar aparece');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();
