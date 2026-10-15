@@ -644,6 +644,7 @@ svg.prod.mock{cursor:zoom-in}
 .junto-i{display:grid;gap:2px;text-align:left;width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1.5px solid var(--line,#cfd6df);border-radius:10px;background:var(--bg,#f4f6f9);color:inherit;cursor:pointer}.junto-i em{font-style:normal;font-weight:700;font-size:15px}.junto-i em.ok{color:var(--ok,#1d7a4a)}.junto-i em.esp{color:var(--atn-ink,#a35a00)}
 .ins-ref{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:10px;background:#fff;border:1.5px solid var(--line,#cfd6df);font-size:17px;line-height:1.35}.ins-ref svg{flex:none;width:22px;height:22px;margin-top:2px}.ins-ref-t{display:grid;gap:2px;min-width:0}.ins-ref-a{font-size:19px}.ins-ref strong{font-weight:800}.ins-ref small{font-size:15px;opacity:.85}
 .gen{display:inline-block;font-size:14px;font-weight:800;letter-spacing:.06em;padding:3px 10px;border-radius:6px;border:2px solid;margin-left:8px;vertical-align:middle}.gen-F{color:#A3266B;border-color:#A3266B;background:#FBE7F1}.gen-M{color:#1F4F8F;border-color:#1F4F8F;background:#E4EEFB}
+.set-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.set-row .set-t{display:flex;align-items:center;gap:10px;flex:1 1 100%;font-size:19px}.set-row .set-t .campo{flex:1;min-width:0}.set-row .sel{flex:1 1 100%;max-width:none}.set-row>.campo{flex:1 1 100%}
 .add-peca{background:var(--bg);border-style:dashed}.sel{appearance:auto;-webkit-appearance:menulist;min-height:52px;font-size:18px;background:#fff;max-width:420px;cursor:pointer}.sel-l{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sel-l .cbol{width:30px;height:30px;flex:none}
 .fp-bol{display:inline-block;width:26px;height:26px;border-radius:50%;border:2px solid #000;vertical-align:-4px;margin-right:8px}
 .fp-obs{min-height:34px;font-size:18px;background:repeating-linear-gradient(transparent 0 26px,#999 26px 27px)}
@@ -956,6 +957,12 @@ const uid=p=>p+Date.now().toString(36)+Math.floor(Math.random()*1e3);
 
 /* ================= cadastros iniciais (conforme conversa com a Martins) ================= */
 const GRUPOS=[{id:'corte',nome:'Corte',i:'i-corte'},{id:'pers',nome:'Personalização',i:'i-estampa'},{id:'costura',nome:'Costura',i:'i-maquina'},{id:'acab',nome:'Acabamento',i:'i-caixa'}];
+/* Setores são cadastráveis (state.setores). Cada setor tem uma FUNÇÃO fixa, que é o que o motor entende:
+   corte = abre o lote · pers = personalização · costura = montagem · acab = acabamento/fecha a peça. */
+const FASES_SETOR=[['corte','Abre o lote (corte)'],['pers','Personalização'],['costura','Montagem / costura'],['acab','Acabamento (fecha a peça)']];
+const SETORES=()=>(typeof state!=='undefined'&&state&&Array.isArray(state.setores)&&state.setores.length)?state.setores:GRUPOS.map(g=>({...g,fase:g.id}));
+const faseG=g=>(SETORES().find(x=>x.id===g)||{}).fase||g;
+const faseT=id=>faseG(tipo(id).grupo);
 const TIPOS0=[
   {id:'corte',nome:'Mesa de corte',curto:'Corte',grupo:'corte',i:'i-corte',qtd:1},
   {id:'sublimacao',nome:'Mesa de sublimação',curto:'Sublimação',grupo:'pers',i:'i-estampa',qtd:1,min:0.9},
@@ -1221,7 +1228,7 @@ const persDe=(l,s)=>(l?.pers||[]).find(q=>q.id===s.id);
 const fornEtapa=(l,s)=>{const x=persDe(l,s),f=x&&x.forn&&fornById(x.forn);return f&&f.servico===s.posto?f:fornDe(s.posto)[0]};
 /* tipos com o mesmo nome (ex.: Estampa terceirizada e Estampa aqui na fábrica) */
 const FAMILIA_PERS=[['estampa','estamparia']];
-const tiposIrmaos=tid=>{const t0=tipo(tid);if(!t0)return [];const fam=(FAMILIA_PERS.find(f=>f.includes(tid))||[]);return state.tipos.filter(t=>t.grupo==='pers'&&(t.id===tid||fam.includes(t.id)||semAc(t.nome)===semAc(t0.nome)))};
+const tiposIrmaos=tid=>{const t0=tipo(tid);if(!t0)return [];const fam=(FAMILIA_PERS.find(f=>f.includes(tid))||[]);return state.tipos.filter(t=>faseG(t.grupo)==='pers'&&(t.id===tid||fam.includes(t.id)||semAc(t.nome)===semAc(t0.nome)))};
 const isExt=s=>!!tipo(s.posto).externo;
 function unidades(){return state.tipos.filter(t=>!t.externo).flatMap(t=>Array.from({length:t.qtd||0},(_,k)=>({id:`${t.id}-${k+1}`,tipo:t.id,nome:t.qtd>1?`${t.nome} ${k+1}`:t.nome})))}
 const unidade=id=>unidades().find(u=>u.id===id);
@@ -1423,7 +1430,7 @@ function carimbaInsumos(){const T=now();
 /* Esteira da produção (pedido de 10/2026): cada fase guarda 3 marcos no pedido.
    lib = liberada (a fase anterior terminou) · ini = alguém começou · fim = terminou. Fila = ini - lib; trabalho = fim - ini. */
 const FASES=[['desp','Despacho para produção','Do fechamento com o cliente até o pedido entrar no sistema','#6C7A89'],['ins','Insumos e compras','Do pedido no sistema até todos os insumos estarem na fábrica','#B7791F'],['corte','Corte','Dos insumos prontos até as peças cortadas','#2B6CB0'],['pers','Personalização','Das peças cortadas até voltarem personalizadas','#9F3A8A'],['cost','Costura','De tudo liberado (corte e personalização) até o fim da costura','#2F855A'],['emb','Embalagem','Da peça costurada até embalada','#C05621']];
-function marcosAgora(p){const ls=lotesDe(p.id).filter(l=>!l.rework);const grp=s=>s.pers?'pers':(tipo(s.posto)?.grupo||'');
+function marcosAgora(p){const ls=lotesDe(p.id).filter(l=>!l.rework);const grp=s=>s.pers?'pers':faseT(s.posto);
   const G=g=>{let ini=0,fim=0,tem=false,todo=true;for(const l of ls){for(const s of rp(l).steps.filter(s=>grp(s)===g)){tem=true;const x=stOf(l,s.id);if(x.herdado)continue;const i=x.ini||x.saiu||(x.partes||[]).map(q=>q.ini||0).filter(Boolean).sort((a,b)=>a-b)[0]||0;if(i&&(!ini||i<ini))ini=i;if(x.st!=='ok')todo=false;else fim=Math.max(fim,x.fim||0)}}return {tem,ini:ini||null,fim:tem&&todo?(fim||null):null}};
   const real=p.criado&&!p.criado.antigo&&p.fonte!=='trello'?p.criado.ts:null;const M=p.materiais||[];const conf=M.map(m=>tv(m.tConf)).filter(Boolean).sort((a,b)=>a-b)[0]||null;
   const C=G('corte'),PZ=G('pers'),CO=G('costura'),EM=G('acab');const pers=PZ.tem;
@@ -1466,7 +1473,8 @@ const MIGRACOES=[
   {v:7,nome:'Almoço no expediente',fn:s=>{if(s.expediente&&!s.expediente.v2){if(!s.expediente.pausas.some(p=>hm(p.h)>=hm('11:00')&&hm(p.h)<=hm('13:00')))s.expediente.pausas.push({nome:'Almoço',h:'12:00',min:60});s.expediente.pausas.sort((a,b)=>hm(a.h)-hm(b.h));s.expediente.v2=true}}},
   {v:8,nome:'Cores padrão (uma vez)',fn:s=>{if(!s.coresV){s.cores={...CORES,...(s.cores||{})};s.coresV=1}}},
   {v:9,nome:'Gola comprada pronta (uma vez)',fn:s=>{if(!s.golaV){(s.produtos||[]).forEach(ajustaGola);s.golaV=1}}},
-  {v:10,nome:'Datas dos insumos: o que já existia fica com data desconhecida',fn:s=>{if(!s.tsInsV){(s.pedidos||[]).forEach(p=>{const M=p.materiais||[];M.forEach(m=>{if(m.conf&&!m.tConf)m.tConf=-1;if(m.st==='comprar'&&!m.tFalta)m.tFalta=-1;if(m.st==='pedido'&&!m.tComprado)m.tComprado=-1;if(m.st==='recebido'&&!m.tChegou)m.tChegou=-1});if(M.length&&M.every(m=>m.tConf===-1&&(m.st==='ok'||m.st==='recebido')))p.insOk=-1});s.tsInsV=1}}}
+  {v:10,nome:'Datas dos insumos: o que já existia fica com data desconhecida',fn:s=>{if(!s.tsInsV){(s.pedidos||[]).forEach(p=>{const M=p.materiais||[];M.forEach(m=>{if(m.conf&&!m.tConf)m.tConf=-1;if(m.st==='comprar'&&!m.tFalta)m.tFalta=-1;if(m.st==='pedido'&&!m.tComprado)m.tComprado=-1;if(m.st==='recebido'&&!m.tChegou)m.tChegou=-1});if(M.length&&M.every(m=>m.tConf===-1&&(m.st==='ok'||m.st==='recebido')))p.insOk=-1});s.tsInsV=1}}},
+  {v:11,nome:'Setores viram cadastro',fn:s=>{if(!Array.isArray(s.setores)||!s.setores.length)s.setores=GRUPOS.map(g=>({...g,fase:g.id,porMaquina:g.id==='acab'}))}}
 ];
 const SCHEMA=MIGRACOES[MIGRACOES.length-1].v;
 function migrar(s){const v0=s.schema||0;MIGRACOES.forEach(m=>{if(m.v>v0)m.fn(s)});s.schema=SCHEMA}
@@ -1546,7 +1554,7 @@ function chips(it){const r=[upill(it.inf.u)];if(it.l.rework)r.push(`<span class=
 /* Cortar junto (pedido de 10/2026): outras peças com o mesmo tecido e a mesma cor que ainda não foram cortadas, de qualquer pedido e qualquer prazo. */
 const chaveCorte=l=>semAc(l.tecido||'')+'|'+semAc(l.cor||'');
 function cortarJunto(l){if(!l||!l.tecido||!l.cor)return [];const k=chaveCorte(l);const PR=new Set(prontas().map(x=>x.l.id+'|'+x.s.id));
-  return (state.lotes||[]).filter(o=>o.id!==l.id&&!o.rework&&chaveCorte(o)===k).map(o=>{const ped=pedById(o.ped);if(!ped||ped.concluido||ped.cancelado)return null;const s=rp(o).steps.find(x=>x.posto==='corte');if(!s||stOf(o,s.id).st!=='pend')return null;return {l:o,ped,pronta:PR.has(o.id+'|'+s.id)}}).filter(Boolean).sort((a,b)=>(a.ped.entrega||0)-(b.ped.entrega||0))}
+  return (state.lotes||[]).filter(o=>o.id!==l.id&&!o.rework&&chaveCorte(o)===k).map(o=>{const ped=pedById(o.ped);if(!ped||ped.concluido||ped.cancelado)return null;const s=rp(o).steps.find(x=>faseT(x.posto)==='corte');if(!s||stOf(o,s.id).st!=='pend')return null;return {l:o,ped,pronta:PR.has(o.id+'|'+s.id)}}).filter(Boolean).sort((a,b)=>(a.ped.entrega||0)-(b.ped.entrega||0))}
 function juntoBox(l){const J=cortarJunto(l);if(!J.length)return '';const tot=sum(J.map(x=>qtdEf(x.l)));
   return `<div class="junto"><div class="junto-h">${ic('i-corte')}<div><b>Dá para cortar junto</b><div class="junto-s">Mais ${J.length} ${J.length===1?'peça':'peças'} em <strong>${esc(l.tecido)} ${esc(l.cor)}</strong> ainda sem corte · ${tot} unidades</div></div></div>
   ${J.map(x=>`<button class="junto-i" data-a="pedido" data-id="${esc(x.ped.id)}"><span><b>${esc(x.ped.cliente)}</b> · pedido ${esc(x.ped.id)}</span><span>${esc(nomePeca(x.l))}${GEN[x.l.gen]&&x.l.gen!=='U'?' '+GEN[x.l.gen].toLowerCase():''} · <b>${qtdEf(x.l)} ${qtdEf(x.l)===1?'peça':'peças'}</b> · entrega ${dataCurta(x.ped.entrega).slice(0,5)}</span><em class="${x.pronta?'ok':'esp'}">${x.pronta?'Liberada para cortar':'Ainda não liberada'}</em></button>`).join('')}</div>`}
@@ -1556,7 +1564,7 @@ function tarefaCard(it,sug){const q=qtdDe(it);
     <div class="desc" style="display:flex;align-items:center;gap:6px">${ic('i-relogio')}Tempo estimado ≈ ${esc(durEt(it.s,q))}</div>
     <div class="desc">${esc(it.p.nome)} · ${esc(modeloTxt(it.l))}</div>
     <div class="desc" style="display:flex;align-items:center;gap:6px;font-weight:700;color:var(--ink)">${ic('i-predio')}${esc(it.ped.cliente)}</div>
-    <div class="para">${chips(it)}</div></div></div>${it.s.obs?`<div class="instr">${ic('i-etiqueta')}<span>${esc(it.s.obs)}</span></div>`:''}${it.s.posto==='corte'&&!it.l.rework?juntoBox(it.l):''}`}
+    <div class="para">${chips(it)}</div></div></div>${it.s.obs?`<div class="instr">${ic('i-etiqueta')}<span>${esc(it.s.obs)}</span></div>`:''}${faseT(it.s.posto)==='corte'&&!it.l.rework?juntoBox(it.l):''}`}
 const estrela=(p,it)=>(p.melhor.includes(it.s.nome)||p.melhor.includes(it.s.posto))?`<span class="estrela" title="Faz melhor">★</span>`:'';
 
 /* ================= FÁBRICA ================= */
@@ -1572,7 +1580,7 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
   <div class="zonas" role="tablist">${zonas.map(([k,n,i,c])=>`<button class="zona" role="tab" data-a="fz" data-v="${k}" aria-pressed="${z===k}">${ic(i)}<span>${n}</span>${c?`<em>${c}</em>`:''}</button>`).join('')}</div>
   ${z==='maq'?`<div class="agora"><span><b>${nIni}</b> para começar</span><span><b>${nTrab}</b> trabalhando</span></div>
   ${livres.length?`<div class="livres"><span class="t">Livres:</span>${livres.map(p=>`<span class="pl-p">${av(p.id,'s')}${esc(p.nome)}</span>`).join('')}</div>`:''}
-  ${GRUPOS.map(g=>{const ts=state.tipos.filter(t=>t.grupo===g.id&&!t.externo&&t.qtd>0);if(!ts.length)return '';
+  ${SETORES().map(g=>{const ts=state.tipos.filter(t=>t.grupo===g.id&&!t.externo&&t.qtd>0);if(!ts.length)return '';
     const us=P.us.filter(u=>ts.some(t=>t.id===u.tipo));
     const ativo=u=>P.uso[u.id]||P.plan[u.id]||ehSemp(u,P);
     const on=us.filter(ativo),off=us.filter(u=>!ativo(u));const vistos=new Set();
@@ -1721,9 +1729,10 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     ${envs.map(e=>{const fo=isExt(e.z)?fornEtapa(e.l,e.z):null;const r=resp('arteEnv',{l:e.l.id,s:e.z.id});return `<div class="mat">${ic(tipo(e.z.posto).i)}<div><b>${esc(e.z.nome)} · ${esc(prod(e.l.prod).nome)} ${esc(e.l.cor)}</b><span>Para ${esc(fo?fo.nome:tipo(e.z.posto).nome)}${!e.ok&&r?' · '+esc(r):''}${(e.l.pers||[]).find(x=>x.id===e.z.id)?.desc?`<br>Arte: ${esc((e.l.pers||[]).find(x=>x.id===e.z.id).desc)}`:''}${(()=>{const x=(e.l.pers||[]).find(x=>x.id===e.z.id);if(!x)return '';const tm=tamTxt(x);return `<label class="tam-in">Posição: <select class="campo" data-pos="${e.l.id}|${x.id}"><option value="">${esc(x.parte==='Mangas'?(LADOS[x.lado]||'Mangas'):x.parte)} (sem detalhe)</option>${[...new Set([...posDe(x.parte),...(x.pos?[x.pos]:[])])].map(v=>`<option ${x.pos===v?'selected':''}>${esc(v)}</option>`).join('')}</select></label><label class="tam-in">Tamanho: <input class="campo" data-tam="${e.l.id}|${x.id}" value="${esc(x.tam||'')}" placeholder="${esc(tm?tm.t:'ex.: 8 × 8 cm')}"></label>${pzArquivos(e.l,x)}`})()}</span></div>
       ${e.ok?`<span class="pill u-ok">${ic('i-check')}Enviada</span>`:`<button class="mbtn" data-a="arteEnv" data-id="${id}" data-l="${e.l.id}" data-s="${e.z.id}" ${ped.arte?'':'disabled style="opacity:.4"'}>Enviei</button>`}</div>`}).join('')}</div>`:''}`}
   <div class="card"><h2>Peças e etapas</h2>${legendaStatus()}${i.ls.filter(l=>!l.rework).map(l=>prodLine(l,ped)+i.ls.filter(r=>r.parent===l.id&&!loteDone(r)).map(r=>prodLine(r,ped)).join('')).join('')}</div>`}
-const ETAPAS=[{nome:'Corte',i:'i-corte',g:['corte']},{nome:'Personalização',i:'i-estampa',g:['pers']},{nome:'Costura',i:'i-maquina',g:['costura']},{nome:'Arremate',i:'i-lupa',t:['arremate']},{nome:'Embalar',i:'i-caixa',t:['embalagem']}];
+/* Barra de etapas da peça: um item por setor; setor marcado "por máquina" mostra cada máquina (ex.: Arremate e Embalagem). */
+const ETAPAS_DE=()=>SETORES().flatMap(g=>g.porMaquina?state.tipos.filter(t=>t.grupo===g.id&&!t.externo).map(t=>({nome:t.curto||t.nome,i:t.i,t:[t.id]})):[{nome:g.nome,i:g.i,g:[g.id]}]);
 function prodLine(l,ped){const p=rp(l);
-  const et=ETAPAS.map(e=>{const ss=p.steps.filter(s=>e.t?e.t.includes(s.posto):e.g.includes(tipo(s.posto).grupo));if(!ss.length)return '';const n=ss.filter(s=>done(l,s.id)).length,and=ss.some(s=>stOf(l,s.id).st==='and'),fo=ss.some(s=>stOf(l,s.id).st==='fora');
+  const et=ETAPAS_DE().map(e=>{const ss=p.steps.filter(s=>e.t?e.t.includes(s.posto):e.g.includes(tipo(s.posto).grupo));if(!ss.length)return '';const n=ss.filter(s=>done(l,s.id)).length,and=ss.some(s=>stOf(l,s.id).st==='and'),fo=ss.some(s=>stOf(l,s.id).st==='fora');
     const c=n===ss.length?'ok':fo?'fora':(and||n>0)?'and':'';return `<div class="tp ${c}"><span class="tc">${ic(c==='ok'?'i-check':c==='fora'?'i-caminhao':e.i)}</span>${e.nome}${ss.length>1&&c!=='ok'?`<small>${n} de ${ss.length}</small>`:''}</div>`}).join('');
   const ands=p.steps.filter(s=>stOf(l,s.id).st==='and'),fo=p.steps.filter(s=>stOf(l,s.id).st==='fora');
   const agora=loteDone(l)?'Pronto':fo.length?`No fornecedor: ${fo.map(s=>s.nome).join(', ')}`:ands.length?'Agora: '+ands.map(s=>`${s.nome} (${pNome(stOf(l,s.id).op)})`).join(', '):!liberado(ped)?'Esperando liberar o corte':'Esperando a próxima máquina';
@@ -1807,8 +1816,17 @@ function legendaStatus(){return `<div class="legenda"><span><i style="background
 function vCadastros(){const tabs=[['maquinas','Máquinas','i-maquina'],['equipe','Equipe','i-pessoas'],['forn','Terceirizados','i-caminhao'],['produtos','Produtos','i-camisa'],['estoque','Estoque','i-rolo'],['ajustes','Ajustes','i-engr']];
   const body=ui.cad==='estoque'?cEstoque():ui.cad==='ajustes'?cAjustes():ui.cad==='equipe'?cEquipe():ui.cad==='forn'?cForn():ui.cad==='produtos'?cProdutos():cMaquinas();
   return `<div class="topo"><h1>Cadastros</h1>${sino()}</div><div class="subtabs">${tabs.map(([k,n,i])=>`<button class="subtab" data-a="cad" data-k="${k}" aria-current="${ui.cad===k?'page':'false'}">${ic(i)}${n}</button>`).join('')}</div>${body}`}
+function cardSetores(){const S=SETORES(),usa=g=>state.tipos.filter(t=>t.grupo===g).length,e=ui.setEd;
+  return `<div class="card" id="Setores"><h2>Setores da fábrica</h2><p class="dica" style="margin:-4px 0 8px">A ordem é a do caminho da peça. A função diz ao app o que o setor faz.</p>
+  ${S.map((g,k)=>`<div class="set-row"><span class="set-t"><span class="m-ic">${ic(g.i)}</span>${e===g.id?`<input class="campo" id="setRen" value="${esc(g.nome)}"><button class="x azul" data-a="setRenOk" data-g="${g.id}">Salvar</button>`:`<b>${esc(g.nome)}</b>`}</span>
+    ${selOp('setFase',`data-g="${g.id}"`,g.fase,FASES_SETOR,'Função do setor')}
+    <button class="depc" data-a="setPorMaq" data-g="${g.id}" aria-pressed="${!!g.porMaquina}" title="Na barra da peça, mostrar cada máquina deste setor">Cada máquina na barra</button>
+    <span class="linha-dep" style="margin:0">${k?`<button class="x azul" data-a="setMov" data-g="${g.id}" data-d="-1" aria-label="Subir ${esc(g.nome)}">↑</button>`:''}${k<S.length-1?`<button class="x azul" data-a="setMov" data-g="${g.id}" data-d="1" aria-label="Descer ${esc(g.nome)}">↓</button>`:''}
+    ${e===g.id?'':`<button class="x azul" data-a="setRen" data-g="${g.id}" aria-label="Mudar o nome de ${esc(g.nome)}">✎</button>`}${usa(g.id)?'':`<button class="x" data-a="setRm" data-g="${g.id}" aria-label="Tirar ${esc(g.nome)}">×</button>`}</span></div>`).join('')}
+  <div class="set-row"><input class="campo" id="setNovo" placeholder="Novo setor (ex.: Lavanderia)" autocomplete="off"><button class="mbtn" data-a="setAdd">${ic('i-mais')}Adicionar setor</button></div>
+  <p class="dica" style="margin:6px 0 0">Para tirar um setor, primeiro mude as máquinas dele para outro setor.</p></div>`}
 function cMaquinas(){const P=plano();return `<p style="margin:-6px 0 14px;color:var(--ink2)">Cada máquina é um posto de trabalho. Ajuste a quantidade com + e −.</p>
-  ${GRUPOS.map(g=>{const ts=state.tipos.filter(t=>t.grupo===g.id&&!t.externo);if(!ts.length)return '';return `<div class="tipo-h">${ic(g.i)}${g.nome}</div>${ts.map(t=>{const ap=aptos(t.id);
+  ${cardSetores()}${SETORES().map(g=>{const ts=state.tipos.filter(t=>t.grupo===g.id&&!t.externo);if(!ts.length)return '';return `<div class="tipo-h">${ic(g.i)}${g.nome}</div>${ts.map(t=>{const ap=aptos(t.id);
     return `<div class="cad-row"><span class="m-ic">${ic(t.i)}</span><div><button class="x azul" data-a="tipoEd" data-t="${t.id}" style="border:0;padding:0;background:none;font-size:20px;color:var(--ink);text-align:left">${esc(t.nome)} <span style="font-size:16px;color:var(--blue)">✎ editar</span></button><span style="display:block">${ap.length?'Sabem usar: '+ap.map(p=>esc(p.nome)+(p.melhor.includes(t.id)?' ★':'')).join(', '):'<b style="color:var(--red);display:inline">Ninguém cadastrado para usar</b>'}</span></div>
       <div class="qtdbox"><button class="stp" data-a="tQtd" data-t="${t.id}" data-d="-1" aria-label="Menos uma ${esc(t.nome)}">−</button><output>${t.qtd}</output><button class="stp" data-a="tQtd" data-t="${t.id}" data-d="1" aria-label="Mais uma ${esc(t.nome)}">+</button></div></div>`}).join('')}`}).join('')}
   <button class="prodc add" data-a="tipoEd" data-t="" style="width:100%;margin-top:6px">${ic('i-mais')}<b>Adicionar máquina ou mesa</b></button>`}
@@ -1817,10 +1835,10 @@ const ICN={'i-maquina':'Costura','i-botao':'Botão','i-corte':'Corte','i-estampa
 function sTipoEd(){const e=ui.sheet;const usoP=e.id?state.produtos.filter(p=>p.steps.some(z=>z.posto===e.id)).map(p=>p.nome):[];
   return `${voltar('Cancelar')}<h1>${e.id?(e.externo?'Editar serviço':'Editar máquina'):(e.externo?'Novo serviço terceirizado':'Nova máquina ou mesa')}</h1>
   <div class="rotulo">Nome</div><input class="campo" id="xNome" value="${esc(e.nome)}" placeholder="Ex.: Travete" autocomplete="off">
-  <div class="rotulo">Setor</div><div class="linha-dep">${GRUPOS.map(g=>`<button class="depc" data-a="tG" data-v="${g.id}" aria-pressed="${e.grupo===g.id}">${ic(g.i)}${esc(g.nome)}</button>`).join('')}</div>
+  <div class="rotulo">Setor</div><div class="linha-dep">${SETORES().map(g=>`<button class="depc" data-a="tG" data-v="${g.id}" aria-pressed="${e.grupo===g.id}">${ic(g.i)}${esc(g.nome)}</button>`).join('')}</div>
   <div class="rotulo">Desenho</div><div class="linha-dep">${ICONES.map(i=>`<button class="depc icn" data-a="tI" data-v="${i}" aria-pressed="${e.i===i}" title="${ICN[i]}">${ic(i)}<small>${ICN[i]}</small></button>`).join('')}</div>
   <div class="linha-dep" style="margin-top:14px"><button class="depc" data-a="tExt" aria-pressed="${!!e.externo}">${ic('i-caminhao')}Feito fora (terceirizado)</button></div>
-  ${e.grupo==='pers'?`<div class="rotulo">Tempo por peça na personalização</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tMin" data-d="-1" aria-label="Menos 5 segundos">−</button><output>${tMin(e.min)}</output><button class="stp" data-a="tMin" data-d="1" aria-label="Mais 5 segundos">+</button></div>`:''}
+  ${faseG(e.grupo)==='pers'?`<div class="rotulo">Tempo por peça na personalização</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tMin" data-d="-1" aria-label="Menos 5 segundos">−</button><output>${tMin(e.min)}</output><button class="stp" data-a="tMin" data-d="1" aria-label="Mais 5 segundos">+</button></div>`:''}
   ${e.externo&&!e.id?`<div class="rotulo">Quem faz esse serviço? (fornecedor)</div><input class="campo" id="xForn" value="${esc(e.forn||'')}" placeholder="Ex.: Junior Bordados" autocomplete="off">
     <div class="rotulo">Prazo do fornecedor (dias)</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tPrazo" data-d="-1" aria-label="Menos um dia">−</button><output>${e.prazo||3}</output><button class="stp" data-a="tPrazo" data-d="1" aria-label="Mais um dia">+</button></div>`:''}
   ${e.externo?'':`<div class="rotulo">Quantas existem?</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tQ" data-d="-1" aria-label="Menos uma">−</button><output>${e.qtd}</output><button class="stp" data-a="tQ" data-d="1" aria-label="Mais uma">+</button></div>`}
@@ -1961,7 +1979,7 @@ function sProduto(pid){const p=prod(pid);if(!p)return voltar();const key='P'+p.i
     <div class="novo-in"><input class="campo" id="avN" placeholder="Nome (ex.: Botão)" autocomplete="off"><input class="campo" id="avQ" type="number" step="0.1" min="0" value="1" aria-label="Quantidade por peça" style="max-width:110px"><select class="campo" id="avU" style="max-width:140px"><option value="un">unidades</option><option value="m">metros</option></select><button class="mbtn" data-a="addAv" data-p="${p.id}">Adicionar</button></div></div>
   <div class="card"><h2>Personalização padrão</h2><p class="dica" style="margin:0 0 10px">Já vem marcada no novo pedido. Em cada pedido dá para mudar.</p>
     <div class="linha-dep">${(p.persPadrao||[]).map((x,j)=>`<span class="depc">${ic(tipo(x.tipo).i)}${esc(tNome(x.tipo))} · ${esc(localTxt(x))}<button class="x" data-a="rmPp" data-p="${p.id}" data-j="${j}" aria-label="Tirar" style="padding:0 8px;margin-left:4px">×</button></span>`).join('')||'<span class="dica">Nenhuma</span>'}</div>
-    <div class="novo-in"><select class="campo" id="ppT">${state.tipos.filter(t=>t.grupo==='pers').map(t=>`<option value="${t.id}">${esc(tNome(t.id))}</option>`).join('')}</select><select class="campo" id="ppP">${(p.partes||[]).map(x=>`<option>${esc(x)}</option>`).join('')}</select><select class="campo" id="ppL"><option value="">Lado (se for manga)</option>${Object.entries(LADOS).map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select><input class="campo" id="ppPos" list="ppPosL" placeholder="Posição (ex.: Peito esquerdo)"><datalist id="ppPosL">${[...new Set((p.partes||[]).flatMap(posDe))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist><button class="mbtn" data-a="addPp" data-p="${p.id}">Adicionar</button></div></div>
+    <div class="novo-in"><select class="campo" id="ppT">${state.tipos.filter(t=>faseG(t.grupo)==='pers').map(t=>`<option value="${t.id}">${esc(tNome(t.id))}</option>`).join('')}</select><select class="campo" id="ppP">${(p.partes||[]).map(x=>`<option>${esc(x)}</option>`).join('')}</select><select class="campo" id="ppL"><option value="">Lado (se for manga)</option>${Object.entries(LADOS).map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select><input class="campo" id="ppPos" list="ppPosL" placeholder="Posição (ex.: Peito esquerdo)"><datalist id="ppPosL">${[...new Set((p.partes||[]).flatMap(posDe))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist><button class="mbtn" data-a="addPp" data-p="${p.id}">Adicionar</button></div></div>
   <div class="card"><h2>Modelos</h2><p class="dica" style="margin:0 0 10px">Um modelo acrescenta uma etapa ao roteiro (ex.: Com zíper).</p>
     ${(p.opcoes||[]).map((o,j)=>`<div class="mat">${ic('i-mais')}<div><b>${esc(o.nome)}</b><span>Acrescenta: ${o.steps.map(z=>`${esc(z.nome)} (${esc(tNome(z.posto))}, ${tMin(z.min)} por peça)`).join(', ')}</span></div><button class="x" data-a="rmOpc" data-p="${p.id}" data-j="${j}">Tirar</button></div>`).join('')||'<p class="dica">Nenhum modelo.</p>'}
     <div class="rotulo">Novo modelo</div>
@@ -2085,7 +2103,7 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
       <div><div class="passo-n">Personalização: o quê e onde</div><div class="linha-dep">${it.pers.map((x,j)=>`<span class="depc" aria-pressed="true">${ic(tipo(x.tipo).i)}${esc(tNome(x.tipo))} · ${esc(localTxt(x))}${tipo(x.tipo).externo?' <small style="font-weight:400">(fora)</small>':''}<button class="x" data-a="wPrm" data-k="${k}" data-j="${j}" aria-label="Tirar" style="padding:0 8px;margin-left:4px">×</button></span>`).join('')}
         <button class="depc" data-a="wPadd" data-k="${k}">${ic('i-mais')}Adicionar</button></div>
         ${!it.pers.length&&(prod(it.prod).persPadrao||[]).length?`<button class="sug" data-a="wPpad" data-k="${k}">Costuma ser <b>${prod(it.prod).persPadrao.map(x=>`${esc(tNome(x.tipo))} na ${esc(localTxt(x).toLowerCase())}`).join(' + ')}</b>. Toque para usar neste pedido</button>`:''}
-        ${it.novaP?`<div class="card" style="margin:10px 0 0;background:var(--bg)"><div class="passo-n">Qual personalização?</div>${selOp('wPt',`data-k="${k}"`,it.novaP.tipo,state.tipos.filter(t=>t.grupo==='pers').map(t=>[t.id,tNome(t.id)]),'Escolha o tipo')}
+        ${it.novaP?`<div class="card" style="margin:10px 0 0;background:var(--bg)"><div class="passo-n">Qual personalização?</div>${selOp('wPt',`data-k="${k}"`,it.novaP.tipo,state.tipos.filter(t=>faseG(t.grupo)==='pers').map(t=>[t.id,tNome(t.id)]),'Escolha o tipo')}
           <div class="passo-n" style="margin-top:12px">Em qual parte da peça?</div>${selOp('wPp',`data-k="${k}"`,it.novaP.parte,(prod(it.prod).partes||[]).map(pp=>[pp,pp]),'Escolha a parte')}
           ${it.novaP.parte==='Mangas'?`<div class="passo-n" style="margin-top:12px">Qual manga? <span style="font-weight:400">(lado de quem veste)</span></div><div class="linha-dep">${Object.entries(LADOS).map(([v,n])=>`<button class="depc" data-a="wPl" data-k="${k}" data-v="${v}" aria-pressed="${it.novaP.lado===v}">${n}</button>`).join('')}</div>`:''}
           ${it.novaP.parte&&(it.novaP.parte!=='Mangas'||it.novaP.lado)?`<div class="passo-n" style="margin-top:12px">Onde exatamente? <span style="font-weight:400">(esquerdo e direito = de quem veste)</span></div>${selOp('wPos',`data-k="${k}"`,null,posDe(it.novaP.parte).map(v=>[v,v]),'Escolha o lugar')}
@@ -2291,6 +2309,7 @@ const FAQ=[
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
+{c:'maq',q:'Como crio um setor novo, como lavanderia ou passadoria?',k:'setor novo criar lavanderia passadoria acabamento renomear ordem função setores',r:['Cadastros › Máquinas › Setores da fábrica: escreva o nome e toque em Adicionar setor.','Escolha a função do setor: abre o lote (corte), personalização, montagem/costura ou acabamento.','Depois, nas máquinas desse setor, toque em ✎ editar e escolha o setor novo.','Use ↑ e ↓ para pôr na ordem do caminho da peça.'],ir:'cad:maquinas#Setores da fábrica',g:1},
 {c:'cad',q:'Como levo as máquinas e os produtos desta fábrica para outra?',k:'modelo fábrica configuração copiar outra confecção começar máquinas produtos exportar importar',r:['Cadastros › Ajustes › Modelo de fábrica: Baixar o modelo desta fábrica.','O modelo leva máquinas, produtos, tamanhos, cores, tecidos, horário e prazos. Não leva pedidos, empresas, equipe, fornecedores, estoque nem acessos.','Na outra fábrica, enquanto não há pedidos de verdade: Começar com um modelo.'],ir:'cad:ajustes#Modelo de fábrica',g:1},
 {c:'cad',q:'Como faço uma cópia de segurança? E como recupero?',k:'cópia segurança backup recuperar restaurar lixeira apagado',r:['O app já faz uma cópia sozinho todo dia (guarda 14 dias).','Cadastros › Ajustes › Cópias de segurança: Fazer uma cópia agora ou Baixar cópia em arquivo.','Para recuperar algo apagado: Ver cópias e lixeira.'],ir:'cad:ajustes#Cópias de segurança',g:1},
 {c:'cad',q:'Como mudo o horário da fábrica, as pausas e os dias?',k:'horário expediente pausa almoço dias sábado entrada saída',r:['Cadastros › Ajustes › Horário da fábrica.','Mude Começa, Para, as pausas e os dias de trabalho. Salva sozinho.'],ir:'cad:ajustes#Horário da fábrica',g:1},
@@ -2515,7 +2534,7 @@ function montaItem(F,L){const txt=[F.modeloTxt,L.rot].filter(Boolean).join(' ');
   it.cor=F.corTxt?(casaExato(F.corTxt,Object.keys(state.cores))||(state.cores[state.apelidos.cor[semAc(F.corTxt)]]?state.apelidos.cor[semAc(F.corTxt)]:null)):null;
   if(!it.cor&&F.corTxt){const a=coresNoTexto(F.corTxt).achou;if(a.length&&a[0].i===0)it.cor=a[0].cor;else it.cor=casaParecido(F.corTxt,Object.keys(state.cores))}if(it.cor&&semAc(it.cor)!==semAc(F.corTxt))it.corAp=true;
   it.c2Txt=[F.corTxt,F.obsCorte].filter(Boolean).join(' . ');
-  const ext=state.tipos.filter(t=>t.externo||t.grupo==='pers');const tipoTxt=(F.persTxt||'').trim();const tipoOk=tipoTxt?(casaExato(tipoTxt,ext.map(t=>t.nome))||casaParecido(tipoTxt,ext.map(t=>t.nome))):null;const apS=state.apelidos.serv[semAc(tipoTxt)];const tId=tipoOk?ext.find(t=>t.nome===tipoOk).id:(apS&&tipo(apS)?apS:tipoNoTexto(tipoTxt,ext));
+  const ext=state.tipos.filter(t=>t.externo||faseG(t.grupo)==='pers');const tipoTxt=(F.persTxt||'').trim();const tipoOk=tipoTxt?(casaExato(tipoTxt,ext.map(t=>t.nome))||casaParecido(tipoTxt,ext.map(t=>t.nome))):null;const apS=state.apelidos.serv[semAc(tipoTxt)];const tId=tipoOk?ext.find(t=>t.nome===tipoOk).id:(apS&&tipo(apS)?apS:tipoNoTexto(tipoTxt,ext));
   it.pers=(F.locais||[]).map(x=>{const tl=tipoNoTexto(x.rot+' '+x.txt,ext);return {rot:x.rot,desc:x.txt,tipo:tl||tId,tipoTxt:tl?tipo(tl).nome:tipoTxt,parte:null,lado:null,sug:null,conf:false}});if(it.prod)ajustaItemProd(it);return it}
 function ajustaItemProd(it){const p=prod(it.prod);if(!p)return;
   {const tw=palavras([it.txt,it.obs,it.c2Txt].filter(Boolean).join(' '));it.opcoes=(p.opcoes||[]).filter(o=>{const ow=palavras(o.nome).filter(w=>!['com','sem','de','do','da','e'].includes(w));return ow.length&&ow.every(w=>tw.some(t=>t.startsWith(w.slice(0,5))))}).map(o=>o.id);it.opcAuto=it.opcoes.length>0}
@@ -2571,7 +2590,7 @@ function impPend(g){const P=[];if(!g.cliente.trim())P.push('empresa');else if(!g
     it.pers.forEach((x,j)=>{if(!x.tipo)P.push(`${n}: tipo da personalização ${j+1}`);if(!x.parte)P.push(`${n}: onde vai a personalização ${j+1}`)})});return P}
 const okTag=(ok,txt)=>ok?`<span class="imp-ok">${ic('i-check')}${txt||'Lido da ficha'}</span>`:`<span class="imp-q">${ic('i-alerta')}${txt||'Confirme'}</span>`;
 const titulo=x=>String(x||'').trim().split(/\s+/).map(w=>/^[A-Z]{1,2}$/.test(w)||/\d|%/.test(w)?w:w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
-function sImp(){const e=ui.sheet,g=e.grupos[e.gi];const pend=impPend(g),ext=state.tipos.filter(t=>t.externo||t.grupo==='pers');
+function sImp(){const e=ui.sheet,g=e.grupos[e.gi];const pend=impPend(g),ext=state.tipos.filter(t=>t.externo||faseG(t.grupo)==='pers');
   const dIn=ts=>ts?new Date(ts-new Date(ts).getTimezoneOffset()*6e4).toISOString().slice(0,10):'';
   return `${voltar('Cancelar')}<h1>Importar ficha</h1>
   ${e.grupos.length>1?`<div class="linha-dep" style="margin-bottom:12px">${e.grupos.map((x,i)=>`<button class="depc" data-a="impG" data-v="${i}" aria-pressed="${i===e.gi}">Pedido ${esc(x.num||'?')}</button>`).join('')}</div>`:''}
@@ -2961,7 +2980,7 @@ async function restaurar(obj){if(!obj||!Array.isArray(obj.pedidos)||!Array.isArr
   const {_app,_ts,...st}=obj;snap();state=normalizar(st);RC={};save();render();tick()}
 async function sSeg(){}
 /* Modelo de fábrica: a configuração sem os dados do dia a dia. Serve para começar outra confecção a partir desta. */
-const MODELO_CFG=['cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
+const MODELO_CFG=['setores','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
 function modeloFabrica(){const c=x=>JSON.parse(JSON.stringify(x??null));const cfg={};MODELO_CFG.forEach(k=>{if(state[k]!=null)cfg[k]=c(state[k])});
   cfg.feriados={local:state.feriados?.local||FER0().local,facult:c(state.feriados?.facult||{}),extras:[],trabalha:[]};
   return {_modelo:1,_ts:now(),nome:marca().nome||'',tipos:c(state.tipos),produtos:c(state.produtos),cfg}}
@@ -3274,6 +3293,14 @@ const A={
   reconectar:()=>{NV.erro='';render();nuvemConectar()},
   soAquiEnviar:()=>soAquiEnviar(),
   soAquiDescartar:d=>{if(!d.ok){ui.soAquiConf=true;return render()}ui.soAquiConf=false;try{localStorage.removeItem('martins-so-aqui')}catch(e){}render();toast('Descartado',false)},
+  setAdd:()=>{const el=document.getElementById('setNovo'),n=(el?.value||'').trim();if(!n)return toast('Escreva o nome do setor');if(SETORES().some(g=>semAc(g.nome)===semAc(n)))return toast('Esse setor já existe');
+    snap();state.setores=SETORES().map(g=>({...g}));state.setores.push({id:uid('s'),nome:n,i:'i-maquina',fase:'costura'});commit();toast(`Setor ${n} criado. Escolha a função dele.`)},
+  setRen:d=>{ui.setEd=d.g;render();setTimeout(()=>document.getElementById('setRen')?.focus(),30)},
+  setRenOk:d=>{const n=(document.getElementById('setRen')?.value||'').trim();if(!n)return toast('Escreva o nome');snap();state.setores=SETORES().map(g=>g.id===d.g?{...g,nome:n}:{...g});ui.setEd=null;commit()},
+  setFase:d=>{snap();state.setores=SETORES().map(g=>g.id===d.g?{...g,fase:d.v}:{...g});RC={};commit()},
+  setPorMaq:d=>{snap();state.setores=SETORES().map(g=>g.id===d.g?{...g,porMaquina:!g.porMaquina}:{...g});commit()},
+  setMov:d=>{const S=SETORES().map(g=>({...g})),i=S.findIndex(g=>g.id===d.g),j=i+(+d.d);if(i<0||j<0||j>=S.length)return;[S[i],S[j]]=[S[j],S[i]];snap();state.setores=S;commit()},
+  setRm:d=>{if(state.tipos.some(t=>t.grupo===d.g))return toast('Esse setor ainda tem máquinas');if(SETORES().length<2)return;snap();state.setores=SETORES().filter(g=>g.id!==d.g).map(g=>({...g}));commit()},
   modAplicar:async()=>{const m=ui.modPend;ui.modPend=null;try{await aplicarModelo(m);toast('Modelo aplicado. Agora cadastre a equipe e os fornecedores.',false)}catch(e){render();toast(e.message==='tem pedidos'?'Já há pedidos de verdade: o modelo não foi aplicado':'Esse arquivo não é um modelo de fábrica',false)}},
   modCancelar:()=>{ui.modPend=null;render()},
   modBaixar:async()=>{const n=`${semAc(marca().nome||'fabrica').replace(/[^a-z0-9]+/gi,'-')} - modelo de fabrica ${hojeISO()}.json`;await baixarBlob(n,new Blob([JSON.stringify(modeloFabrica())],{type:'application/json'}))},
@@ -3331,7 +3358,7 @@ const A={
     if(e.m2&&e.m2!=='depois'&&e.p2){const pt={id:proxParte(pai),n:n2,st:'and',ini:now(),op:e.p2,maq:e.m2};if(situacao().k!=='trab'){const a=heAtiva(t.x);if(a)pt.he=[{i:now(),f:a.f}]}pai.partes.push(pt);txt=`${pNome(e.p2)} começou ${n2} peças na ${unidade(e.m2)?.nome||''}`}
     acertaPai(t.l,t.s.id);registrar({tipo:'divisao',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:e.p2||'',ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n:n2});
     ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} dividido: ${txt}`)},
-  pMot:d=>{const s=ui.sheet,t=tarefaNa(s.m),pr=state.probs[+d.k];s.mot=pr.k;const opts=topo(t.p).filter(x=>(x.id===t.s.id||anc(t.p,t.s.id).has(x.id))&&x.posto!=='corte').map(x=>x.id);s.orig=(pr.alvo||[]).find(a=>opts.includes(a))||t.s.id;s.step=2;render()},
+  pMot:d=>{const s=ui.sheet,t=tarefaNa(s.m),pr=state.probs[+d.k];s.mot=pr.k;const opts=topo(t.p).filter(x=>(x.id===t.s.id||anc(t.p,t.s.id).has(x.id))&&faseT(x.posto)!=='corte').map(x=>x.id);s.orig=(pr.alvo||[]).find(a=>opts.includes(a))||t.s.id;s.step=2;render()},
   pN:d=>{const s=ui.sheet,t=tarefaNa(s.m);s.n=Math.min(qtdEf(t.l),Math.max(1,s.n+(+d.d)));render()},
   pNext:()=>{ui.sheet.step=3;render()},
   pOrig:d=>{ui.sheet.orig=d.s;render()},
@@ -3439,8 +3466,8 @@ const A={
     const primeira=e.sid&&p.steps[0].id===e.sid;
     if(!e.nome.trim())e.err='Escreva o nome da etapa';else if(!e.posto)e.err='Escolha onde é feita';else if(!e.deps.length&&!primeira)e.err='Escolha o que precisa estar pronto antes';
     if(e.err)return render();snap();
-    if(e.sid){const st=p.steps.find(z=>z.id===e.sid);Object.assign(st,{nome:e.nome.trim(),posto:e.posto,deps:[...e.deps],min:e.min,pers:e.pers||tipo(e.posto).grupo==='pers',fecha:e.fecha,obs:(e.obs||'').trim(),partes:[...e.partes]});ui.fx={k:'P'+p.id,s:st.id};ui.sheet={t:'produto',p:p.id};commit();toast('Etapa salva');return}const base=e.nome.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'')||'etapa';let id=base,k=2;while(p.steps.some(s=>s.id===id))id=base+k++;
-    p.steps.push(S(id,e.nome.trim(),e.posto,[...e.deps],e.min,{pers:e.pers||tipo(e.posto).grupo==='pers',fecha:e.fecha,obs:(e.obs||'').trim(),partes:[...e.partes]}));ui.fx={k:'P'+p.id,s:id};ui.sheet={t:'produto',p:p.id};commit();toast(`Etapa ${e.nome.trim()} adicionada`)},
+    if(e.sid){const st=p.steps.find(z=>z.id===e.sid);Object.assign(st,{nome:e.nome.trim(),posto:e.posto,deps:[...e.deps],min:e.min,pers:e.pers||faseT(e.posto)==='pers',fecha:e.fecha,obs:(e.obs||'').trim(),partes:[...e.partes]});ui.fx={k:'P'+p.id,s:st.id};ui.sheet={t:'produto',p:p.id};commit();toast('Etapa salva');return}const base=e.nome.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'')||'etapa';let id=base,k=2;while(p.steps.some(s=>s.id===id))id=base+k++;
+    p.steps.push(S(id,e.nome.trim(),e.posto,[...e.deps],e.min,{pers:e.pers||faseT(e.posto)==='pers',fecha:e.fecha,obs:(e.obs||'').trim(),partes:[...e.partes]}));ui.fx={k:'P'+p.id,s:id};ui.sheet={t:'produto',p:p.id};commit();toast(`Etapa ${e.nome.trim()} adicionada`)},
   edEtapa:d=>{const z=sMap(prod(d.p))[d.s];openSheet({t:'etapa',p:d.p,sid:z.id,nome:z.nome,posto:z.posto,deps:[...z.deps],partes:[...(z.partes||[])],min:z.min,pers:!!z.pers,fecha:!!z.fecha,obs:z.obs||'',err:''})},
   rmEtapa:d=>{const p=prod(d.p);if(filhos(p,d.s).length)return;snap();const n=sMap(p)[d.s].nome;p.steps=p.steps.filter(s=>s.id!==d.s);ui.fx=null;if(ui.sheet?.t==='etapa')ui.sheet={t:'produto',p:p.id};commit();toast(`Etapa ${n} tirada`)},
   nprod:()=>openSheet({t:'nprod',nome:'',forma:'camiseta',tecido:'',copia:null,err:''}),

@@ -270,3 +270,11 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Baixar o modelo desta fábrica** gera um arquivo com máquinas, produtos, tamanhos, cores, tecidos, horário e prazos. Não leva pedidos, empresas, equipe, estoque nem acessos.
 - Serve para montar o app de outra confecção. **No dia a dia da Martins, não precisa mexer.**
 - O botão "Começar com um modelo" só aparece em fábrica sem pedidos de verdade, então não aparece para vocês.
+
+---
+
+## Setores da fábrica (só para a gestão)
+
+- Em **Cadastros › Máquinas**, no topo, apareceu o quadro **Setores da fábrica**: Corte, Personalização, Costura e Acabamento.
+- Dá para mudar o nome, mudar a ordem (↑ ↓) e criar setor novo (ex.: Lavanderia). Cada setor tem uma **função**, que diz ao app o que ele faz.
+- **Para a equipe, nada muda.** Única diferença: na barra de etapas da peça, "Embalar" agora aparece como "Embalagem" (o nome da mesa).
