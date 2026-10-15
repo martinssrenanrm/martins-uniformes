@@ -12,18 +12,18 @@ const dbop=modo=>async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null}
 (async()=>{const b=await chromium.launch();const fake=fs.readFileSync(path.join(__dirname,'fakedb.js'),'utf8');const erros=[];
   async function aparelho(n,{modo='ok',sessao='u-helena',semDb=false,local=null}={}){const ctx=await b.newContext({viewport:{width:390,height:844}});await ctx.exposeFunction('__dbop',dbop(modo));await ctx.addInitScript(fake);
     if(semDb)await ctx.addInitScript(()=>{window.claude={use:async()=>null}});
-    await ctx.addInitScript(([s,l])=>{try{if(s&&!localStorage.getItem('martins-sessao'))localStorage.setItem('martins-sessao',JSON.stringify({id:s,email:s==='u-helena'?'helenanenimga67@gmail.com':'roger@martinsuniformes.com.br'}));if(l&&!localStorage.getItem('martins-v8'))localStorage.setItem('martins-v8',l)}catch(e){}},[sessao,local]);
+    await ctx.addInitScript(([s,l])=>{try{if(s&&!localStorage.getItem('martins-sessao'))localStorage.setItem('martins-sessao',JSON.stringify({id:s,email:s==='u-helena'?'helena@exemplo.test':'roger@exemplo.test'}));if(l&&!localStorage.getItem('martins-v8'))localStorage.setItem('martins-v8',l)}catch(e){}},[sessao,local]);
     const p=await ctx.newPage();p.on('pageerror',e=>erros.push(n+': '+e.message));pages.push(p);await p.goto(APP);await p.waitForTimeout(1500);await p.evaluate(()=>{ui.sheet=null;render()});return p}
   console.log('1) Aparelho principal começa a nuvem e a Helena cria a senha');
   const A=await aparelho('A');await A.click('[data-a=inicio][data-v=exemplo]');await A.waitForTimeout(2500);
   await A.evaluate(async()=>{const u=state.usuarios.find(x=>x.id==='u-helena');u.salt=novoSalt();u.hash=await hashSenha('martins123',u.salt);save()});await A.waitForTimeout(1500);
   ok(!!store.get('usuarios/u-helena')?.hash,'senha da Helena está na nuvem');
-  const localVelho=await A.evaluate(()=>{const s=JSON.parse(JSON.stringify(state));s.usuarios.forEach(u=>{u.hash=null;u.salt=null});s.pedidos.push({...s.pedidos[0],id:'7777',cliente:'Pedido Só Do Celular'});return JSON.stringify(s)});
+  const localVelho=await A.evaluate(()=>{const s=JSON.parse(JSON.stringify(state));s.usuarios.forEach(u=>{u.hash=null;u.salt=null});s.pedidos.push({...s.pedidos[0],id:'7777',exemplo:false,cliente:'Pedido Só Do Celular'});return JSON.stringify(s)});
 
   console.log('2) Celular com cópia antiga guardada (caso da Helena)');
   const C=await aparelho('C',{sessao:null,local:localVelho});
   ok(await C.evaluate(()=>!!document.getElementById('lgS')&&!document.getElementById('lgS1')),'login pede a SENHA (não pede para criar de novo)');
-  await C.fill('#lgE','helenanenimga67@gmail.com');await C.fill('#lgS','martins123');await C.click('[data-a=lgEntrar]');await C.waitForTimeout(1200);
+  await C.fill('#lgE','helena@exemplo.test');await C.fill('#lgS','martins123');await C.click('[data-a=lgEntrar]');await C.waitForTimeout(1200);
   ok(await C.evaluate(()=>!!usuarioAtual()),'Helena entra com a senha que já tinha');
   ok(await C.evaluate(()=>!!soAqui()&&soAqui().pedidos.some(p=>p.id==='7777')),'pedido que só existia no celular foi guardado para enviar');
   ok(await C.evaluate(()=>!pedById('7777')),'a tela mostra só o que está na nuvem');

@@ -24,6 +24,23 @@ O sistema inteiro está em `app.html`. Antes de mudar qualquer coisa, leia `READ
 4. **Nenhuma função é adicionada ou removida** numa onda de usabilidade. Função nova é pedido separado.
 5. **Central "Como usar o app" (lista `FAQ` em `app.html`):** toda função nova, botão renomeado ou tela mudada atualiza as perguntas e respostas no mesmo commit. Rode `tests/ajuda.test.js`.
 
+## Produto para várias confecções (obrigatório)
+
+A Martins é o primeiro cliente, não o produto. O mesmo código vai servir outras confecções de roupas e acessórios.
+
+**Antes de implementar um pedido, classifique:**
+1. **Dado** (tecido, fornecedor, tempo de etapa): já cabe em cadastro. Não mexa no código; ensine onde fica.
+2. **Regra que outra fábrica faria diferente** (quem faz a arte, o que trava o corte): vira opção de configuração, com padrão neutro.
+3. **Função que só alguns clientes querem**: vira módulo liga/desliga.
+4. **Melhoria que serve a todos**: núcleo, sem nome de cliente.
+
+**Nunca no código (o teste `cliente-novo` confere):**
+- nome de pessoa, e-mail real, id de pedido ou de produto de um cliente na lógica;
+- migração em `normalizar()` que mude conteúdo (só formato) ou que rode a cada abertura re-impondo dado apagado;
+- acesso fixo. Os primeiros acessos vêm de `clientes/<id>.json` (`admins`), só quando o banco não tem nenhum usuário.
+
+Textos que citam quem procurar usam `SUPORTE()`, `gestoresTxt()` e `NOME_EMP()`. Dados de demonstração ficam só em `seed()` e são marcados com `exemplo:true`.
+
 ## Testes
 
 ```
@@ -40,6 +57,7 @@ NODE_PATH=$(npm root -g) node tests/feriados-entrega.test.js
 NODE_PATH=$(npm root -g) node tests/modelagem-tecidos.test.js
 NODE_PATH=$(npm root -g) node tests/etiquetas.test.js
 NODE_PATH=$(npm root -g) node tests/ciclo.test.js
+NODE_PATH=$(npm root -g) node tests/cliente-novo.test.js
 ```
 
 ## Supabase (endereço próprio)

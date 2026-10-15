@@ -11,7 +11,7 @@ async function dbop(o,p,data){if(o==='get')return {data:store.get(p)||null};if(o
 const conta=c=>list(c).length;
 (async()=>{const b=await chromium.launch();const fake=fs.readFileSync(path.join(__dirname,'fakedb.js'),'utf8');const erros=[];
   async function aparelho(n){const ctx=await b.newContext({viewport:{width:1000,height:850}});await ctx.exposeFunction('__dbop',dbop);await ctx.addInitScript(fake);
-    await ctx.addInitScript(()=>{try{if(!localStorage.getItem('martins-sessao'))localStorage.setItem('martins-sessao',JSON.stringify({id:'u-helena',email:'helenanenimga67@gmail.com'}))}catch(e){}});
+    await ctx.addInitScript(()=>{try{if(!localStorage.getItem('martins-sessao'))localStorage.setItem('martins-sessao',JSON.stringify({id:'u-helena',email:'helena@exemplo.test'}))}catch(e){}});
     const p=await ctx.newPage();p.on('pageerror',e=>erros.push(n+': '+e.message));pages.push(p);await p.goto(APP);await p.waitForTimeout(1200);const e=await p.$('text=Entendi');if(e)await e.click();return p}
   console.log('1) Começar na nuvem e cadastrar um pedido real');
   const A=await aparelho('A');await A.click('[data-a=inicio][data-v=exemplo]');await A.waitForTimeout(2500);
@@ -39,11 +39,10 @@ const conta=c=>list(c).length;
   console.log('7) Restaurar a cópia de antes de apagar');
   const nome=list('backup').find(x=>x.id.includes('antes-de-apagar')).id;await C.evaluate(async n=>{await restaurar(await lerBackup(n))},nome);await C.waitForTimeout(2500);
   ok(store.has('pedidos/0412')&&store.has('pedidos/'+real),'cópia restaurada com exemplos e o pedido real');
-  console.log('8) Acesso de gestão do Roger chega nos dados já existentes');
+  console.log('8) Acesso apagado pela gestão não volta sozinho (nada de acesso fixo no código)');
   store.delete('usuarios/u-roger');merge(store.get('config/main'),{usersV:1});const D=await aparelho('D');await D.waitForTimeout(4000);
-  const rg=store.get('usuarios/u-roger');ok(!!rg&&rg.email==='roger@martinsuniformes.com.br'&&rg.perfil==='gestao'&&!rg.hash,'Roger criado na nuvem, perfil gestão, aguardando primeira senha');
+  ok(!store.has('usuarios/u-roger'),'acesso apagado não é recriado pelo app');
   ok(store.has('usuarios/u-helena')&&!!store.get('usuarios/u-helena').email,'acesso da Helena continua');
-  await D.evaluate(()=>{sair()});await D.waitForTimeout(500);await D.fill('#lgE','Roger@MartinsUniformes.com.br');await D.click('[data-a=lgEntrar]');await D.waitForTimeout(800);
-  ok(await D.evaluate(()=>ui.login&&ui.login.passo==='criar'),'Roger vê a tela de primeiro acesso para criar a senha');
+  ok(await D.evaluate(()=>!JSON.stringify(state).includes('martinsuniformes')&&!JSON.stringify(state).includes('gmail.com')),'nenhum e-mail real da Martins nos dados de demonstração');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} FALHA(S)`:'\nTudo certo.');process.exit(falhas?1:0)})();

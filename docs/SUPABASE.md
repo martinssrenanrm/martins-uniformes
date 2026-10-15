@@ -49,7 +49,7 @@
    ```
 5. **Gerar o site e publicar.**
    ```
-   SUPABASE_URL=… SUPABASE_ANON_KEY=… node tools/build.js
+   CLIENTE=martins SUPABASE_URL=… SUPABASE_ANON_KEY=… node tools/build.js   (cliente em clientes/<id>.json)
    ```
    - Faça o commit de `site/` neste repositório.
    - **GitHub Pages:** o push de `site/` publica sozinho em cerca de 1 minuto.

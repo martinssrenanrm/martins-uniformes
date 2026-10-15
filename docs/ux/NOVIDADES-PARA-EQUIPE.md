@@ -253,3 +253,11 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **✎** muda o nome (ex.: "Moletom" para "Moletom PA"). O nome muda também nos produtos.
 - **×** tira o tecido. O app pergunta antes e avisa se algum pedido aberto usa ele.
 - Pedidos que já estão abertos continuam com o nome antigo, para não bagunçar a ficha.
+
+---
+
+## Arrumação por dentro (nada muda para a equipe)
+
+- O app foi arrumado por dentro para poder ser usado também por outras confecções.
+- **Para vocês, nada muda:** mesmas telas, mesmos botões, mesmos dados, mesmos acessos.
+- Única diferença visível: algumas mensagens de ajuda agora dizem "alguém da gestão" ou mostram o nome de quem é da gestão no app, em vez de nomes escritos fixos.
