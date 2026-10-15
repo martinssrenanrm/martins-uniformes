@@ -235,3 +235,21 @@ O tempo de cada parte conta para quem fez, no Painel.
 **O que NÃO mudou:**
 - Ninguém precisa fazer nada diferente: as datas são anotadas sozinhas, nos mesmos botões de sempre.
 - O que foi feito antes desta mudança fica sem a data de liberação (aparece "—").
+
+---
+
+## Estampa: escolher onde é feita, desfazer "Levei" e mexer nos tecidos
+
+**Onde vai ser feita a estampa (ou o bordado):**
+- Abra a etapa da personalização no pedido. Aparece **"Onde vai ser feito?"** com os botões: o fornecedor (ex.: **Rafael**) ou **Aqui na fábrica**.
+- Toque no certo. A tarefa de levar ao fornecedor some ou aparece sozinha.
+
+**Marquei "Levei" sem querer:**
+- Na mesma etapa aparece **"Desfazer: as peças não foram levadas"**. Toque e pronto.
+- Se era para fazer aqui, toque depois em **Aqui na fábrica**.
+
+**Tecidos:**
+- Agora o quadro **Tecidos** fica também em **Cadastros › Produtos**, logo em cima.
+- **✎** muda o nome (ex.: "Moletom" para "Moletom PA"). O nome muda também nos produtos.
+- **×** tira o tecido. O app pergunta antes e avisa se algum pedido aberto usa ele.
+- Pedidos que já estão abertos continuam com o nome antigo, para não bagunçar a ficha.

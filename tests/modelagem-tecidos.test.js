@@ -47,6 +47,21 @@ async function dbop(o,p,data){if(o==='get')return {data:store.get(p)||null};if(o
   await A.evaluate(()=>{document.getElementById('tecG').value='meia MALHA p.a.';A.addTecG()});
   ok(await A.evaluate(()=>tecidosAll().filter(t=>semAc(t)===semAc('Meia malha P.A.')).length===1),'o mesmo tecido não entra duas vezes');
 
+  await A.evaluate(()=>{ui.cad='produtos';render()});
+  ok(await A.evaluate(()=>!!document.querySelector('#Tecidos')&&!!document.getElementById('tecG')),'o quadro Tecidos também fica em Cadastros › Produtos');
+  r=await A.evaluate(()=>{A.tecRen({v:'Moletom'});document.getElementById('tecRen').value='Moletom PA';A.tecRenOk({v:'Moletom'});document.getElementById('tecG').value='Moletom poliéster';A.addTecG();
+    const T=tecidosAll();const blusa=prod('blusa').tecidos;A.tecRm({v:'Tactel'});const pergunta=/Tirar <b>Tactel<\/b>/.test(document.body.innerHTML);A.tecRmOk({v:'Tactel'});
+    return {pa:T.includes('Moletom PA'),pol:T.includes('Moletom poliéster'),velho:T.includes('Moletom'),blusa:blusa.includes('Moletom PA')&&!blusa.includes('Moletom'),pergunta,tactel:tecidosAll().includes('Tactel')}});
+  ok(r.pa&&r.pol&&!r.velho,'renomeia Moletom para Moletom PA e adiciona Moletom poliéster');ok(r.blusa,'o nome muda também nos produtos');ok(r.pergunta&&!r.tactel,'tirar tecido pede confirmação e tira');
+
+  console.log('4b) Onde vai a personalização');
+  r=await A.evaluate(()=>{if(!state.tipos.some(t=>t.id==='estampa'))state.tipos.push({id:'estampa',nome:'Estampa',grupo:'pers',i:'i-estampa',externo:true,min:1});if(!fornDe('estampa').length)state.forn.push({id:'rafa',nome:'Rafael',servico:'estampa'});RC={};const l=state.lotes.find(l=>(l.pers||[]).some(x=>x.tipo==='estampa'))||(()=>{const l=state.lotes.find(l=>!l.rework&&pedById(l.ped)&&!pedById(l.ped).concluido);l.pers=[{tipo:'estampa',parte:'Frente',pos:'Centro do peito',id:'pz9'}];RC={};return l})();
+    const x=l.pers.find(q=>q.tipo==='estampa');const s=sMap(rp(l))[x.id];const box=ondeBox(l,s);
+    A.levei({l:l.id,s:x.id});const fora=l.steps[x.id]?.st==='fora';A.persDesfaz({l:l.id,s:x.id});const desfez=!l.steps[x.id];
+    A.levei({l:l.id,s:x.id});const int=tiposIrmaos('estampa').find(t=>!t.externo);A.persOnde({l:l.id,s:x.id,v:'i:'+int.id});
+    return {box:/Aqui na fábrica/.test(box)&&/Rafael/.test(box),fora,desfez,int:x.tipo===int.id&&!l.steps[x.id]&&!isExt(sMap(rp(l))[x.id])}});
+  ok(r.box,'a estampa pergunta onde vai ser feita: fornecedor ou Aqui na fábrica');ok(r.fora&&r.desfez,'dá para desfazer o Levei feito sem querer');ok(r.int,'trocar para Aqui na fábrica tira do fornecedor e vira etapa interna');
+
   console.log('4) Tamanhos');
   r=await A.evaluate(()=>({s:sizesAll(),us:usParaBr({S:1,M:2,L:3,XL:4,'2XL':5}),br:usParaBr({P:1,G:2})}));
   ok(r.s.indexOf('0')>=0&&r.s.indexOf('0')===r.s.indexOf('2')-1,'tamanho 0 vem logo antes do 2');
