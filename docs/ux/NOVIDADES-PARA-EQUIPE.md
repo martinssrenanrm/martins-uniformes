@@ -187,3 +187,4 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Em **Conferir insumos**, ao lado da quantidade aparece **para quantas peças** ela é. Exemplo: "Precisa ≈ 14 metros **para 15 Blusa de Agasalho**".
 - Quando o mesmo item serve para mais de uma peça, aparece a divisão: "para 53 peças (15 Blusa de Agasalho, 38 Polo Amsterdã)".
 - Assim dá para conferir a conta ali mesmo, sem sair da tela para abrir a ficha.
+- Ao tocar em **Falta**, junto com a quantidade sugerida aparece **para quantas peças** ela é e **quanto dá por peça** (ex.: "Para 15 Blusa de Agasalho · Sugestão ≈ 14 metros = ≈ 0,93 m por peça"). O comprador bate o olho e vê se está dentro do normal.
