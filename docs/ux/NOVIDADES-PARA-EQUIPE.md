@@ -336,3 +336,15 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Tarefas do escritório e peças "Fora" mostram **"Ver pedido ›"**.
 
 **Para mandar no grupo:** "Para tirar alguém de uma máquina, abra a máquina onde ela está. No cartão da máquina tem o botão Mais opções."
+
+---
+
+## Onda 5a: a tela do Pedido ficou mais curta
+
+- Os blocos **"Antes de cortar"**, **"Arte para quem aplica"** e **"Peças e etapas"** agora **abrem e fecham**: toque no título.
+- Já vem aberto o que tem pendência. Fechado, o bloco mostra um resumo (ex.: "Pode cortar", "2 a enviar", "3 de 5 prontas").
+- O mapa de processos de cada peça fica atrás do botão **"Ver mapa de processos"**.
+- Nos pedidos de verdade, a tela ficou **cerca de 40% mais curta** no celular.
+- **Nada sumiu e nenhum botão mudou de lugar dentro dos blocos.**
+
+**Para mandar no grupo:** "No pedido, alguns blocos agora abrem e fecham. Toque no título para ver."

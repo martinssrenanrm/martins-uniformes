@@ -96,5 +96,13 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
     ui.sheet=null;render();return {mais,ver,ir,lab,add}});
   ok(r.mais,'cartão da máquina tem "Mais opções"');ok(r.ver,'tarefas mostram "Ver pedido"');ok(r.ir!==false,'pessoa ocupada: explica onde está e leva até a máquina');
   ok(r.lab,'"Faltou algum item?": campos com nome e unidade em 3 botões');ok(r.add,'item entra na lista com a unidade escolhida');
+  console.log('12) Onda 5a: pedido em blocos');
+  r=await A.evaluate(()=>{const ped=state.pedidos.find(p=>!p.concluido&&lotesDe(p.id).length);ui.blk={};ui.sheet={t:'pedido',id:ped.id};render();
+    const bl=[...document.querySelectorAll('#sheet details.blk')].map(d=>[d.dataset.blk.replace(ped.id,''),d.open]);const lib=liberado(ped);
+    const mapa0=!!document.querySelector('#sheet details.mapa .nd');const sm=document.querySelector('#sheet details.mapa');ui.blk['map'+sm.dataset.blk.slice(3)]=true;render();
+    const mapa1=!!document.querySelector('#sheet details.mapa[open] .nd');ui.sheet=null;render();return {bl,lib,mapa0,mapa1}});
+  const antes=r.bl.find(x=>x[0]==='antes'),pecas=r.bl.find(x=>x[0]==='pecas');
+  ok(antes&&antes[1]===!r.lib,'"Antes de cortar" abre sozinho só quando falta liberar');ok(pecas&&pecas[1],'"Peças e etapas" vem aberto');
+  ok(!r.mapa0&&r.mapa1,'mapa de processos só aparece ao tocar em "Ver mapa de processos"');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

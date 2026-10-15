@@ -71,3 +71,9 @@
 - Novo pedido: o erro leva até a peça com problema e marca em vermelho.
 - Fora do horário: "Começar em hora extra".
 - Prints conferidos em 360×640: janela de confirmação e aviso no alto.
+
+## Onda 5a: Pedido em blocos (15/10/2026)
+
+- **Perguntas 1 e 2 (entende o que fazer / acha sem procurar) na tela Pedido:** melhoraram. Blocos com título e resumo; abre sozinho só o que tem pendência; mapa de processos atrás de "Ver mapa de processos".
+- Medida com 8 pedidos reais em 360×640: de 4,7–23,6 telas de rolagem para 4,3–9,3 (média ≈ 11 → ≈ 7).
+- Ainda pesa: o cartão de cada peça (≈ 1 tela por peça). Fica para uma próxima etapa, sem misturar com esta.
