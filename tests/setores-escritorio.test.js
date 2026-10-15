@@ -106,7 +106,7 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
   ok(!r.mapa0&&r.mapa1,'mapa de processos só aparece ao tocar em "Ver mapa de processos"');
   console.log('13) Onda 5b: tela da máquina');
   r=await A.evaluate(()=>{const P=plano();const livre=Object.keys(P.plan)[0];ui.blk={};ui.sheet={t:'maq',m:livre};render();
-    const vis=sel=>{const e=document.querySelector(sel);return !!e&&e.offsetParent!==null};
+    const vis=sel=>{const e=document.querySelector(sel);return !!e&&e.checkVisibility()};
     const a={comecar:vis('#sheet [data-a=comecar]'),reservar:vis('#sheet [data-a=mRes]'),mais:!!document.querySelector('#sheet details.blk[data-blk^=maqmais]:not([open])')};
     ui.blk['maqmais'+livre]=true;render();a.reservar2=vis('#sheet [data-a=mRes]');ui.sheet=null;render();return a});
   ok(r.comecar&&!r.reservar&&r.mais,'à vista só o essencial; Reservar fica em Mais opções');ok(r.reservar2,'abrindo Mais opções, Reservar aparece');
