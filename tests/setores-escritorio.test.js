@@ -86,5 +86,15 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
   else ok(false,'achou um pedido para entregar');
   r=await A.evaluate(()=>{ui.sheet={t:'novo',w:{step:2,itens:[{prod:state.produtos[0].id,cor:'',tecido:'',g:{},pers:[],opcoes:[],cores2:[]}],cliente:'X',vend:'paula'}};render();try{A.wNext()}catch(e){return 'erro '+e.message}return {k:ui.sheet.w.errK,marca:!!document.querySelector('#wIt0.w-erro')}});
   ok(r&&r.k===0&&r.marca,'Novo pedido: erro marca a peça com problema');await A.evaluate(()=>{ui.sheet=null;render()});
+  console.log('11) Onda 4: travas do dia a dia');
+  r=await A.evaluate(()=>{ui.sheet=null;ui.tela='fabrica';ui.fz='maq';render();const mais=document.querySelectorAll('.p-mais[data-a=maq]').length>0;
+    ui.fz='esc';render();const ver=document.querySelectorAll('.tar-t .ver-p').length>0;
+    const P=plano();const ocupada=Object.keys(P.uso)[0];let ir=null;
+    if(ocupada){const op=P.uso[ocupada].x.op,tp=unidade(ocupada).tipo,outra=P.us.find(x=>x.tipo===tp&&x.id!==ocupada);if(outra){ui.sheet={t:'maq',m:outra.id};render();const b=document.querySelector(`.ocup-l [data-a=maq][data-m="${ocupada}"]`);ir=!!b&&/termine lá/.test(document.querySelector('.ocup-l').innerText)}}
+    const ped=state.pedidos.find(p=>!p.concluido);ui.sheet={t:'ins',id:ped.id};render();const lab=!!document.querySelector('label[for=insN]')&&!!document.querySelector('label[for=insQ]')&&document.querySelectorAll('[data-a=insAU]').length===3;
+    let add=null;if(lab){document.getElementById('insN').value='Zíper teste';document.getElementById('insQ').value='12';A.insAU({v:'m'});const n0=ped.materiais.length;A.insAdd({id:ped.id});const m=ped.materiais[ped.materiais.length-1];add=ped.materiais.length===n0+1&&m.item==='Zíper teste'&&m.un==='m'&&m.nec===12}
+    ui.sheet=null;render();return {mais,ver,ir,lab,add}});
+  ok(r.mais,'cartão da máquina tem "Mais opções"');ok(r.ver,'tarefas mostram "Ver pedido"');ok(r.ir!==false,'pessoa ocupada: explica onde está e leva até a máquina');
+  ok(r.lab,'"Faltou algum item?": campos com nome e unidade em 3 botões');ok(r.add,'item entra na lista com a unidade escolhida');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

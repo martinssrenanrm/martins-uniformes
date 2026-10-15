@@ -325,3 +325,14 @@ O tempo de cada parte conta para quem fez, no Painel.
 - No Novo pedido, se faltar algo, a tela vai até a peça com problema e marca em vermelho.
 
 **Para mandar no grupo:** "Agora o app pergunta antes de entregar, apagar ou restaurar. O 'Pronto!' aparece em cima e some sozinho."
+
+---
+
+## Onda 4: três travas do dia a dia
+
+- **Cartão da máquina:** ganhou o botão **"Mais opções"** (deu problema, trocar pessoa, reservar).
+- **Trocar a costureira de máquina:** quem está ocupada aparece com o aviso "está na Galoneira 1: termine lá ou pause" e o botão **"Ir para a Galoneira 1"**.
+- **"Faltou algum item?"** (Conferir insumos): campos com nome ("Qual item?", "Quantos?") e a unidade em 3 botões grandes: unidades, metros, Kg.
+- Tarefas do escritório e peças "Fora" mostram **"Ver pedido ›"**.
+
+**Para mandar no grupo:** "Para tirar alguém de uma máquina, abra a máquina onde ela está. No cartão da máquina tem o botão Mais opções."
