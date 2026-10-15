@@ -288,3 +288,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Logo abaixo: **o que precisa estar pronto para o corte começar** (vias, arte aprovada, insumos).
 - Em cada etapa, **✎ Ajustar**: mudar o nome que a equipe usa, escolher quais cargos recebem a etapa e se a vendedora do próprio pedido tem preferência.
 - **Na Martins está tudo ligado e com os nomes de sempre. Nada muda para a equipe.**
+
+---
+
+## Cadastros › Configurar (só para a gestão)
+
+- Nova aba **Configurar**, a primeira de Cadastros: 10 passos para deixar o app com a cara da fábrica (empresa, horário, setores, produtos, equipe, terceirizados, escritório, tamanhos/cores/tecidos, acessos e estoque).
+- Cada passo mostra ✓ quando está pronto, ou **o que falta**. **Abrir** leva direto ao lugar certo.
+- Nada mudou de lugar: as outras abas continuam iguais.
+- Na Martins, aparece só um ponto pendente: telefone/WhatsApp da empresa nos documentos.

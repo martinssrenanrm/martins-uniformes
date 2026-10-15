@@ -59,5 +59,13 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   ok(r.limpo,'equipe, fornecedores, estoque e pedidos começam em branco');ok(r.acessos,'acessos continuam');
   ok(r.recusou,'com pedido de verdade, o modelo não é aplicado');ok(r.card&&r.conf,'quadro Modelo de fábrica em Ajustes, com confirmação na tela');
   console.log('7) Fábrica sem equipe abre todas as telas');
+  console.log('8) Configurar fábrica (passo a passo)');
+  r=await A.evaluate(()=>{ui.tela='fabrica';render();const aviso=!!document.querySelector('.cfg-av');const P=passosConfig();
+    ui.tela='cadastros';ui.cad='config';render();const n=document.querySelectorAll('.cfg-p').length;const falta=P.filter(x=>!x.ok&&!x.opc).map(x=>x.t);
+    document.querySelector('.cfg-p [data-a=ajIr][data-v="cad:equipe"]').click();const foi=ui.cad==='equipe';
+    state.pessoas.push({id:'p1',nome:'Teste',papeis:['costura'],sabe:state.tipos.map(t=>t.id),melhor:[],funcoes:FUNCOES.map(f=>f.id)});
+    const eq=passosConfig().find(x=>x.t==='Equipe').ok;return {aviso,n,falta,foi,eq}});
+  ok(r.aviso,'fábrica nova vê o aviso para configurar');ok(r.n===10,'10 passos na tela Configurar');ok(r.falta.includes('Equipe'),'mostra o que falta (equipe em branco)');
+  ok(r.foi,'Abrir leva direto ao lugar certo');ok(r.eq,'cadastrando a equipe, o passo fica pronto');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

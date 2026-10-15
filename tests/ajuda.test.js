@@ -12,7 +12,7 @@ const CASOS=[['como faço hora extra','hora extra'],['esqueci a senha','Esqueci 
   await p.goto(APP);await p.waitForTimeout(1200);
   const r=await p.evaluate(C=>C.map(([q,esp])=>{const R=ajBusca(q);return [q,esp,R[0]?R[0].f.q:'']}),CASOS);
   r.forEach(([q,esp,top])=>ok(top.toLowerCase().includes(esp.toLowerCase()),`“${q}” → ${top||'(nada)'}`));
-  const semIr=await p.evaluate(()=>FAQ.filter(f=>f.ir&&!/^(fab:(maq|fora|esc)|ped|emp|novo|sino|eu|cad:(maquinas|equipe|forn|produtos|estoque|ajustes)(#.+)?|gest:(agora|ciclo|equipe|atrasos|org))$/.test(f.ir)).map(f=>f.q));
+  const semIr=await p.evaluate(()=>FAQ.filter(f=>f.ir&&!/^(fab:(maq|fora|esc)|ped|emp|novo|sino|eu|cad:(config|maquinas|equipe|forn|produtos|estoque|ajustes)(#.+)?|gest:(agora|ciclo|equipe|atrasos|org))$/.test(f.ir)).map(f=>f.q));
   ok(!semIr.length,'todo "Me leve até lá" aponta para um lugar que existe'+(semIr.length?': '+semIr.join(' | '):''));
   ok(!er.length,'sem erros de JavaScript'+(er.length?': '+er.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} FALHA(S)`:'\nTudo certo.');process.exit(falhas?1:0)})();
