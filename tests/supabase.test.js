@@ -50,7 +50,7 @@ const REAL=process.env.REAL||path.resolve(__dirname,'../../claude-code-scratch-r
   ok(/ainda não tem acesso/.test(await B.textContent('#app')),'e-mail fora da lista não vê nada');
   const antes=docs.size;await B.evaluate(async()=>{try{await sbDB(SB.c).doc('pedidos/hack').set({x:1})}catch(e){}});ok(docs.size===antes&&!docs.has('pedidos/hack'),'e-mail fora da lista não consegue gravar');
   console.log('4) Marcos entra e vê ao vivo o que a Regina faz');
-  users.set('roger@exemplo.test',{pass:'roger12',ok:true});await B.click('[data-a=sbSair]');await B.waitForTimeout(1500);
+  users.set('roger@exemplo.test',{pass:'roger12',ok:true});await B.click('[data-a=sbSair]');await B.click('[data-a=confSim]');await B.waitForTimeout(1500);
   await B.fill('#sbE','roger@exemplo.test');await B.fill('#sbS','roger12');await B.click('[data-a=sbEntrar]');await B.waitForTimeout(2500);
   ok(await B.evaluate(()=>usuarioAtual()?.nome==='Marcos'),'Marcos entrou');
   const pid=await A.evaluate(()=>{const p=state.pedidos.find(x=>!x.concluido)||state.pedidos[0];snap();p.contato='Contato Novo Supabase';commit();return p.id});await A.waitForTimeout(1500);

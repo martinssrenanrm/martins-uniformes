@@ -62,3 +62,12 @@
 - As perguntas 1 e 2 melhoraram na leitura, mas o excesso de coisas só se resolve na Onda 5.
 - As perguntas 4 e 5 (confirmação e aviso de sucesso) são a Onda 2.
 - A pergunta 6 (palavras) é a Onda 3.
+
+
+## Onda 2: confirmações e aviso (15/10/2026)
+
+- **Pergunta 4 (o que acontece se errar):** passa nas telas com ação sem volta. Entregar, tirar, restaurar, sair, parar hora extra, marcar "fora" e desmarcar vias/arte pedem confirmação na tela, com o verbo no botão ("Sim, entregar").
+- **Pergunta 5 (sabe se deu certo):** passa. O aviso aparece no alto, curto, com o que aconteceu ("Pronto! Ana começou Pregar gola na Reta 1"), some em 4 s (8 s com Desfazer) e tem ×.
+- Novo pedido: o erro leva até a peça com problema e marca em vermelho.
+- Fora do horário: "Começar em hora extra".
+- Prints conferidos em 360×640: janela de confirmação e aviso no alto.

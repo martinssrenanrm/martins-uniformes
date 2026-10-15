@@ -73,5 +73,18 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
     ui.tela='fabrica';ui.fz='esc';render();const txt=document.getElementById('app').innerText;const depois=!/\bvias\b/i.test(txt)&&/\bficha\b/i.test(txt);const maiusc=!/\bficha\b/.test(txt)||/Ficha|ficha/.test(txt);
     A.vocRm({k:0});render();const volta=/\bvias\b/i.test(document.getElementById('app').innerText);return {antes,depois,volta,maiusc}});
   ok(r.antes&&r.depois,'"vias" aparece como "ficha" nas telas');ok(r.volta,'tirando a troca, volta a palavra do app');
+  console.log('10) Onda 2: confirmação e aviso');
+  await A.evaluate(()=>{const p=state.pedidos.find(x=>!x.concluido&&!x.cancelado);lotesDe(p.id).forEach(l=>rp(l).steps.forEach(z=>{l.steps[z.id]={st:'ok',ini:now()-6e4,fim:now(),op:'leo'}}));RC={};save();ui.sheet=null;ui.tela='fabrica';ui.fz='esc';render()});
+  const ent=await A.$('[data-a=entregar]');
+  if(ent){const pid=await ent.getAttribute('data-id');await ent.click();
+    ok(await A.evaluate(id=>!pedById(id).concluido&&!!document.querySelector('.conf [data-a=confSim]'),pid),'Entregar pergunta antes e não entrega sozinho');
+    await A.click('[data-a=confNao]');ok(await A.evaluate(id=>!pedById(id).concluido&&!document.querySelector('.conf'),pid),'Cancelar não entrega');
+    await A.click(`[data-a=entregar][data-id="${pid}"]`);await A.click('[data-a=confSim]');ok(await A.evaluate(id=>!!pedById(id).concluido,pid),'Sim, entregar entrega');
+    const t=await A.evaluate(()=>{const e=document.querySelector('#toast .toast');return e&&{topo:e.getBoundingClientRect().top<120,x:!!e.querySelector('[data-a=toastX]'),desf:!!e.querySelector('[data-a=desfazer]')}});
+    ok(t&&t.topo&&t.x&&!t.desf,'aviso no alto, com ×, sem Desfazer depois de confirmar');
+    await A.evaluate(id=>{const p=pedById(id);p.concluido=null;save();render()},pid)}
+  else ok(false,'achou um pedido para entregar');
+  r=await A.evaluate(()=>{ui.sheet={t:'novo',w:{step:2,itens:[{prod:state.produtos[0].id,cor:'',tecido:'',g:{},pers:[],opcoes:[],cores2:[]}],cliente:'X',vend:'paula'}};render();try{A.wNext()}catch(e){return 'erro '+e.message}return {k:ui.sheet.w.errK,marca:!!document.querySelector('#wIt0.w-erro')}});
+  ok(r&&r.k===0&&r.marca,'Novo pedido: erro marca a peça com problema');await A.evaluate(()=>{ui.sheet=null;render()});
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

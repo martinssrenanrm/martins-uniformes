@@ -312,3 +312,16 @@ O tempo de cada parte conta para quem fez, no Painel.
 
 - Em **Cadastros › Ajustes › Palavras da fábrica** dá para trocar uma palavra do app pela que a equipe usa (ex.: "vias" → "ficha"). Vale para todas as telas e a ajuda.
 - **Na Martins a lista está vazia: as palavras continuam as de sempre.**
+
+---
+
+## Onda 2: nada se perde por um toque errado
+
+**O que mudou:**
+- **O app pergunta antes** de: entregar pedido, tirar (pessoa, máquina, produto, estoque, cor, tamanho e outros cadastros), restaurar cópia, sair, parar a hora extra, marcar alguém como "fora", desmarcar vias ou arte e marcar "cliente aprovou". Aparece uma janela com **"Sim, …"** e **"Cancelar"**.
+- **O aviso de "Pronto!" agora aparece no alto da tela**, não cobre os botões e some sozinho. Tem um **×** para fechar.
+- **"Desfazer"** continua nas ações do dia a dia: Começar, Terminou, Comprei, Chegou, Levei e peças de volta.
+- Fora do horário, o botão vira **"Começar em hora extra"**.
+- No Novo pedido, se faltar algo, a tela vai até a peça com problema e marca em vermelho.
+
+**Para mandar no grupo:** "Agora o app pergunta antes de entregar, apagar ou restaurar. O 'Pronto!' aparece em cima e some sozinho."

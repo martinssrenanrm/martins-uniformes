@@ -643,6 +643,13 @@ svg.prod.mock{cursor:zoom-in}
 .set-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.set-row .set-t{display:flex;align-items:center;gap:10px;flex:1 1 100%;font-size:19px}.set-row .set-t .campo{flex:1;min-width:0}.set-row .sel{flex:1 1 100%;max-width:none}.set-row>.campo{flex:1 1 100%}
 .cfg-p{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}.cfg-p.ok{opacity:.85;padding-top:10px;padding-bottom:10px}.cfg-h{display:flex;gap:12px;align-items:flex-start;flex:1 1 240px}.cfg-h b{display:block;font-size:19px}.cfg-h span{display:block;color:var(--ink2)}.cfg-n{flex:none;width:40px;height:40px;border-radius:50%;background:var(--bg);display:flex!important;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:var(--ink)!important}.cfg-p.ok .cfg-n{background:var(--okbg,#E3F4E8);color:var(--ok,#17864A)!important}.cfg-f{color:var(--red)!important;font-weight:700;margin-top:4px}.cfg-av{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-color:var(--blue)}.cfg-av span{flex:1 1 220px}
 body.sem-pers .mod-pers{display:none!important}body.sem-etq .mod-etq{display:none!important}body.sem-junto .mod-junto{display:none!important}body.sem-hora .mod-hora{display:none!important}body.sem-imp .mod-imp{display:none!important}body.sem-ciclo .mod-ciclo{display:none!important}
+#toast .toast{top:calc(12px + env(safe-area-inset-top,0px))!important;bottom:auto!important;padding:10px 10px 10px 18px;gap:10px;font-size:18px}
+#toast .toast{width:calc(100% - 24px);max-width:560px}#toast .toast>span{flex:1;min-width:0;line-height:1.3}#toast .toast [data-a=desfazer]{flex:none;padding:8px 14px}
+#toast .toast .tx{background:transparent;color:#fff;border:0;font-size:26px;line-height:1;min-width:44px;min-height:44px;cursor:pointer}
+.conf-fundo{position:fixed;inset:0;background:rgba(10,20,30,.45);z-index:70}
+.conf{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(520px,calc(100% - 24px));z-index:71;background:#fff;border-radius:18px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.conf p{margin:0 0 14px;font-size:20px;line-height:1.35;color:var(--ink)}.conf .acoes{display:flex;flex-direction:column;gap:10px;margin:0}
+.w-erro{box-shadow:0 0 0 3px var(--red)!important;border-radius:14px}
 .add-peca{background:var(--bg);border-style:dashed}.sel{appearance:auto;-webkit-appearance:menulist;min-height:52px;font-size:18px;background:#fff;max-width:420px;cursor:pointer}.sel-l{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sel-l .cbol{width:30px;height:30px;flex:none}
 .fp-bol{display:inline-block;width:26px;height:26px;border-radius:50%;border:2px solid #000;vertical-align:-4px;margin-right:8px}
 .fp-obs{min-height:34px;font-size:18px;background:repeating-linear-gradient(transparent 0 26px,#999 26px 27px)}
@@ -1665,7 +1672,7 @@ function maqTile(u,P,esp){const t=P.uso[u.id],pl=P.plan[u.id],sp=!t&&!pl?(P.semP
     <div class="p-body">${it?`${loteSvg(it.l)}<div>${pl?`<span class="prox">${pl.reservado?'Reservado':'Próximo'}</span>`:''}<b>${esc(it.s.nome)}</b><span>${qtdDe(it)} peças${it.l.steps[it.s.id]?.partes&&!it.pai?' <b style="color:var(--blue)">· retomar</b>':''}</span><span class="emp">${ic('i-predio')}${esc(it.ped.cliente)}</span>${quem?`<span class="quem-l">${av(quem,'s')}${esc(pNome(quem))} ${pl?estrela(pessoa(quem),pl):''}</span>`:''}</div>`:'<span class="vazio">Sem trabalho para esta máquina</span>'}</div></button>
     ${P.resEspera[u.id]?`<div class="dica" style="padding:0 14px 8px;color:var(--blue);font-weight:700">Reservado a seguir: ${esc(P.resEspera[u.id].s.nome)} · ${esc(P.resEspera[u.id].ped.cliente)}</div>`:''}
     ${t?tileTempo(t,u):sp?'<div class="p-st"><span class="dot"></span>Esperando alguém livre</div>':''}
-    ${t?`<button class="p-act fim" data-a="terminou" data-m="${u.id}">${ic('i-check')}Terminou</button>${heAtiva(t.x)?`<button class="he-b" data-a="hePara" data-m="${u.id}">Parar a hora extra agora</button>`:''}`:pl?`<button class="p-act ini" data-a="comecar" data-m="${u.id}" data-l="${pl.l.id}" data-s="${pl.s.id}" data-p="${pl.pessoa}">${ic('i-play')}Começar</button>`:''}
+    ${t?`<button class="p-act fim" data-a="terminou" data-m="${u.id}">${ic('i-check')}Terminou</button>${heAtiva(t.x)?`<button class="he-b" data-a="hePara" data-m="${u.id}">Parar a hora extra agora</button>`:''}`:pl?`<button class="p-act ini" data-a="comecar" data-m="${u.id}" data-l="${pl.l.id}" data-s="${pl.s.id}" data-p="${pl.pessoa}">${ic('i-play')}${situacao().k==='fora'?'Começar em hora extra':'Começar'}</button>`:''}
   </div>`}
 
 /* ================= PEDIDOS ================= */
@@ -2091,7 +2098,7 @@ function sMaq(){const e=ui.sheet,u=unidade(e.m);if(!u)return voltar();const P=pl
     ${bloq?`<div class="instr" style="background:var(--red-soft);border-color:var(--red);color:var(--red)">${ic('i-alerta')}<span>Fora da ordem: ainda espera ${esc(sel.falta.join(', '))}. Só comece se as peças já estiverem aqui.</span></div>`:''}
     <div class="rotulo">Quem vai fazer?</div>
     ${todosAptos.length?`<div class="linha-dep">${todosAptos.map(p=>{const oc=P.ocup.has(p.id);return `<button class="pchip" data-a="mP" data-v="${p.id}" aria-pressed="${quem===p.id}" ${oc?'disabled':''}>${av(p.id,'s')}${esc(p.nome)} ${estrela(p,sel)}${oc?` <small>(na ${esc(ondeEsta(p.id))})</small>`:''}</button>`}).join('')}</div>`:''}
-    ${quem?`<div class="acoes"><button class="big go ini" data-a="comecar" data-m="${u.id}" data-l="${sel.l.id}" data-s="${sel.s.id}" data-p="${quem}">${ic('i-play')}Começar com ${esc(pNome(quem))}</button>
+    ${quem?`<div class="acoes"><button class="big go ini" data-a="comecar" data-m="${u.id}" data-l="${sel.l.id}" data-s="${sel.s.id}" data-p="${quem}">${ic('i-play')}${situacao().k==='fora'?'Começar em hora extra com':'Começar com'} ${esc(pNome(quem))}</button>
       ${reservado?`<button class="big neutro" data-a="mResX" data-m="${u.id}">Tirar reserva</button>`:`<button class="big neutro" data-a="mRes" data-m="${u.id}" data-l="${sel.l.id}" data-s="${sel.s.id}" data-p="${quem}">Reservar para esta máquina</button>`}</div>`
     :`<div class="vazio-box">${ic('i-pessoas')}<b>Ninguém livre sabe usar esta máquina</b><button class="mbtn" data-a="irEquipe">Ver cadastro da equipe</button></div>`}
     ${listas('Outras opções agora')}`}
@@ -2121,7 +2128,7 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
     <div class="rotulo">Quem vendeu?</div>${selOp('wVend','',w.vend,state.pessoas.filter(p=>temPapel(p,'vendas')).map(p=>[p.id,p.nome]),'Escolha quem vendeu')}${nav()}`;
   if(w.step===2){const catalogo=`<div class="card add-peca"><div class="rotulo" style="margin-top:0">${w.itens.length?'Adicionar outra peça':'Adicionar peça'}</div>${selOp('wAdd','data-key="p"',null,state.produtos.map(p=>[p.id,p.nome]),'Escolha a peça')}</div>`;
     return `${head}<h1>${w.edit?'Peças do pedido':'Quais peças?'}</h1>${w.edit||w.itens.length?'':catalogo}
-    ${w.itens.map((it,k)=>`<div class="item"><div class="item-h">${it.mock?mockSvg(it.mock,'W:'+k):prodSvg(it.prod,it.cor,it.cores2)}<b>${esc(nomePeca(it))}</b>${genTag(it)}<button class="x azul" data-a="wMock" data-k="${k}" style="font-size:16px">${ic('i-camisa')}${it.mock?'Trocar mockup':'Pôr mockup'}</button>${it.travado?'':`<button class="x" data-a="wRm" data-k="${k}">Tirar</button>`}</div>
+    ${w.itens.map((it,k)=>`<div class="item${w.errK===k?' w-erro':''}" id="wIt${k}"><div class="item-h">${it.mock?mockSvg(it.mock,'W:'+k):prodSvg(it.prod,it.cor,it.cores2)}<b>${esc(nomePeca(it))}</b>${genTag(it)}<button class="x azul" data-a="wMock" data-k="${k}" style="font-size:16px">${ic('i-camisa')}${it.mock?'Trocar mockup':'Pôr mockup'}</button>${it.travado?'':`<button class="x" data-a="wRm" data-k="${k}">Tirar</button>`}</div>
       ${it.travado?`<div class="instr" style="margin:0">${ic('i-cadeado')}<span><b>A produção desta peça já começou.</b> Dá para corrigir quantidades e personalização. Peça, tecido e cor ficam como estão: <b>${esc(modeloTxt(it))}</b>.</span></div>`:`
       <div><div class="passo-n">Masculina ou feminina?</div>${selOp('wGen',`data-k="${k}"`,it.gen||'',[['M','Masculina'],['F','Feminina'],['U','Unissex (não separa)']],'Escolha a modelagem')}</div>
       ${(prod(it.prod).variacoes||[]).length?`<div><div class="passo-n">Variação</div>${selOp('wVar',`data-k="${k}"`,it.variacao||'',prod(it.prod).variacoes.map(v=>[v,v]),'Escolha a variação')}</div>`:''}
@@ -2242,7 +2249,7 @@ const FAQ=[
 {c:'comeco',q:'Como saio do app ou troco de pessoa no aparelho?',k:'sair deslogar logout trocar usuário outra pessoa',r:['Toque na sua letra ou foto, no alto da tela, à direita (ao lado do sininho).','Toque em Sair.','Quem for usar entra com o próprio e-mail.'],ir:'eu'},
 {c:'comeco',q:'Para que serve o sininho lá em cima?',k:'avisos notificação sino alerta pedido novo',r:['O número vermelho mostra quantos avisos novos você tem (por exemplo, pedido novo cadastrado).','Toque no sininho para ver a lista.','Toque no aviso para abrir o pedido. Ele sai da lista de novos.','Para limpar tudo: Marcar todos como vistos.'],ir:'sino'},
 {c:'comeco',q:'Como mudo de tela?',k:'navegar menu barra de baixo trocar tela onde fica',r:['Use a barra de baixo: Fábrica, Pedidos, Novo, Gestor e Cadastros.','Gestor e Cadastros aparecem só para a gestão.','Nas folhas que abrem por cima, use Voltar ou Fechar, no alto.']},
-{c:'comeco',q:'Apertei errado. Como desfaço?',k:'desfazer errei voltar atrás cancelar engano',r:['Logo depois da ação aparece uma mensagem escura com o botão Desfazer.','Toque em Desfazer antes dela sumir (uns 9 segundos).','Se ela já sumiu, corrija à mão: por exemplo, abra o pedido e desmarque, ou use Corrigir pedido.']},
+{c:'comeco',q:'Apertei errado. Como desfaço?',k:'desfazer errei voltar atrás cancelar engano',r:['Em Começar, Terminou, Comprei, Chegou e Levei aparece, no alto da tela, uma mensagem escura com o botão Desfazer.','Toque em Desfazer antes dela sumir (uns 8 segundos).','Entregar, tirar e restaurar perguntam antes: se tocou sem querer, toque em Cancelar.','Se ela já sumiu, corrija à mão: por exemplo, abra o pedido e desmarque, ou use Corrigir pedido.']},
 {c:'comeco',q:'Apareceu "Este aparelho não está ligado à nuvem". O que faço?',k:'nuvem sem conexão não abre erro conta claude',r:['O app só abre ligado à nuvem, para todos verem os mesmos dados.','Abra o link no Chrome, entre na conta que recebeu acesso ao app e toque em Tentar de novo.','Se continuar, chame alguém da gestão.']},
 {c:'comeco',q:'Apareceu "Só leitura". Por que não salva?',k:'só leitura não salva não grava permissão',r:['Esse acesso consegue ver, mas não consegue gravar.','Nada do que você fizer será salvo até a gestão liberar o acesso de edição.','Chame alguém da gestão.']},
 {c:'comeco',q:'Estou sem internet. Perco o que fiz?',k:'internet caiu wifi offline sem sinal',r:['Se a internet cair no meio do uso, o app avisa em vermelho e salva sozinho quando ela voltar.','Não feche o app enquanto o aviso estiver na tela.']},
@@ -2281,7 +2288,7 @@ const FAQ=[
 {c:'esc',q:'Como confiro os tecidos e aviamentos (insumos) de um pedido?',k:'conferir insumos tecidos aviamentos estoque material conferência',r:['Escritório › Lista de compras: "Conferir insumos" → toque em Conferir (ou abra o pedido e toque em Insumos conferidos).','Vá até o estoque e, em cada item, toque em Tem ou Falta.','No Falta, escreva quanto falta, escolha a unidade (unidade, metro ou Kg) e toque em Pôr na lista de compras.','A lista de compras mostra exatamente o que falta.','Ao lado de cada quantidade aparece para quantas peças ela é (ex.: ≈ 14 metros para 15 Blusa de Agasalho). Assim dá para conferir a conta sem abrir a ficha.','Ao tocar em Falta, aparece também quanto dá por peça (ex.: ≈ 0,93 m por peça), para ver se a quantidade está dentro do normal.']},
 {c:'esc',q:'Faltou um item na conferência. Como acrescento?',k:'faltou item acrescentar incluir zíper entretela botão conferência insumo novo',r:['Abra a conferência (Conferir insumos).','Em "Faltou algum item na lista?", escreva o nome, a quantidade e a unidade.','Toque em Pôr. Depois toque em Tem ou Falta nele.']},
 {c:'esc',q:'Comprei o material. Como registro?',k:'comprei compra comprar material tecido aviamento lista de compras',r:['Escritório › Lista de compras: "Comprar …" → toque em Comprei.','Quando chegar: "Receber …" → toque em Chegou.'],ir:'fab:esc'},
-{c:'esc',q:'Como entrego o pedido ao cliente?',k:'entregar entregue finalizar pedido concluir cliente',r:['Quando tudo estiver pronto aparece a tarefa "Entregar ao cliente" (Escritório › Logística) e um botão grande no pedido.','Toque em Entregue. O pedido sai da lista de abertos.','Errou? Toque em Desfazer logo em seguida.'],ir:'fab:esc'},
+{c:'esc',q:'Como entrego o pedido ao cliente?',k:'entregar entregue finalizar pedido concluir cliente',r:['Quando tudo estiver pronto aparece a tarefa "Entregar ao cliente" (Escritório › Logística) e um botão grande no pedido.','Toque em Entregue e confirme em Sim, entregar. O pedido sai da lista de abertos.','Tocou sem querer? Na pergunta, toque em Cancelar.'],ir:'fab:esc'},
 {c:'esc',q:'O que quer dizer "Chamar app para levar"?',k:'chamar app uber motoboy aplicativo entrega',r:['A pessoa responsável faz levar e buscar chamando um aplicativo de entrega.','Isso se marca no cadastro da pessoa: "Leva e entrega chamando aplicativo".']},
 /* pedidos */
 {c:'ped',q:'Como acho um pedido?',k:'achar buscar procurar pesquisar pedido cliente empresa cnpj número',r:['Toque em Pedidos, na barra de baixo.','Escreva na busca o nome da empresa, do cliente, o CNPJ ou o número.'],ir:'ped'},
@@ -2293,7 +2300,7 @@ const FAQ=[
 {c:'ped',q:'Onde vejo todos os pedidos de uma empresa?',k:'empresa cliente pedidos da empresa histórico',r:['Em Pedidos, toque na chave Empresas (ícone de prédio).','Toque na empresa.'],ir:'emp'},
 {c:'ped',q:'Como corrijo o nome, CNPJ ou contato de uma empresa?',k:'corrigir empresa dados cnpj contato nome cliente',r:['Pedidos › Empresas › toque na empresa.','Mude os dados e toque em Salvar.'],ir:'emp'},
 {c:'ped',q:'Como cancelo um pedido?',k:'cancelar cancelamento desistiu desistência cliente desistiu parar pedido anular',r:['Abra o pedido e toque em Cancelar pedido (no fim do primeiro quadro).','Se quiser, escreva o motivo. Toque em Sim, cancelar pedido.','O pedido sai da produção, das máquinas e das tarefas. O que estava rodando para, e o tempo já trabalhado fica registrado.','Ele continua guardado em Pedidos › Filtrar › Cancelados.'],ir:'ped'},
-{c:'ped',q:'Cancelei sem querer. Como volto o pedido?',k:'voltar reativar desfazer cancelamento cancelado engano descancelar',r:['Logo depois, toque em Desfazer na mensagem escura.','Se já passou: Pedidos › Filtrar › Cancelados, abra o pedido e toque em Voltar o pedido para a produção.','O que estava rodando volta para a fila.'],ir:'ped'},
+{c:'ped',q:'Cancelei sem querer. Como volto o pedido?',k:'voltar reativar desfazer cancelamento cancelado engano descancelar',r:['Pedidos › Filtrar › Cancelados, abra o pedido e toque em Voltar o pedido para a produção.','O que estava rodando volta para a fila.'],ir:'ped'},
 {c:'ped',q:'Dá para apagar um pedido?',k:'apagar excluir deletar pedido remover',r:['Um pedido real não se apaga. Se o cliente desistiu, use Cancelar pedido: ele sai da produção e fica guardado em Cancelados.','Se foi lançado errado, use Corrigir pedido.','Só os pedidos de exemplo podem ser apagados (Cadastros › Ajustes › Pedidos de exemplo).']},
 /* novo e corrigir */
 {c:'novo',q:'Como lanço um pedido novo?',k:'novo pedido lançar cadastrar criar pedido venda',r:['Toque no + Novo, na barra de baixo.','Passo 1: empresa, contato, CNPJ e quem vendeu.','Passo 2: em Adicionar peça, escolha a peça na lista. Depois escolha tecido e cor nas listas, a personalização e as quantidades por tamanho.','Passo 3: a data de entrega. Passo 4: confira e toque em Criar pedido.'],ir:'novo'},
@@ -2344,7 +2351,7 @@ const FAQ=[
 {c:'cad',q:'Como cadastro uma pessoa nova na equipe?',k:'pessoa nova funcionária costureira contratar equipe cadastrar',r:['Cadastros › Equipe › Adicionar pessoa.','Escreva o nome, ponha a foto, marque o cargo e as máquinas que sabe usar.','Toque em Salvar.'],ir:'cad:equipe',g:1},
 {c:'cad',q:'Como coloco a foto de alguém?',k:'foto pessoa imagem rosto trocar foto',r:['Cadastros › Equipe › toque na pessoa.','Toque em Pôr foto (ou Trocar foto) e em Salvar.'],ir:'cad:equipe',g:1},
 {c:'cad',q:'Como marco as máquinas que a pessoa sabe usar?',k:'sabe usar máquinas habilidade estrela faz melhor',r:['Cadastros › Equipe › toque na pessoa.','Em "Máquinas que sabe usar", toque nas máquinas. Em "Faz melhor ★", marque onde ela é mais rápida.','Toque em Salvar.'],ir:'cad:equipe',g:1},
-{c:'cad',q:'Como tiro alguém da equipe?',k:'tirar pessoa demitir saiu da empresa remover funcionária',r:['Cadastros › Equipe › toque na pessoa › Tirar da equipe.','Se errar, toque em Desfazer logo em seguida.'],ir:'cad:equipe',g:1},
+{c:'cad',q:'Como tiro alguém da equipe?',k:'tirar pessoa demitir saiu da empresa remover funcionária',r:['Cadastros › Equipe › toque na pessoa › Tirar da equipe.','O app pergunta antes. Toque em Sim, tirar para confirmar.'],ir:'cad:equipe',g:1},
 {c:'cad',q:'Comprei (ou vendi) uma máquina. Como atualizo?',k:'máquina nova quantidade comprar vender mesa',r:['Cadastros › Máquinas.','Use + e − para a quantidade, ou Adicionar máquina ou mesa para um tipo novo.'],ir:'cad:maquinas',g:1},
 {c:'cad',q:'Como cadastro um produto novo?',k:'produto novo peça modelo cadastrar camiseta',r:['Cadastros › Produtos › Cadastrar produto.','Escreva o nome, escolha o desenho, os tecidos e de qual produto copiar os processos.','Depois ajuste os processos, tempos e aviamentos dentro dele.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
@@ -3195,8 +3202,9 @@ function renderTela(){RC={};if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){con
   ajustaA4();
   const f=document.getElementById('wCli');if(f&&!f.value)f.focus()}
 function snap(){undo=JSON.stringify(state)}
-function toast(msg,comDesfazer=true){const el=document.getElementById('toast');clearTimeout(toastT);
-  el.innerHTML=`<div class="toast" role="status"><span>${esc(msg)}</span>${comDesfazer?'<button data-a="desfazer">Desfazer</button>':''}</div>`;toastT=setTimeout(()=>{el.innerHTML='';undo=null},9000)}
+/* Aviso de sucesso: no alto da tela, some sozinho (4 s; 8 s quando tem Desfazer). Desfazer só nas ações do dia a dia sem confirmação. */
+function toast(msg,comDesfazer=false){const el=document.getElementById('toast');clearTimeout(toastT);
+  el.innerHTML=`<div class="toast" role="status"><span>${esc(msg)}</span>${comDesfazer?'<button data-a="desfazer">Desfazer</button>':''}<button class="tx" data-a="toastX" aria-label="Fechar aviso">×</button></div>`;toastT=setTimeout(()=>{el.innerHTML='';undo=null},comDesfazer?8000:4000)}
 function commit(){save();render()}
 function openSheet(s){ui.sheet=s;render();const e=document.querySelector('.sheet');if(e)e.scrollTop=0}
 function wRead(){const w=ui.sheet?.w;if(!w)return;const fi=document.getElementById('wFicha');if(fi)w.ficha=fi.value;const c=document.getElementById('wCli');if(c)w.cliente=c.value;const ct=document.getElementById('wCont');if(ct)w.contato=ct.value;const cj=document.getElementById('wCnpj');if(cj)w.cnpj=cj.value;
@@ -3231,11 +3239,11 @@ const A={
   mRes:d=>{snap();{const l=lote(d.l);registrar({tipo:'reserva',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:sMap(rp(l))[d.s].nome})}state.reservas=state.reservas||{};Object.keys(state.reservas).forEach(k=>{const r=state.reservas[k];if(r.l===d.l&&r.s===d.s)delete state.reservas[k]});state.reservas[d.m]={l:d.l,s:d.s,p:d.p||''};ui.sheet.sel=null;commit();toast(`Reservado para ${unidade(d.m)?.nome}`)},
   mResX:d=>{snap();delete (state.reservas||{})[d.m];ui.sheet.sel=null;commit();toast('Reserva tirada: o sistema volta a escolher')},
   pedido:d=>{ui.fx=null;openSheet({t:'pedido',id:d.id});if(avisos().some(p=>p.id===d.id))marcaVisto([d.id])},
-  terminou:d=>{const t=tarefaNa(d.m);if(!t)return;snap();t.x.st='ok';t.x.fim=now();{const a=heAtiva(t.x,t.x.fim-1);if(a)a.f=t.x.fim}t.x.util=Math.round(tempoUtil(t.x)/MIN);if(t.pai)acertaPai(t.l,t.s.id);save();const n=t.pai?`${pNome(t.x.op)} terminou ${t.x.n} peças de ${t.s.nome}${t.pai.st==='ok'?'. Processo completo':`. Faltam ${qtdEf(t.l)-pecasFeitas(t.pai)}`}`:`${pNome(t.x.op)} terminou ${t.s.nome}`;openSheet({t:'maq',m:d.m,feito:n});toast(n)},
+  terminou:d=>{const t=tarefaNa(d.m);if(!t)return;snap();t.x.st='ok';t.x.fim=now();{const a=heAtiva(t.x,t.x.fim-1);if(a)a.f=t.x.fim}t.x.util=Math.round(tempoUtil(t.x)/MIN);if(t.pai)acertaPai(t.l,t.s.id);save();const n=t.pai?`${pNome(t.x.op)} terminou ${t.x.n} peças de ${t.s.nome}${t.pai.st==='ok'?'. Processo completo':`. Faltam ${qtdEf(t.l)-pecasFeitas(t.pai)}`}`:`${pNome(t.x.op)} terminou ${t.s.nome}`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true)},
   comecar:d=>{if(!d.p)return;const l=lote(d.l);snap();const s=sMap(rp(l))[d.s],fora=!ready(l,s,pedById(l.ped));
     {const P0=plano(),pl=P0.plan[d.m],rs=(state.reservas||{})[d.m],k=d.l+'|'+d.s;
      const modo=fora?'fora':rs&&rs.l===d.l&&rs.s===d.s?'reserva':pl&&kIt(pl)===k?(pl.pessoa===d.p?'sugerido':'pessoa'):'outro';
-     registrar({tipo:'inicio',modo,maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,sug:pl?.pessoa||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:s.nome})}const x0=l.steps[d.s];let alvo,retoma='';if(x0&&x0.partes){const n=restante(l,d.s);alvo={id:proxParte(x0),n,st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};x0.partes.push(alvo);acertaPai(l,d.s);retoma=` (${n} peças que faltavam)`}else alvo=l.steps[d.s]={st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};let heTxt='';if(situacao().k!=='trab'){const ot=Object.values(plano().uso).map(q=>heAtiva(q.x)).filter(Boolean)[0];const ate=situacao().k==='pausa'?null:(ot?ot.f:heOpcoes()[1]||heOpcoes()[0]);if(ate){alvo.he=[{i:now(),f:ate}];heTxt=` · hora extra até ${tsHm(ate)}`}}const R_=state.reservas||{};Object.keys(R_).forEach(k=>{if(k===d.m||(R_[k].l===d.l&&R_[k].s===d.s))delete R_[k]});ui.sheet=null;commit();toast(`${pNome(d.p)} começou ${s.nome}${retoma} na ${unidade(d.m)?.nome||''}${fora?' (fora da ordem)':''}${heTxt}`)},
+     registrar({tipo:'inicio',modo,maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,sug:pl?.pessoa||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:s.nome})}const x0=l.steps[d.s];let alvo,retoma='';if(x0&&x0.partes){const n=restante(l,d.s);alvo={id:proxParte(x0),n,st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};x0.partes.push(alvo);acertaPai(l,d.s);retoma=` (${n} peças que faltavam)`}else alvo=l.steps[d.s]={st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};let heTxt='';if(situacao().k!=='trab'){const ot=Object.values(plano().uso).map(q=>heAtiva(q.x)).filter(Boolean)[0];const ate=situacao().k==='pausa'?null:(ot?ot.f:heOpcoes()[1]||heOpcoes()[0]);if(ate){alvo.he=[{i:now(),f:ate}];heTxt=` · hora extra até ${tsHm(ate)}`}}const R_=state.reservas||{};Object.keys(R_).forEach(k=>{if(k===d.m||(R_[k].l===d.l&&R_[k].s===d.s))delete R_[k]});ui.sheet=null;commit();toast(`Pronto! ${pNome(d.p)} começou ${s.nome}${retoma} na ${unidade(d.m)?.nome||''}${fora?' (fora da ordem)':''}${heTxt}`,true)},
   impFichas:()=>{const i=document.getElementById('fImpF');i.value='';i.click()},
   impMocks:()=>{const i=document.getElementById('fImpM');i.value='';i.click()},
   wMock:d=>{wRead();ui.mockK=null;ui.mockL=null;ui.mockW=+d.k;const i=document.getElementById('fImpM1');i.value='';i.click()},
@@ -3412,6 +3420,9 @@ const A={
     e.sel.forEach(m=>{const t=P.uso[m];if(!t)return;const x=t.x;x.he=x.he||[];const a=heAtiva(x);if(a)a.f=e.ate;else x.he.push({i:t0,f:e.ate})});
     ui.sheet=null;commit();toast(`Hora extra até ${tsHm(e.ate)} para ${e.sel.length} ${e.sel.length>1?'pessoas':'pessoa'}`)},
   hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`)},
+  confSim:()=>{const c=ui.conf;ui.conf=null;desenhaConf();if(c&&c.fn)c.fn()},
+  confNao:()=>{ui.conf=null;desenhaConf()},
+  toastX:()=>{clearTimeout(toastT);document.getElementById('toast').innerHTML=''},
   desfazer:()=>{if(!undo)return;state=JSON.parse(undo);undo=null;document.getElementById('toast').innerHTML='';ui.sheet=null;commit()},
   problema:d=>openSheet({t:'prob',m:d.m,step:1,n:1,orig:null,mot:null}),
   pausar:d=>{const t=tarefaNa(d.m);if(!t)return;const tot=qtdDe(t),pad=t.s.min*tot*MIN,est=pad?Math.floor(tot*tempoUtil(t.x)/pad):0;openSheet({t:'pausa',m:d.m,n:Math.max(0,Math.min(tot-1,est)),err:''})},
@@ -3464,15 +3475,15 @@ const A={
   trocaSel:d=>{snap();{const t=tarefasEsc().find(x=>x.key===ui.sheet.key);if(t)registrar({tipo:'troca',f:t.f,de:t.resp||'',para:d.v||'',ped:t.ped.id,cli:t.ped.cliente,step:t.t})}if(d.v)state.atrib[ui.sheet.key]=d.v;else delete state.atrib[ui.sheet.key];ui.sheet=null;commit();toast(d.v?`Tarefa passada para ${pNome(d.v)}`:'O sistema volta a escolher')},
   xFun:d=>{eRead();const e=ui.sheet;togl(e.funcoes,d.v);if(!e.funcoes.includes(d.v))e.melhor=e.melhor.filter(x=>x!==d.v);render()},
   xApp:d=>{eRead();ui.sheet.viaApp=!ui.sheet.viaApp;render()},
-  comprei:d=>{const p=pedById(d.id);snap();p.materiais[+d.k].st='pedido';commit();toast('Compra anotada')},
-  chegou:d=>{const p=pedById(d.id);snap();p.materiais[+d.k].st='recebido';commit();toast('Material chegou')},
+  comprei:d=>{const p=pedById(d.id);snap();p.materiais[+d.k].st='pedido';commit();toast('Compra anotada',true)},
+  chegou:d=>{const p=pedById(d.id);snap();p.materiais[+d.k].st='recebido';commit();toast('Material chegou',true)},
   persOnde:d=>{const l=lote(d.l),x=(l.pers||[]).find(q=>q.id===d.s);if(!x)return;const [k,v]=String(d.v).split(':');snap();const st=l.steps[d.s];
     if(k==='i'){x.tipo=v;delete x.forn;if(st&&st.st==='fora')delete l.steps[d.s]}
     else{const f=fornById(v);if(!f)return;x.tipo=f.servico;x.forn=f.id;if(st&&st.st==='fora'){st.forn=f.id;st.op=f.leva}}
     RC={};commit();toast(k==='i'?'Vai ser feito aqui na fábrica':`Vai para ${fornById(v)?.nome}`)},
   persDesfaz:d=>{const l=lote(d.l);if(!l.steps[d.s]||l.steps[d.s].st!=='fora')return;snap();delete l.steps[d.s];RC={};commit();toast('Desfeito: as peças continuam aqui')},
-  levei:d=>{const l=lote(d.l),s=sMap(rp(l))[d.s],f=fornEtapa(l,s);snap();l.steps[s.id]={st:'fora',saiu:now(),forn:f?.id,op:f?.leva};commit();toast(`${qtdEf(l)} peças foram para ${f?.nome||tNome(s.posto)}`)},
-  buscou:d=>{const l=lote(d.l),x=l.steps[d.s];snap();x.st='ok';x.fim=now();commit();toast('Peças de volta na fábrica')},
+  levei:d=>{const l=lote(d.l),s=sMap(rp(l))[d.s],f=fornEtapa(l,s);snap();l.steps[s.id]={st:'fora',saiu:now(),forn:f?.id,op:f?.leva};commit();toast(`${qtdEf(l)} peças foram para ${f?.nome||tNome(s.posto)}`,true)},
+  buscou:d=>{const l=lote(d.l),x=l.steps[d.s];snap();x.st='ok';x.fim=now();commit();toast('Peças de volta na fábrica',true)},
   entregar:d=>{const p=pedById(d.id);snap();p.concluido=now();commit();toast(`Pedido de ${p.cliente} entregue`)},
   /* cadastros */
   tQtd:d=>{const t=tipo(d.t),n=Math.max(0,(t.qtd||0)+(+d.d));if(n<t.qtd&&plano().uso[`${t.id}-${t.qtd}`]){toast(`A ${t.nome} ${t.qtd} está em uso agora`,false);return}snap();t.qtd=n;commit()},
@@ -3596,7 +3607,9 @@ const A={
     if(w.step===1){if(!w.cliente.trim())w.err='Escreva o nome da empresa';else if(w.cnpj&&soDig(w.cnpj).length!==14)w.err='O CNPJ precisa ter 14 números';else if(!w.vend)w.err='Escolha quem vendeu'}
     if(w.step===2){if(!w.itens.length)w.err='Toque em uma peça para adicionar';else if(w.itens.some(i=>!i.tecido))w.err='Escolha o tecido de cada peça';else if(w.itens.some(i=>i.pers.some(x=>x.parte==='Mangas'&&!x.lado)))w.err='Diga em qual manga vai a personalização';else if(w.itens.some(i=>!i.cor))w.err='Escolha a cor principal de cada peça';else if(w.itens.some(i=>i.novaC2))w.err='Confirme ou cancele a cor que está adicionando';else if(w.itens.some(i=>!sum(sizesAll().map(s=>i.g[s]||0))))w.err='Coloque a quantidade de cada peça'}
     if(w.step===3&&!w.entrega)w.err='Escolha a data de entrega';
-    if(!w.err)w.step++;render();const e=document.querySelector('.sheet');if(e&&!w.err)e.scrollTop=0},
+    w.errK=null;if(w.err&&w.step===2){const ruim=i=>!i.tecido||!i.cor||i.novaC2||i.pers.some(x=>x.parte==='Mangas'&&!x.lado)||!sum(sizesAll().map(s=>i.g[s]||0));const k=w.itens.findIndex(ruim);if(k>=0)w.errK=k}
+    if(!w.err)w.step++;render();const e=document.querySelector('.sheet');if(e&&!w.err)e.scrollTop=0;
+    if(w.err)setTimeout(()=>{const alvo=(w.errK!=null&&document.getElementById('wIt'+w.errK))||document.querySelector('.sheet .aviso');if(alvo)alvo.scrollIntoView({behavior:'smooth',block:'center'})},30)},
   pedCancelar:d=>{ui.cancPed=d.id;render()},
   pedCancN:()=>{ui.cancPed=null;render()},
   pedCancOk:d=>{const p=pedById(d.id);if(!p||p.concluido)return;const mot=(document.getElementById('cancMot')?.value||'').trim().slice(0,200);snap();const T=now();
@@ -3611,11 +3624,38 @@ const A={
     w.itens.forEach((it,i)=>{if(it.mockG)guardaMockG(`${id}-${i+1}`,it.mockG)});lines.forEach((x,i)=>state.lotes.push({id:`${id}-${i+1}`,ped:id,mock:w.itens[i].mock||undefined,prod:x.prod,gen:x.gen,variacao:x.variacao,cor:x.cor,cores2:x.cores2,tecido:x.tecido,opcoes:x.opcoes,pers:x.pers,qtd:x.qtd,grade:x.g,desm:0,steps:{},rework:false,parent:null}));
     ui.tela='pedidos';ui.sheet={t:'pedido',id};commit();toast('Pedido criado')},
 };
-document.addEventListener('click',e=>{const z=e.target.closest('svg.mock[data-z]');if(z){e.preventDefault();e.stopPropagation();abreZoom(z.dataset.z);return}const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const f=A[b.dataset.a];if(f){e.preventDefault();f(b.dataset)}});
+/* Confirmação na tela, com o verbo, para o que não tem volta. Cada regra devolve [pergunta, botão] ou nada (não precisa confirmar). */
+const CONF={
+  entregar:d=>{const p=pedById(d.id);return p&&[`Entregar o pedido ${p.id} (${p.cliente}) ao cliente? Ele sai da produção.`,'Sim, entregar']},
+  sair:()=>['Sair do app neste aparelho?','Sim, sair'],euSair:()=>['Sair do app neste aparelho?','Sim, sair'],sbSair:()=>['Sair do app neste aparelho?','Sim, sair'],
+  hePara:d=>{const t=tarefaNa(d.m);return t&&[`Parar a hora extra de ${pNome(t.x.op)} agora?`,'Sim, parar']},
+  disp:d=>{const p=pessoa(d.id);return p&&p.disp!==false&&[`Marcar ${p.nome} como fora agora? As tarefas dela vão para outras pessoas.`,'Sim, está fora']},
+  vias:d=>{const p=pedById(d.id);return p&&p.vias&&[`Desmarcar "${tN('vias','Vias separadas')}" do pedido ${p.id}?`,'Sim, desmarcar']},
+  artePrep:d=>{const p=pedById(d.id);return p&&p.artePrep&&[`Desmarcar a arte preparada do pedido ${p.id}? A aprovação também volta.`,'Sim, desmarcar']},
+  arte:d=>{const p=pedById(d.id);if(!p||(!p.artePrep&&!p.arte))return null;return p.arte?[`Desmarcar a aprovação da arte do pedido ${p.id}?`,'Sim, desmarcar']:[`O cliente aprovou a arte do pedido ${p.id} (${p.cliente})?`,'Sim, o cliente aprovou']},
+  xRm:()=>ui.sheet&&[`Tirar ${ui.sheet.nome||'esta pessoa'} da equipe?`,'Sim, tirar'],
+  tRm:()=>ui.sheet&&[`Tirar ${ui.sheet.nome||'esta máquina'} do cadastro?`,'Sim, tirar'],
+  rmProd:d=>{const p=prod(d.p);return p&&[`Excluir o produto ${p.nome}?`,'Sim, excluir']},
+  rmEst:d=>[`Tirar "${d.v}" do estoque?`,'Sim, tirar'],
+  acsRm:d=>{const u=(state.usuarios||[]).find(x=>x.id===d.id);return u&&[`Tirar o acesso de ${u.nome||u.email}?`,'Sim, tirar acesso']},
+  rmCat:()=>['Tirar esta grade de tamanhos?','Sim, tirar'],rmCor:d=>[`Tirar a cor ${d.v||''}?`,'Sim, tirar'],rmPx:()=>['Tirar este detalhe?','Sim, tirar'],
+  rmPeso:()=>['Tirar esta parte da conta de tecido?','Sim, tirar'],rmProb:()=>['Tirar este motivo de conserto?','Sim, tirar'],
+  setRm:()=>['Tirar este setor?','Sim, tirar'],vocRm:()=>['Tirar esta troca de palavra?','Sim, tirar'],posRm:()=>['Tirar esta posição?','Sim, tirar'],
+  termoRm:()=>['Tirar esta informação do pedido?','Sim, tirar'],logoRm:()=>['Tirar a logo dos documentos?','Sim, tirar'],rmPausa:()=>['Tirar esta pausa do horário?','Sim, tirar'],
+  rmTec:d=>[`Tirar o tecido ${d.v} deste produto?`,'Sim, tirar'],rmVar:()=>['Tirar esta variação?','Sim, tirar'],rmOpc:()=>['Tirar esta opção?','Sim, tirar'],
+  rmParte:()=>['Tirar esta parte do produto?','Sim, tirar'],rmAv:()=>['Tirar este aviamento?','Sim, tirar'],rmPp:()=>['Tirar esta personalização padrão?','Sim, tirar'],
+  wRm:()=>['Tirar esta peça do pedido?','Sim, tirar a peça'],
+  cliApRm:()=>['Tirar este outro nome da empresa?','Sim, tirar'],apRm:()=>['Esquecer este nome aprendido?','Sim, esquecer']};
+function pedeConfirma(txt,sim,fn){ui.conf={txt,sim,fn};desenhaConf()}
+function desenhaConf(){let el=document.getElementById('confirma');if(!el){el=document.createElement('div');el.id='confirma';document.body.appendChild(el)}
+  const c=ui.conf;el.innerHTML=c?`<div class="conf-fundo" data-a="confNao"></div><div class="conf" role="alertdialog" aria-label="Confirmar"><p>${esc(c.txt)}</p><div class="acoes"><button class="big go" data-a="confSim">${ic('i-check')}${esc(c.sim)}</button><button class="big neutro" data-a="confNao">Cancelar</button></div></div>`:''}
+document.addEventListener('click',e=>{const z=e.target.closest('svg.mock[data-z]');if(z){e.preventDefault();e.stopPropagation();abreZoom(z.dataset.z);return}const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const nome=b.dataset.a,f=A[nome];if(!f)return;e.preventDefault();
+  if(CONF[nome]&&!b.dataset.ok){let q=null;try{q=CONF[nome](b.dataset)}catch(err){}if(q){const d={...b.dataset,ok:'1'};return pedeConfirma(q[0],q[1],()=>A[nome](d))}}
+  f(b.dataset)});
 document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)return;
   if(d.sel){const v=t.value;if(!v)return;if(v==='__nova'){if(d.nova)A[d.nova]({...d});return}A[d.sel]({...d,[d.key||'v']:v});return}
   if(t.id==='fModelo'&&t.files[0]){lerArq(t.files[0],true).then(txt=>{let m;try{m=JSON.parse(txt)}catch(e){}if(!m||m._modelo!==1)return toast('Esse arquivo não é um modelo de fábrica',false);ui.modPend=m;render()});return}
-  if(t.id==='fSeg'&&t.files[0]){lerArq(t.files[0],true).then(async txt=>{try{await restaurar(JSON.parse(txt));toast('Cópia restaurada',false)}catch(e){toast('Esse arquivo não é uma cópia do sistema',false)}});return}
+  if(t.id==='fSeg'&&t.files[0]){const arq=t.files[0];t.value='';pedeConfirma(`Restaurar a cópia "${arq.name}"? O que está no app agora vira uma cópia antes.`,'Sim, restaurar',()=>lerArq(arq,true).then(async txt=>{try{await restaurar(JSON.parse(txt));toast('Cópia restaurada')}catch(e){toast('Esse arquivo não é uma cópia do sistema')}}));return}
   if(t.id==='fArq'&&t.files.length){const fs=[...t.files],al=ui.arqAlvo;if(!al)return;(async()=>{toast('Guardando…',false);let ult=null;for(const fl of fs){try{ult=await arqSalvar(fl,al.cli,al.tipo)||ult}catch(er){toast(`Não consegui abrir ${fl.name}`,false)}}
       document.getElementById('toast').innerHTML='';if(!ult)return;snap();if(al.alvo){usaArq(ult,al.alvo);if(ui.sheet&&ui.sheet.t==='arqPick')ui.sheet=ui.sheet.volta||null}commit();toast(fs.length>1?`${fs.length} arquivos guardados na empresa`:'Arquivo guardado na empresa')})();return}
   if(t.id==='fImpF'&&t.files.length){importarFichas([...t.files]);return}
