@@ -178,3 +178,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 
 **O que NÃO mudou:**
 - A ficha de produção e o PDF de produção continuam iguais.
+
+---
+
+## Conferir insumos: para quantas peças é cada item
+
+**O que mudou:**
+- Em **Conferir insumos**, ao lado da quantidade aparece **para quantas peças** ela é. Exemplo: "Precisa ≈ 14 metros **para 15 Blusa de Agasalho**".
+- Quando o mesmo item serve para mais de uma peça, aparece a divisão: "para 53 peças (15 Blusa de Agasalho, 38 Polo Amsterdã)".
+- Assim dá para conferir a conta ali mesmo, sem sair da tela para abrir a ficha.
