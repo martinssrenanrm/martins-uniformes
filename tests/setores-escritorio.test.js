@@ -58,5 +58,13 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
     return {titulo:t&&t.t,ganhou,vendSai,volta:fNome('vias')==='Separar vias'&&(o=>JSON.stringify(Object.keys(o).sort().map(k=>[k,[...o[k]].sort()])))(cargoFun())===(o=>JSON.stringify(Object.keys(o).sort().map(k=>[k,[...o[k]].sort()])))(CARGO_FUN)&&vendFaz().includes('vias')}});
   ok(r.titulo==='Imprimir ficha','a tarefa usa o nome que a fábrica escolheu');ok(r.ganhou,'cargo Compras passa a receber a etapa');ok(r.vendSai,'preferência da vendedora desligada');
   ok(r.volta,'apagando o nome e voltando os cargos, fica como o padrão');
+  console.log('8) Partes do app (módulos)');
+  r=await A.evaluate(()=>{const ped=state.pedidos.find(p=>!p.concluido);ui.tela='pedidos';ui.sheet={t:'pedido',id:ped.id};render();const vis=sel=>{const e=document.querySelector(sel);return !!e&&getComputedStyle(e).display!=='none'};
+    const antes={etq:vis('[data-a=docEtq]')};['etq','pers','ciclo','hora','imp','junto'].forEach(v=>A.modLiga({v}));ui.tela='pedidos';ui.sheet={t:'pedido',id:ped.id};render();
+    const depois={etq:vis('[data-a=docEtq]')};ui.sheet=null;ui.tela='gestor';ui.gt='agora';render();const ciclo=!!document.querySelector('[data-a=gt][data-v=ciclo],[data-v=ciclo]');
+    ui.sheet={t:'ajuda',q:'etiqueta térmica'};const busca=ajBusca('etiquetas do corte').some(x=>x.f.m==='etq');ui.sheet=null;
+    ['etq','pers','ciclo','hora','imp','junto'].forEach(v=>A.modLiga({v}));return {antes,depois,ciclo,busca,volta:!(state.modOff||[]).length,dados:state.pedidos.length>0}});
+  ok(r.antes.etq&&!r.depois.etq,'desligar Etiquetas some o botão');ok(!r.ciclo,'desligar Ciclo some a aba do painel');
+  ok(!r.busca,'ajuda não mostra perguntas de parte desligada');ok(r.volta&&r.dados,'religando, tudo volta; nenhum dado apagado');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

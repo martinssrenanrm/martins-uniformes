@@ -297,3 +297,11 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Cada passo mostra ✓ quando está pronto, ou **o que falta**. **Abrir** leva direto ao lugar certo.
 - Nada mudou de lugar: as outras abas continuam iguais.
 - Na Martins, aparece só um ponto pendente: telefone/WhatsApp da empresa nos documentos.
+
+---
+
+## Partes do app (só para a gestão)
+
+- Em **Cadastros › Ajustes › Partes do app** dá para desligar o que a fábrica não usa: personalização, etiquetas, cortar junto, hora extra, importar fichas e o painel do ciclo.
+- O que é desligado some da tela e da ajuda. **Nada é apagado**: ligando de novo, volta tudo.
+- **Na Martins está tudo ligado. Nada muda para a equipe.**
