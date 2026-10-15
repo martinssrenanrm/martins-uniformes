@@ -1851,7 +1851,7 @@ const campoN=(lab,attr,val,suf)=>`<label class="aj-row"><span>${lab}</span><span
 function cAjustes(){const pr=state.params;
   return `${state.pedidos.some(ehExemplo)?`<div class="card" style="border-color:var(--atn)"><h2>Pedidos de exemplo</h2><p style="margin:0 0 12px;color:var(--ink2)">Antes de começar com dados reais, apague os ${state.pedidos.filter(ehExemplo).length} pedidos de exemplo (e as empresas de exemplo). Pedidos reais, como os importados de fichas, continuam. Máquinas, equipe, produtos e estoque continuam.</p>
     ${ui.apagaEx?`<div class="aviso">${ic('i-alerta')}Isso apaga só os pedidos de exemplo, em todos os aparelhos. Antes, uma cópia de segurança é guardada. Tem certeza?</div><div class="acoes"><button class="big" style="background:var(--red);color:#fff" data-a="apagaEx" data-ok="1">Sim, apagar</button><button class="big neutro" data-a="apagaExN">Não</button></div>`:`<button class="mbtn" data-a="apagaEx">Apagar pedidos de exemplo</button>`}</div>`:''}
-  ${cardAcessos()}${cardAvisos()}${cardSeguranca()}<div class="card"><h2>Este aparelho</h2><div class="aj-row"><span>Conectado como: <b>${esc(usuarioAtual()?.nome||'')}</b><br><small class="lido">${esc(usuarioAtual()?.email||'')}</small></span><button class="mbtn" data-a="sair">Sair</button></div>
+  ${cardAcessos()}${cardAvisos()}${cardSeguranca()}${cardModelo()}<div class="card"><h2>Este aparelho</h2><div class="aj-row"><span>Conectado como: <b>${esc(usuarioAtual()?.nome||'')}</b><br><small class="lido">${esc(usuarioAtual()?.email||'')}</small></span><button class="mbtn" data-a="sair">Sair</button></div>
     <div class="aj-row"><span>Dúvidas sobre o app</span><button class="mbtn" data-a="ajuda">${ic('i-duvida')}Como usar</button></div></div>
   <div class="card"><h2>Onde ficam os dados</h2><p style="margin:0;color:var(--ink2)">${NV.modo==='nuvem'?'Na nuvem: todos os aparelhos veem as mesmas informações ao mesmo tempo.':'Só neste aparelho. Abra pelo link do sistema para usar a nuvem.'}</p></div>
   <div class="card"><h2>Sua empresa nos documentos</h2><p class="dica" style="margin:-4px 0 8px">Aparece no Pedido enviado ao cliente e nas fichas.</p>
@@ -2291,6 +2291,7 @@ const FAQ=[
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
+{c:'cad',q:'Como levo as máquinas e os produtos desta fábrica para outra?',k:'modelo fábrica configuração copiar outra confecção começar máquinas produtos exportar importar',r:['Cadastros › Ajustes › Modelo de fábrica: Baixar o modelo desta fábrica.','O modelo leva máquinas, produtos, tamanhos, cores, tecidos, horário e prazos. Não leva pedidos, empresas, equipe, fornecedores, estoque nem acessos.','Na outra fábrica, enquanto não há pedidos de verdade: Começar com um modelo.'],ir:'cad:ajustes#Modelo de fábrica',g:1},
 {c:'cad',q:'Como faço uma cópia de segurança? E como recupero?',k:'cópia segurança backup recuperar restaurar lixeira apagado',r:['O app já faz uma cópia sozinho todo dia (guarda 14 dias).','Cadastros › Ajustes › Cópias de segurança: Fazer uma cópia agora ou Baixar cópia em arquivo.','Para recuperar algo apagado: Ver cópias e lixeira.'],ir:'cad:ajustes#Cópias de segurança',g:1},
 {c:'cad',q:'Como mudo o horário da fábrica, as pausas e os dias?',k:'horário expediente pausa almoço dias sábado entrada saída',r:['Cadastros › Ajustes › Horário da fábrica.','Mude Começa, Para, as pausas e os dias de trabalho. Salva sozinho.'],ir:'cad:ajustes#Horário da fábrica',g:1},
 {c:'cad',q:'Como coloco a logo e os contatos da Martins nos documentos?',k:'logo logomarca marca colocar coloco contatos documento whatsapp endereço',r:['Cadastros › Ajustes › Sua empresa nos documentos.','Toque em Pôr logo e preencha os campos. Salva sozinho.'],ir:'cad:ajustes#Sua empresa nos documentos',g:1},
@@ -2690,7 +2691,7 @@ function abreZoom(z){const [k,v]=[z.slice(0,1),z.slice(2)];let src='',tit='Mocku
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('zoom')?.innerHTML){document.getElementById('zoom').innerHTML='';e.stopImmediatePropagation()}},true);
 
 /* ================= documentos: ficha de produção, mockups e pedido para o cliente ================= */
-const MARCA0={nome:'Martins Pro',sub:'Uniformes profissionais',tel:'',whats:'',email:'',insta:'',site:'',end:'',cnpj:'',logo:''};
+const MARCA0={nome:CLIENTE.nome==='Demonstração'?'Confecção Exemplo':CLIENTE.nome,sub:CLIENTE.sub||'',tel:'',whats:'',email:'',insta:'',site:'',end:'',cnpj:'',logo:''};
 const TERMOS0=[
  ['Cores','Pode haver pequenas variações de tom entre a imagem, a amostra e a peça pronta, de acordo com o lote do tecido e a disponibilidade do fornecedor.'],
  ['Imagens','As imagens deste pedido são ilustrativas. A cor que aparece na tela do celular ou do computador pode ser diferente da cor real do tecido.'],
@@ -2959,6 +2960,24 @@ async function lerBackup(nome){const m=await NV.db.doc(`backup/${nome}`).get();i
 async function restaurar(obj){if(!obj||!Array.isArray(obj.pedidos)||!Array.isArray(obj.produtos))throw new Error('arquivo inválido');await backupNuvem(`${hojeISO()}-antes-de-restaurar-${Date.now().toString(36)}`);
   const {_app,_ts,...st}=obj;snap();state=normalizar(st);RC={};save();render();tick()}
 async function sSeg(){}
+/* Modelo de fábrica: a configuração sem os dados do dia a dia. Serve para começar outra confecção a partir desta. */
+const MODELO_CFG=['cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
+function modeloFabrica(){const c=x=>JSON.parse(JSON.stringify(x??null));const cfg={};MODELO_CFG.forEach(k=>{if(state[k]!=null)cfg[k]=c(state[k])});
+  cfg.feriados={local:state.feriados?.local||FER0().local,facult:c(state.feriados?.facult||{}),extras:[],trabalha:[]};
+  return {_modelo:1,_ts:now(),nome:marca().nome||'',tipos:c(state.tipos),produtos:c(state.produtos),cfg}}
+const temPedidoReal=()=>state.pedidos.some(p=>!ehExemplo(p));
+async function aplicarModelo(m){if(!m||m._modelo!==1||!Array.isArray(m.tipos)||!Array.isArray(m.produtos)||!m.cfg)throw new Error('arquivo inválido');
+  if(temPedidoReal())throw new Error('tem pedidos');await backupNuvem(`${hojeISO()}-antes-do-modelo-${Date.now().toString(36)}`);snap();
+  const c=x=>JSON.parse(JSON.stringify(x));state.tipos=c(m.tipos);state.produtos=c(m.produtos);MODELO_CFG.forEach(k=>{if(m.cfg[k]!=null)state[k]=c(m.cfg[k])});if(m.cfg.feriados)state.feriados=c(m.cfg.feriados);
+  state.pedidos=[];state.lotes=[];state.consertos=[];state.log=[];state.atrib={};state.reservas={};state.estoque={};state.pessoas=[];state.forn=[];state.donos={};state.clientes=[];state.exemplo=false;
+  state=normalizar(state);RC={};commit()}
+function cardModelo(){if(!ehGestao())return '';const pode=!temPedidoReal();return `<div class="card" id="Modelo"><h2>Modelo de fábrica</h2>
+  <p class="dica" style="margin:-4px 0 8px">O modelo leva máquinas, produtos com as etapas, tamanhos, cores, tecidos, posições, horário e prazos. <b>Não leva</b> pedidos, empresas, equipe, fornecedores, estoque nem acessos.</p>
+  <div class="linha-dep"><button class="mbtn neutro2" data-a="modBaixar">${ic('i-lista')}Baixar o modelo desta fábrica</button>
+  ${pode?`<label class="mbtn neutro2" style="cursor:pointer">${ic('i-mais')}Começar com um modelo<input type="file" id="fModelo" accept="application/json,.json" hidden></label>`:''}</div>
+  ${pode&&ui.modPend?`<div class="aviso" style="margin-top:10px">${ic('i-alerta')}<span>Trocar máquinas, produtos e ajustes pelos do modelo <b>${esc(ui.modPend.nome||'')}</b> (${ui.modPend.produtos.length} produtos, ${ui.modPend.tipos.length} máquinas)? Equipe, fornecedores e estoque ficam em branco. O app guarda uma cópia antes.</span></div>
+  <div class="linha-dep"><button class="mbtn" data-a="modAplicar">${ic('i-check')}Sim, começar com este modelo</button><button class="mbtn neutro2" data-a="modCancelar">Cancelar</button></div>`:''}
+  ${pode?'<p class="dica" style="margin:8px 0 0">Começar com um modelo troca máquinas, produtos e ajustes por os do arquivo e deixa equipe, fornecedores e estoque em branco. Antes, o app guarda uma cópia.</p>':'<p class="dica" style="margin:8px 0 0">Começar com um modelo só aparece enquanto não há pedidos de verdade.</p>'}</div>`}
 function cardSeguranca(){if(!ehGestao())return '';return `<div class="card"><h2>Cópias de segurança</h2>
   <p class="dica" style="margin:-4px 0 8px">Todo dia o sistema guarda uma cópia completa na nuvem (ficam as dos últimos 14 dias). Nada apagado some de vez: vai para a lixeira por 60 dias.</p>
   <div class="linha-dep"><button class="mbtn" data-a="segAgora">${ic('i-check')}Fazer uma cópia agora</button><button class="mbtn neutro2" data-a="segBaixar">${ic('i-lista')}Baixar cópia em arquivo</button><label class="mbtn neutro2" style="cursor:pointer">${ic('i-mais')}Restaurar de um arquivo<input type="file" id="fSeg" accept="application/json,.json" hidden></label><button class="mbtn neutro2" data-a="segLista">Ver cópias e lixeira</button></div></div>`}
@@ -3255,7 +3274,10 @@ const A={
   reconectar:()=>{NV.erro='';render();nuvemConectar()},
   soAquiEnviar:()=>soAquiEnviar(),
   soAquiDescartar:d=>{if(!d.ok){ui.soAquiConf=true;return render()}ui.soAquiConf=false;try{localStorage.removeItem('martins-so-aqui')}catch(e){}render();toast('Descartado',false)},
-  segBaixar:async()=>{const n=`Martins - copia de seguranca ${hojeISO()}.json`;await baixarBlob(n,new Blob([snapshot()],{type:'application/json'}))},
+  modAplicar:async()=>{const m=ui.modPend;ui.modPend=null;try{await aplicarModelo(m);toast('Modelo aplicado. Agora cadastre a equipe e os fornecedores.',false)}catch(e){render();toast(e.message==='tem pedidos'?'Já há pedidos de verdade: o modelo não foi aplicado':'Esse arquivo não é um modelo de fábrica',false)}},
+  modCancelar:()=>{ui.modPend=null;render()},
+  modBaixar:async()=>{const n=`${semAc(marca().nome||'fabrica').replace(/[^a-z0-9]+/gi,'-')} - modelo de fabrica ${hojeISO()}.json`;await baixarBlob(n,new Blob([JSON.stringify(modeloFabrica())],{type:'application/json'}))},
+  segBaixar:async()=>{const n=`${marca().nome||'Fabrica'} - copia de seguranca ${hojeISO()}.json`;await baixarBlob(n,new Blob([snapshot()],{type:'application/json'}))},
   segLista:async()=>{openSheet({t:'seg',bk:null,lx:null});if(NV.modo!=='nuvem'){ui.sheet.bk=[];ui.sheet.lx=[];return render()}
     try{const [B,X]=await Promise.all([NV.db.collection('backup').get(),NV.db.collection('lixeira').get()]);if(ui.sheet?.t!=='seg')return;
       ui.sheet.bk=B.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);ui.sheet.lx=X.docs.map(d=>({doc:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts).slice(0,80);render()}catch(e){ui.sheet.bk=[];ui.sheet.lx=[];render()}},
@@ -3490,6 +3512,7 @@ const A={
 document.addEventListener('click',e=>{const z=e.target.closest('svg.mock[data-z]');if(z){e.preventDefault();e.stopPropagation();abreZoom(z.dataset.z);return}const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const f=A[b.dataset.a];if(f){e.preventDefault();f(b.dataset)}});
 document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)return;
   if(d.sel){const v=t.value;if(!v)return;if(v==='__nova'){if(d.nova)A[d.nova]({...d});return}A[d.sel]({...d,[d.key||'v']:v});return}
+  if(t.id==='fModelo'&&t.files[0]){lerArq(t.files[0],true).then(txt=>{let m;try{m=JSON.parse(txt)}catch(e){}if(!m||m._modelo!==1)return toast('Esse arquivo não é um modelo de fábrica',false);ui.modPend=m;render()});return}
   if(t.id==='fSeg'&&t.files[0]){lerArq(t.files[0],true).then(async txt=>{try{await restaurar(JSON.parse(txt));toast('Cópia restaurada',false)}catch(e){toast('Esse arquivo não é uma cópia do sistema',false)}});return}
   if(t.id==='fArq'&&t.files.length){const fs=[...t.files],al=ui.arqAlvo;if(!al)return;(async()=>{toast('Guardando…',false);let ult=null;for(const fl of fs){try{ult=await arqSalvar(fl,al.cli,al.tipo)||ult}catch(er){toast(`Não consegui abrir ${fl.name}`,false)}}
       document.getElementById('toast').innerHTML='';if(!ult)return;snap();if(al.alvo){usaArq(ult,al.alvo);if(ui.sheet&&ui.sheet.t==='arqPick')ui.sheet=ui.sheet.volta||null}commit();toast(fs.length>1?`${fs.length} arquivos guardados na empresa`:'Arquivo guardado na empresa')})();return}
@@ -3680,14 +3703,14 @@ async function nuvemIniciar(modo){const btns=document.querySelectorAll('[data-a=
   try{const l=await NV.db.doc('trava/inicio').acquire({holder:DEV,ttlMs:60000});const m=await nuvemLer();
     const temDados=Object.keys(m).some(k=>/^(pedidos|lotes|pessoas|produtos|clientes)\//.test(k));
     if(m['config/main']?.v||temDados||!l.acquired){ui.inicio=false;if(m['config/main']?.v||temDados)return nuvemAdotar(m);return setTimeout(nuvemConectar,3000)}
-    if(modo==='vazia'){state.pedidos=[];state.lotes=[];state.consertos=[];state.log=[];state.atrib={};state.exemplo=false}else state.exemplo=true;
+    if(modo==='vazia'){state.pedidos=[];state.lotes=[];state.consertos=[];state.log=[];state.atrib={};state.reservas={};state.pessoas=[];state.forn=[];state.donos={};state.estoque={};state.clientes=[];state.exemplo=false}else state.exemplo=true;
     ui.inicio=false;NV.pronto=true;NV.acked={};NV.last={};NV.modo='nuvem';save();render();tick();nuvemOuvir();mockPendentes();toast('Pronto! Os dados agora ficam na nuvem',false)}
   catch(e){btns.forEach(b=>b.disabled=false);toast('Sem conexão. Tente de novo.',false)}}
 function vInicio(){return `<div class="inicio"><span class="m-ic" style="width:72px;height:72px">${ic('i-fabrica')}</span><h1>Vamos começar</h1>
-  <p>É a primeira vez que o sistema abre na nuvem. As máquinas, a equipe, os produtos e o estoque <b>deste aparelho</b> vão para a nuvem. Escolha como começar:</p>
-  <button class="big go" data-a="inicio" data-v="vazia">${ic('i-check')}Começar a usar (sem pedidos de exemplo)</button>
+  <p>É a primeira vez que o sistema abre na nuvem. Escolha como começar:</p>
+  <button class="big go" data-a="inicio" data-v="vazia">${ic('i-check')}Começar a usar (máquinas e produtos de modelo; a equipe você cadastra)</button>
   <button class="big neutro" data-a="inicio" data-v="exemplo">${ic('i-lista')}Treinar com os pedidos de exemplo</button>
-  <p class="sub-l">Dá para apagar os pedidos de exemplo depois, em Cadastros › Ajustes.</p></div>`}
+  <p class="sub-l">Dá para apagar os pedidos de exemplo depois, em Cadastros › Ajustes. Para usar as máquinas e os produtos de outra fábrica: Cadastros › Ajustes › Modelo de fábrica.</p></div>`}
 const QR_PUB=(()=>{try{const m=location.hash.match(/[#&]f=([0-9a-f]{20,})/);return m?m[1]:null}catch(e){return null}})();
 async function buscaFichaPub(tok){if(SB_CFG){const r=await fetch(SB_CFG.url+'/rest/v1/rpc/ficha_publica',{method:'POST',headers:{apikey:SB_CFG.key,Authorization:'Bearer '+SB_CFG.key,'Content-Type':'application/json'},body:JSON.stringify({tok})});if(!r.ok)throw new Error('rede');return await r.json()}
   load();const l=(state.lotes||[]).find(x=>x.qr===tok);if(!l)return null;const m=paraDocs(state);return {docs:m,mock:mockGrande(l)||await pegaMock(l)||null,mockId:mockChave(l)}}

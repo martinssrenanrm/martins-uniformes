@@ -261,3 +261,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - O app foi arrumado por dentro para poder ser usado também por outras confecções.
 - **Para vocês, nada muda:** mesmas telas, mesmos botões, mesmos dados, mesmos acessos.
 - Única diferença visível: algumas mensagens de ajuda agora dizem "alguém da gestão" ou mostram o nome de quem é da gestão no app, em vez de nomes escritos fixos.
+
+---
+
+## Modelo de fábrica (só para a gestão)
+
+- Em **Cadastros › Ajustes** apareceu o quadro **Modelo de fábrica**.
+- **Baixar o modelo desta fábrica** gera um arquivo com máquinas, produtos, tamanhos, cores, tecidos, horário e prazos. Não leva pedidos, empresas, equipe, estoque nem acessos.
+- Serve para montar o app de outra confecção. **No dia a dia da Martins, não precisa mexer.**
+- O botão "Começar com um modelo" só aparece em fábrica sem pedidos de verdade, então não aparece para vocês.
