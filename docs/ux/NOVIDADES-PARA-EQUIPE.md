@@ -367,3 +367,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 - A gestão pode escolher a **cor da marca** em Cadastros › Ajustes › Sua empresa.
 
 **Para mandar no grupo:** "O app ficou com visual novo, mas os botões estão nos mesmos lugares."
+
+---
+
+## Onda 5c: Novo pedido mais leve
+
+- Em cada peça ficam à vista: **modelagem, tecido, cor e quantidades**.
+- **"Outras cores na peça"** e **"Personalização"** abrem ao tocar. Se a peça costuma ter personalização (ou já tem), o bloco já vem aberto.
+- Na lista de cores, **as mais usadas aparecem primeiro**.
+
+**Para mandar no grupo (vendedoras):** "No Novo pedido, Outras cores e Personalização abrem ao tocar no título."

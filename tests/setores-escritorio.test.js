@@ -116,5 +116,12 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
     const lum=h=>{const f=x=>{x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)};const [r,g,b]=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return .2126*f(r)+.7152*f(g)+.0722*f(b)};
     const contraste=1.05/(lum(clara)+.05);state.marca={...marca(),cor:''};render();return {antes,roxo,contraste,volta:v()===antes}});
   ok(r.roxo==='#7c3aed','a cor da marca vira a cor principal do app');ok(r.contraste>=4.5,'cor clara demais é escurecida para o texto branco continuar legível');ok(r.volta,'sem cor, volta ao padrão');
+  console.log('15) Onda 5c: Novo pedido, peça mais curta');
+  r=await A.evaluate(()=>{ui.blk={};A.novo();const w=ui.sheet.w;w.cliente='T';w.vend='paula';w.step=2;const sem=state.produtos.find(p=>!(p.persPadrao||[]).length),com=state.produtos.find(p=>(p.persPadrao||[]).length);
+    A.wAdd({p:sem.id});if(com)A.wAdd({p:com.id});render();const d=k=>document.querySelector(`details[data-blk="${k}"]`);
+    const r={c2fechado:d('wc20')&&!d('wc20').open,pzSem:d('wpz0')&&!d('wpz0').open,pzCom:com?d('wpz1')&&d('wpz1').open:true,
+      ordem:(()=>{const f={};state.lotes.forEach(l=>f[l.cor]=(f[l.cor]||0)+1);const top=Object.entries(f).sort((a,b)=>b[1]-a[1])[0][0];return coresOrdem()[0]===top})()};
+    ui.sheet=null;render();return r});
+  ok(r.c2fechado,'"Outras cores" começa fechado quando não tem');ok(r.pzSem&&r.pzCom,'Personalização abre sozinha só no produto que costuma ter');ok(r.ordem,'cor mais usada aparece primeiro na lista');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();
