@@ -357,3 +357,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Reservar, Pausar, Dividir e as outras opções** ficam no bloco **"Mais opções"**, logo abaixo. Toque nele para abrir.
 
 **Para mandar no grupo:** "Na máquina, Pausar, Dividir e Reservar agora ficam em Mais opções."
+
+---
+
+## Visual novo do app
+
+- O app ganhou um **visual mais moderno**: letra nova (Inter), cartões mais leves, botões com destaque para a ação principal, abas da Fábrica no estilo de "botões juntos" e barra de baixo translúcida.
+- **Nada mudou de lugar.** Letras continuam grandes e os botões continuam fáceis de tocar.
+- A gestão pode escolher a **cor da marca** em Cadastros › Ajustes › Sua empresa.
+
+**Para mandar no grupo:** "O app ficou com visual novo, mas os botões estão nos mesmos lugares."
