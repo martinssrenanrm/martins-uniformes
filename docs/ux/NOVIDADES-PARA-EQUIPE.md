@@ -412,3 +412,15 @@ O tempo de cada parte conta para quem fez, no Painel.
 - No alto do quadro: **quanto do registro está confiável** (etapas em que Começar e Terminei foram tocados na hora). Meta: 80% ou mais.
 
 **Recado para a equipe:** "Toque em Começar quando começar e em Terminei quando acabar. Marcar depois não conta o tempo."
+
+---
+
+## Cortar vários pedidos juntos (pedido do corte, 16/10)
+
+- Na **Mesa de corte**, no corte sugerido:
+  - em **"Dá para cortar junto"** (mesmo tecido e cor), toque em **+ Juntar** nos que vão juntos;
+  - para outro tecido ou modelo (ex.: bermuda e calça), abra **"Juntar outro corte"** e toque em **+ Juntar**.
+- O botão vira **"Começar 3 cortes juntos com Fábio"**: todos começam na mesma hora, na mesma mesa, com o mesmo cortador.
+- No fim, **um Terminou fecha todos**. O tempo é dividido entre os cortes pelo tamanho de cada um.
+
+**Para mandar ao Fábio:** "Na mesa de corte, toque em + Juntar nos cortes que vão juntos e depois em Começar. No fim, um Terminou fecha todos."
