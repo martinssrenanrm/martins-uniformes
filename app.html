@@ -842,6 +842,15 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 details.sub{border-top:1px solid var(--line);padding-top:10px}details.sub>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;cursor:pointer}details.sub>summary::-webkit-details-marker{display:none}
 details.sub .sub-r{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-weight:600;font-size:17px}details.sub .sub-r svg.ic{width:22px;height:22px;transition:transform .15s}details.sub[open] .sub-r svg.ic{transform:rotate(90deg)}details.sub[open]>summary{margin-bottom:8px}details.sub>summary .passo-n{color:var(--ink)}
 .aj-idx{margin:0 0 16px}.aj-idx .linha-dep{gap:8px}.aj-idx .pulo{font-size:16px;min-height:44px;border-radius:999px}
+body.chao .nav{display:none!important}body.chao main{padding-bottom:40px}
+.mv{max-width:640px;margin:0 auto;display:grid;gap:14px}.mv-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mv-eu{display:flex;align-items:center;gap:14px}.mv-eu .av{width:64px!important;height:64px!important;font-size:28px}.mv-eu small{display:block;color:var(--ink2);font-size:18px}.mv-eu b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.02em}
+.mv-h{margin:6px 0 0;font-size:22px}.mv-onde{display:flex;align-items:center;gap:8px;margin:-4px 0 0;font-size:20px;color:var(--ink2)}
+.mv-b{min-height:84px!important;font-size:28px!important;width:100%}
+.mv-meta-t{display:flex;align-items:baseline;justify-content:space-between;font-size:20px;font-weight:700}.mv-meta-t b{font-size:34px;letter-spacing:-.02em}
+.mv-bar{height:14px;background:var(--grey-soft);border-radius:999px;overflow:hidden;margin-top:8px}.mv-bar i{display:block;height:100%;background:var(--go);border-radius:999px}
+.mv-quem{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.mv-p{display:grid;justify-items:center;gap:10px;padding:18px 10px;border:1.5px solid var(--line-btn);border-radius:var(--r-lg);background:var(--card);box-shadow:var(--sh-1);font-size:22px}.mv-p .av{width:72px!important;height:72px!important;font-size:30px}
+.mv-pe{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 /* ================= Design system v2 (10/2026) =================
    Visual de produto: superfícies leves com sombra suave, cantos consistentes, tipografia Inter, cor da marca.
    Regras que NÃO mudam (público 60+): letra ≥ 16px, alvos ≥ 48px, contraste de texto AA, botão sempre parece botão. */
@@ -1604,7 +1613,8 @@ const MIGRACOES=[
   {v:8,nome:'Cores padrão (uma vez)',fn:s=>{if(!s.coresV){s.cores={...CORES,...(s.cores||{})};s.coresV=1}}},
   {v:9,nome:'Gola comprada pronta (uma vez)',fn:s=>{if(!s.golaV){(s.produtos||[]).forEach(ajustaGola);s.golaV=1}}},
   {v:10,nome:'Datas dos insumos: o que já existia fica com data desconhecida',fn:s=>{if(!s.tsInsV){(s.pedidos||[]).forEach(p=>{const M=p.materiais||[];M.forEach(m=>{if(m.conf&&!m.tConf)m.tConf=-1;if(m.st==='comprar'&&!m.tFalta)m.tFalta=-1;if(m.st==='pedido'&&!m.tComprado)m.tComprado=-1;if(m.st==='recebido'&&!m.tChegou)m.tChegou=-1});if(M.length&&M.every(m=>m.tConf===-1&&(m.st==='ok'||m.st==='recebido')))p.insOk=-1});s.tsInsV=1}}},
-  {v:11,nome:'Setores viram cadastro',fn:s=>{if(!Array.isArray(s.setores)||!s.setores.length)s.setores=GRUPOS.map(g=>({...g,fase:g.id,porMaquina:g.id==='acab'}))}}
+  {v:11,nome:'Setores viram cadastro',fn:s=>{if(!Array.isArray(s.setores)||!s.setores.length)s.setores=GRUPOS.map(g=>({...g,fase:g.id,porMaquina:g.id==='acab'}))}},
+  {v:12,nome:'Perfil Operação antigo vira Escritório (mesmo acesso)',fn:s=>{(s.usuarios||[]).forEach(u=>{if(u.perfil==='operacao')u.perfil='escritorio'})}}
 ];
 const SCHEMA=MIGRACOES[MIGRACOES.length-1].v;
 function migrar(s){const v0=s.schema||0;MIGRACOES.forEach(m=>{if(m.v>v0)m.fn(s)});s.schema=SCHEMA}
@@ -1734,9 +1744,32 @@ function sSetor(){const z=SETORES_ESC.find(x=>x.id===ui.sheet.v);if(!z)return vo
 /* Sininho de avisos: sempre no canto de cima, à direita. Abre uma janelinha com os avisos. */
 function sino(){const u=usuarioAtual();if(!u)return '';const n=avisos().length;return `${euBtn(u)}<button class="sino" data-a="sinoAbre" aria-expanded="${!!ui.sino}" aria-label="${n?n+(n>1?' avisos novos':' aviso novo'):'Avisos'}" title="Avisos">${ic('i-sino')}${n?`<em>${n>9?'9+':n}</em>`:''}</button>`}
 function euBtn(u){const pid=u.pessoa&&pessoa(u.pessoa)?u.pessoa:null;return `<button class="eu" data-a="euAbre" aria-expanded="${!!ui.eu}" aria-label="Você: ${esc(quemNome()||u.nome)}. Como usar e Sair" title="${esc(quemNome()||u.nome)}">${pid?av(pid,'s'):`<span class="eu-i">${esc((u.nome||'?')[0].toUpperCase())}</span>`}</button>`}
+/* ================= Minha vez (perfil Chão de fábrica) =================
+   Uma tela só: quem é você → o que fazer agora → meta do dia. Gestão pode abrir para ver ou deixar num tablet. */
+const ehChao=()=>!!usuarioAtual()&&(usuarioAtual().perfil==='operacao'||!!ui.chao);
+const PAPEIS_CHAO=['costura','corte','pers','acab'];
+function prodPessoaDia(pid,t){const a=sod(t||now()).getTime(),b=a+DIA;let pecas=0,pad=0;
+  state.lotes.forEach(l=>{rp(l).steps.forEach(s=>{const x=l.steps[s.id];if(!x)return;(x.partes?x.partes:[x]).forEach(q=>{if(q.st==='ok'&&q.op===pid&&q.fim>=a&&q.fim<b){const n=q.n||qtdEf(l);pecas+=n;pad+=(s.min||0)*n}})})});return {pecas,pad}}
+function metaPessoaDia(pid){const js=janelasDia(sod(now())),disp=js.reduce((t,[a,b])=>t+(b-a)/MIN,0),alvo=Math.round(disp*(prm().efic||.85)),pr=prodPessoaDia(pid);
+  return {...pr,alvo,pct:alvo?Math.min(999,Math.round(pr.pad/alvo*100)):0}}
+function mvPessoa(){const u=usuarioAtual();if(u&&u.perfil==='operacao'&&u.pessoa&&pessoa(u.pessoa))return u.pessoa;if(ui.mvP&&pessoa(ui.mvP))return ui.mvP;try{const v=localStorage.getItem('martins-mv');if(v&&pessoa(v))return ui.mvP=v}catch(e){}return null}
+function vMinhaVez(){const u=usuarioAtual(),fixo=u&&u.perfil==='operacao'&&u.pessoa&&pessoa(u.pessoa),pid=mvPessoa();
+  const sair=ui.chao?`<button class="mbtn neutro2" data-a="chaoSair">${ic('i-seta')}Voltar ao app completo</button>`:'';
+  if(!pid){const ps=state.pessoas.filter(p=>(p.papeis||[]).some(k=>PAPEIS_CHAO.includes(k)));
+    return `<div class="mv"><div class="mv-topo"><h1>Quem é você?</h1>${sair}</div><p class="sub-l">Toque no seu nome.</p>
+      <div class="mv-quem">${ps.map(p=>`<button class="mv-p" data-a="mvQuem" data-v="${p.id}">${av(p.id)}<b>${esc(p.nome)}</b></button>`).join('')||'<div class="vazio-box">Ninguém da produção cadastrado. Peça para a gestão cadastrar a equipe.</div>'}</div></div>`}
+  const P=plano(),at=Object.entries(P.uso).find(([m,t])=>t.x.op===pid),pl=!at&&Object.entries(P.plan).find(([m,x])=>x.pessoa===pid),M=metaPessoaDia(pid);
+  const meta=`<div class="card mv-meta"><div class="mv-meta-t"><span>Sua meta de hoje</span><b>${M.pct}%</b></div><div class="mv-bar"><i style="width:${Math.min(100,M.pct)}%"></i></div><p class="dica" style="margin:6px 0 0">${M.pecas} ${M.pecas===1?'peça feita':'peças feitas'} hoje${M.pct>=100?' · meta batida!':''}</p></div>`;
+  const trab=at?`<h2 class="mv-h">Você está fazendo</h2>${tarefaCard(at[1])}<p class="mv-onde">${ic('i-maquina')}${esc(unidade(at[0])?.nome||'')}</p>
+      <div class="acoes"><button class="big go mv-b" data-a="terminou" data-m="${at[0]}">${ic('i-check')}Terminei</button><button class="big prob mv-b" data-a="problema" data-m="${at[0]}">${ic('i-alerta')}Deu problema</button></div>`
+    :pl?`<h2 class="mv-h">Seu próximo trabalho</h2>${tarefaCard(pl[1],true)}<p class="mv-onde">${ic('i-maquina')}Na <b>${esc(unidade(pl[0])?.nome||'')}</b></p>
+      <div class="acoes"><button class="big azul mv-b ini" data-a="comecar" data-m="${pl[0]}" data-l="${pl[1].l.id}" data-s="${pl[1].s.id}" data-p="${pid}">${ic('i-play')}${situacao().k==='fora'?'Começar em hora extra':'Começar'}</button></div>`
+    :`<div class="vazio-box">${ic('i-dormir')}<b>Nada para você agora</b><span>Avise a encarregada que você está livre.</span></div>`;
+  return `<div class="mv"><div class="mv-topo"><span class="mv-eu">${av(pid)}<span><small>Olá,</small><b>${esc(pNome(pid))}</b></span></span>${fixo?'':`<button class="mbtn neutro2" data-a="mvTroca">Não sou eu</button>`}</div>
+    ${trab}${meta}<div class="mv-pe"><button class="mbtn neutro2" data-a="euAjuda">${ic('i-duvida')}Como usar</button>${sair}${!ui.chao&&u?`<button class="mbtn neutro2" data-a="euSair">Sair</button>`:''}</div></div>`}
 function popEu(){const u=usuarioAtual();if(!u)return '';const pid=u.pessoa&&pessoa(u.pessoa)?u.pessoa:null;
   return `<div class="pop-fundo" data-a="euFecha"></div><div class="pop" role="dialog" aria-label="Você"><div class="pop-h"><span class="eu-h">${pid?av(pid):''}<span><b>${esc(quemNome()||u.nome)}</b><span>${esc(u.email||'')}</span></span></span><button class="x" data-a="euFecha" aria-label="Fechar">× Fechar</button></div>
-  <div class="menu-l"><button class="menu-r" data-a="euAjuda">${ic('i-duvida')}<span><b>Como usar o app</b></span>${ic('i-seta')}</button><button class="menu-r" data-a="euSair">${ic('i-pessoas')}<span><b>Sair</b><span>Trocar de pessoa neste aparelho</span></span>${ic('i-seta')}</button></div></div>`}
+  <div class="menu-l"><button class="menu-r" data-a="euAjuda">${ic('i-duvida')}<span><b>Como usar o app</b></span>${ic('i-seta')}</button>${ehGestao()?`<button class="menu-r" data-a="chaoVer">${ic('i-maquina')}<span><b>Ver a tela do chão de fábrica</b><br><small>Para deixar num tablet ou celular da produção</small></span>${ic('i-seta')}</button>`:''}<button class="menu-r" data-a="euSair">${ic('i-pessoas')}<span><b>Sair</b><span>Trocar de pessoa neste aparelho</span></span>${ic('i-seta')}</button></div></div>`}
 function popAvisos(){const u=usuarioAtual(),rec=(state.avisarNovos||[]).includes(u?.id),av_=avisos();
   const vistos=rec?state.pedidos.filter(p=>p.criado&&!p.criado.antigo&&(p.vistoPor||{})[u.id]>1&&now()-p.criado.ts<7*DIA).sort((a,b)=>b.criado.ts-a.criado.ts).slice(0,6):[];
   const item=(p,novo)=>{const q=sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd));return `<button class="av-item${novo?' novo':''}" data-a="avAbrir" data-id="${p.id}">${ic('i-lista')}<span><b>${novo?'Pedido novo: ':''}${esc(p.cliente)}</b><span>${q?q+' peças · ':''}entrega ${fD(p.entrega)}${p.criado.por?` · por ${esc(p.criado.por)}`:''} · ${haQuanto(p.criado.ts)}</span></span>${ic('i-seta')}</button>`};
@@ -2473,6 +2506,7 @@ const FAQ=[
 {c:'maq',q:'Como crio um setor novo, como lavanderia ou passadoria?',k:'setor novo criar lavanderia passadoria acabamento renomear ordem função setores',r:['Cadastros › Máquinas › Setores da fábrica: escreva o nome e toque em Adicionar setor.','Escolha a função do setor: abre o lote (corte), personalização, montagem/costura ou acabamento.','Depois, nas máquinas desse setor, toque em ✎ editar e escolha o setor novo.','Use ↑ e ↓ para pôr na ordem do caminho da peça.'],ir:'cad:maquinas#Setores da fábrica',g:1},
 {c:'cad',q:'A equipe chama as coisas de outro jeito. Dá para trocar as palavras?',k:'palavra vocabulário nome trocar termo vias ficha terceirizado prestador como a equipe fala',r:['Cadastros › Ajustes › Palavras da fábrica.','Escreva a palavra do app e como a fábrica fala, e toque em Trocar palavra. Vale para todas as telas e a ajuda.'],ir:'cad:ajustes#Palavras da fábrica',g:1},
 {c:'cad',q:'Como escondo partes do app que a fábrica não usa?',k:'desligar módulo esconder parte personalização etiqueta hora extra importar ciclo cortar junto não uso',r:['Cadastros › Ajustes › Partes do app: toque no que a fábrica não usa para desligar.','Some da tela e da ajuda. Nada é apagado: ligando de novo, volta tudo.'],ir:'cad:ajustes#Partes do app',g:1},
+{c:'cad',q:'Como deixo um celular ou tablet só com a tela da costureira?',k:'minha vez chão de fábrica tablet celular costureira operadora tela simples perfil acesso meta do dia',r:['Em Ajustes › Acessos, crie um acesso com o perfil Chão de fábrica (pode ser um só para a produção).','Quem entrar com ele vê só a tela Minha vez: escolhe o nome e vê o trabalho de agora, o próximo e a meta do dia.','A gestão pode ver essa tela em: toque na sua foto › Ver a tela do chão de fábrica.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Por onde começo a configurar o app para a minha fábrica?',k:'configurar começar primeiro uso passo a passo implantação nova fábrica checklist',r:['Cadastros › Configurar: são 10 passos, do nome da empresa ao estoque inicial.','Cada passo mostra se está pronto ou o que falta. Toque em Abrir para ir direto ao lugar certo.'],ir:'cad:config',g:1},
 {c:'cad',q:'Como mudo o nome de uma etapa do escritório ou quem faz ela?',k:'nome etapa escritório renomear cargo vendedora quem faz arte vias compras preferência',r:['Cadastros › Ajustes › Etapas do escritório: toque em ✎ Ajustar na etapa.','Escreva o nome que a equipe usa e escolha quais cargos recebem essa etapa.','Marque se a vendedora do próprio pedido tem preferência.'],ir:'cad:ajustes#Etapas do escritório',g:1},
 {c:'cad',q:'Esta fábrica não faz arte (ou vias). Como tiro essa etapa?',k:'desligar etapa escritório arte vias conferir comprar liberar corte começar sem arte personalização',r:['Cadastros › Ajustes › Etapas do escritório: toque na etapa para desligar. Ela some das tarefas e conta como feita.','Logo abaixo, escolha o que precisa estar pronto para o corte começar: vias, arte aprovada e insumos.'],ir:'cad:ajustes#Etapas do escritório',g:1},
@@ -3107,7 +3141,7 @@ function pzArquivos(l,x){const ped=pedById(l.ped),cli=ped&&ped.cli;if(!cli)retur
 
 /* ================= login ================= */
 const adminsIniciais=s=>(CLIENTE.admins||[]).map(a=>{const pe=(s.pessoas||[]).find(p=>chaveNome(p.nome)===chaveNome(a.nome));return {id:a.id||uid('u'),email:a.email,nome:a.nome,perfil:'gestao',hash:null,salt:null,pessoa:pe?pe.id:''}});
-const PERFIS={gestao:'Gestão (acesso completo)',operacao:'Operação (Fábrica, Pedidos e Novo pedido)'};
+const PERFIS={gestao:'Gestão (acesso completo)',escritorio:'Escritório (Fábrica, Pedidos e Novo pedido)',operacao:'Chão de fábrica (só a tela Minha vez)'};
 const normEmail=e=>String(e||'').trim().toLowerCase();
 let SESSAO=(()=>{try{return JSON.parse(localStorage.getItem('martins-sessao')||'null')}catch(e){return null}})();
 const usuarioAtual=()=>SESSAO&&state&&(state.usuarios||[]).find(u=>u.id===SESSAO.id&&normEmail(u.email)===normEmail(SESSAO.email))||null;
@@ -3132,8 +3166,8 @@ function vLogin(){const L=ui.login=ui.login||{};const u=L.passo==='criar'?(state
 function cardAcessos(){if(!ehGestao())return '';const us=state.usuarios||[];
   return `<div class="card"><h2>Acessos ao sistema</h2><p class="dica" style="margin:-4px 0 8px">Quem pode entrar com e-mail e senha. No primeiro acesso, a própria pessoa cria a senha${SB_CFG?' (toca em "É meu primeiro acesso" e confirma pelo e-mail)':''}.</p>
   ${us.map(u=>`<div class="aj-row acs"><span><b>${esc(u.nome)}</b><br><small class="lido">${esc(u.email)} · ${esc(PERFIS[u.perfil]||u.perfil)}${SB_CFG?'':u.hash?'':' · ainda não criou a senha'}</small></span>
-    <span class="aq-b">${SB_CFG?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Mandar link de senha nova</button>`:u.hash?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Redefinir senha</button>`:''}<button class="x azul" data-a="acsPerfil" data-id="${u.id}">${u.perfil==='gestao'?'Mudar para operação':'Mudar para gestão'}</button>${u.id!==usuarioAtual()?.id?`<button class="x" data-a="acsRm" data-id="${u.id}">Tirar</button>`:''}</span></div>`).join('')}
-  <div class="acs-novo"><input class="campo" id="acsNome" placeholder="Nome"><input class="campo" id="acsEmail" type="email" placeholder="E-mail"><select class="campo" id="acsPerfil">${Object.entries(PERFIS).map(([k,n])=>`<option value="${k}" ${k==='operacao'?'selected':''}>${n}</option>`).join('')}</select><select class="campo" id="acsPes"><option value="">Pessoa da equipe (opcional)</option>${state.pessoas.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select><button class="mbtn" data-a="acsAdd">${ic('i-mais')}Dar acesso</button></div></div>`}
+    <span class="aq-b">${SB_CFG?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Mandar link de senha nova</button>`:u.hash?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Redefinir senha</button>`:''}${selOp('acsPerfilSel',`data-id="${u.id}"`,u.perfil,Object.entries(PERFIS),'Perfil')}${u.id!==usuarioAtual()?.id?`<button class="x" data-a="acsRm" data-id="${u.id}">Tirar</button>`:''}</span></div>`).join('')}
+  <div class="acs-novo"><input class="campo" id="acsNome" placeholder="Nome"><input class="campo" id="acsEmail" type="email" placeholder="E-mail"><select class="campo" id="acsPerfil">${Object.entries(PERFIS).map(([k,n])=>`<option value="${k}" ${k==='escritorio'?'selected':''}>${n}</option>`).join('')}</select><select class="campo" id="acsPes"><option value="">Pessoa da equipe (opcional)</option>${state.pessoas.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select><button class="mbtn" data-a="acsAdd">${ic('i-mais')}Dar acesso</button></div></div>`}
 
 /* ================= cópias de segurança ================= */
 const ehExemplo=p=>!!(p&&p.exemplo);
@@ -3318,7 +3352,7 @@ function renderTela(){RC={};aplicaCor();if(LINK_FICHA&&NV.pronto&&state&&usuario
   if(!NV.pronto){document.body.classList.add('sem-login');document.getElementById('app').innerHTML=vConectando();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());MODULOS.forEach(([k])=>document.body.classList.toggle('sem-'+k,!modOn(k)));
   if(!logado){document.getElementById('app').innerHTML=vLogin();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
-  document.getElementById('app').innerHTML=ui.inicio?vInicio():ui.tela==='avisos'?vAvisos():ui.tela==='gestor'?vGestor():ui.tela==='pedidos'?vPedidos():ui.tela==='cadastros'?vCadastros():vFabrica();
+  document.body.classList.toggle('chao',ehChao());document.getElementById('app').innerHTML=ehChao()&&!ui.inicio?vMinhaVez():ui.inicio?vInicio():ui.tela==='avisos'?vAvisos():ui.tela==='gestor'?vGestor():ui.tela==='pedidos'?vPedidos():ui.tela==='cadastros'?vCadastros():vFabrica();
   {const pp=document.getElementById('pop');if(pp)pp.innerHTML=ui.sheet?'':ui.sino?popAvisos():ui.eu?popEu():''}
   const sh=document.getElementById('sheet');const s=ui.sheet;
   if(!s){sh.innerHTML='';document.body.style.overflow='';return}
@@ -3484,6 +3518,7 @@ const A={
     if(!n||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast('Escreva o nome e um e-mail válido',false);return}if(state.usuarios.some(u=>normEmail(u.email)===e)){toast('Esse e-mail já tem acesso',false);return}
     snap();state.usuarios.push({id:uid('u'),email:e,nome:n,perfil:pf,pessoa:ps,hash:null,salt:null});commit();toast(`${n} pode entrar. No primeiro acesso cria a senha.`)},
   acsReset:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(SB_CFG){SB.c.auth.resetPasswordForEmail(u.email,{redirectTo:sbVolta()}).then(r=>toast(r.error?sbErro(r.error):`Mandamos para ${u.email} um link para criar uma senha nova`,false));return}snap();u.hash=null;u.salt=null;commit();toast(`${u.nome} vai criar uma senha nova no próximo acesso`)},
+  acsPerfilSel:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(!u||!PERFIS[d.v]||u.perfil===d.v)return;if(u.perfil==='gestao'&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão');return render()}snap();u.perfil=d.v;commit();toast(`${u.nome}: ${PERFIS[d.v]}`)},
   acsPerfil:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(u.id===usuarioAtual()?.id&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão',false);return}snap();u.perfil=u.perfil==='gestao'?'operacao':'gestao';commit()},
   acsRm:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);snap();state.usuarios=state.usuarios.filter(x=>x.id!==d.id);commit();toast(`${u.nome} não tem mais acesso`)},
   segAgora:async()=>{toast('Guardando cópia…',false);const ok=await backupNuvem(`${hojeISO()}-manual-${tsHm(now()).replace(':','h')}`);toast(ok?'Cópia guardada na nuvem':'Sem nuvem agora. Use “Baixar cópia em arquivo”.',false)},
@@ -3550,6 +3585,10 @@ const A={
     ui.sheet=null;commit();toast(`Hora extra até ${tsHm(e.ate)} para ${e.sel.length} ${e.sel.length>1?'pessoas':'pessoa'}`)},
   hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`)},
   ajPulo:d=>{ui.blk=ui.blk||{};ui.blk['aj:'+d.v]=true;render();setTimeout(()=>{const x=[...document.querySelectorAll('#app details.blk>summary h2')].find(h=>h.textContent.trim()===d.v);if(x){const c=x.closest('details');c.scrollIntoView({behavior:'smooth',block:'start'});c.classList.add('aj-luz');setTimeout(()=>c.classList.remove('aj-luz'),2500)}},40)},
+  mvQuem:d=>{ui.mvP=d.v;try{localStorage.setItem('martins-mv',d.v)}catch(e){}render();window.scrollTo(0,0)},
+  mvTroca:()=>{ui.mvP=null;try{localStorage.removeItem('martins-mv')}catch(e){}render()},
+  chaoVer:()=>{ui.eu=false;ui.chao=true;ui.sheet=null;render();window.scrollTo(0,0)},
+  chaoSair:()=>{ui.chao=false;render()},
   confSim:()=>{const c=ui.conf;ui.conf=null;desenhaConf();if(c&&c.fn)c.fn()},
   confNao:()=>{ui.conf=null;desenhaConf()},
   toastX:()=>{clearTimeout(toastT);document.getElementById('toast').innerHTML=''},

@@ -385,3 +385,20 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Cada quadro de **Cadastros › Ajustes** virou um bloco que abre e fecha. Ficam abertos só os do dia a dia: Acessos, Aviso de pedido novo e Cópias de segurança.
 - A tela caiu de **cerca de 32 rolagens para 5** no celular.
 - As abas de Cadastros ficaram mais compactas, todas visíveis.
+
+---
+
+## Perfis de acesso e a tela "Minha vez" (fase 1 da gestão por metas)
+
+**Perfis (Cadastros › Ajustes › Acessos):**
+- **Gestão:** tudo, como hoje. Helena, Roger, Laiara e Mateus continuam na gestão.
+- **Escritório:** Fábrica, Pedidos e Novo pedido (é o antigo "Operação").
+- **Chão de fábrica:** só a tela **Minha vez**.
+
+**Minha vez (para costureiras e cortador):**
+- A pessoa escolhe o nome (ou já entra com o próprio acesso).
+- Vê **o que está fazendo** (com Terminei e Deu problema) ou **o próximo trabalho** (com Começar e a máquina onde fazer).
+- Vê **a meta de hoje**: a porcentagem do dia que já fez e quantas peças.
+- A gestão pode ver essa tela: toque na sua foto › **Ver a tela do chão de fábrica**. Serve para deixar um celular ou tablet na produção.
+
+**Importante nas 2 primeiras semanas:** a meta só fica certa se todo mundo tocar em **Começar** e **Terminei** na hora. Vale acompanhar o uso.
