@@ -123,5 +123,11 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
       ordem:(()=>{const f={};state.lotes.forEach(l=>f[l.cor]=(f[l.cor]||0)+1);const top=Object.entries(f).sort((a,b)=>b[1]-a[1])[0][0];return coresOrdem()[0]===top})()};
     ui.sheet=null;render();return r});
   ok(r.c2fechado,'"Outras cores" começa fechado quando não tem');ok(r.pzSem&&r.pzCom,'Personalização abre sozinha só no produto que costuma ter');ok(r.ordem,'cor mais usada aparece primeiro na lista');
+  console.log('16) Onda 5d: Ajustes em blocos');
+  r=await A.evaluate(()=>{ui.blk={};ui.sheet=null;ui.tela='cadastros';ui.cad='ajustes';render();const B=[...document.querySelectorAll('#app>details.blk')];
+    const ab=B.filter(d=>d.open).map(d=>d.querySelector('summary h2').textContent.trim());A.ajIr({v:'cad:ajustes#Palavras da fábrica'});
+    const voc=[...document.querySelectorAll('#app>details.blk')].find(d=>d.querySelector('summary h2').textContent.trim()==='Palavras da fábrica');
+    return {n:B.length,ab,voc:voc&&voc.open,campo:!!document.getElementById('vocDe')}});
+  ok(r.n>=15,'Ajustes viram blocos ('+r.n+')');ok(r.ab.includes('Acessos ao sistema')&&r.ab.length<=4,'só os do dia a dia vêm abertos');ok(r.voc&&r.campo,'atalho da ajuda abre o bloco certo');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

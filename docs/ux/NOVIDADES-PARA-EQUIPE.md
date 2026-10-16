@@ -377,3 +377,11 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Na lista de cores, **as mais usadas aparecem primeiro**.
 
 **Para mandar no grupo (vendedoras):** "No Novo pedido, Outras cores e Personalização abrem ao tocar no título."
+
+---
+
+## Onda 5d: Ajustes organizado
+
+- Cada quadro de **Cadastros › Ajustes** virou um bloco que abre e fecha. Ficam abertos só os do dia a dia: Acessos, Aviso de pedido novo e Cópias de segurança.
+- A tela caiu de **cerca de 32 rolagens para 5** no celular.
+- As abas de Cadastros ficaram mais compactas, todas visíveis.

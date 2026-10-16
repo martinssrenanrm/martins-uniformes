@@ -77,3 +77,10 @@
 - **Perguntas 1 e 2 (entende o que fazer / acha sem procurar) na tela Pedido:** melhoraram. Blocos com título e resumo; abre sozinho só o que tem pendência; mapa de processos atrás de "Ver mapa de processos".
 - Medida com 8 pedidos reais em 360×640: de 4,7–23,6 telas de rolagem para 4,3–9,3 (média ≈ 11 → ≈ 7).
 - Ainda pesa: o cartão de cada peça (≈ 1 tela por peça). Fica para uma próxima etapa, sem misturar com esta.
+
+## Ondas 5b, 5c, 5d e visual novo (16/10/2026)
+
+- **Folha da máquina (5b):** à vista só trabalho, quem faz e Começar/Terminou/Deu problema; o resto em "Mais opções". 7,4 → 4,7 telas (livre), 5,8 → 4,5 (ocupada).
+- **Novo pedido (5c):** "Outras cores" e "Personalização" em blocos; abre sozinho quando a peça costuma ter personalização; cores mais usadas primeiro.
+- **Ajustes (5d):** blocos que abrem e fecham; ≈ 32 → 5 telas. Perguntas 1 e 2 passam.
+- **Visual novo:** tipografia Inter, superfícies leves, hierarquia de botões. Mantidos: letra ≥ 16px, alvos ≥ 48px, contraste AA, botão sempre com contorno.
