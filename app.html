@@ -851,6 +851,8 @@ body.chao .nav{display:none!important}body.chao main{padding-bottom:40px}
 .mv-bar{height:14px;background:var(--grey-soft);border-radius:999px;overflow:hidden;margin-top:8px}.mv-bar i{display:block;height:100%;background:var(--go);border-radius:999px}
 .mv-quem{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.mv-p{display:grid;justify-items:center;gap:10px;padding:18px 10px;border:1.5px solid var(--line-btn);border-radius:var(--r-lg);background:var(--card);box-shadow:var(--sh-1);font-size:22px}.mv-p .av{width:72px!important;height:72px!important;font-size:30px}
 .mv-pe{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.cal-r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}.cal-r>div:first-child b{display:block;font-size:18px}.cal-r>div:first-child span{color:var(--ink2);font-size:16px}.cal-r .linha-dep{grid-column:1/-1}
+.cal-q{display:grid;gap:6px;padding:12px 14px;border-radius:14px;margin:0 0 10px}.cal-q b{display:block;font-size:19px}.cal-q span{color:var(--ink2)}.cal-q.ok{background:var(--go-soft)}.cal-q.ruim{background:var(--atn-soft)}
 /* ================= Design system v2 (10/2026) =================
    Visual de produto: superfícies leves com sombra suave, cantos consistentes, tipografia Inter, cor da marca.
    Regras que NÃO mudam (público 60+): letra ≥ 16px, alvos ≥ 48px, contraste de texto AA, botão sempre parece botão. */
@@ -2506,6 +2508,7 @@ const FAQ=[
 {c:'maq',q:'Como crio um setor novo, como lavanderia ou passadoria?',k:'setor novo criar lavanderia passadoria acabamento renomear ordem função setores',r:['Cadastros › Máquinas › Setores da fábrica: escreva o nome e toque em Adicionar setor.','Escolha a função do setor: abre o lote (corte), personalização, montagem/costura ou acabamento.','Depois, nas máquinas desse setor, toque em ✎ editar e escolha o setor novo.','Use ↑ e ↓ para pôr na ordem do caminho da peça.'],ir:'cad:maquinas#Setores da fábrica',g:1},
 {c:'cad',q:'A equipe chama as coisas de outro jeito. Dá para trocar as palavras?',k:'palavra vocabulário nome trocar termo vias ficha terceirizado prestador como a equipe fala',r:['Cadastros › Ajustes › Palavras da fábrica.','Escreva a palavra do app e como a fábrica fala, e toque em Trocar palavra. Vale para todas as telas e a ajuda.'],ir:'cad:ajustes#Palavras da fábrica',g:1},
 {c:'cad',q:'Como escondo partes do app que a fábrica não usa?',k:'desligar módulo esconder parte personalização etiqueta hora extra importar ciclo cortar junto não uso',r:['Cadastros › Ajustes › Partes do app: toque no que a fábrica não usa para desligar.','Some da tela e da ajuda. Nada é apagado: ligando de novo, volta tudo.'],ir:'cad:ajustes#Partes do app',g:1},
+{c:'gestor',q:'O tempo de uma etapa está errado. Como acerto?',k:'tempo padrão etapa errado real medido calibrar ajustar tempo por peça meta prazo',r:['Painel do gestor › Organização › Tempos padrão: cadastrado × real.','O app mostra o tempo medido de verdade (mediana dos últimos 60 dias). Toque em Usar o real ou em Manter.','Também dá para mudar à mão no produto, na etapa.'],ir:'gest:org',g:1},
 {c:'cad',q:'Como deixo um celular ou tablet só com a tela da costureira?',k:'minha vez chão de fábrica tablet celular costureira operadora tela simples perfil acesso meta do dia',r:['Em Ajustes › Acessos, crie um acesso com o perfil Chão de fábrica (pode ser um só para a produção).','Quem entrar com ele vê só a tela Minha vez: escolhe o nome e vê o trabalho de agora, o próximo e a meta do dia.','A gestão pode ver essa tela em: toque na sua foto › Ver a tela do chão de fábrica.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Por onde começo a configurar o app para a minha fábrica?',k:'configurar começar primeiro uso passo a passo implantação nova fábrica checklist',r:['Cadastros › Configurar: são 10 passos, do nome da empresa ao estoque inicial.','Cada passo mostra se está pronto ou o que falta. Toque em Abrir para ir direto ao lugar certo.'],ir:'cad:config',g:1},
 {c:'cad',q:'Como mudo o nome de uma etapa do escritório ou quem faz ela?',k:'nome etapa escritório renomear cargo vendedora quem faz arte vias compras preferência',r:['Cadastros › Ajustes › Etapas do escritório: toque em ✎ Ajustar na etapa.','Escreva o nome que a equipe usa e escolha quais cargos recebem essa etapa.','Marque se a vendedora do próprio pedido tem preferência.'],ir:'cad:ajustes#Etapas do escritório',g:1},
@@ -3183,7 +3186,7 @@ async function restaurar(obj){if(!obj||!Array.isArray(obj.pedidos)||!Array.isArr
   const {_app,_ts,...st}=obj;snap();state=normalizar(st);RC={};save();render();tick()}
 async function sSeg(){}
 /* Modelo de fábrica: a configuração sem os dados do dia a dia. Serve para começar outra confecção a partir desta. */
-const MODELO_CFG=['vocab','modOff','setores','escOff','liberaCom','escNomes','cargoFun','vendFaz','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
+const MODELO_CFG=['temposHist','vocab','modOff','setores','escOff','liberaCom','escNomes','cargoFun','vendFaz','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
 function modeloFabrica(){const c=x=>JSON.parse(JSON.stringify(x??null));const cfg={};MODELO_CFG.forEach(k=>{if(state[k]!=null)cfg[k]=c(state[k])});
   cfg.feriados={local:state.feriados?.local||FER0().local,facult:c(state.feriados?.facult||{}),extras:[],trabalha:[]};
   return {_modelo:1,_ts:now(),nome:marca().nome||'',tipos:c(state.tipos),produtos:c(state.produtos),cfg}}
@@ -3317,9 +3320,30 @@ function gAtrasos(desde){const at=state.pedidos.filter(p=>!p.concluido).map(p=>(
   <div class="card"><h2>Pedidos em aberto, do mais apertado</h2>${at.map(({p,f})=>`<button class="rk" data-a="pedido" data-id="${p.id}" style="width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0"><span class="pill u-${f.u}"><span class="dot"></span>${ULAB[f.u]}</span><div class="rk-t"><b>${esc(p.cliente)}</b><span>Entrega ${fD(p.entrega)} · ${f.du} dias úteis · falta ~${nf(f.need,0)} de trabalho · folga ${nf(f.folga,0)}</span>${barra(f.prog,1,f.u==='crit'?'var(--red)':f.u==='warn'?'var(--atn)':'var(--go)')}</div><div class="rk-p"><b>${Math.round(f.prog*100)}%</b><small>feito</small></div></button>`).join('')||'<p class="dica">Nenhum pedido em aberto.</p>'}</div>
   ${late.length?`<div class="card"><h2>Entregues com atraso no período</h2>${late.map(p=>`<div class="grow"><span>${esc(p.cliente)}</span><span>prazo ${fD(p.entrega)}, entregue ${fD(p.concluido)}</span><b>+${Math.max(1,-wdUntil(p.concluido)+wdUntil(p.entrega))}d</b></div>`).join('')}</div>`:''}
   ${esc_.length?`<div class="card"><h2>Terceirizados atrasados</h2>${esc_.map(t=>`<button class="alrt a-crit" data-a="ir" data-to="fab:fora">${ic('i-caminhao')}<div><b>${esc(t.t)}</b><span>${esc(t.ped.cliente)} · ${esc(t.sub||'')}</span></div><span class="alrt-go">Ver terceirizados ›</span></button>`).join('')}</div>`:''}`}
-function gTempos(desde){const E=gDados(desde).porEt.filter(e=>e.n>=2).map(e=>({...e,r:e.real/e.pad})).filter(e=>e.r>1.4||e.r<.6).sort((a,b)=>Math.abs(Math.log(b.r))-Math.abs(Math.log(a.r))).slice(0,8);
-  return `<div class="card"><h2>Tempos do cadastro fora da realidade</h2><p class="dica" style="margin:-4px 0 8px">Etapas em que o tempo real ficou muito diferente do previsto. Tempo errado bagunça prazos, prioridade e o ranking.</p>
-    ${E.map(e=>`<div class="grow g-link" data-a="produto" data-p="${e.p}" title="Abrir o produto para corrigir o tempo"><span>${esc(e.k)}<br><small>${e.n} vezes · previsto ${tMin(e.min)} por peça</small></span><span>real ≈ <b style="display:inline">${tMin(e.min*e.r)} por peça</b></span><b class="${e.r>1?'ruim':'ok'}">${nf(e.r,1)}×</b></div>`).join('')||'<p class="dica" style="margin:0">Os tempos cadastrados estão batendo com a realidade.</p>'}</div>`}
+/* Registro confiável: etapas terminadas em que Começar e Terminei foram tocados na hora (duração entre 1 min e 12 h). */
+function registroConfiavel(dias=CAL_DIAS){const desde=now()-dias*DIA;let tot=0,bom=0;state.lotes.forEach(l=>{if(l.rework)return;Object.values(l.steps||{}).forEach(x=>{(x.partes||[x]).forEach(q=>{if(q.st!=='ok'||!q.fim||q.fim<desde||q.herdado)return;tot++;const d=q.fim-(q.ini||q.fim);if(d>=MIN&&d<=12*H)bom++})})});return {tot,bom,pct:tot?bom/tot:null}}
+/* Tempos padrão (fase 2): o app mede quanto cada etapa leva de verdade e a gestão decide.
+   Amostras dos últimos 60 dias, só etapas da produção (sem personalização e terceirizado), sem conserto.
+   Descarta registros absurdos (menos de 1/4 ou mais de 4× o previsto, ex.: esqueceu de tocar Terminei). Usa a mediana. */
+const CAL_DIAS=60,CAL_MIN_AMOSTRAS=3,CAL_DIF=.15;
+const etapaProd=(pid,sid)=>{const p=prod(pid);if(!p)return null;return (p.steps||[]).find(z=>z.id===sid)||(p.opcoes||[]).flatMap(o=>o.steps||[]).find(z=>z.id===sid)||null};
+function calibTempos(){const desde=now()-CAL_DIAS*DIA,A={},ign=state.temposIgn||{};
+  state.lotes.forEach(l=>{if(l.rework)return;rp(l).steps.forEach(s=>{if(s.pers||isExt(s)||!s.min)return;const x=l.steps[s.id];if(!x)return;
+    (x.partes||[x]).forEach(q=>{if(q.st!=='ok'||!q.fim||q.fim<desde||!q.ini)return;const n=q.n||qtdEf(l);if(!n)return;const real=(q.util!=null?q.util*MIN:tempoUtil(q))/MIN/n;const r=real/s.min;if(!(r>=.25&&r<=4))return;
+      const k=l.prod+'|'+s.id,a=A[k]=A[k]||{k,p:l.prod,sid:s.id,nome:s.nome,amostras:[]};a.amostras.push(real)})})});
+  return Object.values(A).map(a=>{const v=[...a.amostras].sort((x,y)=>x-y),m=v.length%2?v[(v.length-1)/2]:(v[v.length/2-1]+v[v.length/2])/2,st=etapaProd(a.p,a.sid);
+    return {...a,n:v.length,real:Math.round(m*100)/100,min:st?st.min:null,r:st&&st.min?m/st.min:1}}).filter(a=>a.min&&a.n>=CAL_MIN_AMOSTRAS&&Math.abs(a.r-1)>CAL_DIF&&!(ign[a.k]&&ign[a.k]>now()-30*DIA))
+    .sort((a,b)=>Math.abs(Math.log(b.r))-Math.abs(Math.log(a.r)))}
+const minPc=m=>m>=1?`${nf(m,m<10?1:0)} min`:`${Math.round(m*60)} s`;
+function gTempos(){const E=calibTempos(),H=(state.temposHist||[]).slice(-5).reverse(),RC_=registroConfiavel(),bom=RC_.pct!=null&&RC_.pct>=.8;
+  return `<div class="card" id="Tempos"><h2>Tempos padrão: cadastrado × real</h2><p class="dica" style="margin:-4px 0 8px">O app mediu quanto cada etapa leva de verdade nos últimos ${CAL_DIAS} dias (mediana, sem registros absurdos). Tempo certo deixa prazos e metas confiáveis.</p>
+    ${RC_.tot?`<div class="cal-q ${bom?'ok':'ruim'}"><div><b>${Math.round((RC_.pct||0)*100)}% do registro está confiável</b><span>${RC_.bom} de ${RC_.tot} etapas terminadas tiveram Começar e Terminei tocados na hora. Meta: 80% ou mais.</span></div>${bom?'':'<span class="dica" style="margin:0">Quando a etapa é marcada depois de pronta, o app não sabe quanto ela demorou. Peça para a equipe tocar Começar ao iniciar e Terminei ao acabar.</span>'}</div>`:''}
+    ${E.length?`${E.slice(0,12).map(e=>`<div class="cal-r"><div><b>${esc(prod(e.p)?.nome||'')} · ${esc(e.nome)}</b><span>Cadastrado <b>${minPc(e.min)}</b> · real <b>${minPc(e.real)}</b> por peça · ${e.n} medições</span></div>
+      <span class="pill ${e.r>1?'u-warn':'u-ok'}">${e.r>1?'+':'−'}${Math.round(Math.abs(e.r-1)*100)}%</span>
+      <div class="linha-dep"><button class="mbtn" data-a="tempoUsar" data-k="${esc(e.k)}" data-v="${e.real}">Usar o real (${minPc(e.real)})</button><button class="mbtn neutro2" data-a="tempoManter" data-k="${esc(e.k)}">Manter</button></div></div>`).join('')}
+      ${E.length>1?`<button class="mbtn neutro2" data-a="tempoUsarTodos" style="margin-top:10px">Usar o real em todas (${Math.min(12,E.length)})</button>`:''}`
+    :'<p class="dica" style="margin:0">Os tempos cadastrados estão batendo com a realidade (ou ainda não há medições suficientes: são precisas 3 por etapa).</p>'}
+    ${H.length?`<div class="rotulo">Últimas mudanças</div>${H.map(h=>`<p class="dica" style="margin:2px 0">${dataCurta(h.ts)} · ${esc(h.nome)}: ${minPc(h.de)} → ${minPc(h.para)}${h.por?' · '+esc(h.por):''}</p>`).join('')}`:''}</div>`}
 function gConsertos(desde){const C=(state.consertos||[]).filter(c=>c.ts>=desde);if(!C.length)return '';const pm={};C.forEach(c=>pm[c.motivo]=(pm[c.motivo]||0)+c.n);const L=Object.entries(pm).sort((a,b)=>b[1]-a[1]);
   return `<div class="card"><h2>Consertos no período</h2>${L.map(([m,n])=>`<div class="grow"><span>${esc(m)}</span>${barra(n,L[0][1],'var(--red)')}<b>${n}</b></div>`).join('')}<p class="dica" style="margin:8px 0 0">${sum(L.map(x=>x[1]))} peças voltaram. O mesmo motivo repetido indica treino ou ajuste de máquina.</p></div>`}
 function vGestor(){const aba=(ui.gt==='ciclo'&&!modOn('ciclo')?'agora':ui.gt)||'agora',desde=gDesde(),per=ui.gp||7;
@@ -3589,6 +3613,9 @@ const A={
   mvTroca:()=>{ui.mvP=null;try{localStorage.removeItem('martins-mv')}catch(e){}render()},
   chaoVer:()=>{ui.eu=false;ui.chao=true;ui.sheet=null;render();window.scrollTo(0,0)},
   chaoSair:()=>{ui.chao=false;render()},
+  tempoUsar:d=>{const [pid,sid]=String(d.k).split('|'),st=etapaProd(pid,sid),v=+d.v;if(!st||!(v>0))return;snap();(state.temposHist=state.temposHist||[]).push({ts:now(),p:pid,sid,nome:`${prod(pid)?.nome||''} · ${st.nome}`,de:st.min,para:v,por:quemNome()||''});if(state.temposHist.length>200)state.temposHist.splice(0,state.temposHist.length-200);st.min=v;RC={};commit();toast(`${st.nome}: agora ${minPc(v)} por peça`)},
+  tempoManter:d=>{snap();state.temposIgn={...(state.temposIgn||{}),[d.k]:now()};commit();toast('Mantido. O app volta a avisar se continuar diferente daqui a 30 dias')},
+  tempoUsarTodos:()=>{const E=calibTempos().slice(0,12);if(!E.length)return;snap();E.forEach(e=>{const st=etapaProd(e.p,e.sid);if(!st)return;(state.temposHist=state.temposHist||[]).push({ts:now(),p:e.p,sid:e.sid,nome:`${prod(e.p)?.nome||''} · ${st.nome}`,de:st.min,para:e.real,por:quemNome()||''});st.min=e.real});RC={};commit();toast(`${E.length} tempos atualizados com o real`)},
   confSim:()=>{const c=ui.conf;ui.conf=null;desenhaConf();if(c&&c.fn)c.fn()},
   confNao:()=>{ui.conf=null;desenhaConf()},
   toastX:()=>{clearTimeout(toastT);document.getElementById('toast').innerHTML=''},
@@ -3809,7 +3836,7 @@ const CONF={
   acsRm:d=>{const u=(state.usuarios||[]).find(x=>x.id===d.id);return u&&[`Tirar o acesso de ${u.nome||u.email}?`,'Sim, tirar acesso']},
   rmCat:()=>['Tirar esta grade de tamanhos?','Sim, tirar'],rmCor:d=>[`Tirar a cor ${d.v||''}?`,'Sim, tirar'],rmPx:()=>['Tirar este detalhe?','Sim, tirar'],
   rmPeso:()=>['Tirar esta parte da conta de tecido?','Sim, tirar'],rmProb:()=>['Tirar este motivo de conserto?','Sim, tirar'],
-  setRm:()=>['Tirar este setor?','Sim, tirar'],vocRm:()=>['Tirar esta troca de palavra?','Sim, tirar'],posRm:()=>['Tirar esta posição?','Sim, tirar'],
+  setRm:()=>['Tirar este setor?','Sim, tirar'],tempoUsarTodos:()=>{const n=Math.min(12,calibTempos().length);return n&&[`Trocar ${n} tempos cadastrados pelos tempos reais medidos? Prazos e metas passam a usar os novos tempos.`,'Sim, usar o real']},vocRm:()=>['Tirar esta troca de palavra?','Sim, tirar'],posRm:()=>['Tirar esta posição?','Sim, tirar'],
   termoRm:()=>['Tirar esta informação do pedido?','Sim, tirar'],logoRm:()=>['Tirar a logo dos documentos?','Sim, tirar'],rmPausa:()=>['Tirar esta pausa do horário?','Sim, tirar'],
   rmTec:d=>[`Tirar o tecido ${d.v} deste produto?`,'Sim, tirar'],rmVar:()=>['Tirar esta variação?','Sim, tirar'],rmOpc:()=>['Tirar esta opção?','Sim, tirar'],
   rmParte:()=>['Tirar esta parte do produto?','Sim, tirar'],rmAv:()=>['Tirar este aviamento?','Sim, tirar'],rmPp:()=>['Tirar esta personalização padrão?','Sim, tirar'],

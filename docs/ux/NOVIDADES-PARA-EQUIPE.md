@@ -402,3 +402,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 - A gestão pode ver essa tela: toque na sua foto › **Ver a tela do chão de fábrica**. Serve para deixar um celular ou tablet na produção.
 
 **Importante nas 2 primeiras semanas:** a meta só fica certa se todo mundo tocar em **Começar** e **Terminei** na hora. Vale acompanhar o uso.
+
+---
+
+## Tempos padrão: cadastrado × real (fase 2 da gestão por metas, só para a gestão)
+
+- Em **Painel do gestor › Organização**, o quadro **Tempos padrão** mostra, para cada etapa, o tempo cadastrado e o tempo **real medido** (mediana dos últimos 60 dias, sem registros absurdos).
+- Para cada uma: **Usar o real** ou **Manter**. Fica guardado quem mudou e quando.
+- No alto do quadro: **quanto do registro está confiável** (etapas em que Começar e Terminei foram tocados na hora). Meta: 80% ou mais.
+
+**Recado para a equipe:** "Toque em Começar quando começar e em Terminei quando acabar. Marcar depois não conta o tempo."
