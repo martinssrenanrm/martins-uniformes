@@ -110,5 +110,11 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
     const a={comecar:vis('#sheet [data-a=comecar]'),reservar:vis('#sheet [data-a=mRes]'),mais:!!document.querySelector('#sheet details.blk[data-blk^=maqmais]:not([open])')};
     ui.blk['maqmais'+livre]=true;render();a.reservar2=vis('#sheet [data-a=mRes]');ui.sheet=null;render();return a});
   ok(r.comecar&&!r.reservar&&r.mais,'à vista só o essencial; Reservar fica em Mais opções');ok(r.reservar2,'abrindo Mais opções, Reservar aparece');
+  console.log('14) Visual: cor da marca');
+  r=await A.evaluate(()=>{const v=()=>getComputedStyle(document.documentElement).getPropertyValue('--blue').trim().toLowerCase();const antes=v();
+    state.marca={...marca(),cor:'#7c3aed'};render();const roxo=v();state.marca={...marca(),cor:'#ffe066'};render();const clara=v();
+    const lum=h=>{const f=x=>{x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)};const [r,g,b]=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return .2126*f(r)+.7152*f(g)+.0722*f(b)};
+    const contraste=1.05/(lum(clara)+.05);state.marca={...marca(),cor:''};render();return {antes,roxo,contraste,volta:v()===antes}});
+  ok(r.roxo==='#7c3aed','a cor da marca vira a cor principal do app');ok(r.contraste>=4.5,'cor clara demais é escurecida para o texto branco continuar legível');ok(r.volta,'sem cor, volta ao padrão');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

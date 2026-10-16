@@ -5,7 +5,7 @@
 <title>Chão de Fábrica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* Um só visual, claro e de alto contraste, escolhido de propósito para leitura fácil. */
 :root{
@@ -843,6 +843,98 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 .maq-mais{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.maq-mais .mbtn{justify-content:center;min-height:56px}
 @media (max-width:640px){.maq-mais{grid-template-columns:1fr}}
 .qtd-ed{display:flex;gap:10px;align-items:center}.qtd-ed .campo{width:130px;text-align:center;font-size:26px;font-weight:700}.qtd-ed .stp{min-width:64px;min-height:56px;font-size:20px;font-weight:700}
+/* ================= Design system v2 (10/2026) =================
+   Visual de produto: superfícies leves com sombra suave, cantos consistentes, tipografia Inter, cor da marca.
+   Regras que NÃO mudam (público 60+): letra ≥ 16px, alvos ≥ 48px, contraste de texto AA, botão sempre parece botão. */
+:root{
+  --font:'Inter','Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --bg:#F3F5F9;--card:#FFFFFF;--ink:#0F172A;--ink2:#334155;--muted:#556071;
+  --line:#E3E8EF;--line-btn:#AEB8C6;--line-strong:#CBD3DE;
+  --blue:#2350D8;--blue-dark:#1A3DA8;--blue-soft:#EBF0FF;--blue-line:#C7D4FB;
+  --go:#14874A;--go-dark:#0C6B39;--go-soft:#E6F5EC;
+  --red:#C4321F;--red-soft:#FDECEA;--atn:#E09B00;--atn-ink:#5A3E00;--atn-soft:#FFF5DB;
+  --grey-soft:#EEF1F5;
+  --r-sm:12px;--r-md:16px;--r-lg:20px;
+  --sh-1:0 1px 2px rgba(15,23,42,.05),0 1px 3px rgba(15,23,42,.06);
+  --sh-2:0 2px 4px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.08);
+  --sh-btn:0 1px 2px rgba(15,23,42,.08);
+}
+body{font-family:var(--font);font-feature-settings:'cv11','ss01';letter-spacing:-.005em;background:var(--bg)}
+h1,h2,h3,.ola b{letter-spacing:-.02em}
+h1{font-weight:800}h2{font-weight:750}
+svg.ic{stroke-width:2.3}
+.nb svg.ic{stroke-width:2.1}
+/* números alinhados em tabelas, contadores e prazos */
+output,.kpi,.ped-ent,.resumo,.imp-g,.pill{font-variant-numeric:tabular-nums}
+
+/* superfícies */
+.card,.pessoa,.ped,.prodc,.tarefa,.outra,.item,.aj,.livres,.escp,.setor,.cad-row,.pes,.eq,.inicio,.faixa,.kpi,.login,.zonas{
+  border:1px solid var(--line);box-shadow:var(--sh-1)}
+.card,.item,.inicio,.login{border-radius:var(--r-lg)}
+.ped,.pessoa{border-radius:var(--r-lg);transition:box-shadow .15s,transform .15s}
+.ped:hover,.pessoa:hover{border-color:var(--line-strong);box-shadow:var(--sh-2)}
+.st-livre{border:1.5px solid var(--atn);box-shadow:0 0 0 3px rgba(224,155,0,.12),var(--sh-1)}
+.st-semp{border:1.5px dashed var(--line-btn);box-shadow:none}
+.vazio-box{border:1.5px dashed var(--line-strong);box-shadow:none}
+.forn{border-width:1.5px;box-shadow:var(--sh-1)}
+
+/* cabeçalho de status dos cartões de pedido: faixa fina + selo, em vez de bloco colorido */
+.ped-st{font-size:15px;letter-spacing:.06em;padding:10px 16px 8px;border-bottom:1px solid var(--line)}
+
+/* botões */
+.mbtn{border-radius:var(--r-sm);box-shadow:var(--sh-btn);transition:background .15s,box-shadow .15s,transform .05s}
+.mbtn:not(.neutro2):not(.go):hover{background:var(--blue-dark)}
+.mbtn:active,.big:active,.depc:active,.chk:active,.pchip:active{transform:translateY(1px)}
+.mbtn.go{background:var(--go);color:#fff}
+.big{border-radius:var(--r-md);transition:background .15s,box-shadow .15s}
+.big.go{box-shadow:0 1px 2px rgba(20,135,74,.25),0 6px 16px rgba(20,135,74,.22)}
+.big.go:hover{background:var(--go-dark)}
+.big.azul,.p-act.ini{box-shadow:0 1px 2px rgba(35,80,216,.25),0 6px 16px rgba(35,80,216,.2)}
+.mbtn.neutro2,.big.neutro,.voltar,.depc,.subtab,.x,.help,.pulo,.stp,.p-mais,.chk,.pchip,.tagp,.cor-ed,.pm{
+  border:1.5px solid var(--line-btn);background:var(--card);box-shadow:var(--sh-btn)}
+.mbtn.neutro2:hover,.big.neutro:hover,.voltar:hover,.depc:hover,.subtab:hover,.x:hover,.p-mais:hover,.chk:hover,.pchip:hover{border-color:var(--ink2);background:#FAFBFD}
+.x.azul{color:var(--blue)}
+.voltar{border-radius:999px;padding:10px 18px 10px 12px;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(8px)}
+.depc{border-radius:var(--r-sm)}
+.depc[aria-pressed="true"],.pchip[aria-pressed="true"],.chk[aria-pressed="true"]{box-shadow:0 0 0 3px rgba(20,135,74,.14)}
+.subtab{border-radius:999px}
+.subtab[aria-current="page"]{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:var(--sh-2)}
+.sino,.eu{border:1.5px solid var(--line-btn);box-shadow:var(--sh-btn);background:var(--card)}
+.pm{border-style:dashed}
+
+/* campos */
+.campo{border:1.5px solid var(--line-btn);border-radius:var(--r-sm);box-shadow:inset 0 1px 2px rgba(15,23,42,.04);transition:border-color .15s,box-shadow .15s}
+.campo:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(35,80,216,.16)}
+.campo::placeholder{color:#7A8494}
+
+/* abas da Fábrica: controle segmentado */
+.zonas{background:#E9EDF3;border:0;box-shadow:inset 0 1px 2px rgba(15,23,42,.06);padding:5px}
+.zona{border-radius:12px;transition:background .15s,color .15s}
+.zona[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.1),0 3px 10px rgba(15,23,42,.1)}
+
+/* barra de baixo: vidro, item ativo em pílula */
+.nav{background:rgba(255,255,255,.9);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-top:1px solid rgba(15,23,42,.06);box-shadow:0 -4px 24px rgba(15,23,42,.06)}
+.nb{border-radius:14px;transition:background .15s,color .15s}
+.nb[aria-current="page"]{background:var(--blue-soft);color:var(--blue)}
+.nb.novo{box-shadow:0 1px 2px rgba(20,135,74,.3),0 8px 20px rgba(20,135,74,.28)}
+
+/* selos e avisos */
+.pill{font-weight:650;letter-spacing:.005em}
+.instr{border-width:1.5px;border-radius:var(--r-md)}
+.sheet{background:var(--bg)}
+.sheet .card:first-of-type{box-shadow:var(--sh-2)}
+.conf{border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28)}
+.conf-fundo{backdrop-filter:blur(2px)}
+#toast .toast{border-radius:16px;box-shadow:0 12px 32px rgba(15,23,42,.28);background:#111827}
+
+/* foco sempre visível (teclado) */
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* cabeçalho do pedido: documentos em grade, selo de status do tamanho do texto */
+.doc-bts{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.doc-bts>*{justify-content:center;width:100%;margin:0!important}.doc-bts>.pill,.doc-bts>span{grid-column:1/-1;justify-self:start;width:auto}.doc-bts .mbtn{min-height:52px;font-size:17px;line-height:1.2}
+.ped-head>.pill:first-child{justify-self:start}
+.p-mais small{display:none}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1683,7 +1775,7 @@ function maqTile(u,P,esp){const t=P.uso[u.id],pl=P.plan[u.id],sp=!t&&!pl?(P.semP
     ${P.resEspera[u.id]?`<div class="dica" style="padding:0 14px 8px;color:var(--blue);font-weight:700">Reservado a seguir: ${esc(P.resEspera[u.id].s.nome)} · ${esc(P.resEspera[u.id].ped.cliente)}</div>`:''}
     ${t?tileTempo(t,u):sp?'<div class="p-st"><span class="dot"></span>Esperando alguém livre</div>':''}
     ${t?`<button class="p-act fim" data-a="terminou" data-m="${u.id}">${ic('i-check')}Terminou</button>${heAtiva(t.x)?`<button class="he-b" data-a="hePara" data-m="${u.id}">Parar a hora extra agora</button>`:''}`:pl?`<button class="p-act ini" data-a="comecar" data-m="${u.id}" data-l="${pl.l.id}" data-s="${pl.s.id}" data-p="${pl.pessoa}">${ic('i-play')}${situacao().k==='fora'?'Começar em hora extra':'Começar'}</button>`:''}
-    <button class="p-mais" data-a="maq" data-m="${u.id}">Mais opções <small>(problema, trocar pessoa, reservar)</small></button>
+    <button class="p-mais" data-a="maq" data-m="${u.id}" aria-label="Mais opções: problema, trocar pessoa, reservar">Mais opções</button>
   </div>`}
 
 /* ================= PEDIDOS ================= */
@@ -1934,6 +2026,7 @@ function cAjustes(){const pr=state.params;
     <div class="aj-row"><span>Dúvidas sobre o app</span><button class="mbtn" data-a="ajuda">${ic('i-duvida')}Como usar</button></div></div>
   <div class="card"><h2>Onde ficam os dados</h2><p style="margin:0;color:var(--ink2)">${NV.modo==='nuvem'?'Na nuvem: todos os aparelhos veem as mesmas informações ao mesmo tempo.':'Só neste aparelho. Abra pelo link do sistema para usar a nuvem.'}</p></div>
   <div class="card"><h2>Sua empresa nos documentos</h2><p class="dica" style="margin:-4px 0 8px">Aparece no Pedido enviado ao cliente e nas fichas.</p>
+    <label class="aj-row"><span>Cor da marca no app</span><input type="color" class="cor-pick" data-marca="cor" value="${esc(/^#[0-9a-f]{6}$/i.test(marca().cor||'')?marca().cor:'#2350d8')}" aria-label="Cor da marca"></label>
     <div class="imp-h">${logoMarca(false)}<label class="mbtn neutro2" style="cursor:pointer">${ic('i-camera')}${marca().logo?'Trocar logo':'Pôr logo'}<input type="file" id="fLogo" accept="image/*" hidden></label>${marca().logo?'<button class="x" data-a="logoRm">Tirar logo</button>':''}</div>
     ${[['nome','Nome'],['sub','Frase abaixo do nome'],['whats','WhatsApp'],['tel','Telefone'],['email','E-mail'],['insta','Instagram'],['site','Site'],['end','Endereço'],['cnpj','CNPJ']].map(([k,n])=>`<label class="aj-row"><span>${n}</span><input class="campo" data-marca="${k}" value="${esc(marca()[k]||'')}" style="max-width:320px"></label>`).join('')}</div>
   <div class="card"><h2>Informações importantes do Pedido</h2><p class="dica" style="margin:-4px 0 8px">Textos da página “Antes de aprovar” que vai para o cliente.</p>
@@ -3204,7 +3297,12 @@ const sheetId=s=>s.t+':'+(s.id||s.p||s.m||'');
 /* Link do QR code da etiqueta: #ficha=<peça> abre a ficha de produção dessa peça */
 let LINK_FICHA=(()=>{try{const m=location.hash.match(/ficha=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
 function render(){renderTela();aplicaVocab()}
-function renderTela(){RC={};if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){const l=(state.lotes||[]).find(x=>x.id===LINK_FICHA);LINK_FICHA=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(l){setTimeout(()=>abreDoc('prod',l.ped,l.id),0)}}
+/* Cor da marca do cliente (Ajustes › Sua empresa): vira a cor principal do app. Escurece sozinha se ficar clara demais para texto branco. */
+function aplicaCor(){const R=document.documentElement.style,c=String((state&&state.marca&&state.marca.cor)||'').trim();if(!/^#[0-9a-f]{6}$/i.test(c)){['--blue','--blue-dark','--blue-soft','--blue-line'].forEach(k=>R.removeProperty(k));return}
+  let [r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));const lum=(r,g,b)=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)};
+  let n=0;while((1.05)/(lum(r,g,b)+.05)<4.5&&n<40){r*=.92;g*=.92;b*=.92;n++}const hx=(r,g,b)=>'#'+[r,g,b].map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('');
+  const mix=(t,w)=>hx(r+(w-r)*t,g+(w-g)*t,b+(w-b)*t);R.setProperty('--blue',hx(r,g,b));R.setProperty('--blue-dark',hx(r*.8,g*.8,b*.8));R.setProperty('--blue-soft',mix(.9,255));R.setProperty('--blue-line',mix(.72,255))}
+function renderTela(){RC={};aplicaCor();if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){const l=(state.lotes||[]).find(x=>x.id===LINK_FICHA);LINK_FICHA=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(l){setTimeout(()=>abreDoc('prod',l.ped,l.id),0)}}
   document.querySelectorAll('.nb[data-t]').forEach(b=>b.setAttribute('aria-current',b.dataset.t===ui.tela?'page':'false'));
   if(!NV.pronto){document.body.classList.add('sem-login');document.getElementById('app').innerHTML=vConectando();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());MODULOS.forEach(([k])=>document.body.classList.toggle('sem-'+k,!modOn(k)));
@@ -3688,7 +3786,7 @@ document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)re
       openSheet({t:'mock',itens:out.map(m=>({...m,alvo:null,sug:sugMock(m.nome)}))})})();return}
   if(t.dataset.imp&&ui.sheet&&ui.sheet.t==='imp'){const g=ui.sheet.grupos[ui.sheet.gi],k=t.dataset.imp;if(k==='cliente'){g.cliente=t.value;const ce=acharCliente(state,t.value,g.cnpj);g.cliId=ce?ce.id:null;g.cliCerto=!!ce;g.cliNovo=!ce;g.cliSug=[];render();return}if(k==='chegada'||k==='entrega'){if(!t.value){g[k]=null}else{const [y,m,dd]=t.value.split('-').map(Number);g[k]=new Date(y,m-1,dd,17).getTime();g[k==='chegada'?'chDeduz':'enDeduz']=false}render()}else g[k]=t.value;return}
   if(t.id==='fLogo'&&t.files[0]){lerURL(t.files[0]).then(async src=>{const im=new Image();im.src=src;await im.decode();const k=Math.min(1,400/im.width,200/im.height),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);snap();state.marca={...marca(),logo:c.toDataURL('image/png')};commit();toast('Logo salvo')});return}
-  if(t.dataset.marca){snap();state.marca={...marca(),[t.dataset.marca]:t.value.trim()};save();toast('Salvo',false);return}
+  if(t.dataset.marca){snap();state.marca={...marca(),[t.dataset.marca]:t.value.trim()};save();if(t.dataset.marca==='cor')render();toast('Salvo',false);return}
   if(t.dataset.termo!=null){snap();state.termos=(state.termos||TERMOS0).map(x=>[...x]);state.termos[+t.dataset.termo][+t.dataset.k]=t.value.trim();save();toast('Salvo',false);return}
   if(t.dataset.tampad){snap();state.tamPadrao={...(state.tamPadrao||TAM0),[t.dataset.tampad]:t.value.trim()};save();toast('Salvo',false);return}
   if(t.dataset.pos!=null&&t.tagName==='SELECT'){const [lid,pid]=t.dataset.pos.split('|');const x=(lote(lid).pers||[]).find(y=>y.id===pid);if(x){snap();x.pos=t.value||undefined;commit();toast('Posição salva',false)}return}
