@@ -949,6 +949,7 @@ output,.kpi,.ped-ent,.resumo,.imp-g,.pill{font-variant-numeric:tabular-nums}
 .doc-bts>*{justify-content:center;width:100%;margin:0!important}.doc-bts>.pill,.doc-bts>span{grid-column:1/-1;justify-self:start;width:auto}.doc-bts .mbtn{min-height:52px;font-size:17px;line-height:1.2}
 .ped-head>.pill:first-child{justify-self:start}
 .p-mais small{display:none}
+.fcli{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 14px}.fcli label{display:inline-flex;align-items:center;gap:8px;font-weight:700}.fcli label svg.ic{width:24px;height:24px}.fcli select{flex:1;min-width:220px;max-width:420px;min-height:52px}.fcli-h{font-size:18px;margin:18px 0 8px;color:var(--ink2)}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1081,7 +1082,7 @@ const GRUPOS=[{id:'corte',nome:'Corte',i:'i-corte'},{id:'pers',nome:'Personaliza
 /* Setores são cadastráveis (state.setores). Cada setor tem uma FUNÇÃO fixa, que é o que o motor entende:
    corte = abre o lote · pers = personalização · costura = montagem · acab = acabamento/fecha a peça. */
 /* Módulos: partes do app que cada fábrica liga ou desliga (state.modOff). Desligado só esconde da tela e da ajuda; os dados ficam. */
-const MODULOS=[['pers','Personalização (estampa, bordado, artes)','i-estampa'],['etq','Etiquetas do corte com QR','i-etiqueta'],['junto','Cortar junto (mesmo tecido e cor)','i-corte'],
+const MODULOS=[['pers','Personalização (estampa, bordado, artes)','i-estampa'],['etq','Etiquetas do corte com QR','i-etiqueta'],['junto','Juntar pedidos (cortar e costurar de uma vez)','i-corte'],
   ['hora','Hora extra','i-relogio'],['imp','Importar fichas (PDF/Word)','i-lista'],['ciclo','Painel do ciclo (tempo por fase)','i-grafico']];
 const modOn=k=>!((typeof state!=='undefined'&&state&&state.modOff)||[]).includes(k);
 const faqOn=f=>!f.m||(f.m==='polo'?((typeof state!=='undefined'&&state&&state.produtos)||[]).some(p=>(p.partes||[]).includes('Peitilho')):modOn(f.m));
@@ -1408,12 +1409,17 @@ function rota(p0,pers,opc,cores){pers=pers||[];opc=opc||[];
   const bs=[...p0.steps.map(z=>({...z,deps:[...z.deps]})),...os];
   os.forEach(z=>(z.antes||[]).forEach(a=>{const t=bs.find(y=>y.id===a);if(t&&!t.deps.includes(z.id))t.deps.push(z.id)}));
   const p={...p0,steps:bs};const c0=p.steps[0];
-  const ps=pers.map((x,k)=>({id:x.id||('pz'+k),nome:`${tNome(x.tipo)} ${String(localTxt(x)).toLowerCase()}`,posto:x.tipo,deps:c0?[c0.id]:[],min:tipo(x.tipo).min||1,pers:true,fecha:false,obs:x.lado?`Aplicar na ${LADOS[x.lado].toUpperCase()} (lado de quem veste)`:'',partes:[x.parte]}));
+  /* peça fechada (pedido da Martins, 10/2026): a estampa é feita com a peça já costurada, então não trava a costura; só o acabamento espera */
+  const ps=pers.map((x,k)=>{const fe=persFechada(x),ob=[x.lado?`Aplicar na ${LADOS[x.lado].toUpperCase()} (lado de quem veste)`:'',fe?'Com a peça já costurada (fechada)':''].filter(Boolean).join(' · ');return{id:x.id||('pz'+k),nome:`${tNome(x.tipo)} ${String(localTxt(x)).toLowerCase()}`,posto:x.tipo,deps:c0?[c0.id]:[],min:tipo(x.tipo).min||1,pers:true,fecha:false,fechada:fe||undefined,obs:ob,partes:[x.parte]}});
+  const pa=ps.filter(x=>!x.fechada),pf=ps.filter(x=>x.fechada);
   const steps=p.steps.map((s,i)=>{if(i===0)return{...s};const an=anc(p,s.id);if(c0)an.delete(c0.id);
-    const ex=ps.filter(x=>usa(p,s).includes(x.partes[0])&&![...an].some(a=>{const z=p.steps.find(y=>y.id===a);return z&&usa(p,z).includes(x.partes[0])})).map(x=>x.id);
+    const ex=pa.filter(x=>usa(p,s).includes(x.partes[0])&&![...an].some(a=>{const z=p.steps.find(y=>y.id===a);return z&&usa(p,z).includes(x.partes[0])})).map(x=>x.id);
     return{...s,deps:[...new Set([...s.deps,...ex])]}});
   if(c0&&cores&&(cores.cores2||[]).length)steps[0]={...steps[0],obs:`Cores: ${cores.cor} (principal) · ${cores.cores2.map((c,i)=>`${ORDEM_COR[i]||'Outra'}: ${c.cor} em ${c.partes.join(', ').toLowerCase()}`).join(' · ')}`};
+  if(pf.length&&c0){const ac=z=>faseT(z.posto)==='acab',na=steps.filter(z=>!ac(z)),fim=na.filter(z=>!na.some(y=>y.deps.includes(z.id))).map(z=>z.id);
+    pf.forEach(x=>x.deps=fim.length?fim:[c0.id]);steps.forEach((z,i)=>{if(i&&ac(z)&&(z.deps.some(d=>fim.includes(d))||!z.deps.some(d=>steps.some(y=>y.id===d&&ac(y)))))z.deps=[...new Set([...z.deps,...pf.map(x=>x.id)])]})}
   return{...p,steps:c0?[steps[0],...ps,...steps.slice(1)]:ps}}
+const persFechada=x=>x.fechada!=null?!!x.fechada:!!tipo(x.tipo).fechada;
 const rp=l=>RC[l.id]||(RC[l.id]=rota(prod(l.prod),l.pers,l.opcoes,l));
 function fase(p,s){if(s.pers)return 'pers';const a=anc(p,s.id);return p.steps.some(x=>x.pers&&a.has(x.id))?'depois':'antes'}
 
@@ -1446,7 +1452,7 @@ function info(ped){const ls=lotesDe(ped.id),ab=ls.filter(l=>!loteDone(l)),pre=pr
   return{ls,ab,prog,du,folga,u,need,score:ped.concluido?1e9:!ab.length?-100:folga-(D>0?3*prog:0)}}
 const ULAB={crit:'Atrasando',warn:'Atenção',ok:'Em dia',pronto:'Pronto',fim:'Entregue',cancel:'Cancelado'};
 function prontas(){const out=[];state.pedidos.filter(p=>!p.concluido).forEach(ped=>{const inf=info(ped);lotesDe(ped.id).forEach(l=>{const p=rp(l);
-  p.steps.forEach(s=>{if(ready(l,s,ped))out.push({ped,inf,l,p,s,adianta:!s.pers&&fase(p,s)==='antes'&&p.steps.some(x=>x.pers&&!done(l,x.id))})})})});
+  p.steps.forEach(s=>{if(ready(l,s,ped))out.push({ped,inf,l,p,s,adianta:!s.pers&&fase(p,s)==='antes'&&p.steps.some(x=>x.pers&&!x.fechada&&!done(l,x.id))})})})});
   return out.sort((a,b)=>a.inf.score-b.inf.score||(b.l.rework?1:0)-(a.l.rework?1:0)||lv(a.p)[a.s.id]-lv(b.p)[b.s.id])}
 /* Plano: coloca cada tarefa numa máquina livre com a melhor pessoa livre.
    Preferência: quem faz melhor aquela etapa/máquina; empate → quem sabe menos coisas,
@@ -1698,7 +1704,8 @@ function chips(it){const r=[upill(it.inf.u)];if(it.l.rework)r.push(`<span class=
 const chaveCorte=l=>semAc(l.tecido||'')+'|'+semAc(l.cor||'');
 function cortarJunto(l){if(!l||!l.tecido||!l.cor)return [];const k=chaveCorte(l);const PR=new Set(prontas().map(x=>x.l.id+'|'+x.s.id));
   return (state.lotes||[]).filter(o=>o.id!==l.id&&!o.rework&&chaveCorte(o)===k).map(o=>{const ped=pedById(o.ped);if(!ped||ped.concluido||ped.cancelado)return null;const s=rp(o).steps.find(x=>faseT(x.posto)==='corte');if(!s||stOf(o,s.id).st!=='pend')return null;return {l:o,s,ped,pronta:PR.has(o.id+'|'+s.id)}}).filter(Boolean).sort((a,b)=>(a.ped.entrega||0)-(b.ped.entrega||0))}
-const grupoTxt=t=>t&&t.grupo&&t.grupo.length?`<div class="junto"><div class="junto-h">${ic('i-corte')}<div><b>Cortando junto (${t.grupo.length+1} cortes)</b><div class="junto-s">${[t,...t.grupo].map(g=>`${esc(g.ped.cliente)} · ${esc(nomePeca(g.l))} · ${qtdEf(g.l)} peças`).join('<br>')}</div></div></div></div>`:'';
+const jPal=posto=>faseT(posto)==='corte'?'cortes':'trabalhos';
+const grupoTxt=t=>t&&t.grupo&&t.grupo.length?`<div class="junto"><div class="junto-h">${ic(faseT(t.s.posto)==='corte'?'i-corte':(tipo(t.s.posto).i||'i-maquina'))}<div><b>${faseT(t.s.posto)==='corte'?'Cortando':'Fazendo'} junto (${t.grupo.length+1} ${jPal(t.s.posto)})</b><div class="junto-s">${[t,...t.grupo].map(g=>`${esc(g.ped.cliente)} · ${faseT(t.s.posto)==='corte'?'':esc(g.s.nome)+' · '}${esc(nomePeca(g.l))} · ${qtdEf(g.l)} peças`).join('<br>')}</div></div></div></div>`:'';
 function juntoBox(l,sel){const J=cortarJunto(l);if(!J.length)return '';const tot=sum(J.map(x=>qtdEf(x.l)));const JS=(ui.sheet&&ui.sheet.junto)||[];
   return `<div class="junto"><div class="junto-h">${ic('i-corte')}<div><b>Dá para cortar junto</b><div class="junto-s">Mais ${J.length} ${J.length===1?'peça':'peças'} em <strong>${esc(l.tecido)} ${esc(l.cor)}</strong> ainda sem corte · ${tot} unidades</div></div></div>
   ${J.map(x=>sel?`<button class="junto-i${JS.includes(x.l.id+'|'+x.s.id)?' on':''}" data-a="mJunto" data-v="${esc(x.l.id+'|'+x.s.id)}" aria-pressed="${JS.includes(x.l.id+'|'+x.s.id)}"><span><b>${esc(x.ped.cliente)}</b> · pedido ${esc(x.ped.id)}</span><span>${esc(nomePeca(x.l))} · <b>${qtdEf(x.l)} ${qtdEf(x.l)===1?'peça':'peças'}</b> · entrega ${dataCurta(x.ped.entrega).slice(0,5)}</span><em class="${x.pronta?'ok':'esp'}">${x.pronta?'Liberada para cortar':'Ainda não liberada'}</em><strong class="junto-add">${JS.includes(x.l.id+'|'+x.s.id)?'✓ Junto':'+ Juntar'}</strong></button>`:`<button class="junto-i" data-a="pedido" data-id="${esc(x.ped.id)}"><span><b>${esc(x.ped.cliente)}</b> · pedido ${esc(x.ped.id)}</span><span>${esc(nomePeca(x.l))}${GEN[x.l.gen]&&x.l.gen!=='U'?' '+GEN[x.l.gen].toLowerCase():''} · <b>${qtdEf(x.l)} ${qtdEf(x.l)===1?'peça':'peças'}</b> · entrega ${dataCurta(x.ped.entrega).slice(0,5)}</span><em class="${x.pronta?'ok':'esp'}">${x.pronta?'Liberada para cortar':'Ainda não liberada'}</em></button>`).join('')}</div>`}
@@ -1724,7 +1731,8 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
   <div class="zonas" role="tablist">${zonas.map(([k,n,i,c])=>`<button class="zona" role="tab" data-a="fz" data-v="${k}" aria-pressed="${z===k}">${ic(i)}<span>${n}</span>${c?`<em>${c}</em>`:''}</button>`).join('')}</div>
   ${z==='maq'?`<div class="agora"><span><b>${nIni}</b> para começar</span><span><b>${nTrab}</b> trabalhando</span></div>
   ${livres.length?`<div class="livres"><span class="t">Livres:</span>${livres.map(p=>`<span class="pl-p">${av(p.id,'s')}${esc(p.nome)}</span>`).join('')}</div>`:''}
-  ${SETORES().map(g=>{const ts=state.tipos.filter(t=>t.grupo===g.id&&!t.externo&&t.qtd>0);if(!ts.length)return '';
+  ${filtroCli()}
+  ${ui.fCli?fabDoCli(P,ui.fCli):SETORES().map(g=>{const ts=state.tipos.filter(t=>t.grupo===g.id&&!t.externo&&t.qtd>0);if(!ts.length)return '';
     const us=P.us.filter(u=>ts.some(t=>t.id===u.tipo));
     const ativo=u=>P.uso[u.id]||P.plan[u.id]||ehSemp(u,P);
     const on=us.filter(ativo),off=us.filter(u=>!ativo(u));const vistos=new Set();
@@ -1818,6 +1826,27 @@ function maqTile(u,P,esp){const t=P.uso[u.id],pl=P.plan[u.id],sp=!t&&!pl?(P.semP
     ${t?`<button class="p-act fim" data-a="terminou" data-m="${u.id}">${ic('i-check')}Terminou</button>${heAtiva(t.x)?`<button class="he-b" data-a="hePara" data-m="${u.id}">Parar a hora extra agora</button>`:''}`:pl?`<button class="p-act ini" data-a="comecar" data-m="${u.id}" data-l="${pl.l.id}" data-s="${pl.s.id}" data-p="${pl.pessoa}">${ic('i-play')}${situacao().k==='fora'?'Começar em hora extra':'Começar'}</button>`:''}
     <button class="p-mais" data-a="maq" data-m="${u.id}" aria-label="Mais opções: problema, trocar pessoa, reservar">Mais opções</button>
   </div>`}
+
+/* filtro por cliente na Fábrica (pedido da Martins, 10/2026): só o que é desse cliente, máquina por máquina */
+const clisNaFab=()=>[...new Set(state.pedidos.filter(p=>!p.concluido&&!p.cancelado&&lotesDe(p.id).some(l=>!loteDone(l))).map(p=>p.cliente).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));
+function filtroCli(){const L=clisNaFab();if(L.length<2&&!ui.fCli)return '';
+  return `<div class="fcli"><label for="fCliS">${ic('i-predio')}<span>Ver só um cliente</span></label><select class="campo" id="fCliS" data-sel="fCli"><option value="*">Todos os clientes</option>${L.map(c=>`<option value="${esc(c)}"${ui.fCli===c?' selected':''}>${esc(c)}</option>`).join('')}</select>${ui.fCli?`<button class="mbtn neutro2" data-a="fCli" data-v="*">Ver todos</button>`:''}</div>`}
+function fabDoCli(P,c){const doC=it=>it.ped.cliente===c;
+  const fazendo=Object.keys(P.uso).flatMap(m=>{const t=P.uso[m];return [t,...(t.grupo||[])].filter(doC).map(g=>({it:g,m,t}))});
+  const ocup=new Set(fazendo.map(f=>kIt(f.it)));
+  const prontos=prontas().filter(it=>doC(it)&&!isExt(it.s)&&!ocup.has(kIt(it)));
+  const fora=[];state.lotes.forEach(l=>{const ped=pedById(l.ped);if(!ped||ped.cliente!==c||ped.concluido)return;rp(l).steps.forEach(z=>{if(stOf(l,z.id).st==='fora')fora.push({l,s:z,ped})})});
+  const unid=it=>{const m=Object.keys(P.plan).find(k=>kIt(P.plan[k])===kIt(it));if(m)return m;const us=P.us.filter(u=>u.tipo===it.s.posto);return (us.find(u=>!P.uso[u.id])||us[0])?.id};
+  const card=(it,m,tag,cor)=>`<button class="outra" data-a="maqSel" data-m="${m||''}" data-v="${esc(kIt(it))}"${m?'':' disabled'}>${loteSvg(it.l)}<div><b>${esc(it.s.nome)} · ${qtdDe(it)} peças</b><span>${esc(nomePeca(it.l))} ${esc(it.l.cor||'')} · <b style="color:${cor}">${tag}</b></span></div><span class="ir">${m?esc(unidade(m)?.nome||''):''}${ic('i-seta')}</span></button>`;
+  const temAlgo=new Set([...fazendo.map(f=>f.it.l.id),...prontos.map(it=>it.l.id),...fora.map(x=>x.l.id)]);
+  const esperando=state.lotes.filter(l=>{const ped=pedById(l.ped);return ped&&ped.cliente===c&&!ped.concluido&&!ped.cancelado&&!loteDone(l)&&!temAlgo.has(l.id)}).map(l=>{const ped=pedById(l.ped),R=rp(l),pend=R.steps.filter(z=>!done(l,z.id)&&stOf(l,z.id).st==='pend'),prox=pend.filter(z=>!z.deps.some(d=>pend.some(y=>y.id===d)));
+    return {l,txt:!liberado(ped)?'espera o escritório liberar o corte':prox.length?`próxima: ${prox.map(z=>z.nome).slice(0,2).join(', ')}`:'esperando'}});
+  const n=fazendo.length+prontos.length+fora.length;
+  return `<section class="grupo"><h2 class="grupo-h">${ic('i-predio')}${esc(c)}</h2>${!n?`<div class="vazio-box">${ic('i-dormir')}<b>Nada deste cliente nas máquinas agora</b></div>`:''}
+    ${fazendo.length?`<h3 class="fcli-h">Fazendo agora</h3><div class="outras">${fazendo.map(f=>card(f.it,f.m,`${esc(pNome(f.t.x.op))} na ${esc(unidade(f.m)?.nome||'')}`,'var(--ok-ink,#1E7B45)')).join('')}</div>`:''}
+    ${prontos.length?`<h3 class="fcli-h">Pode começar</h3><div class="outras">${prontos.map(it=>card(it,unid(it),'pronto para começar','var(--blue)')).join('')}</div>`:''}
+    ${fora.length?`<h3 class="fcli-h">No fornecedor</h3><div class="outras">${fora.map(x=>`<div class="outra" style="cursor:default">${loteSvg(x.l)}<div><b>${esc(x.s.nome)} · ${qtdEf(x.l)} peças</b><span>${esc(fornById(x.l.steps[x.s.id]?.forn)?.nome||tNome(x.s.posto))}</span></div></div>`).join('')}</div>`:''}
+    ${esperando.length?`<h3 class="fcli-h">Ainda esperando</h3><div class="outras">${esperando.map(x=>`<button class="outra" data-a="pedido" data-id="${esc(x.l.ped)}">${loteSvg(x.l)}<div><b>${esc(nomePeca(x.l))} ${esc(x.l.cor||'')} · ${qtdEf(x.l)} peças</b><span>${esc(x.txt)}</span></div><span class="ir">Pedido ${esc(x.l.ped)}${ic('i-seta')}</span></button>`).join('')}</div>`:''}</section>`}
 
 /* ================= PEDIDOS ================= */
 const soDig=x=>String(x||'').replace(/\D/g,'');
@@ -1977,6 +2006,7 @@ function fxInfo(p,s,key,l){const m=sMap(p),fil=filhos(p,s.id),podeTirar=!l&&!fil
     <div class="lin"><b>${isExt(s)?'Fornecedor:':'Quem sabe fazer:'}</b>${quem.length?quem.map(n=>`<span class="tagp">${esc(n)}</span>`).join(''):'<span style="color:var(--red);font-weight:700">ninguém cadastrado</span>'}</div>
     ${s.obs?`<div class="lin">${ic('i-etiqueta')}<b>${esc(s.obs)}</b></div>`:''}
     ${l&&s.pers?ondeBox(l,s):''}
+    ${l&&s.pers&&!done(l,s.id)&&(l.pers||[]).some((x,k)=>(x.id||'pz'+k)===s.id)?`<div class="lin"><b>Quando aplica:</b><button class="depc" data-a="persFech" data-l="${l.id}" data-s="${s.id}" data-v="0" aria-pressed="${!s.fechada}">Antes de costurar</button><button class="depc" data-a="persFech" data-l="${l.id}" data-s="${s.id}" data-v="1" aria-pressed="${!!s.fechada}">Com a peça pronta</button></div>`:''}
     <div style="display:flex;gap:10px;flex-wrap:wrap">${!l&&!s.id.startsWith('pz')&&!s.opt?`<button class="x azul" data-a="edEtapa" data-p="${p.id}" data-s="${s.id}">✎ Editar etapa</button>`:''}${podeTirar&&!s.opt?`<button class="x" data-a="rmEtapa" data-p="${p.id}" data-s="${s.id}">Tirar esta etapa</button>`:''}<button class="x azul" data-a="fxSel" data-k="${key}" data-s="${s.id}">Fechar</button></div></div>`}
 function vInfo(p,s,key,l,ped){const t=vTask(l,ped,s),cs=capazes(s.f);
   return `<div class="fx-info"><div class="t">${ic(s.icon)}${esc(s.nome)}</div><div>${esc(fNome(s.f))} · ${vDone(l,ped,s.id)?'feito':'a fazer'} · tempo estimado ≈ ${minTxt(state.tEsc[s.f]||0)}</div>
@@ -2031,7 +2061,7 @@ function sTipoEd(){const e=ui.sheet;const usoP=e.id?state.produtos.filter(p=>p.s
   <div class="rotulo">Nome</div><input class="campo" id="xNome" value="${esc(e.nome)}" placeholder="Ex.: Travete" autocomplete="off">
   <div class="rotulo">Setor</div><div class="linha-dep">${SETORES().map(g=>`<button class="depc" data-a="tG" data-v="${g.id}" aria-pressed="${e.grupo===g.id}">${ic(g.i)}${esc(g.nome)}</button>`).join('')}</div>
   <div class="rotulo">Desenho</div><div class="linha-dep">${ICONES.map(i=>`<button class="depc icn" data-a="tI" data-v="${i}" aria-pressed="${e.i===i}" title="${ICN[i]}">${ic(i)}<small>${ICN[i]}</small></button>`).join('')}</div>
-  <div class="linha-dep" style="margin-top:14px"><button class="depc" data-a="tExt" aria-pressed="${!!e.externo}">${ic('i-caminhao')}Feito fora (terceirizado)</button></div>
+  <div class="linha-dep" style="margin-top:14px"><button class="depc" data-a="tExt" aria-pressed="${!!e.externo}">${ic('i-caminhao')}Feito fora (terceirizado)</button>${faseG(e.grupo)==='pers'?`<button class="depc" data-a="tFech" aria-pressed="${!!e.fechada}">${ic('i-camisa')}Aplica com a peça pronta (costurada)</button>`:''}</div>${faseG(e.grupo)==='pers'?'<p class="dica" style="margin:6px 0 0">Ligado: a costura não espera esta personalização; ela entra antes do acabamento. Dá para trocar em cada pedido.</p>':''}
   ${faseG(e.grupo)==='pers'?`<div class="rotulo">Tempo por peça na personalização</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tMin" data-d="-1" aria-label="Menos 5 segundos">−</button><output>${tMin(e.min)}</output><button class="stp" data-a="tMin" data-d="1" aria-label="Mais 5 segundos">+</button></div>`:''}
   ${e.externo&&!e.id?`<div class="rotulo">Quem faz esse serviço? (fornecedor)</div><input class="campo" id="xForn" value="${esc(e.forn||'')}" placeholder="Ex.: Junior Bordados" autocomplete="off">
     <div class="rotulo">Prazo do fornecedor (dias)</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tPrazo" data-d="-1" aria-label="Menos um dia">−</button><output>${e.prazo||3}</output><button class="stp" data-a="tPrazo" data-d="1" aria-label="Mais um dia">+</button></div>`:''}
@@ -2229,7 +2259,7 @@ function sMaq(){const e=ui.sheet,u=unidade(e.m);if(!u)return voltar();const P=pl
   if(t){const sel=e.sel&&achar(e.sel),rIt=res&&achar(res.l+'|'+res.s);
     return `${voltar()}${head}<h2>${av(t.x.op,'s')} ${esc(pNome(t.x.op))} está fazendo</h2>${tarefaCard(t)}${grupoTxt(t)}
     <div class="acoes"><button class="big go" data-a="terminou" data-m="${u.id}">${ic('i-check')}Terminou</button><button class="big prob" data-a="problema" data-m="${u.id}">${ic('i-alerta')}Deu problema</button></div>
-    ${blkA('maqmais'+u.id,'Mais opções',!!e.sel,'<small class="dica" style="margin:0">pausar, dividir, escolher o próximo</small>')}${t.grupo&&t.grupo.length?'<p class="dica" style="margin:0 0 8px">Cortes juntos: terminam todos de uma vez em Terminou.</p>':`<div class="maq-mais"><button class="mbtn neutro2" data-a="pausar" data-m="${u.id}">${ic('i-relogio')}Pausar (parar no meio)</button><button class="mbtn neutro2" data-a="dividir" data-m="${u.id}">${ic('i-pessoas')}Dividir com outra pessoa</button></div>`}
+    ${blkA('maqmais'+u.id,'Mais opções',!!e.sel,'<small class="dica" style="margin:0">pausar, dividir, escolher o próximo</small>')}${t.grupo&&t.grupo.length?`<p class="dica" style="margin:0 0 8px">${faseT(t.s.posto)==='corte'?'Cortes juntos':'Trabalhos juntos'}: terminam todos de uma vez em Terminou.</p>`:`<div class="maq-mais"><button class="mbtn neutro2" data-a="pausar" data-m="${u.id}">${ic('i-relogio')}Pausar (parar no meio)</button><button class="mbtn neutro2" data-a="dividir" data-m="${u.id}">${ic('i-pessoas')}Dividir com outra pessoa</button></div>`}
     <div class="card" style="margin-top:22px"><h2>Depois deste</h2>${rIt?`<p style="margin:0 0 10px"><b>Reservado:</b> ${esc(rIt.s.nome)} · ${esc(rIt.ped.cliente)}</p><button class="mbtn" data-a="mResX" data-m="${u.id}">Tirar reserva</button>`:'<p style="margin:0;color:var(--ink2)">O sistema escolhe sozinho quando terminar. Para decidir você, escolha abaixo e reserve.</p>'}
       ${sel?`<div class="acoes"><button class="big azul" data-a="mRes" data-m="${u.id}" data-l="${sel.l.id}" data-s="${sel.s.id}" data-p="">${ic('i-check')}Reservar "${esc(sel.s.nome)}" como próximo</button></div>`:''}</div>
     ${listas('Opções para esta máquina')}</details>`}
@@ -2246,10 +2276,10 @@ function sMaq(){const e=ui.sheet,u=unidade(e.m);if(!u)return voltar();const P=pl
     <div class="rotulo">Quem vai fazer?</div>
     ${todosAptos.length?`<div class="linha-dep">${todosAptos.map(p=>{const oc=P.ocup.has(p.id);return `<button class="pchip" data-a="mP" data-v="${p.id}" aria-pressed="${quem===p.id}" ${oc?'disabled':''}>${av(p.id,'s')}${esc(p.nome)} ${estrela(p,sel)}${oc?` <small>(na ${esc(ondeEsta(p.id))})</small>`:''}</button>`}).join('')}</div>`:''}
     ${todosAptos.filter(p=>P.ocup.has(p.id)&&ondeEstaM(p.id)&&ondeEstaM(p.id)!==u.id).map(p=>`<div class="ocup-l">${av(p.id,'s')}<span><b>${esc(p.nome)}</b> está na ${esc(ondeEsta(p.id))}: termine lá ou pause para trazer para cá.</span><button class="mbtn neutro2" data-a="maq" data-m="${ondeEstaM(p.id)}">Ir para a ${esc(ondeEsta(p.id))}</button></div>`).join('')}
-    ${faseT(sel.s.posto)==='corte'&&!sel.l.rework&&modOn('junto')?(()=>{const JS=e.junto||[],ja=new Set([kIt(sel),...cortarJunto(sel.l).map(x=>x.l.id+'|'+x.s.id)]),out=[...O.pr,...O.ch].filter(it=>!ja.has(kIt(it))&&!it.l.rework&&!it.l.steps[it.s.id]?.partes);if(!out.length)return '';
-      const n=out.filter(it=>JS.includes(kIt(it))).length;return `<details class="card blk junto-outros" data-blk="jout${u.id}"${(ui.blk||{})['jout'+u.id]??n?' open':''}><summary><h2>Juntar outro corte</h2><span class="blk-r">${n?`<span class="pill u-ok">${n} junto</span>`:'<span class="dica" style="margin:0">outro tecido ou modelo</span>'}<span class="blk-i">${ic('i-seta')}</span></span></summary>
-        ${out.slice(0,20).map(it=>`<button class="junto-i${JS.includes(kIt(it))?' on':''}" data-a="mJunto" data-v="${esc(kIt(it))}" aria-pressed="${JS.includes(kIt(it))}"><span><b>${esc(it.ped.cliente)}</b> · ${esc(nomePeca(it.l))}</span><span>${esc(it.l.tecido||'')} ${esc(it.l.cor||'')} · <b>${qtdDe(it)} peças</b></span>${O.ch.includes(it)?'<em class="esp">Ainda não liberada</em>':''}<strong class="junto-add">${JS.includes(kIt(it))?'✓ Junto':'+ Juntar'}</strong></button>`).join('')}</details>`})():''}
-    ${quem?`<div class="acoes"><button class="big go ini" data-a="comecar" data-m="${u.id}" data-l="${sel.l.id}" data-s="${sel.s.id}" data-p="${quem}" data-j="${esc((e.junto||[]).join(','))}">${ic('i-play')}${(e.junto||[]).length?`Começar ${(e.junto||[]).length+1} cortes juntos com`:situacao().k==='fora'?'Começar em hora extra com':'Começar com'} ${esc(pNome(quem))}</button>
+    ${!sel.l.rework&&!sel.l.steps[sel.s.id]?.partes&&modOn('junto')?(()=>{const ehC=faseT(sel.s.posto)==='corte',JS=e.junto||[],ja=new Set([kIt(sel),...(ehC?cortarJunto(sel.l).map(x=>x.l.id+'|'+x.s.id):[])]),igual=it=>semAc(it.s.nome)===semAc(sel.s.nome),mesmaCor=it=>semAc(it.l.cor||'')===semAc(sel.l.cor||''),out=[...O.pr,...O.ch].filter(it=>!ja.has(kIt(it))&&!it.l.rework&&!it.l.steps[it.s.id]?.partes).sort((a,b)=>ehC?0:(igual(b)-igual(a))||(mesmaCor(b)-mesmaCor(a)));if(!out.length)return '';const nI=ehC?0:out.filter(igual).length;
+      const n=out.filter(it=>JS.includes(kIt(it))).length;return `<details class="card blk junto-outros" data-blk="jout${u.id}"${(ui.blk||{})['jout'+u.id]??n?' open':''}><summary><h2>${ehC?'Juntar outro corte':'Juntar outros pedidos'}</h2><span class="blk-r">${n?`<span class="pill u-ok">${n} junto</span>`:ehC?'<span class="dica" style="margin:0">outro tecido ou modelo</span>':nI?`<span class="pill">${nI} com ${esc(sel.s.nome.toLowerCase())}</span>`:'<span class="dica" style="margin:0">fazer de uma vez só</span>'}<span class="blk-i">${ic('i-seta')}</span></span></summary>
+        ${out.slice(0,20).map(it=>`<button class="junto-i${JS.includes(kIt(it))?' on':''}" data-a="mJunto" data-v="${esc(kIt(it))}" aria-pressed="${JS.includes(kIt(it))}"><span><b>${esc(it.ped.cliente)}</b> · ${ehC?esc(nomePeca(it.l)):esc(it.s.nome)}</span><span>${ehC?esc(it.l.tecido||''):esc(nomePeca(it.l))} ${esc(it.l.cor||'')} · <b>${qtdDe(it)} peças</b></span>${O.ch.includes(it)?'<em class="esp">Ainda não liberada</em>':''}<strong class="junto-add">${JS.includes(kIt(it))?'✓ Junto':'+ Juntar'}</strong></button>`).join('')}</details>`})():''}
+    ${quem?`<div class="acoes"><button class="big go ini" data-a="comecar" data-m="${u.id}" data-l="${sel.l.id}" data-s="${sel.s.id}" data-p="${quem}" data-j="${esc((e.junto||[]).join(','))}">${ic('i-play')}${(e.junto||[]).length?`Começar ${(e.junto||[]).length+1} ${jPal(sel.s.posto)} juntos com`:situacao().k==='fora'?'Começar em hora extra com':'Começar com'} ${esc(pNome(quem))}</button>
       </div>`
     :`<div class="vazio-box">${ic('i-pessoas')}<b>Ninguém livre sabe usar esta máquina</b><button class="mbtn" data-a="irEquipe">Ver cadastro da equipe</button></div>`}
     ${blkA('maqmais'+u.id,'Mais opções',!!e.sel||reservado,'<small class="dica" style="margin:0">reservar, escolher outro trabalho</small>')}
@@ -2510,6 +2540,9 @@ const FAQ=[
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
+{c:'maq',q:'Como vejo só os trabalhos de um cliente?',k:'filtro cliente filtrar empresa ver só um cliente máquinas cards',r:['Na Fábrica › Máquinas, use Ver só um cliente e escolha o nome.','Aparece o que está sendo feito, o que pode começar, o que está no fornecedor e o que ainda espera.','Toque num trabalho para abrir a máquina com ele escolhido. Ver todos volta ao normal.'],ir:'fab:maq'},
+{c:'maq',q:'A estampa é feita com a camiseta pronta. Como a costura não fica esperando?',m:'pers',k:'estampa peça fechada pronta costurada travando unir ombro espera frente voltar personalização depois da costura',r:['No pedido, toque na etapa da estampa e escolha Com a peça pronta. A costura segue e a estampa entra antes do acabamento.','Para valer sempre, em Cadastros › Máquinas, edite a estampa e ligue Aplica com a peça pronta.']},
+{c:'maq',q:'Como faço o mesmo trabalho de vários pedidos de uma vez (ex.: 8 peitilhos)?',m:'junto',k:'juntar costura junto vários pedidos mesmo trabalho peitilho de uma vez só começar acabar',r:['Toque na máquina. Abaixo do trabalho sugerido, abra Juntar outros pedidos.','Toque em + Juntar nos pedidos que vão juntos. Os do mesmo trabalho e mesma cor aparecem primeiro.','Toque em Começar N trabalhos juntos. No fim, um Terminou fecha todos.'],ir:'fab:maq'},
 {c:'maq',q:'Como corto vários pedidos juntos (ex.: bermuda e calça)?',m:'junto',k:'cortar junto vários cortes ao mesmo tempo bermuda calça mesmo tecido juntar corte',r:['Toque na Mesa de corte. No corte sugerido, em Dá para cortar junto, toque em + Juntar nos que vão juntos.','Se for outro tecido ou modelo, abra Juntar outro corte e toque em + Juntar.','Toque em Começar N cortes juntos. No fim, um Terminou fecha todos e o tempo é dividido entre eles.'],ir:'fab:maq'},
 {c:'maq',q:'Como crio um setor novo, como lavanderia ou passadoria?',k:'setor novo criar lavanderia passadoria acabamento renomear ordem função setores',r:['Cadastros › Máquinas › Setores da fábrica: escreva o nome e toque em Adicionar setor.','Escolha a função do setor: abre o lote (corte), personalização, montagem/costura ou acabamento.','Depois, nas máquinas desse setor, toque em ✎ editar e escolha o setor novo.','Use ↑ e ↓ para pôr na ordem do caminho da peça.'],ir:'cad:maquinas#Setores da fábrica',g:1},
 {c:'cad',q:'A equipe chama as coisas de outro jeito. Dá para trocar as palavras?',k:'palavra vocabulário nome trocar termo vias ficha terceirizado prestador como a equipe fala',r:['Cadastros › Ajustes › Palavras da fábrica.','Escreva a palavra do app e como a fábrica fala, e toque em Trocar palavra. Vale para todas as telas e a ajuda.'],ir:'cad:ajustes#Palavras da fábrica',g:1},
@@ -3420,6 +3453,8 @@ const A={
     else if(a==='cad'&&ehGestao()){ui.tela='cadastros';ui.cad=b}else if(a==='gest'&&ehGestao()){ui.tela='gestor';ui.gt=b}
     if(alvo){ui.blk=ui.blk||{};ui.blk['aj:'+alvo]=true}render();scrollTo(0,0);if(alvo)setTimeout(()=>{const h=[...document.querySelectorAll('#app h2')].find(x=>x.textContent.trim().startsWith(alvo));if(h){const dd=h.closest('details');if(dd&&!dd.open){dd.open=true}}if(h){h.scrollIntoView({behavior:'smooth',block:'start'});const c=h.closest('.card');if(c){c.classList.add('aj-luz');setTimeout(()=>c.classList.remove('aj-luz'),2500)}}},60)},
   maq:d=>openSheet({t:'maq',m:d.m}),
+  maqSel:d=>{if(d.m)openSheet({t:'maq',m:d.m,sel:d.v})},
+  fCli:d=>{ui.fCli=d.v==='*'?null:d.v;render();scrollTo(0,0)},
   mP:d=>{ui.sheet.p=d.v;render()},
   pfSt:d=>{ui.pf.st=d.v;ui.pfAb=null;render()},
   pfAbre:d=>{ui.pfAb=ui.pfAb===d.v?null:d.v;render()},
@@ -3433,7 +3468,7 @@ const A={
   mResX:d=>{snap();delete (state.reservas||{})[d.m];ui.sheet.sel=null;commit();toast('Reserva tirada: o sistema volta a escolher')},
   pedido:d=>{ui.fx=null;openSheet({t:'pedido',id:d.id});if(avisos().some(p=>p.id===d.id))marcaVisto([d.id])},
   terminou:d=>{const t=tarefaNa(d.m);if(!t)return;if(t.grupo&&t.grupo.length){snap();const T=now(),tot=tempoUtil(t.x,T),G=[t,...t.grupo],w=G.map(g=>(g.s.min||1)*qtdEf(g.l)),W=sum(w)||1;
-      G.forEach((g,i)=>{g.x.st='ok';g.x.fim=T;const a=heAtiva(g.x,T-1);if(a)a.f=T;g.x.util=Math.round(tot*w[i]/W/MIN)});save();const n=`${pNome(t.x.op)} terminou ${G.length} cortes juntos`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true);return}
+      G.forEach((g,i)=>{g.x.st='ok';g.x.fim=T;const a=heAtiva(g.x,T-1);if(a)a.f=T;g.x.util=Math.round(tot*w[i]/W/MIN)});save();const n=`${pNome(t.x.op)} terminou ${G.length} ${jPal(t.s.posto)} juntos`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true);return}
     snap();t.x.st='ok';t.x.fim=now();{const a=heAtiva(t.x,t.x.fim-1);if(a)a.f=t.x.fim}t.x.util=Math.round(tempoUtil(t.x)/MIN);if(t.pai)acertaPai(t.l,t.s.id);save();const n=t.pai?`${pNome(t.x.op)} terminou ${t.x.n} peças de ${t.s.nome}${t.pai.st==='ok'?'. Processo completo':`. Faltam ${qtdEf(t.l)-pecasFeitas(t.pai)}`}`:`${pNome(t.x.op)} terminou ${t.s.nome}`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true)},
   comecar:d=>{if(!d.p)return;const l=lote(d.l);snap();const s=sMap(rp(l))[d.s],fora=!ready(l,s,pedById(l.ped));
     {const P0=plano(),pl=P0.plan[d.m],rs=(state.reservas||{})[d.m],k=d.l+'|'+d.s;
@@ -3443,7 +3478,7 @@ const A={
     let nj=0;if(d.j){const gid=uid('j');String(d.j).split(',').filter(Boolean).forEach(k=>{const [lid,sid]=k.split('|'),l2=lote(lid);if(!l2||lid===d.l)return;const s2=sMap(rp(l2))[sid];if(!s2||stOf(l2,sid).st!=='pend'||l2.steps[sid]?.partes)return;
       const fora2=!ready(l2,s2,pedById(l2.ped));l2.steps[sid]={st:'and',ini:alvo.ini,op:d.p,maq:d.m,junto:gid,manual:fora2||undefined,...(alvo.he?{he:JSON.parse(JSON.stringify(alvo.he))}:{})};nj++;
       registrar({tipo:'inicio',modo:'junto',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,sug:'',ped:l2.ped,cli:pedById(l2.ped).cliente,prod:prod(l2.prod).nome,step:s2.nome});Object.keys(R_).forEach(r=>{if(R_[r].l===lid&&R_[r].s===sid)delete R_[r]})});if(nj)alvo.junto=gid}
-    ui.sheet=null;commit();toast(nj?`Pronto! ${pNome(d.p)} começou ${nj+1} cortes juntos na ${unidade(d.m)?.nome||''}${heTxt}`:`Pronto! ${pNome(d.p)} começou ${s.nome}${retoma} na ${unidade(d.m)?.nome||''}${fora?' (fora da ordem)':''}${heTxt}`,true)},
+    ui.sheet=null;commit();toast(nj?`Pronto! ${pNome(d.p)} começou ${nj+1} ${jPal(s.posto)} juntos na ${unidade(d.m)?.nome||''}${heTxt}`:`Pronto! ${pNome(d.p)} começou ${s.nome}${retoma} na ${unidade(d.m)?.nome||''}${fora?' (fora da ordem)':''}${heTxt}`,true)},
   impFichas:()=>{const i=document.getElementById('fImpF');i.value='';i.click()},
   impMocks:()=>{const i=document.getElementById('fImpM');i.value='';i.click()},
   wMock:d=>{wRead();ui.mockK=null;ui.mockL=null;ui.mockW=+d.k;const i=document.getElementById('fImpM1');i.value='';i.click()},
@@ -3665,16 +3700,19 @@ const A={
   artePrep:d=>{const p=pedById(d.id);snap();p.artePrep=!p.artePrep;if(!p.artePrep)p.arte=false;commit();if(p.artePrep)toast('Arte preparada')},
   disp:d=>{const p=pessoa(d.id);snap();p.disp=p.disp===false;commit();toast(p.disp?`${p.nome} disponível`:`${p.nome} fora agora: tarefas foram redistribuídas`)},
   troca:d=>openSheet({t:'troca',key:d.key,f:d.f}),
-  tipoEd:d=>{const t=state.tipos.find(x=>x.id===d.t);openSheet(t?{t:'tipo',id:t.id,nome:t.nome,grupo:t.grupo,i:t.i,qtd:t.qtd||0,externo:!!t.externo,min:t.min||1,err:''}:{t:'tipo',id:null,nome:'',grupo:d.ext?'pers':'costura',i:d.ext?'i-bordado':'i-maquina',qtd:d.ext?0:1,externo:!!d.ext,min:1,err:''})},
+  tipoEd:d=>{const t=state.tipos.find(x=>x.id===d.t);openSheet(t?{t:'tipo',id:t.id,nome:t.nome,grupo:t.grupo,i:t.i,qtd:t.qtd||0,externo:!!t.externo,fechada:!!t.fechada,min:t.min||1,err:''}:{t:'tipo',id:null,nome:'',grupo:d.ext?'pers':'costura',i:d.ext?'i-bordado':'i-maquina',qtd:d.ext?0:1,externo:!!d.ext,min:1,err:''})},
   tPrazo:d=>{eRead();ui.sheet.prazo=Math.max(1,(ui.sheet.prazo||3)+(+d.d));render()},
   tExt:d=>{eRead();ui.sheet.externo=!ui.sheet.externo;render()},
+  tFech:d=>{eRead();ui.sheet.fechada=!ui.sheet.fechada;render()},
+  persFech:d=>{const l=lote(d.l);if(!l)return;const x=(l.pers||[]).find((y,k)=>(y.id||'pz'+k)===d.s);if(!x)return;const v=d.v==='1';if(persFechada(x)===v)return;snap();x.fechada=v;
+    lotesDe(l.ped).filter(o=>o.parent===l.id).forEach(o=>{const y=(o.pers||[]).find((z,k)=>(z.id||'pz'+k)===d.s);if(y)y.fechada=v});commit();toast(v?'Pronto: a costura não espera mais esta personalização':'Pronto: a costura espera esta personalização')},
   tMin:d=>{eRead();ui.sheet.min=(()=>{const t=Math.round(ui.sheet.min*60),st=t<60?5:t<300?15:60;return Math.max(5,Math.round((t+(+d.d)*st)/st)*st)/60})();render()},
   tG:d=>{eRead();ui.sheet.grupo=d.v;render()},
   tI:d=>{eRead();ui.sheet.i=d.v;render()},
   tQ:d=>{eRead();ui.sheet.qtd=Math.max(0,ui.sheet.qtd+(+d.d));render()},
   tOk:()=>{eRead();const e=ui.sheet;e.err='';if(!e.nome.trim()){e.err='Escreva o nome';return render()}
     const uso=plano().uso;if(e.id&&Object.keys(uso).some(u=>u.startsWith(e.id+'-')&&+u.split('-').pop()>e.qtd)){e.err='Uma das máquinas que sairiam está em uso agora. Termine o trabalho antes.';return render()}
-    snap();const ext={externo:!!e.externo||undefined,min:e.min,qtd:e.externo?0:e.qtd};if(e.id){const t=state.tipos.find(x=>x.id===e.id);Object.assign(t,{nome:e.nome.trim(),curto:e.nome.trim(),grupo:e.grupo,i:e.i,...ext})}
+    snap();const ext={externo:!!e.externo||undefined,fechada:(faseG(e.grupo)==='pers'&&!!e.fechada)||undefined,min:e.min,qtd:e.externo?0:e.qtd};if(e.id){const t=state.tipos.find(x=>x.id===e.id);Object.assign(t,{nome:e.nome.trim(),curto:e.nome.trim(),grupo:e.grupo,i:e.i,...ext})}
     else{const base=e.nome.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'')||'maq';let id=base,k=2;while(state.tipos.some(x=>x.id===id))id=base+k++;state.tipos.push({id,nome:e.nome.trim(),curto:e.nome.trim(),grupo:e.grupo,i:e.i,...ext});
       if(e.externo&&(e.forn||'').trim())state.forn.push({id:uid('f'),nome:e.forn.trim(),servico:id,prazo:e.prazo||3,leva:state.pessoas.find(p=>(p.funcoes||[]).includes('levar'))?.id||''})}
     ui.sheet=null;commit();toast(`${e.nome.trim()} salva`)},

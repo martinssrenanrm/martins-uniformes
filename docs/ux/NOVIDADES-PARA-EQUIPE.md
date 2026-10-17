@@ -424,3 +424,16 @@ O tempo de cada parte conta para quem fez, no Painel.
 - No fim, **um Terminou fecha todos**. O tempo é dividido entre os cortes pelo tamanho de cada um.
 
 **Para mandar ao Fábio:** "Na mesa de corte, toque em + Juntar nos cortes que vão juntos e depois em Começar. No fim, um Terminou fecha todos."
+
+---
+
+## Juntar na costura, filtro por cliente, estampa com a peça pronta, etiqueta no cobre-gola (17/10)
+
+- **Juntar em qualquer máquina:** abaixo do trabalho sugerido, abra **"Juntar outros pedidos"** e toque em **+ Juntar**. O mesmo trabalho e a mesma cor aparecem primeiro (ex.: 8 peitilhos). Toque em **Começar N trabalhos juntos**. Um **Terminou** fecha todos.
+- **Ver só um cliente:** em Fábrica › Máquinas, escolha o cliente na lista. A tela mostra o que está sendo feito, o que pode começar, o que está no fornecedor e o que ainda espera.
+- **Estampa com a peça pronta:**
+  - no pedido, toque na etapa da estampa e escolha **"Com a peça pronta"**. A costura não espera mais a estampa;
+  - para valer sempre, ligue em Cadastros › Máquinas › Estampa: **"Aplica com a peça pronta"**.
+- **Camisetas manga curta e longa:** a etiqueta agora vai junto no **Cobre-gola e etiqueta**. Não existe mais "Pregar etiqueta" na reta.
+
+**Para mandar ao grupo:** "Para juntar pedidos na costura, toque na máquina, abra Juntar outros pedidos e toque em + Juntar. Na camiseta, a etiqueta agora vai junto no cobre-gola."
