@@ -437,3 +437,14 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Camisetas manga curta e longa:** a etiqueta agora vai junto no **Cobre-gola e etiqueta**. Não existe mais "Pregar etiqueta" na reta.
 
 **Para mandar ao grupo:** "Para juntar pedidos na costura, toque na máquina, abra Juntar outros pedidos e toque em + Juntar. Na camiseta, a etiqueta agora vai junto no cobre-gola."
+
+---
+
+## Etapas do produto em lista (17/10)
+
+- Em **Cadastros › Produtos**, cada produto mostra as **Etapas em ordem**, numeradas.
+- **↑ ↓** mudam a ordem. **Inserir etapa depois desta** coloca uma nova no meio. **Excluir** tira a etapa, e quem vinha depois passa a esperar a anterior.
+- Etapa que está sendo feita agora não pode ser excluída.
+- O desenho com setas continua em **"Ver o desenho com as setas"**.
+
+**Para mandar à gestão:** "Para mudar o processo de um produto: Cadastros › Produtos › toque no produto › Etapas em ordem."

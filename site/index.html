@@ -954,6 +954,9 @@ output,.kpi,.ped-ent,.resumo,.imp-g,.pill{font-variant-numeric:tabular-nums}
 .ped-head>.pill:first-child{justify-self:start}
 .p-mais small{display:none}
 .fcli{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 14px}.fcli label{display:inline-flex;align-items:center;gap:8px;font-weight:700}.fcli label svg.ic{width:24px;height:24px}.fcli select{flex:1;min-width:220px;max-width:420px;min-height:52px}.fcli-h{font-size:18px;margin:18px 0 8px;color:var(--ink2)}
+.etl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}.etl-i{display:grid;grid-template-columns:44px 1fr;gap:6px 12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--card)}
+.etl-n{width:40px;height:40px;border-radius:50%;background:var(--blue-soft,#E8EEFC);color:var(--blue);font-weight:800;display:grid;place-items:center;font-size:18px}.etl-t b{display:block;font-size:19px}.etl-t span{display:flex;flex-wrap:wrap;align-items:center;gap:6px;color:var(--ink2);font-size:16px}.etl-t span svg.ic{width:20px;height:20px}.etl-t em{font-style:normal;color:var(--atn-ink,#8A5A00);font-weight:600}
+.etl-a{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.etl-a .stp{width:52px;height:52px;font-size:22px}.etl-a .stp:disabled{opacity:.35}.etl-ins{grid-column:1/-1;justify-self:start;display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--line-btn,#9AA4B2);background:transparent;border-radius:999px;padding:8px 14px;min-height:48px;font-weight:700;color:var(--blue);font-size:16px}.etl-ins svg.ic{width:20px;height:20px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2185,10 +2188,11 @@ function sFornEd(){const e=ui.sheet,ext=state.tipos.filter(t=>t.externo);
 function sProduto(pid){const p=prod(pid);if(!p)return voltar();const key='P'+p.id;
   const porMaq=state.tipos.map(t=>({t,ss:p.steps.filter(s=>s.posto===t.id)})).filter(x=>x.ss.length);
   return `${voltar()}<div class="card"><div class="item-h">${prodSvg(p.id,'')}<div style="margin-right:auto"><h1 style="margin:0">${esc(p.nome)}</h1><div style="color:var(--ink2)">${esc((p.tecidos||[]).join(', '))} · ${p.steps.length} etapas</div></div></div></div>
-  <div class="card"><h2>Como é feita</h2><p style="margin:0 0 4px;color:var(--ink2)">Siga as setas: cada etapa só começa quando as que chegam nela terminam.</p>
+  <div class="card"><h2>Como é feita</h2><p style="margin:0 0 4px;color:var(--ink2)">Abaixo, a ordem das etapas. Use as setas ↑ ↓ para mudar a ordem, ✎ para editar e Excluir para tirar.</p>
     <div class="legenda"><span><i></i><b style="color:var(--go-dark)">Pode adiantar</b></span><span><i style="background:var(--atn-soft);border-color:var(--atn)"></i>Personalização interna</span><span><i style="background:#F3ECFB;border-color:#B48ACB"></i>Terceirizado</span><span><i></i>Depois da personalização</span></div>
     <div class="nota" style="margin:10px 0 0">A personalização é escolhida em cada pedido. Aqui o exemplo usa: ${(p.persPadrao||[]).map(x=>`<b>${esc(tNome(x.tipo))} na ${esc(localTxt(x).toLowerCase())}</b>`).join(' e ')||'nenhuma'}. Só as etapas que usam essa parte esperam por ela.</div>
-    ${fluxo(rota(p,(p.persPadrao||[]).map((x,k)=>({...x,id:'pz'+k})),(p.opcoes||[]).map(o=>o.id)),key)}<div class="acoes"><button class="big azul" data-a="addEtapa" data-p="${p.id}">${ic('i-mais')}Adicionar etapa</button></div></div>
+    ${blkA('fxd'+p.id,'Ver o desenho com as setas',false,'<small class="dica" style="margin:0">mostra o que corre junto</small>')}${fluxo(rota(p,(p.persPadrao||[]).map((x,k)=>({...x,id:'pz'+k})),(p.opcoes||[]).map(o=>o.id)),key)}</details></div>
+  ${listaEtapas(p)}
   <div class="card"><h2>Dados do produto</h2>
     <div class="rotulo" style="margin-top:0">Nome</div><input class="campo" id="prNome" value="${esc(p.nome)}" autocomplete="off">
     <div class="rotulo">Consumo de tecido por peça <span class="dica">(metros, tamanho adulto)</span></div><input class="campo" id="prCons" type="number" step="0.01" min="0" value="${p.consumo}">
@@ -2220,9 +2224,28 @@ function sProduto(pid){const p=prod(pid);if(!p)return voltar();const key='P'+p.i
     <div class="novo-in"><input class="campo" id="novaParte" placeholder="Nova parte (ex.: Bolso)" autocomplete="off"><button class="mbtn" data-a="addParte" data-p="${p.id}">Adicionar</button></div></div>
   <div class="card"><h2>Etapas por máquina</h2>${porMaq.map(x=>`<div class="mat">${ic(x.t.i)}<div><b>${esc(x.t.nome)}</b><span>${x.ss.map(s=>esc(s.nome)).join(' · ')}</span></div><span class="tagp">${x.t.externo?'fora':tMin(sum(x.ss.map(s=>s.min)))}</span></div>`).join('')}</div>
   <div class="acoes"><button class="big neutro" data-a="rmProd" data-p="${p.id}">Excluir este produto</button></div>`}
+/* Etapas do produto em lista (pedido da Martins, 10/2026): mudar a ordem, inserir, editar e excluir sem mexer em setas.
+   A ordem da lista é a ordem de p.steps (sempre válida: cada etapa vem depois das que espera). */
+function ordemEt(p){const ok=p.steps.every((z,i)=>z.deps.every(d=>p.steps.slice(0,i).some(y=>y.id===d)));return ok?p.steps:topo(p)}
+function emAndamento(pid,sid){return state.lotes.filter(l=>l.prod===pid&&stOf(l,sid).st==='and').length}
+function listaEtapas(p){const L=ordemEt(p),i0=L[0]?.id;
+  const dep=(z,i)=>{if(!z.deps.length)return 'primeira etapa';const ant=L[i-1];if(z.deps.length===1&&ant&&z.deps[0]===ant.id)return '';return 'depois de: '+z.deps.map(d=>(L.find(y=>y.id===d)||{}).nome).filter(Boolean).join(', ')};
+  return `<div class="card"><h2>Etapas em ordem</h2><p class="dica" style="margin:0 0 10px">A personalização (estampa, bordado) entra sozinha em cada pedido. Etapas que dizem "depois de" podem correr junto com a de cima.</p>
+  <ol class="etl">${L.map((z,i)=>{const d=dep(z,i),t=tipo(z.posto);return `<li class="etl-i"><span class="etl-n">${i+1}</span><div class="etl-t"><b>${esc(z.nome)}</b><span>${ic(t.i||'i-maquina')}${esc(tNome(z.posto))}${t.externo?' · terceirizado':' · '+tMin(z.min)+' por peça'}${d?` · <em>${esc(d)}</em>`:''}</span></div>
+    <div class="etl-a">${z.id===i0?'<span class="dica" style="margin:0">sempre a primeira</span>':`<button class="stp" data-a="etMov" data-p="${p.id}" data-s="${z.id}" data-d="-1" aria-label="Subir ${esc(z.nome)}" ${i<=1?'disabled':''}>↑</button><button class="stp" data-a="etMov" data-p="${p.id}" data-s="${z.id}" data-d="1" aria-label="Descer ${esc(z.nome)}" ${i>=L.length-1?'disabled':''}>↓</button>`}
+    <button class="x azul" data-a="edEtapa" data-p="${p.id}" data-s="${z.id}">✎ Editar</button>${z.id===i0?'':`<button class="x" data-a="etRm" data-p="${p.id}" data-s="${z.id}">Excluir</button>`}</div>
+    <button class="etl-ins" data-a="addEtapa" data-p="${p.id}" data-s="${z.id}">${ic('i-mais')}Inserir etapa depois desta</button></li>`}).join('')}</ol></div>`}
+/* troca duas etapas vizinhas (A vem antes de B). Se B esperava A, B passa a esperar o que A esperava e A passa a esperar B. */
+function trocaEt(p,A,B){const L=ordemEt(p).map(z=>z),i=L.indexOf(A),j=L.indexOf(B);
+  if(B.deps.includes(A.id)){B.deps=[...new Set([...B.deps.filter(d=>d!==A.id),...A.deps])];A.deps=[B.id];
+    L.forEach(z=>{if(z!==A&&z!==B&&z.deps.includes(B.id))z.deps=[...new Set(z.deps.map(d=>d===B.id?A.id:d))]})}
+  [L[i],L[j]]=[L[j],L[i]];p.steps=L}
+function tiraEt(p,id){const z=sMap(p)[id];if(!z)return;p.steps=p.steps.filter(y=>y.id!==id);
+  p.steps.forEach(y=>{if(y.deps.includes(id))y.deps=[...new Set(y.deps.flatMap(d=>d===id?z.deps:[d]))]});
+  (p.opcoes||[]).forEach(o=>o.steps.forEach(y=>{y.deps=[...new Set((y.deps||[]).flatMap(d=>d===id?z.deps:[d]))];if(y.antes)y.antes=y.antes.filter(a=>a!==id)}))}
 function eRead(){const e=ui.sheet;[['xForn','forn'],['eNome','nome'],['eObs','obs'],['pNome','nome'],['pTec','tecido'],['xNome','nome']].forEach(([id,k])=>{const n=document.getElementById(id);if(n)e[k]=n.value})}
 function sEtapa(){const e=ui.sheet,p=prod(e.p),proib=e.sid?desc(p,e.sid):new Set();
-  return `${voltar('Cancelar')}<h1>${e.sid?'Editar etapa':'Nova etapa em '+esc(p.nome)}</h1>
+  return `${voltar('Cancelar')}<h1>${e.sid?'Editar etapa':'Nova etapa em '+esc(p.nome)}</h1>${e.ins&&sMap(p)[e.ins]?`<p class="sub-l">Entra logo depois de <b>${esc(sMap(p)[e.ins].nome)}</b>. O que vinha depois passa a esperar esta.</p>`:''}
   <div class="rotulo">Nome da etapa</div><input class="campo" id="eNome" value="${esc(e.nome)}" placeholder="Ex.: Pregar vivo na gola" autocomplete="off">
   <div class="rotulo">Onde é feita?</div><div class="escolhe">${state.tipos.map(t=>`<button class="opc" data-a="eP" data-v="${t.id}" aria-pressed="${e.posto===t.id}">${ic(t.i)}${esc(t.nome)}${t.externo?'<span style="font-weight:400;font-size:16px;color:#6B2F8C">terceirizado</span>':''}</button>`).join('')}</div>
   <div class="rotulo">O que precisa estar pronto antes?</div><div class="linha-dep">${topo(p).filter(s=>!proib.has(s.id)).map(s=>`<button class="depc" data-a="eD" data-v="${s.id}" aria-pressed="${e.deps.includes(s.id)}">${ic(PICON[s.posto])}${esc(s.nome)}</button>`).join('')}</div>
@@ -2231,7 +2254,7 @@ function sEtapa(){const e=ui.sheet,p=prod(e.p),proib=e.sid?desc(p,e.sid):new Set
   <div class="rotulo">Marque se for o caso</div><div class="linha-dep"><button class="depc" data-a="eT" data-v="pers" aria-pressed="${e.pers}">${ic('i-estampa')}É personalização</button><button class="depc" data-a="eT" data-v="fecha" aria-pressed="${e.fecha}">${ic('i-cadeado')}Fecha a peça</button></div>
   <div class="rotulo">Aviso para quem faz (opcional)</div><input class="campo" id="eObs" value="${esc(e.obs)}" placeholder="Ex.: etiqueta do lado esquerdo" autocomplete="off">
   ${e.err?`<div class="aviso">${ic('i-alerta')}${esc(e.err)}</div>`:''}
-  <div class="acoes"><button class="big go" data-a="eOk">${ic('i-check')}${e.sid?'Salvar etapa':'Adicionar etapa'}</button>${e.sid&&!filhos(p,e.sid).length&&p.steps[0].id!==e.sid?`<button class="big neutro" data-a="rmEtapa" data-p="${p.id}" data-s="${e.sid}">Tirar esta etapa</button>`:''}</div>`}
+  <div class="acoes"><button class="big go" data-a="eOk">${ic('i-check')}${e.sid?'Salvar etapa':'Adicionar etapa'}</button>${e.sid&&p.steps[0].id!==e.sid?`<button class="big neutro" data-a="etRm" data-p="${p.id}" data-s="${e.sid}">Excluir esta etapa</button>`:''}</div>`}
 const FORMAS=[['polo','Polo'],['polo2','Polo com punho'],['camiseta','Camiseta'],['camisetaML','Manga longa'],['regata','Sem manga'],['calca','Calça'],['bermuda','Bermuda'],['legging','Legging'],['shortsaia','Short saia'],['jaleco','Jaleco'],['blusa','Blusa']];
 function sNovoProd(){const e=ui.sheet,formas=FORMAS;
   return `${voltar('Cancelar')}<h1>Cadastrar produto</h1>
@@ -2544,6 +2567,7 @@ const FAQ=[
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
+{c:'cad',q:'Como mudo a ordem, incluo ou excluo uma etapa de um produto?',k:'etapa processo ordem mudar subir descer excluir tirar incluir inserir produto roteiro costura',r:['Em Cadastros › Produtos, toque no produto e desça até Etapas em ordem.','↑ e ↓ mudam a ordem. Inserir etapa depois desta coloca uma nova no meio. Excluir tira a etapa, e quem vinha depois passa a esperar a anterior.','Etapa que está sendo feita agora não pode ser excluída: termine antes.']},
 {c:'maq',q:'Como vejo só os trabalhos de um cliente?',k:'filtro cliente filtrar empresa ver só um cliente máquinas cards',r:['Na Fábrica › Máquinas, use Ver só um cliente e escolha o nome.','Aparece o que está sendo feito, o que pode começar, o que está no fornecedor e o que ainda espera.','Toque num trabalho para abrir a máquina com ele escolhido. Ver todos volta ao normal.'],ir:'fab:maq'},
 {c:'maq',q:'A estampa é feita com a camiseta pronta. Como a costura não fica esperando?',m:'pers',k:'estampa peça fechada pronta costurada travando unir ombro espera frente voltar personalização depois da costura',r:['No pedido, toque na etapa da estampa e escolha Com a peça pronta. A costura segue e a estampa entra antes do acabamento.','Para valer sempre, em Cadastros › Máquinas, edite a estampa e ligue Aplica com a peça pronta.']},
 {c:'maq',q:'Como faço o mesmo trabalho de vários pedidos de uma vez (ex.: 8 peitilhos)?',m:'junto',k:'juntar costura junto vários pedidos mesmo trabalho peitilho de uma vez só começar acabar',r:['Toque na máquina. Abaixo do trabalho sugerido, abra Juntar outros pedidos.','Toque em + Juntar nos pedidos que vão juntos. Os do mesmo trabalho e mesma cor aparecem primeiro.','Toque em Começar N trabalhos juntos. No fim, um Terminou fecha todos.'],ir:'fab:maq'},
@@ -3755,7 +3779,7 @@ const A={
     const obj={id:e.id||uid('f'),nome:e.nome.trim(),servico:e.servico,prazo:e.prazo,leva:e.leva};const i=state.forn.findIndex(f=>f.id===e.id);i<0?state.forn.push(obj):state.forn[i]=obj;ui.sheet=null;commit();toast(`${obj.nome} salvo`)},
   fxSel:d=>{ui.fx=ui.fx&&ui.fx.k===d.k&&ui.fx.s===d.s?null:{k:d.k,s:d.s};render()},
   produto:d=>{ui.fx=null;openSheet({t:'produto',p:d.p})},
-  addEtapa:d=>openSheet({t:'etapa',p:d.p,nome:'',posto:null,deps:[],partes:[],min:0.5,pers:false,fecha:false,obs:'',err:''}),
+  addEtapa:d=>{const p=prod(d.p),L=p?ordemEt(p):[],ap=d.s||L.filter(z=>faseT(z.posto)!=='acab').slice(-1)[0]?.id;openSheet({t:'etapa',p:d.p,ins:d.s||null,nome:'',posto:null,deps:ap?[ap]:[],partes:[...(sMap(p)[ap]?.partes||[])],min:0.5,pers:false,fecha:false,obs:'',err:''})},
   ePt:d=>{eRead();togl(ui.sheet.partes,d.v);render()},
   prSalvar:d=>{const p=prod(d.p),n=(document.getElementById('prNome')?.value||'').trim(),c=parseFloat((document.getElementById('prCons')?.value||'').replace(',','.')),g=(document.getElementById('prGola')?.value||'').trim();if(!n){toast('Escreva o nome',false);return}snap();p.nome=n;if(!isNaN(c)&&c>=0)p.consumo=c;p.golaItem=g||undefined;commit();toast('Dados salvos')},
   prForma:d=>{snap();prod(d.p).forma=d.v;commit()},
@@ -3805,8 +3829,12 @@ const A={
     if(!e.nome.trim())e.err='Escreva o nome da etapa';else if(!e.posto)e.err='Escolha onde é feita';else if(!e.deps.length&&!primeira)e.err='Escolha o que precisa estar pronto antes';
     if(e.err)return render();snap();
     if(e.sid){const st=p.steps.find(z=>z.id===e.sid);Object.assign(st,{nome:e.nome.trim(),posto:e.posto,deps:[...e.deps],min:e.min,pers:e.pers||faseT(e.posto)==='pers',fecha:e.fecha,obs:(e.obs||'').trim(),partes:[...e.partes]});ui.fx={k:'P'+p.id,s:st.id};ui.sheet={t:'produto',p:p.id};commit();toast('Etapa salva');return}const base=e.nome.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'')||'etapa';let id=base,k=2;while(p.steps.some(s=>s.id===id))id=base+k++;
-    p.steps.push(S(id,e.nome.trim(),e.posto,[...e.deps],e.min,{pers:e.pers||faseT(e.posto)==='pers',fecha:e.fecha,obs:(e.obs||'').trim(),partes:[...e.partes]}));ui.fx={k:'P'+p.id,s:id};ui.sheet={t:'produto',p:p.id};commit();toast(`Etapa ${e.nome.trim()} adicionada`)},
+    const nova=S(id,e.nome.trim(),e.posto,[...e.deps],e.min,{pers:e.pers||faseT(e.posto)==='pers',fecha:e.fecha,obs:(e.obs||'').trim(),partes:[...e.partes]});
+    if(e.ins&&sMap(p)[e.ins]){const L=ordemEt(p);L.forEach(z=>{if(z.deps.includes(e.ins))z.deps=z.deps.map(x=>x===e.ins?id:x)});L.splice(L.findIndex(z=>z.id===e.ins)+1,0,nova);p.steps=L}else{const L=ordemEt(p),k=L.findIndex(z=>faseT(z.posto)==='acab'&&!e.deps.includes(z.id)&&!anc(p,z.id).has(id));if(k>0){L.forEach((z,i)=>{if(i>=k&&faseT(z.posto)==='acab'&&e.deps.some(x=>z.deps.includes(x)))z.deps=[...new Set([...z.deps.filter(x=>!e.deps.includes(x)),id])]});L.splice(k,0,nova)}else L.push(nova);p.steps=L}ui.fx={k:'P'+p.id,s:id};ui.sheet={t:'produto',p:p.id};commit();toast(`Etapa ${e.nome.trim()} adicionada`)},
   edEtapa:d=>{const z=sMap(prod(d.p))[d.s];openSheet({t:'etapa',p:d.p,sid:z.id,nome:z.nome,posto:z.posto,deps:[...z.deps],partes:[...(z.partes||[])],min:z.min,pers:!!z.pers,fecha:!!z.fecha,obs:z.obs||'',err:''})},
+  etMov:d=>{const p=prod(d.p);if(!p)return;const L=ordemEt(p),i=L.findIndex(z=>z.id===d.s),j=i+(+d.d);if(i<1||j<1||j>=L.length)return;snap();const a=Math.min(i,j),b=Math.max(i,j);trocaEt(p,L[a],L[b]);commit()},
+  etRm:d=>{const p=prod(d.p),z=p&&sMap(p)[d.s];if(!z||p.steps[0].id===d.s)return;const n=emAndamento(p.id,d.s);if(n)return toast(`${z.nome} está sendo feita agora em ${n} ${n>1?'pedidos':'pedido'}. Termine antes de excluir.`,false);
+    pedeConfirma(`Excluir a etapa "${z.nome}" de ${p.nome}? As etapas que vinham depois passam a esperar a anterior.`,'Sim, excluir',()=>{snap();tiraEt(p,d.s);ui.fx=null;if(ui.sheet?.t==='etapa')ui.sheet={t:'produto',p:p.id};commit();toast(`Etapa ${z.nome} excluída`)})},
   rmEtapa:d=>{const p=prod(d.p);if(filhos(p,d.s).length)return;snap();const n=sMap(p)[d.s].nome;p.steps=p.steps.filter(s=>s.id!==d.s);ui.fx=null;if(ui.sheet?.t==='etapa')ui.sheet={t:'produto',p:p.id};commit();toast(`Etapa ${n} tirada`)},
   nprod:()=>openSheet({t:'nprod',nome:'',forma:'camiseta',tecido:'',copia:null,err:''}),
   npF:d=>{eRead();ui.sheet.forma=d.v;render()},
