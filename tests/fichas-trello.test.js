@@ -55,12 +55,14 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
     const t=state.tipos.find(x=>faseG(x.grupo)==='pers').id;A.wPt({k:'0',v:t});document.getElementById('wPtam0').value='8 cm';document.getElementById('wPobs0').value='logo novo';
     document.querySelector('#sheet [data-a=wPloc][data-v="2"]').click();const tamFica=document.getElementById('wPtam0').value;document.querySelector('#sheet [data-a=wPok]').click();
     const x=ui.sheet.w.itens[0].pers[0];const chip=document.querySelector('#sheet .depc[aria-pressed=true]')?.textContent||'';
-    const it=ui.sheet.w.itens[0];it.cor=Object.keys(state.cores)[0];it.tecido=p.tecidos[0];it.g={M:2};const w=ui.sheet.w;w.entrega=now()+20*DIA;const n0=state.pedidos.length;A.wCriar();const ped=state.pedidos[state.pedidos.length-1];const lz=state.pedidos.length>n0?lotesDe(ped.id)[0].pers[0]:null;
-    ui.sheet=null;render();return {ops,x,tamFica,chip,lz}});
+    const it=ui.sheet.w.itens[0];it.cor=Object.keys(state.cores)[0];if(!p.tecidos.includes('Tecido de teste'))p.tecidos.push('Tecido de teste');it.tecido='Tecido de teste';it.g={M:2};const w=ui.sheet.w;w.entrega=now()+20*DIA;
+    w.step=4;render();const conf=document.getElementById('sheet').innerText;const compraCerta=conf.includes('Tecido de teste '+it.cor)&&!conf.includes(p.tecidos[0]+' '+it.cor);const n0=state.pedidos.length;A.wCriar();const ped=state.pedidos[state.pedidos.length-1];const lz=state.pedidos.length>n0?lotesDe(ped.id)[0].pers[0]:null;
+    ui.sheet=null;render();return {ops,x,tamFica,chip,lz,compraCerta}});
   ok(r.ops.join('|')==='Peito esquerdo|Manga esquerda|Manga direita|Costas|Peito centralizado','só os 5 lugares: '+r.ops.join(', '));
   ok(r.tamFica==='8 cm','a medida digitada não some ao escolher o lugar');
   ok(r.x&&r.x.parte==='Mangas'&&r.x.lado==='dir'&&r.x.tam==='8 cm'&&r.x.desc==='logo novo','logo salvo: manga direita, medida 8 cm e observação');
   ok(/8 cm/.test(r.chip)&&/logo novo/.test(r.chip),'a lista mostra a medida e a observação do logo');
+  ok(r.compraCerta,'"Vai precisar comprar" usa o tecido escolhido na peça (não o primeiro do cadastro)');
   ok(r.lz&&r.lz.tam==='8 cm'&&r.lz.desc==='logo novo','ao criar o pedido, medida e observação ficam gravadas na peça');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

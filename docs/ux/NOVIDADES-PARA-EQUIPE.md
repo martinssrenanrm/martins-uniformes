@@ -464,3 +464,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Personalização no Novo pedido:** só 5 lugares (**Peito esquerdo, Manga esquerda, Manga direita, Costas, Peito centralizado**), com campo de **medida** e **observação** de cada logo. Para calça e outras peças, use **Outro lugar da peça**.
 
 **Para mandar ao escritório:** "No pedido novo, em Personalização: escolha o tipo, toque no lugar, escreva a medida e, se quiser, uma observação. Tudo sai na ficha de produção."
+
+---
+
+## Sugestão de compra com o tecido certo (20/10)
+
+- No último passo do pedido ("Confira"), **"Provavelmente vai precisar comprar"** agora usa o **tecido escolhido na peça**. Antes usava o primeiro tecido do cadastro do produto (ex.: pedia Malha dry para polo de Piquet).
+- As cores secundárias (ex.: gola de outra cor) também entram na conta.
+- Os pedidos já salvos estavam certos: o erro era só nessa tela de conferência.
+
+**Para mandar ao escritório:** "A sugestão de compra agora usa o tecido que vocês escolheram na peça."
