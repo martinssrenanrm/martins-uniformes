@@ -448,3 +448,19 @@ O tempo de cada parte conta para quem fez, no Painel.
 - O desenho com setas continua em **"Ver o desenho com as setas"**.
 
 **Para mandar à gestão:** "Para mudar o processo de um produto: Cadastros › Produtos › toque no produto › Etapas em ordem."
+
+---
+
+## Fichas do Trello, ficha de produção no A4 e personalização simplificada (19/10)
+
+- **Importar fichas:** agora abre também o **Word antigo (.doc)**. Testado com as 94 fichas dos 48 cartões do Trello: todas abrem e o app lê tudo que está escrito nelas.
+  - Ficha com conta errada (os tamanhos não batem com o total) ou páginas repetidas: o app avisa para conferir.
+  - Se a mesma ficha vier em PDF e em Word, o app usa uma só.
+- **Ficha de produção:**
+  - cabe sempre numa folha A4 (aperta a letra um pouco se precisar);
+  - a bolinha da cor sai na cor certa também na impressão, com uma bolinha para cada cor secundária;
+  - **masculina e feminina do mesmo produto saem na mesma ficha**, com uma linha de tamanhos para cada;
+  - a coluna **Descrição** mostra o texto de cada logo. No bordado sem descrição aparece um aviso em vermelho.
+- **Personalização no Novo pedido:** só 5 lugares (**Peito esquerdo, Manga esquerda, Manga direita, Costas, Peito centralizado**), com campo de **medida** e **observação** de cada logo. Para calça e outras peças, use **Outro lugar da peça**.
+
+**Para mandar ao escritório:** "No pedido novo, em Personalização: escolha o tipo, toque no lugar, escreva a medida e, se quiser, uma observação. Tudo sai na ficha de produção."
