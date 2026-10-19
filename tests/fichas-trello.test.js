@@ -64,5 +64,15 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   ok(/8 cm/.test(r.chip)&&/logo novo/.test(r.chip),'a lista mostra a medida e a observação do logo');
   ok(r.compraCerta,'"Vai precisar comprar" usa o tecido escolhido na peça (não o primeiro do cadastro)');
   ok(r.lz&&r.lz.tam==='8 cm'&&r.lz.desc==='logo novo','ao criar o pedido, medida e observação ficam gravadas na peça');
+  console.log('5) Nº do pedido no Conta Azul');
+  r=await A.evaluate(()=>{A.novo();const temCampo=!!document.getElementById('wFicha');document.getElementById('wFicha').value='7788';document.getElementById('wCli').value='Cliente Conta Azul';A.wNext&&0;
+    const w=ui.sheet.w;wRead();w.cliente='Cliente Conta Azul';w.vend=state.pessoas[0].id;w.step=2;render();const p=state.produtos[0];A.wAdd({p:p.id});const it=w.itens[0];it.cor=Object.keys(state.cores)[0];it.tecido=p.tecidos[0];it.g={M:1};w.entrega=now()+20*DIA;A.wCriar();
+    const ped=state.pedidos[state.pedidos.length-1];const P=paginasDoc({tipo:'prod',id:ped.id,vias:1,cinza:{},pb:false,mocks:false}).join('');const E=etiquetasDe(ped).join('');
+    const sem=state.pedidos.find(x=>x!==ped&&!x.ficha&&lotesDe(x.id).length);const PS=sem?paginasDoc({tipo:'prod',id:sem.id,vias:1,cinza:{},pb:false,mocks:false}).join(''):'';
+    ui.sheet=null;openSheet({t:'pedido',id:sem.id});const head=document.getElementById('sheet')?.innerText||document.body.innerText;ui.sheet=null;render();
+    return {temCampo,ficha:ped.ficha,docOk:/PEDIDO <b>7788<\/b>/.test(P)&&!new RegExp('PEDIDO <b>'+ped.id+'<').test(P),etq:E.includes('7788')&&!E.includes('>'+ped.id+' ·'),semNum:/PEDIDO <b>______<\/b>/.test(PS),botao:/Pôr o número/.test(head)}});
+  ok(r.temCampo&&r.ficha==='7788','pedido novo tem o campo "Nº do pedido no Conta Azul" e grava o número');
+  ok(r.docOk&&r.etq,'ficha de produção e etiquetas mostram o nº do Conta Azul, não o número automático');
+  ok(r.semNum&&r.botao,'sem número: a ficha deixa espaço em branco e o pedido mostra "Pôr o número"');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();

@@ -1918,10 +1918,10 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
   const chk=(a,on,icn,t)=>`<button class="chk" data-a="${a}" data-id="${id}" aria-pressed="${!!on}">${ic(icn)}${t}<span class="box">${ic('i-check')}</span>${!on&&resp(a)?`<span style="font-weight:400;font-size:16px;color:var(--muted)">${esc(resp(a))}</span>`:''}</button>`;
   const envs=[];i.ls.filter(l=>!l.rework).forEach(l=>rp(l).steps.filter(z=>z.pers).forEach(z=>envs.push({l,z,ok:arteOk(ped,l,z)})));
   const tEnt=TS.find(t=>t.a==='entregar');
-  return `${voltar()}<div class="card ped-head">${upill(i.u)}<h1>${ped.cli&&cliById(ped.cli)?`<button class="h1-link" data-a="cli" data-id="${ped.cli}">${esc(ped.cliente)} ${ic('i-seta')}</button>`:esc(ped.cliente)}</h1>${ped.ficha?`<div class="ped-ent">${ic('i-lista')}<span>Ficha de produção nº <b>${esc(ped.ficha)}</b></span></div>`:''}<div class="ped-ent">${ic('i-caminhao')}<span>${entregaTxt(ped,i)}</span></div>
+  return `${voltar()}<div class="card ped-head">${upill(i.u)}<h1>${ped.cli&&cliById(ped.cli)?`<button class="h1-link" data-a="cli" data-id="${ped.cli}">${esc(ped.cliente)} ${ic('i-seta')}</button>`:esc(ped.cliente)}</h1>${`<div class="ped-ent">${ic('i-lista')}<span>${numCA(ped)?`Pedido Conta Azul nº <b>${esc(numCA(ped))}</b>`:`Sem nº do Conta Azul · <button class="x azul" data-a="pedEditar" data-id="${esc(ped.id)}">Pôr o número</button>`}</span></div>`}<div class="ped-ent">${ic('i-caminhao')}<span>${entregaTxt(ped,i)}</span></div>
     ${ped.contato||ped.cnpj?`<div class="ped-ent">${ic('i-predio')}<span>${ped.contato?`Cliente: <b>${esc(ped.contato)}</b>`:''}${ped.contato&&ped.cnpj?' · ':''}${ped.cnpj?`<span class="nw">CNPJ ${esc(ped.cnpj)}</span>`:''}</span></div>`:''}
     ${!ped.concluido&&i.ab.length?`<div class="ped-ent">${ic('i-relogio')}<span>Trabalho restante ≈ ${nf(i.need)} dias úteis</span></div>`:''}
-    <div class="ped-ent">${v?av(v,'s'):''}<span>Vendedora: <b>${esc(pNome(v)||'—')}</b> · Pedido ${esc(ped.id)} feito em ${fD(ped.chegada)}</span></div>
+    <div class="ped-ent">${v?av(v,'s'):''}<span>Vendedora: <b>${esc(pNome(v)||'—')}</b> · feito em ${fD(ped.chegada)}</span></div>
     ${ped.obs?`<div class="ped-ent">${ic('i-lista')}<span>Observações: <b>${esc(ped.obs)}</b></span></div>`:''}
     ${(ped.edicoes||[]).length?`<div class="ped-ent" style="font-size:16px">${ic('i-engr')}<span>Corrigido por ${esc(ped.edicoes[ped.edicoes.length-1].por||'?')} ${haQuanto(ped.edicoes[ped.edicoes.length-1].ts)}${ped.edicoes.length>1?` · ${ped.edicoes.length} correções`:''}</span></div>`:''}
     ${ped.cancelado?`<div class="aviso">${ic('i-alerta')}<span>Pedido cancelado ${fD(ped.cancelado.ts)}${ped.cancelado.por?` por ${esc(ped.cancelado.por)}`:''}.${ped.cancelado.motivo?` Motivo: ${esc(ped.cancelado.motivo)}.`:''} Ele não aparece na produção nem nas tarefas.</span></div><div class="acoes"><button class="mbtn" data-a="pedReativar" data-id="${id}">Voltar o pedido para a produção</button></div>`:''}
@@ -2337,11 +2337,12 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
   if(w.step===1&&w.edit)return `${head}<h1>Dados do pedido</h1><div class="rotulo" style="margin-top:0">Nome da empresa</div><input class="campo" id="wCli" value="${esc(w.cliente)}" autocomplete="off"><div id="wCliSug" class="linha-dep" style="margin-top:8px">${sugClientes(w.cliente,w.cli)}</div>
     <div class="rotulo">Nome do cliente (contato)</div><input class="campo" id="wCont" value="${esc(w.contato||'')}" autocomplete="off">
     <div class="rotulo">CNPJ</div><input class="campo" id="wCnpj" value="${esc(w.cnpj||'')}" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off">
-    <div class="rotulo">Número da ficha</div><input class="campo" id="wFicha" value="${esc(w.ficha||'')}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off">
+    <div class="rotulo">Nº do pedido no Conta Azul</div><input class="campo" id="wFicha" value="${esc(w.ficha||'')}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off" style="max-width:260px">
     <div class="rotulo">Quem vendeu?</div>${selOp('wVend','',w.vend,state.pessoas.filter(p=>temPapel(p,'vendas')||p.id===w.vend).map(p=>[p.id,p.nome]),'Escolha quem vendeu')}${nav()}`;
   if(w.step===1)return `${head}<div class="imp-box"><b>Tem a ficha de produção em PDF ou Word?</b><span>O sistema lê a ficha e preenche o pedido para você conferir. Pode escolher as fichas e os mockups juntos.</span><div class="imp-bar" style="margin:6px 0 0"><button class="mbtn mod-imp" data-a="impFichas">${ic('i-lista')}Importar fichas</button><button class="mbtn neutro2" data-a="impMocks">${ic('i-camisa')}Importar mockups</button></div></div><h1>Para quem é o pedido?</h1><div class="rotulo" style="margin-top:0">Nome da empresa</div><input class="campo" id="wCli" value="${esc(w.cliente)}" placeholder="Ex.: Hospital Santa Clara" autocomplete="off"><div id="wCliSug" class="linha-dep" style="margin-top:8px">${sugClientes(w.cliente,w.cli)}</div>
     <div class="rotulo">Nome do cliente (contato)</div><input class="campo" id="wCont" value="${esc(w.contato||'')}" placeholder="Ex.: Ana Souza" autocomplete="off">
     <div class="rotulo">CNPJ</div><input class="campo" id="wCnpj" value="${esc(w.cnpj||'')}" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off">
+    <div class="rotulo">Nº do pedido no Conta Azul</div><input class="campo" id="wFicha" value="${esc(w.ficha||'')}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off" style="max-width:260px">
     <div class="rotulo">Quem vendeu?</div>${selOp('wVend','',w.vend,state.pessoas.filter(p=>temPapel(p,'vendas')).map(p=>[p.id,p.nome]),'Escolha quem vendeu')}${nav()}`;
   if(w.step===2){const catalogo=`<div class="card add-peca"><div class="rotulo" style="margin-top:0">${w.itens.length?'Adicionar outra peça':'Adicionar peça'}</div>${selOp('wAdd','data-key="p"',null,state.produtos.map(p=>[p.id,p.nome]),'Escolha a peça')}</div>`;
     return `${head}<h1>${w.edit?'Peças do pedido':'Quais peças?'}</h1>${w.edit||w.itens.length?'':catalogo}
@@ -2993,6 +2994,9 @@ function tecidoContido(txt,TT,p){const W=palavras(txt).map(w=>w==='alg'?'algodao
 function casaParecido(txt,lista,igual){const w=new Set(semAc(txt).split(/[^a-z0-9%]+/).filter(Boolean));if(!w.size)return null;
   const c=lista.filter(x=>{const xw=semAc(x).split(/[^a-z0-9%]+/).filter(Boolean);if(!xw.length)return false;if(igual)return xw.length===w.size&&xw.every(y=>w.has(y));return xw.every(y=>w.has(y))||[...w].every(y=>xw.includes(y))});
   if(c.length===1)return c[0];const mx=Math.max(...c.map(x=>semAc(x).length));const top=c.filter(x=>semAc(x).length===mx);return top.length===1?top[0]:null}
+/* Número do pedido no Conta Azul (digitado ou lido da ficha). É ele que sai nos documentos, no lugar do número interno. */
+const numCA=ped=>String(ped&&ped.ficha||'').trim();
+const numDoc=ped=>numCA(ped)?esc(numCA(ped)):'______';
 const fichasDe=p=>String(p.ficha||'').split('/').map(x=>x.trim()).filter(Boolean);
 /* Liga um mockup solto à peça certa pelo nome do arquivo: cor, produto, pedido e página (1_2, 2-2…). */
 function casaMockItem(nome,cands){if(!cands.length)return null;if(cands.length===1)return cands[0];const t=' '+semAc(String(nome).replace(/\.[a-z0-9]{2,5}$/i,'').replace(/[._\-]+/g,' ')).replace(/[^a-z0-9]+/g,' ')+' ';
@@ -3054,6 +3058,7 @@ function sImp(){const e=ui.sheet,g=e.grupos[e.gi];const pend=impPend(g),ext=stat
        <button class="depc novo-t" data-a="impCliNovo" aria-pressed="${g.cliNovo}">${ic('i-mais')}${g.cliSug&&g.cliSug.length?'Não, é uma empresa nova: cadastrar':'Empresa nova: será cadastrada como'} “${esc(g.cliente)}”</button></div>`}
     <div class="imp-2"><div><div class="rotulo">Fechou ${g.chegada?okTag(true,g.chDeduz?'Lido (ano deduzido)':''):okTag(false,'Escolha')}</div><input class="campo" type="date" data-imp="chegada" value="${dIn(g.chegada)}">${g.chTxt?`<small class="lido">Na ficha: “${esc(g.chTxt)}”</small>`:''}</div>
       <div><div class="rotulo">Prazo de entrega ${g.entrega?okTag(true,g.enDeduz?'Lido (ano deduzido)':''):okTag(false,'Escolha')}</div><input class="campo" type="date" data-imp="entrega" value="${dIn(g.entrega)}">${g.enTxt?`<small class="lido">Na ficha: “${esc(g.enTxt)}”</small>`:''}</div></div>
+    <div class="rotulo">Nº do pedido no Conta Azul ${okTag(!!(g.nums&&g.nums.length?g.nums.join(''):g.num),(g.nums&&g.nums.length?g.nums.join(''):g.num)?'Lido da ficha':'Não está na ficha')}</div><input class="campo" id="impNum" value="${esc((g.nums&&g.nums.length?g.nums:[g.num]).filter(Boolean).join(' / '))}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off" style="max-width:260px">
     <div class="rotulo">Quem vendeu? ${okTag(!!g.vend,g.vend?'Escolhido':'Não está na ficha')}</div>${selOp('impVend','',g.vend,state.pessoas.filter(p=>temPapel(p,'vendas')).map(p=>[p.id,p.nome]),'Escolha quem vendeu')}
     <div class="imp-2"><div><div class="rotulo">Contato (opcional)</div><input class="campo" data-imp="contato" value="${esc(g.contato)}"></div><div><div class="rotulo">CNPJ (opcional)</div><input class="campo" data-imp="cnpj" value="${esc(g.cnpj)}" inputmode="numeric"></div></div>
     <div class="rotulo">Observações do pedido ${g.obsLido?okTag(true):'<span style="font-weight:400;color:var(--muted)">(se tiver: vão na ficha de produção)</span>'}</div><textarea class="campo" data-imp="obs" rows="3" placeholder="Ex.: entregar dobradas">${esc(g.obs||'')}</textarea></div>
@@ -3202,7 +3207,7 @@ function docFicha(L,ped,via,n,N,gray,pb){const ls=Array.isArray(L)?L:[L],l=ls[0]
   const gens=ls.map(x=>GEN[x.gen]&&x.gen!=='U'?GEN[x.gen].toUpperCase():'').filter(Boolean);const mk=ls.find(x=>x.mock);
   const c2=(l.cores2||[]);const ehB=x=>/bord/i.test(x.tipo+' '+tNome(x.tipo));
   return `<div class="a4 fp${pb?'':' colorida'}"><div class="fp-top"><div><div class="fp-k">FICHA DE PRODUÇÃO</div><div class="fp-cli">${esc(ped.cliente)}</div></div><div class="fp-via">${via}ª VIA</div></div>
-  <div class="fp-ids"><span>PEDIDO <b>${esc(ped.id)}</b></span>${ped.ficha&&ped.ficha!==ped.id?`<span>FICHA <b>${esc(ped.ficha)}</b></span>`:''}<span>PEÇA <b>${n} de ${N}</b></span><span>VENDEDORA <b>${esc(pNome(ped.vendedor)||'—')}</b></span></div>
+  <div class="fp-ids"><span>PEDIDO <b>${numDoc(ped)}</b></span><span>PEÇA <b>${n} de ${N}</b></span><span>VENDEDORA <b>${esc(pNome(ped.vendedor)||'—')}</b></span></div>
   <div class="fp-datas"><div><span>FECHOU</span><b>${dataCurta(ped.chegada)}</b></div><div class="fp-ent"><span>ENTREGA</span><b>${dataCurta(ped.entrega)}</b></div></div>
   <div class="fp-mid"><div class="fp-img">${mk?`<img src="${(pb&&gray)||mockGrande(mk)}" alt="">`:prodSvg(l.prod,'',[]).replace('<svg class="prod"','<svg')}</div>
     <div class="fp-dados"><div class="fp-l"><span>PRODUTO</span><b class="xl">${esc(nomePeca(l))}</b></div>
@@ -3216,18 +3221,18 @@ function docFicha(L,ped,via,n,N,gray,pb){const ls=Array.isArray(L)?L:[L],l=ls[0]
     ${ls.length>1?`<tr class="soma"><th class="rot">TOTAL</th>${tams.map(z=>`<td>${sum(ls.map(x=>(x.grade||{})[z]||0))||''}</td>`).join('')}<td class="tt">${tot}</td></tr>`:''}</table>
   <div class="fp-bx"><div class="fp-sec">ETAPAS <small>marque ao terminar</small></div><div class="fp-et">${st.map((s,i)=>`<span>☐ ${i+1}. ${esc(s.nome)}</span>`).join('')}</div></div>
   <div class="fp-bx"><div class="fp-sec">OBSERVAÇÕES</div><div class="fp-obs">${[ped.obs,...[...new Set(ls.map(x=>x.obs).filter(Boolean))]].filter(Boolean).map(x=>esc(x)).join('<br>')}</div></div>
-  <div class="fp-rod"><span>${esc(marca().nome)} · Pedido ${esc(ped.id)} · ${esc(nomePeca(l))}${gens.length?' '+gens.join(' + '):''} ${esc(l.cor)}</span><span>Gerado em ${dataCurta(now())} · ${via}ª via</span></div></div>`}
+  <div class="fp-rod"><span>${esc(marca().nome)} · Pedido ${numDoc(ped)} · ${esc(nomePeca(l))}${gens.length?' '+gens.join(' + '):''} ${esc(l.cor)}</span><span>Gerado em ${dataCurta(now())} · ${via}ª via</span></div></div>`}
 /* Se a ficha não couber no A4, aperta espaços e letras um pouco (até 3 níveis) */
 function ajustaFicha(raiz){(raiz||document).querySelectorAll('.a4.fp').forEach(el=>{el.classList.remove('ap1','ap2','ap3');for(const c of ['ap1','ap2','ap3']){if(el.scrollHeight<=el.clientHeight+1)break;el.classList.add(c)}})}
-function docMockPag(l,ped,n,N){const p=prod(l.prod);return `<div class="a4 fm"><div class="fp-top"><div><div class="fp-k">MOCKUP · PEÇA ${n} DE ${N}</div><div class="fp-cli">${esc(ped.cliente)}</div></div><div class="fm-id">PEDIDO<br><b>${esc(ped.id)}</b></div></div>
+function docMockPag(l,ped,n,N){const p=prod(l.prod);return `<div class="a4 fm"><div class="fp-top"><div><div class="fp-k">MOCKUP · PEÇA ${n} DE ${N}</div><div class="fp-cli">${esc(ped.cliente)}</div></div><div class="fm-id">PEDIDO<br><b>${numDoc(ped)}</b></div></div>
   <div class="fm-sub">${esc(nomePeca(l))}${GEN[l.gen]&&l.gen!=='U'?' · '+GEN[l.gen].toUpperCase():''} · ${esc(l.cor)} · ${esc(l.tecido||'')} · ${qtdEf(l)} peças</div>
   <div class="fm-img"><img src="${mockGrande(l)}" alt=""></div>
   ${(l.pers||[]).length?`<div class="fm-pz">${l.pers.map((x,i)=>`<span><b>${i+1}. ${esc(tNome(x.tipo))}</b> · ${esc(posTxt(x))}${x.desc?' · '+esc(x.desc):''}</span>`).join('')}</div>`:''}
   <div class="fp-rod"><span>${esc(marca().nome)}</span><span>A cor da imagem pode ser diferente da cor real do tecido.</span></div></div>`}
 // --- pedido para o cliente aprovar (colorido)
 function docPedido(ped){const m=marca(),ls=lotesDe(ped.id).filter(l=>!l.rework),tot=sum(ls.map(l=>qtdEf(l))),cl=ped.cli&&cliById(ped.cli);const pags=[];const COR=['#12BFD0','#E03A3E','#F2A900','#6C5CE7','#16A34A','#0EA5E9'];
-  const cab=(t)=>`<div class="pc-head">${logoMarca(true)}<div class="pc-hd"><span>${t}</span><b>Pedido nº ${esc(ped.id)}</b><small>${dataLonga(ped.chegada)}</small></div></div>`;
-  const rod=(n)=>`<div class="pc-rod"><span>${contatoMarca()||esc(m.nome)}</span><span>Pedido ${esc(ped.id)} · página ${n}</span></div>`;
+  const cab=(t)=>`<div class="pc-head">${logoMarca(true)}<div class="pc-hd"><span>${t}</span><b>Pedido nº ${numDoc(ped)}</b><small>${dataLonga(ped.chegada)}</small></div></div>`;
+  const rod=(n)=>`<div class="pc-rod"><span>${contatoMarca()||esc(m.nome)}</span><span>Pedido ${numDoc(ped)} · página ${n}</span></div>`;
   pags.push(`<div class="a4 pc">${cab('Pedido para aprovação')}
     <div class="pc-ola"><h1>Olá, ${esc(ped.contato||ped.cliente)}! 👋</h1><p>Obrigado por escolher a <b>${esc(m.nome)}</b>. Preparamos cada detalhe do uniforme da <b>${esc(ped.cliente)}</b> com muito cuidado. Confira tudo com calma: depois da sua aprovação, a produção começa exatamente como está aqui.</p></div>
     <div class="pc-cards"><div class="pc-c"><span>Empresa</span><b>${esc(ped.cliente)}</b><small>${esc(ped.cnpj||cl?.cnpj||'')}</small></div><div class="pc-c"><span>Contato</span><b>${esc(ped.contato||cl?.contato||'—')}</b><small>Atendimento: ${esc(pNome(ped.vendedor)||'—')}</small></div>
@@ -3251,7 +3256,7 @@ function docPedido(ped){const m=marca(),ls=lotesDe(ped.id).filter(l=>!l.rework),
     <div class="pc-termos">${T.map(([t,d])=>`<div><b>${esc(t)}</b><p>${esc(d)}</p></div>`).join('')}</div>
     <div class="pc-ok"><h2>Aprovação do pedido</h2><p>Declaro que conferi as peças, tecidos, cores, personalizações, tamanhos, quantidades e o prazo deste pedido, e autorizo o início da produção.</p>
       <div class="pc-ass"><div><span></span>Nome</div><div><span></span>Assinatura</div><div><span></span>Data</div></div>
-      <p class="pc-p" style="margin:10px 0 0">Prefere aprovar pelo WhatsApp? Basta responder <b>“Aprovado — Pedido ${esc(ped.id)}”</b>.</p></div>
+      <p class="pc-p" style="margin:10px 0 0">Prefere aprovar pelo WhatsApp? Basta responder <b>“Aprovado — Pedido ${numCA(ped)?esc(numCA(ped)):esc(ped.cliente)}”</b>.</p></div>
     <div class="pc-fim">${logoMarca(false)}<p>Obrigado pela confiança! ${esc(m.end||'')}${m.cnpj?` · CNPJ ${esc(m.cnpj)}`:''}</p></div>${rod(ls.length+2)}</div>`);
   return pags}
 async function paraCinza(src){if(!src)return '';const im=new Image();im.src=src;await im.decode();const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const g=c.getContext('2d');g.drawImage(im,0,0);const d=g.getImageData(0,0,c.width,c.height),a=d.data;
@@ -3293,7 +3298,7 @@ function fornEtq(tipoId){const fs=(state.forn||[]).filter(f=>f.servico===tipoId)
   const nomes=fs.length>1?`<span class="tq-chk">${fs.map(f=>`<span>${esc(f.nome)}</span>`).join('')}</span>`:fs.length?`<b>${esc(fs[0].nome)}</b>`:`<span>${t&&t.externo?'Fornecedor: ________':'Interno'}</span>`;
   const pz=fs.length?Math.max(...fs.map(f=>f.prazo||0)):0;return nomes+(pz?`<span>Volta em <b>${pz} ${pz===1?'dia útil':'dias úteis'}</b></span>`:'')}
 function etqPacote(l,ped,k,N){const G=gruposPers(l),c2=(l.cores2||[]).map(c=>`${esc(c.cor)}: ${esc((c.partes||[]).join(', ').toLowerCase())}`).join(' · ');
-  return `<div class="tq tq-pac"><div class="tq-bar"><span>Pacote · costura</span><span>${esc(ped.id)} · ${k}/${N}</span></div>
+  return `<div class="tq tq-pac"><div class="tq-bar"><span>Pacote · costura</span><span>${numDoc(ped)} · ${k}/${N}</span></div>
   <div class="tq-top"><div class="tq-txt"><div class="tq-cli">${esc(ped.cliente)}</div><div class="tq-prod">${esc(nomePeca(l))}</div>${genEtq(l)}</div><div class="tq-qr">${qrSvg(linkFicha(l))}</div></div>
   <div class="tq-l"><i>Cor</i> <b>${esc(l.cor||'—')}</b>${c2?` · ${c2}`:''}</div>
   <div class="tq-l"><i>Tecido</i> ${esc(l.tecido||'—')}</div>
@@ -3301,7 +3306,7 @@ function etqPacote(l,ped,k,N){const G=gruposPers(l),c2=(l.cores2||[]).map(c=>`${
   ${gradeEtq(l)}
   <div class="tq-rod"><span>Entrega <b>${dataCurta(ped.entrega).slice(0,5)}</b></span><span>${esc(pNome(ped.vendedor)||'')}</span><span>Peça <b>${esc(l.id)}</b></span></div></div>`}
 function etqPers(l,ped,g,n,N){const linhas=g.itens.map(x=>{const onde=[x.parte==='Mangas'&&x.lado?'Manga '+(LADO_ETQ[x.lado]||''):'',x.pos].filter(Boolean).join(' · ');return `<div>${onde?`<b>${esc(onde)}</b>${x.desc?': '+esc(x.desc):''}`:`<b>${esc(x.desc||'Ver mockup na ficha')}</b>`}</div>`}).join('');
-  return `<div class="tq tq-pers"><div class="tq-bar"><span>${esc(tNome(g.tipo))}</span><span>${esc(ped.id)} · ${n}/${N}</span></div>
+  return `<div class="tq tq-pers"><div class="tq-bar"><span>${esc(tNome(g.tipo))}</span><span>${numDoc(ped)} · ${n}/${N}</span></div>
   <div class="tq-top"><div class="tq-txt"><div class="tq-parte">${esc(g.parte)}</div><div class="tq-cli">${esc(ped.cliente)}</div></div><div class="tq-qr">${qrSvg(linkFicha(l))}</div></div>
   <div class="tq-l tq-peca"><b>${esc(nomePeca(l))}</b> · ${esc(l.cor||'')} ${genEtq(l)}</div>
   <div class="tq-pz">${linhas}</div>
@@ -4097,7 +4102,7 @@ const A={
   wCriar:()=>{const w=ui.sheet.w;snap();const id=String(state.seq++).padStart(4,'0');const lines=w.itens.map(it=>({prod:it.prod,gen:it.gen||undefined,variacao:it.variacao||undefined,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...it.opcoes],pers:it.pers.map((x,j)=>({tipo:x.tipo,parte:x.parte,lado:x.lado,pos:x.pos,desc:x.desc||undefined,tam:x.tam||undefined,id:'pz'+j})),g:{...it.g},qtd:sum(sizesAll().map(s=>it.g[s]||0))}));
     lines.forEach(x=>{if(x.tecido&&!tecidosAll().some(y=>semAc(y)===semAc(x.tecido)))(state.tecidos=state.tecidos||[]).push(x.tecido)});
     const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);
-    state.pedidos.push({id,cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim()||cl.cnpj||'',vendedor:w.vend,chegada:now(),entrega:w.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null,obs:(w.obs||'').trim()||undefined});
+    state.pedidos.push({id,...((w.ficha||'').trim()?{ficha:w.ficha.trim()}:{}),cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim()||cl.cnpj||'',vendedor:w.vend,chegada:now(),entrega:w.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null,obs:(w.obs||'').trim()||undefined});
     w.itens.forEach((it,i)=>{if(it.mockG)guardaMockG(`${id}-${i+1}`,it.mockG)});lines.forEach((x,i)=>state.lotes.push({id:`${id}-${i+1}`,ped:id,mock:w.itens[i].mock||undefined,prod:x.prod,gen:x.gen,variacao:x.variacao,cor:x.cor,cores2:x.cores2,tecido:x.tecido,opcoes:x.opcoes,pers:x.pers,qtd:x.qtd,grade:x.g,desm:0,steps:{},rework:false,parent:null}));
     ui.tela='pedidos';ui.sheet={t:'pedido',id};commit();toast('Pedido criado')},
 };
@@ -4132,6 +4137,7 @@ document.addEventListener('click',e=>{const z=e.target.closest('svg.mock[data-z]
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.blk){ui.blk=ui.blk||{};const era=ui.blk[d.dataset.blk];ui.blk[d.dataset.blk]=d.open;if(d.classList.contains('mapa')&&era!==d.open&&!!era!==d.open)render()}},true);
 document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)return;
   if(d.sel){const v=t.value;if(!v)return;if(v==='__nova'){if(d.nova)A[d.nova]({...d});return}A[d.sel]({...d,[d.key||'v']:v});return}
+  if(t.id==='impNum'&&ui.sheet&&ui.sheet.t==='imp'){const g=ui.sheet.grupos[ui.sheet.gi];const ns=t.value.split(/[\/,;]|\be\b/).map(x=>x.trim()).filter(Boolean);g.num=ns[0]||'';g.nums=ns;return}
   if(t.id==='fModelo'&&t.files[0]){lerArq(t.files[0],true).then(txt=>{let m;try{m=JSON.parse(txt)}catch(e){}if(!m||m._modelo!==1)return toast('Esse arquivo não é um modelo de fábrica',false);ui.modPend=m;render()});return}
   if(t.id==='fSeg'&&t.files[0]){const arq=t.files[0];t.value='';pedeConfirma(`Restaurar a cópia "${arq.name}"? O que está no app agora vira uma cópia antes.`,'Sim, restaurar',()=>lerArq(arq,true).then(async txt=>{try{await restaurar(JSON.parse(txt));toast('Cópia restaurada')}catch(e){toast('Esse arquivo não é uma cópia do sistema')}}));return}
   if(t.id==='fArq'&&t.files.length){const fs=[...t.files],al=ui.arqAlvo;if(!al)return;(async()=>{toast('Guardando…',false);let ult=null;for(const fl of fs){try{ult=await arqSalvar(fl,al.cli,al.tipo)||ult}catch(er){toast(`Não consegui abrir ${fl.name}`,false)}}

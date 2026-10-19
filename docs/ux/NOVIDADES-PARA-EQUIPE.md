@@ -474,3 +474,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Os pedidos já salvos estavam certos: o erro era só nessa tela de conferência.
 
 **Para mandar ao escritório:** "A sugestão de compra agora usa o tecido que vocês escolheram na peça."
+
+---
+
+## Nº do pedido do Conta Azul (20/10)
+
+- Pedido novo, correção e importação têm o campo **"Nº do pedido no Conta Azul"**. Na importação ele já vem preenchido com o número da ficha; dá para trocar.
+- Ficha de produção, mockup, pedido para aprovação e etiquetas mostram **esse número**. O número automático do app não aparece mais nos documentos.
+- Pedido sem número: a ficha sai com o espaço em branco (______) e a tela do pedido mostra **"Pôr o número"**.
+
+**Para mandar ao escritório:** "Ao lançar o pedido, preencha o Nº do pedido no Conta Azul. É ele que sai na ficha."
