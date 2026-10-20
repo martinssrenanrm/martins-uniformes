@@ -493,3 +493,16 @@ O tempo de cada parte conta para quem fez, no Painel.
 - O registro "está no fornecedor" acompanha a personalização quando o pedido é corrigido. Os registros antigos foram religados sozinhos.
 
 **Para mandar ao grupo:** "A aba Fora voltou a funcionar. Fechem e abram o app."
+
+---
+
+## Escritório por pedido e trocar fornecedor arrastando (20/10)
+
+- **Escritório › Por pedido** (agora é o padrão): um cartão por pedido, do mais urgente para o menos urgente, com a lista curta das tarefas e o botão de cada uma.
+  - Tarefas iguais do mesmo pedido (ex.: "Enviar arte" de 6 peças) ficam numa linha só. Toque para abrir.
+  - **Por setor** mostra a visão de antes.
+- **Fora › trocar de fornecedor:** em cada item, **Mudar para…** ou segure a alça **⠿** e arraste até o outro fornecedor.
+  - Os pacotes prontos para levar também aparecem listados e podem ser trocados.
+  - Só aparecem fornecedores do mesmo serviço. Se as peças já estão no fornecedor, o app pergunta antes.
+
+**Para mandar ao escritório:** "No Escritório, use Por pedido para ver tudo de cada pedido junto. Para trocar o fornecedor, use Mudar para… no item, na aba Fora."

@@ -54,7 +54,7 @@ const dbop=modo=>async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null}
   await A.evaluate(()=>{state.pessoas.forEach(p=>{p.funcoes=(p.funcoes||[]).filter(f=>f!=='vias')});save()});await A.waitForTimeout(800);
   const vias=await A.evaluate(()=>tarefasEsc().filter(t=>t.f==='vias').map(t=>[t.resp,t.como]));
   ok(vias.length&&vias.every(([r,c])=>r&&c==='reserva'),'sem ninguém com a função, vai para a gestão');
-  await A.evaluate(()=>{ui.sheet=null;ui.tela='fabrica';ui.fz='esc';render()});
+  await A.evaluate(()=>{ui.sheet=null;ui.tela='fabrica';ui.fz='esc';ui.escVer='setor';render()});
   ok(await A.evaluate(()=>['Pedidos','Artes','Lista de compras','Logística'].every(n=>[...document.querySelectorAll('.setor-t b')].some(b=>b.textContent===n))),'Escritório mostra os setores');
 
   console.log('7) Aviso de pedido novo para a Regina');

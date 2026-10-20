@@ -88,7 +88,7 @@ const dbop=async(o,p,data)=>{if(o==='get')return {data:store.get(p)||null};if(o=
   ok(r&&r.k===0&&r.marca,'Novo pedido: erro marca a peça com problema');await A.evaluate(()=>{ui.sheet=null;render()});
   console.log('11) Onda 4: travas do dia a dia');
   r=await A.evaluate(()=>{ui.sheet=null;ui.tela='fabrica';ui.fz='maq';render();const mais=document.querySelectorAll('.p-mais[data-a=maq]').length>0;
-    ui.fz='esc';render();const ver=document.querySelectorAll('.tar-t .ver-p').length>0;
+    ui.fz='esc';render();const ver=document.querySelectorAll('.tar-t .ver-p, .eped-t .ver-p').length>0;
     const P=plano();const ocupada=Object.keys(P.uso)[0];let ir=null;
     if(ocupada){const op=P.uso[ocupada].x.op,tp=unidade(ocupada).tipo,outra=P.us.find(x=>x.tipo===tp&&x.id!==ocupada);if(outra){ui.sheet={t:'maq',m:outra.id};render();const b=document.querySelector(`.ocup-l [data-a=maq][data-m="${ocupada}"]`);ir=!!b&&/termine lá/.test(document.querySelector('.ocup-l').innerText)}}
     const ped=state.pedidos.find(p=>!p.concluido);ui.sheet={t:'ins',id:ped.id};render();const lab=!!document.querySelector('label[for=insN]')&&!!document.querySelector('label[for=insQ]')&&document.querySelectorAll('[data-a=insAU]').length===3;
