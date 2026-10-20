@@ -1380,6 +1380,9 @@ const sMap=p=>Object.fromEntries(p.steps.map(s=>[s.id,s]));
 const stOf=(l,sid)=>l.steps[sid]||{st:'pend'};
 const done=(l,sid)=>stOf(l,sid).st==='ok';
 const qtdEf=l=>l.qtd-(l.desm||0);
+/* Personalização editada ganha código novo; o registro ("está no fornecedor", "feito") vai junto (bug de 10/2026: travava a aba Fora). */
+function religaPers(l,forns){const ids=(l.pers||[]).map((x,k)=>x.id||'pz'+k);const orf=Object.keys(l.steps||{}).filter(k=>/^pz/.test(k)&&!ids.includes(k));if(!orf.length)return false;let mud=false;
+  const livres=ids.filter(id=>!l.steps[id]);orf.forEach(k=>{const rec=l.steps[k],f=(forns||[]).find(x=>x.id===rec.forn);const i=livres.findIndex(id=>{const x=(l.pers||[]).find((y,j)=>(y.id||'pz'+j)===id);return !f||!x||x.tipo===f.servico});if(i<0)return;l.steps[livres[i]]=rec;delete l.steps[k];livres.splice(i,1);mud=true});return mud}
 const loteFora=l=>Object.values(l.steps).some(x=>x.st==='fora');
 /* Partes de um processo: quando alguém pausa no meio ou divide com outra pessoa, o registro do processo
    ganha x.partes = [{id,n,st,ini,fim,op,maq,he,util}]. Sem partes, tudo funciona como sempre. */
@@ -1637,11 +1640,12 @@ const MIGRACOES=[
   {v:9,nome:'Gola comprada pronta (uma vez)',fn:s=>{if(!s.golaV){(s.produtos||[]).forEach(ajustaGola);s.golaV=1}}},
   {v:10,nome:'Datas dos insumos: o que já existia fica com data desconhecida',fn:s=>{if(!s.tsInsV){(s.pedidos||[]).forEach(p=>{const M=p.materiais||[];M.forEach(m=>{if(m.conf&&!m.tConf)m.tConf=-1;if(m.st==='comprar'&&!m.tFalta)m.tFalta=-1;if(m.st==='pedido'&&!m.tComprado)m.tComprado=-1;if(m.st==='recebido'&&!m.tChegou)m.tChegou=-1});if(M.length&&M.every(m=>m.tConf===-1&&(m.st==='ok'||m.st==='recebido')))p.insOk=-1});s.tsInsV=1}}},
   {v:11,nome:'Setores viram cadastro',fn:s=>{if(!Array.isArray(s.setores)||!s.setores.length)s.setores=GRUPOS.map(g=>({...g,fase:g.id,porMaquina:g.id==='acab'}))}},
-  {v:12,nome:'Perfil Operação antigo vira Escritório (mesmo acesso)',fn:s=>{(s.usuarios||[]).forEach(u=>{if(u.perfil==='operacao')u.perfil='escritorio'})}}
+  {v:12,nome:'Perfil Operação antigo vira Escritório (mesmo acesso)',fn:s=>{(s.usuarios||[]).forEach(u=>{if(u.perfil==='operacao')u.perfil='escritorio'})}},
+  {v:13,nome:'Registro de personalização editada volta para a etapa certa',fn:s=>{(s.lotes||[]).forEach(l=>religaPers(l,s.forn))}}
 ];
 const SCHEMA=MIGRACOES[MIGRACOES.length-1].v;
 function migrar(s){const v0=s.schema||0;MIGRACOES.forEach(m=>{if(m.v>v0)m.fn(s)});s.schema=SCHEMA}
-function normalizar(s){s.usuarios=s.usuarios||[];migrar(s);if(!s.feriados)s.feriados=FER0();if(!s.usuarios.length)s.usuarios=adminsIniciais(s);s.usersV=2;
+function normalizar(s){s.usuarios=s.usuarios||[];migrar(s);(s.lotes||[]).forEach(l=>religaPers(l,s.forn));if(!s.feriados)s.feriados=FER0();if(!s.usuarios.length)s.usuarios=adminsIniciais(s);s.usersV=2;
 
 s.clientes=s.clientes||[];s.arquivos=s.arquivos||[];if(s.mockups&&s.mockups.length){s.mockups.forEach(m=>{if(m&&m.id&&m.img&&!MOCKG[m.id])guardaMockG(m.id,m.img)})}delete s.mockups;s.apelidos=s.apelidos||{};['tecido','cor','prod','local','serv'].forEach(k=>{if(!s.apelidos[k])s.apelidos[k]={}});
   (s.pedidos||[]).forEach(p=>{if(p.cli&&s.clientes.some(c=>c.id===p.cli))return;const c=acharCliente(s,p.cliente,p.cnpj);if(c){p.cli=c.id;if(!c.cnpj&&p.cnpj)c.cnpj=p.cnpj;if(!c.contato&&p.contato)c.contato=p.contato}else{const n={id:'c-'+(nCli(p.cliente).replace(/\s+/g,'-').slice(0,60)||'sem-nome'),nome:(p.cliente||'').trim(),cnpj:p.cnpj||'',contato:p.contato||'',apelidos:[]};s.clientes.push(n);p.cli=n.id}});s.log=s.log||[];s.pessoas=s.pessoas||[];s.consertos=s.consertos||[];s.pedidos.forEach(p=>{p.contato=p.contato||'';p.cnpj=p.cnpj||''});s.pessoas.forEach(p=>{if(!p.papeis)p.papeis=p.papel?[p.papel]:[];delete p.papel});const mg=x=>{if(x.parte==='Mangas'&&!x.lado)x.lado='esq'};s.produtos.forEach(p=>{(p.persPadrao||[]).forEach(mg)});s.lotes.forEach(l=>(l.pers||[]).forEach(mg));cfgDefaults(s);juntaClientes(s);mockNaBib(s);return s}
@@ -1810,7 +1814,7 @@ function tarRow(t){const lab={insumos:'Conferir',vias:'Separei',artePrep:'Pronta
   return `<div class="tar2"><button class="tar-t" data-a="pedido" data-id="${t.ped.id}" title="Abrir o pedido"><b>${esc(tarTxt(t))}</b><span>${esc(t.ped.cliente)}${t.sub?' · '+esc(t.sub):''}</span>${t.late?'<span style="display:block;color:var(--red);font-weight:700">Passou do prazo do fornecedor</span>':''}<span class="ver-p">Ver pedido ›</span></button>
   <div class="tar-pe"><button class="resp2${t.como==='reserva'?' reserva':''}" data-a="troca" data-key="${esc(t.key)}" data-f="${t.f}" title="${quem?'Quem faz: '+esc(quem):'Escolher quem faz'}" aria-label="${quem?'Quem faz: '+esc(quem)+'. Toque para trocar':'Escolher quem faz'}">${t.resp?av(t.resp,'s'):ic('i-pessoas')}</button>${t.como==='reserva'?'<small class="tar-res">ninguém tem esta função</small>':''}
   <button class="mbtn ${['buscou','chegou','entregar'].includes(t.a)?'go':''}" data-a="${t.a}" data-id="${t.ped.id}" data-k="${t.k??''}" data-l="${t.l||''}" data-s="${t.s||''}">${lab}</button></div></div>`}
-function fornCard(f,esc_){const fora=[];state.lotes.forEach(l=>{const ped=pedById(l.ped);if(ped.concluido)return;const p=rp(l);Object.entries(l.steps).forEach(([sid,x])=>{if(x.st==='fora'&&x.forn===f.id)fora.push({l,p,s:sMap(p)[sid],x,ped})})});
+function fornCard(f,esc_){const fora=[];state.lotes.forEach(l=>{const ped=pedById(l.ped);if(!ped||ped.concluido||ped.cancelado)return;const p=rp(l);Object.entries(l.steps).forEach(([sid,x])=>{if(x.st==='fora'&&x.forn===f.id)fora.push({l,p,s:sMap(p)[sid]||{id:sid,nome:'Personalização (tirada do pedido)'},x,ped})})});
   const lev=esc_.filter(t=>t.a==='levei'&&(fornById(stOf(lote(t.l),t.s).forn)||fornEtapa(lote(t.l),sMap(rp(lote(t.l)))[t.s]))?.id===f.id);
   return `<div class="forn"><div class="forn-h"><span class="m-ic">${ic(tipo(f.servico).i)}</span><div><b>${esc(f.nome)}</b><span>${esc(tNome(f.servico))} · prazo ${f.prazo} ${f.prazo>1?'dias':'dia'}</span></div></div>
     ${fora.map(o=>{const d=diasDesde(o.x.saiu);return `<div class="fitem">${loteSvg(o.l)}<button class="tar-t" data-a="pedido" data-id="${o.ped.id}" title="Abrir o pedido"><b>${esc(o.s.nome)} · ${qtdEf(o.l)} peças</b><span>${esc(o.ped.cliente)} · lá ${haQuanto(o.x.saiu)}</span>${d>f.prazo?'<span class="late" style="display:block">Passou do prazo</span>':''}<span class="ver-p">Ver pedido ›</span></button><button class="mbtn go" data-a="buscou" data-l="${o.l.id}" data-s="${o.s.id}">Chegou</button></div>`}).join('')||'<div class="vazio-s">Nada lá agora</div>'}
@@ -2428,7 +2432,7 @@ function salvarEdicao(){const w=ui.sheet.w,ped=pedById(w.edit);if(!ped)return;co
     let l=it.lote&&lote(it.lote);
     if(!l){l={id:`${ped.id}-${++n}`,ped:ped.id,desm:0,steps:{},rework:false,parent:null};state.lotes.push(l)}
     Object.assign(l,{pers,qtd,grade:{...it.g},gen:it.gen||undefined,variacao:it.variacao||undefined});if(!it.travado)Object.assign(l,{prod:it.prod,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...it.opcoes]});
-    if(it.mockG){guardaMockG(l.id,it.mockG);l.mock=it.mock;delete l.mockBin}});
+    religaPers(l,state.forn);if(it.mockG){guardaMockG(l.id,it.mockG);l.mock=it.mock;delete l.mockBin}});
   const velhos=ped.materiais||[],lines=state.lotes.filter(l=>l.ped===ped.id&&!l.rework).map(l=>({prod:l.prod,cor:l.cor,cores2:l.cores2,tecido:l.tecido,opcoes:l.opcoes,g:l.grade,qtd:l.qtd}));
   const novos=calcMat(lines).map(m=>{const o=velhos.find(x=>x.item===m.item);if(!o)return m;return {...m,conf:!!o.conf&&m.nec<=o.nec,st:o.st==='pedido'?'pedido':o.st==='ok'&&m.nec<=o.nec?'ok':m.st,...(o.falta!=null&&m.nec<=o.nec?{falta:o.falta,unF:o.unF}:{})}});
   velhos.filter(o=>(o.extra||o.st==='pedido')&&!novos.some(m=>m.item===o.item)).forEach(o=>novos.push(o));ped.materiais=novos;
@@ -3957,7 +3961,7 @@ const A={
     RC={};commit();toast(k==='i'?'Vai ser feito aqui na fábrica':`Vai para ${fornById(v)?.nome}`)},
   persDesfaz:d=>{const l=lote(d.l);if(!l.steps[d.s]||l.steps[d.s].st!=='fora')return;snap();delete l.steps[d.s];RC={};commit();toast('Desfeito: as peças continuam aqui')},
   levei:d=>{const l=lote(d.l),s=sMap(rp(l))[d.s],f=fornEtapa(l,s);snap();l.steps[s.id]={st:'fora',saiu:now(),forn:f?.id,op:f?.leva};commit();toast(`${qtdEf(l)} peças foram para ${f?.nome||tNome(s.posto)}`,true)},
-  buscou:d=>{const l=lote(d.l),x=l.steps[d.s];snap();x.st='ok';x.fim=now();commit();toast('Peças de volta na fábrica',true)},
+  buscou:d=>{const l=lote(d.l),x=l&&l.steps[d.s];if(!x)return;snap();x.st='ok';x.fim=now();commit();toast('Peças de volta na fábrica',true)},
   entregar:d=>{const p=pedById(d.id);snap();p.concluido=now();commit();toast(`Pedido de ${p.cliente} entregue`)},
   /* cadastros */
   tQtd:d=>{const t=tipo(d.t),n=Math.max(0,(t.qtd||0)+(+d.d));if(n<t.qtd&&plano().uso[`${t.id}-${t.qtd}`]){toast(`A ${t.nome} ${t.qtd} está em uso agora`,false);return}snap();t.qtd=n;commit()},

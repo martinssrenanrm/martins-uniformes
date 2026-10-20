@@ -484,3 +484,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Pedido sem número: a ficha sai com o espaço em branco (______) e a tela do pedido mostra **"Pôr o número"**.
 
 **Para mandar ao escritório:** "Ao lançar o pedido, preencha o Nº do pedido no Conta Azul. É ele que sai na ficha."
+
+---
+
+## Aba "Fora" voltou a abrir (20/10)
+
+- A aba **Fora** travava quando um pedido tinha uma personalização trocada depois de já ter ido para o fornecedor (caso do pedido da Ticos). Agora abre sempre.
+- O registro "está no fornecedor" acompanha a personalização quando o pedido é corrigido. Os registros antigos foram religados sozinhos.
+
+**Para mandar ao grupo:** "A aba Fora voltou a funcionar. Fechem e abram o app."

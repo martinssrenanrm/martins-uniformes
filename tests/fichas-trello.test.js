@@ -74,5 +74,13 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   ok(r.temCampo&&r.ficha==='7788','pedido novo tem o campo "Nº do pedido no Conta Azul" e grava o número');
   ok(r.docOk&&r.etq,'ficha de produção e etiquetas mostram o nº do Conta Azul, não o número automático');
   ok(r.semNum&&r.botao,'sem número: a ficha deixa espaço em branco e o pedido mostra "Pôr o número"');
+  console.log('6) Aba Fora com personalização editada (vídeo da Martins, 20/10)');
+  r=await A.evaluate(()=>{const l=state.lotes.find(x=>!x.rework&&(x.pers||[]).length);const f=state.forn.find(x=>x.servico===l.pers[0].tipo)||state.forn[0];l.pers[0].tipo=f.servico;
+    const velho=l.pers[0].id||'pz0';l.steps[velho]={op:f.leva,st:'fora',forn:f.id,saiu:now()-2*DIA};l.pers[0].id='pznovo1';RC={};let erro='';
+    // sem religar: a tela não pode travar
+    try{ui.sheet=null;ui.inicio=null;ui.tela='fabrica';ui.fz='fora';render()}catch(e){erro=e.message}const semTrava=!erro&&!!document.querySelector('.forn');
+    state=normalizar(state);RC={};render();const religou=!!l.steps.pznovo1&&!l.steps[velho]&&l.steps.pznovo1.st==='fora';const aparece=document.body.innerText.includes(f.nome);ui.fz='maq';render();return {semTrava,erro,religou,aparece}});
+  ok(r.semTrava,'a aba Fora abre mesmo com registro antigo'+(r.erro?' ('+r.erro+')':''));
+  ok(r.religou&&r.aparece,'o registro "no fornecedor" volta para a personalização certa');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();
