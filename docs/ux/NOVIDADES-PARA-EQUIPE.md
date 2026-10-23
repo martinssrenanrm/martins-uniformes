@@ -506,3 +506,21 @@ O tempo de cada parte conta para quem fez, no Painel.
   - Só aparecem fornecedores do mesmo serviço. Se as peças já estão no fornecedor, o app pergunta antes.
 
 **Para mandar ao escritório:** "No Escritório, use Por pedido para ver tudo de cada pedido junto. Para trocar o fornecedor, use Mudar para… no item, na aba Fora."
+
+---
+
+## Pedido do Conta Azul vira pré-pedido no app
+
+**O que mudou:**
+- Em **+ Novo › Importar fichas**, agora dá para escolher o **PDF do orçamento ou do pedido do Conta Azul**.
+- O app lê só o que está no Conta Azul: empresa, CNPJ, telefone, e-mail, endereço, número, prazo, peças, quantidades, personalização e valores.
+- O **número do Conta Azul** vai sozinho para "Nº do pedido no Conta Azul" e sai na ficha de produção.
+- O que não está no Conta Azul (cor a definir, tamanhos, tecido) fica em branco: o pedido entra como **pré-pedido**.
+- O pré-pedido aparece no Escritório como **"Completar o pedido do Conta Azul"**. O corte só libera depois de completar.
+- No pedido, o bloco **Valores (Conta Azul)** mostra peças, frete, valor líquido e condições.
+- Em **Empresas**, a gestão tem **Importar clientes do Conta Azul**: lê vários PDFs, mostra a lista e só salva depois do OK. Nenhum pedido é criado.
+- A empresa agora guarda **telefone, e-mail e endereço**.
+
+**O que NÃO mudou:**
+- Importar a ficha de produção (PDF ou Word) continua igual.
+- Nenhum botão mudou de lugar.
