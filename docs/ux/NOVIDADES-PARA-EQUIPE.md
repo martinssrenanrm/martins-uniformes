@@ -524,3 +524,16 @@ O tempo de cada parte conta para quem fez, no Painel.
 **O que NÃO mudou:**
 - Importar a ficha de produção (PDF ou Word) continua igual.
 - Nenhum botão mudou de lugar.
+
+---
+
+## Desfazer por mais tempo, etapa do escritório e horário depois
+
+**O que mudou:**
+- **Desfazer fica disponível por 15 minutos.** Depois que a mensagem some, o botão **↶ Desfazer** continua no canto de baixo da tela. Ele volta o último toque (Começar, Terminou, Comprei, Chegou, Levei, Feito). Se alguém já mexeu na mesma peça depois, ele avisa e não desfaz.
+- **Etapa no escritório:** no produto, em "Onde é feita?", agora tem **Escritório ou Expedição**. Exemplo: calça jeans comprada pronta pode ter a etapa "Encomendar no fornecedor" antes da personalização. Ela aparece no Escritório com o botão **Feito**, e a próxima etapa espera.
+- **Esqueceu de tocar em Começar?** Na máquina, toque em **Já terminou? Informar o horário** e diga quem fez, de que hora até que hora.
+- **Começou antes de tocar?** Na máquina que está trabalhando, toque em **Começou em outro horário? Corrigir**.
+
+**O que NÃO mudou:**
+- Começar e Terminou continuam no mesmo lugar.

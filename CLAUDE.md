@@ -68,6 +68,7 @@ NODE_PATH=$(npm root -g) node tests/etapas-produto.test.js
 NODE_PATH=$(npm root -g) node tests/fichas-trello.test.js
 NODE_PATH=$(npm root -g) node tests/escritorio-fora.test.js
 NODE_PATH=$(npm root -g) node tests/conta-azul.test.js
+NODE_PATH=$(npm root -g) node tests/audios-2310.test.js
 ```
 
 ## Supabase (endereço próprio)
