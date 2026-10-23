@@ -2718,7 +2718,7 @@ const lerURL=f=>new Promise((ok,er)=>{const r=new FileReader();r.onload=()=>ok(r
 const semAc=x=>String(x||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[“”"'.]/g,'').replace(/\s+/g,' ').trim();
 const MESES=['janeiro','fevereiro','marco','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 function lerData(txt,depoisDe){const t=semAc(txt);let d,m,y;let r=t.match(/(\d{1,2})\s*[\/\-]\s*(\d{1,2})(?:\s*[\/\-]\s*(\d{2,4}))?/)||String(txt).match(/(\d{1,2})\.(\d{1,2})(?:\.(\d{2,4}))?/);
-  if(r){d=+r[1];m=+r[2]-1;y=r[3]?+(r[3].length===2?'20'+r[3]:r[3]):null}else{r=t.match(/(\d{1,2})\s*(?:de\s*)?([a-z]+)(?:\s*(?:de\s*)?(\d{4}))?/);if(!r)return null;const mi=MESES.findIndex(x=>x.startsWith(r[2].slice(0,3)));if(mi<0)return null;d=+r[1];m=mi;y=r[3]?+r[3]:null}
+  if(r){d=+r[1];m=+r[2]-1;y=r[3]?+(r[3].length===2?'20'+r[3]:r[3]):null}else{r=t.match(/(\d{1,2})\s*(?:de\s+)?([a-z]{3,})(?:\s*(?:de\s*)?(\d{4}))?/);if(!r)return null;const mi=MESES.findIndex(x=>x.startsWith(r[2].slice(0,3)));if(mi<0)return null;d=+r[1];m=mi;y=r[3]?+r[3]:null}
   if(!(d>=1&&d<=31&&m>=0&&m<=11))return null;const deduz=y==null;
   if(y==null){const hoje=new Date();y=hoje.getFullYear();if(depoisDe){const a=new Date(depoisDe);y=a.getFullYear();if(new Date(y,m,d,17).getTime()<depoisDe)y++}else if(new Date(y,m,d).getTime()>now()+7*DIA)y--}
   const dt=new Date(y,m,d,17,0,0,0);if(dt.getDate()!==d)return null;return {ts:dt.getTime(),deduz}}
@@ -2735,7 +2735,7 @@ async function lerFicha(file){
   if(ehDoc(file))return [await lerFichaDoc(file)];
   const pdf=await pdfLib();const buf=await lerArq(file);const doc=await pdf.getDocument({data:new Uint8Array(buf),isEvalSupported:false}).promise;const out=[];
   for(let n=1;n<=doc.numPages;n++){const pg=await doc.getPage(n);const tc=await pg.getTextContent();const it=tc.items.filter(t=>t.str.trim()).map(t=>({x:t.transform[4],y:t.transform[5],w:t.width||0,s:t.str.trim()}));
-    if(n===1&&ehContaAzul(it)){const all=[...it];for(let k=2;k<=doc.numPages;k++){const p2=await doc.getPage(k);const t2=await p2.getTextContent();t2.items.filter(t=>t.str.trim()).forEach(t=>all.push({x:t.transform[4],y:t.transform[5]-(k-1)*1000,w:t.width||0,s:t.str.trim()}))}return [lerContaAzul(all,file.name)]}
+    if(n===1&&ehContaAzul(it)){const all=[...it];for(let k=2;k<=doc.numPages;k++){const p2=await doc.getPage(k);const t2=await p2.getTextContent();const pi=t2.items.filter(t=>t.str.trim()).map(t=>({x:t.transform[4],y:t.transform[5],w:t.width||0,s:t.str.trim()}));const hq=pi.find(t=>/^produto\/servi/i.test(t.s));pi.filter(t=>!hq||t.y<hq.y-3).forEach(t=>all.push({...t,y:t.y-(k-1)*1000}))}return [lerContaAzul(all,file.name)]}
     const linhas=[];[...it].sort((a,b)=>b.y-a.y||a.x-b.x).forEach(t=>{const l=linhas.find(l=>Math.abs(l.y-t.y)<=3);l?l.it.push(t):linhas.push({y:t.y,it:[t]})});
     linhas.forEach(l=>{l.it.sort((a,b)=>a.x-b.x);l.t=l.it.map(x=>x.s).join(' ').replace(/\s+/g,' ')});
     const F={arquivo:file.name,pagArq:doc.numPages>1?n:null,avisos:[],linhas:[],tabOk:false};textoFicha(F,linhas);
@@ -2822,7 +2822,7 @@ function lerContaAzul(it,arquivo){const L=[];[...it].sort((a,b)=>b.y-a.y||a.x-b.
   const iHdr=L.findIndex(l=>l.it.some(t=>/^produto\/servi/i.test(t.s)));const iCnpjE=L.findIndex(l=>l.it.some(t=>/^CNPJ:/i.test(t.s)));
   F.emailVend=(L.slice(1,iCnpjE+1).flatMap(l=>l.it).find(t=>/@/.test(t.s))||{}).s||'';
   const cli=L.slice(iCnpjE+1,iHdr);const rx=cli.flatMap(l=>l.it).filter(t=>/^(validade|previs)/i.test(t.s)).map(t=>t.x);const xR=rx.length?Math.min(...rx):460;
-  const esq=cli.map(l=>({y:l.y,it:l.it.filter(t=>t.x<xR-5)})).filter(l=>l.it.length),dir=cli.flatMap(l=>l.it.filter(t=>t.x>=xR-5)).sort((a,b)=>b.y-a.y);
+  const esq0=cli.map(l=>({y:l.y,it:l.it.filter(t=>t.x<xR-5)})).filter(l=>l.it.length),esq=esq0.filter((l,i)=>esq0.slice(1,i+1).every((m,j)=>esq0[j].y-m.y<=32)),dir=cli.flatMap(l=>l.it.filter(t=>t.x>=xR-5)).sort((a,b)=>b.y-a.y);
   dir.forEach((t,i)=>{const v=dir[i+1];if(!v||/^(validade|previs)/i.test(v.s))return;if(/^validade/i.test(t.s))F.validade=v.s;if(/^previs/i.test(t.s))F.prevTxt=v.s});
   const TEL=/\(?\d{2}\)?\s*\d{4,5}-?\d{4}/,end=[];
   esq.forEach((l,i)=>l.it.forEach(t=>{if(/^(CNPJ|CPF):/i.test(t.s))F.cnpj=t.s.replace(/^(CNPJ|CPF):\s*/i,'').trim();else if(/@/.test(t.s))F.email=t.s.trim().toLowerCase();else if(TEL.test(t.s)&&t.s.replace(/[\d\s()\-+]/g,'').length<3)F.tel=t.s.trim();
@@ -2830,7 +2830,7 @@ function lerContaAzul(it,arquivo){const L=[];[...it].sort((a,b)=>b.y-a.y||a.x-b.
   if(end.length){F.end=end.join(' ').replace(/(\s-)+\s-\s/g,' - ').replace(/\s+/g,' ').replace(/\s-\s*$/,'').trim();const c=F.end.match(/CEP:\s*([\d.\-]+)/i);if(c)F.cep=c[1];const u=F.end.match(/-\s*([^-]+?)\s*-\s*([A-Z]{2})\s*-\s*CEP/);if(u){F.cidade=u[1].trim();F.uf=u[2];F.end=F.end.replace(/\s*-\s*[^-]+?\s*-\s*[A-Z]{2}\s*-\s*CEP:.*$/i,'')}else if(c)F.end=F.end.replace(/\s*-?\s*CEP:.*$/i,'')}
   // itens: Qt. | Produto/Serviço | Detalhe | Valor unitário | Subtotal
   const H=L[iHdr].it,cx=re=>(H.find(t=>re.test(t.s))||{}).x;const xP=cx(/^produto/i)??80,xD=cx(/^detalhe/i)??230,xU=cx(/^valor unit/i)??450,xS=cx(/^subtotal/i)??530;
-  const iTot=L.findIndex((l,i)=>i>iHdr&&/^total$/i.test(l.it[0]?.s||'')||i>iHdr&&l.it.some(t=>/^total$/i.test(t.s)));const corpo=L.slice(iHdr+1,iTot<0?L.length:iTot).filter(l=>!/^p[aá]gina \d+ de \d+$/i.test(txt(l)));
+  const iTot=L.findIndex((l,i)=>i>iHdr&&/^total$/i.test(l.it[0]?.s||'')||i>iHdr&&l.it.some(t=>/^total$/i.test(t.s)));const corpo=L.slice(iHdr+1,iTot<0?L.length:iTot).map(l=>({...l,it:l.it.filter(t=>!/^continua na pr[oó]xima/i.test(t.s))})).filter(l=>l.it.length&&!/^p[aá]gina \d+ de \d+$/i.test(txt(l)));
   let cur=null;corpo.forEach(l=>{const q=l.it.find(t=>t.x<xP-5&&/^\d+([.,]\d+)?$/.test(t.s));if(q){cur={qt:num(q.s),prod:[],det:[],unit:null,sub:null};F.itensCA.push(cur)}if(!cur)return;
     l.it.forEach(t=>{if(t===q)return;const dinheiro=/^-?[\d.]+,\d{2}$/.test(t.s);if(dinheiro&&t.x>=xS-30)cur.sub=num(t.s);else if(dinheiro&&t.x>=xU-40)cur.unit=num(t.s);else if(t.x>=xD-5)cur.det.push(t.s);else if(t.x>=xP-5)cur.prod.push(t.s)})});
   F.itensCA.forEach(x=>{x.prodTxt=x.prod.join(' ').replace(/\s+/g,' ').trim();x.detalhe=x.det.join(' ').replace(/\s+/g,' ').trim();const m=x.prodTxt.match(/^(\S+)\s+-\s+(.+)$/);x.cod=m?m[1]:'';x.nome=m?m[2]:x.prodTxt});
@@ -2841,10 +2841,10 @@ function lerContaAzul(it,arquivo){const L=[];[...it].sort((a,b)=>b.y-a.y||a.x-b.
   return F}
 /* Personalização escrita no detalhe do item: "Com 2 logos bordado no peito lado esq. (Zap + Zelo) + Cipa em DTF manga esq." */
 function persCA(det){const ps=[];let d=0,c='';for(const ch of det){if(ch==='(')d++;if(ch===')')d=Math.max(0,d-1);if(!d&&ch==='+'){ps.push(c);c='';continue}c+=ch}ps.push(c);const out=[];
-  ps.flatMap(p=>p.split(/\.\s+(?=[A-ZÇÉ])|,\s+(?=com\s)|\s+(?=com\s+(?:\d+|um|uma|dois|duas|tr[eê]s)\s)|\s+(?=modelos?\s)|\s+-\s+(?=[A-ZÇÃÉ ]{3,20}:)/i)).forEach(f=>{const t=semAc(f);if(!/(bord|estamp|silk|dtf|sublim|logo|bandeira|aplica)/.test(t)||/sem logo/.test(t))return;
-    const w=f.match(/\b(peito|mangas?|costas|nuca|bolso|frente|perna|coxa)\b\S*(\s+lado)?(\s+(esq|dir)\S*)?/i);const rot=w?w[0].replace(/\s+lado\b/i,'').replace(/[.,;]+$/,''):'';
+  ps.flatMap(p=>p.split(/\.\s+(?=[A-ZÇÉ][a-zçéãõ])/)).flatMap(p=>p.split(/,\s+(?=com\s)|\s+(?=com\s+(?:apenas\s+|mais\s+)?(?:\d+|um|uma|dois|duas|tr[eê]s)\s)|\s+-\s+(?=[A-ZÇÉ][a-zçé]+\s+personaliz)|\s+(?=modelos?\s)|\s+-\s+(?=[A-ZÇÃÉ ]{3,20}:)/i)).forEach(f=>{const t=semAc(f).replace(/verde\s+bandeira/g,'');if(!/(bord|estamp|silk|dtf|sublim|logo|bandeira|aplica|escrita|arte)/.test(t)||/sem logo/.test(t)||/^\s*(no\s+tecido|em\s+[a-z]+\s+(fechado|aberto))\b/.test(t)&&!/(logo|bord|silk|estamp|dtf|aplica)/.test(t))return;
+    const w=f.match(/\b(peito|mangas?|costas|nuca|bolso|frente|perna|coxa|lapela|gola|lateral|ombro|capuz)\b\S*(\s+lado)?(\s+(esq|dir)\S*)?/i);const rot=w?w[0].replace(/\s+lado\b/i,'').replace(/[.,;]+$/,''):'';
     const txt=f.replace(/^\s*(e\s+)?com\s+/i,'').replace(/[.\s]+$/,'').trim();if(txt)out.push({rot,txt})});return out}
-const SERV_CA=/\b(matriz|frete|taxa|desenvolvimento|programa de bordado|arte final|desconto|servi[cç]o de)\b/i,PECA_CA=/camis|polo|cal[cç]a|jaqueta|blusa|bermuda|avental|jaleco|short|legging|moletom|regata|bon[eé]|colete|macac|saia|vestido|agasalho/i;
+const SERV_CA=/\b(matriz|frete|taxa|desenvolvimento|programa de bordado|arte final|desconto|servi[cç]o de|aplica[cç][aã]o de)\b/i,PECA_CA=/camis|polo|cal[cç]a|jaqueta|blusa|bermuda|avental|jaleco|short|legging|moletom|regata|bon[eé]|colete|macac|saia|vestido|agasalho/i;
 function itemCA(x,det0,G,idem){const det=det0.replace(/\s*-?\s*\b[A-ZÇÃÉ][A-ZÇÃÉa-zçãé ]{2,20}?\s*:\s*(?:[A-Z0-9]{1,4}\s*\/\s*\d+\s*-?\s*)+/g,' ').replace(/\s+/g,' ').trim();const d=lerDescricao(det);if(/cor\s+a\s+definir/i.test(det))d.corResto='';if(/cor\s+a\s+definir/i.test(det))d.corTxt='';if(idem){const di=lerDescricao(idem);if(di.tecidoTxt)d.tecidoTxt=di.tecidoTxt;if(di.corTxt)d.corTxt=di.corTxt}
   if(/tecido[^.]{0,20}a definir/i.test(det)&&!idem)d.tecidoTxt='';const tq=sum(Object.values(G.g||{}));
   const Fx={arquivo:'Conta Azul',pag:'',produto:`${x.nome} · ${det}`,modeloTxt:x.nome,tecidoTxt:d.tecidoTxt||'',corTxt:d.corTxt||'',corResto:d.corResto,locais:persCA(det),persTxt:'',obsCorte:'',obs:'',resto:[]};
@@ -2863,8 +2863,16 @@ function grupoCA(F){const loc=semAc((F.emailVend||'').split('@')[0]);const vp=st
     g.fin.itens.push({nome:x.nome,cod:x.cod,qt:x.qt,unit:x.unit,sub:x.sub});
     let det=x.detalhe,idem='';if(/^idem acima/i.test(det)&&ant){idem=det.replace(/^idem acima,?\s*(sendo)?\s*/i,'');det=ant+' '+idem}
     const grades=[];const re=/\b([A-ZÇÃÉ][A-ZÇÃÉa-zçãé ]{2,20}?)\s*:\s*((?:[A-Z0-9]{1,4}\s*\/\s*\d+\s*-?\s*)+)/g;let m;while((m=re.exec(det))){const gg={};m[2].replace(/([A-Z0-9]{1,4})\s*\/\s*(\d+)/gi,(_,t,q)=>{const k=tamNorm(t);gg[k]=(gg[k]||0)+(+q)});if(Object.keys(gg).length)grades.push({rot:m[1].replace(/^[-\s]+/,'').trim(),g:gg})}
+    let detI=det;if(!grades.length){const SZ='(?:PP|P|M|G|GG|XG|XXG|EG|EXG|G[1-5]|XS|S|L|XL|XXL|[23]XL|\\d{1,2})';const re2=new RegExp('(?:tam(?:anhos?)?\\.?\\s*:?\\s*)?('+SZ+'\\s*\\/\\s*\\d{1,4}(?:\\s*[-,;]\\s*'+SZ+'\\s*\\/\\s*\\d{1,4})*)(?=$|[\\s.),;-])','gi');let m2;
+      while((m2=re2.exec(det))){if(/^\s*malha/i.test(det.slice(re2.lastIndex)))continue;const ps=[...m2[1].matchAll(/([A-Z0-9]{1,3})\s*\/\s*(\d{1,4})/gi)].map(p=>[tamNorm(p[1].toUpperCase()),+p[2]]);if(!ps.length||ps.some(([t])=>!sizesAll().includes(t)))continue;const gg={};ps.forEach(([t,q])=>gg[t]=(gg[t]||0)+q);
+        if(sum(Object.values(gg))===x.qt||ps.length>=2){grades.push({rot:'',g:gg});detI=det.replace(m2[0],' ').replace(/\s+-\s*$/,'').replace(/\s+/g,' ').trim();break}}}
     const soma=sum(grades.map(G=>sum(Object.values(G.g))));if(grades.length&&soma!==x.qt)g.avisos.push(`${x.nome}: a grade escrita soma ${soma}, a quantidade é ${x.qt}. Confira.`);
-    (grades.length?grades:[{rot:'',g:{}}]).forEach(G=>g.itens.push(itemCA(x,det,G,idem)));ant=idem?ant:x.detalhe});
+    (grades.length?grades:[{rot:'',g:{}}]).forEach(G=>g.itens.push(itemCA(x,detI,G,idem)));ant=idem?ant:x.detalhe});
+  {const SF=it=>{const m=String(it.caCod||'').match(/^(.*?\d.*?)(\d{2}|PP|GG|XG|EG|P|M|G)$/);if(!m||Object.keys(it.g).length)return null;const t=tamNorm(m[2]);return sizesAll().includes(t)?{base:m[1],t,raw:m[2]}:null};
+    const grp={};let ult=null,n=0;g.itens.forEach((it,i)=>{const f=SF(it);if(!f){ult=null;return}const sem=t=>semAc(String(t||'').replace(new RegExp('(^|\\s)'+f.raw+'(?=\\s|$)'),' ').replace(/\s+/g,' ').trim());const k0=f.base+'|'+sem(it.caNome)+'|'+semAc((it.obs||'').split(' · ').slice(1).join(' · ').replace(/(^|·\s*)(?:PP|P|M|G|GG|XG|EG|\d{1,2})(?:\s+-(?:\s+|$)|\s*$)/,'$1').replace(new RegExp('(^|\\s)'+f.raw+'(?=\\s|$)'),' ').replace(/\s+/g,' ').trim());if(!ult||ult.k0!==k0||ult.ts.has(f.t)){n++;ult={k0,ts:new Set()}}ult.ts.add(f.t);(grp[n]=grp[n]||[]).push({i,t:f.t,base:f.base,raw:f.raw})});
+    const tira=new Set();Object.values(grp).filter(L=>new Set(L.map(x=>x.t)).size>=2).forEach(L=>{const it=g.itens[L[0].i];it.g={};L.forEach(x=>{const o=g.itens[x.i];it.g[x.t]=(it.g[x.t]||0)+(o.qtCA||0);if(x.i!==L[0].i)tira.add(x.i)});
+      it.caNome=it.caNome.replace(new RegExp('(\\s)'+L[0].raw+'$'),'').trim();it.caCod=L[0].base;it.chaveP='ca:'+semAc(L[0].base);it.qtCA=sum(Object.values(it.g));it.gOk=true;it.obs=it.obs.replace(new RegExp('(\\s)'+L[0].raw+'(?=\\s|$)'),'$1').replace(/\s+/g,' ').trim()+` (tamanhos ${L.map(x=>x.t).join(', ')})`});
+    if(tira.size)g.itens=g.itens.filter((_,i)=>!tira.has(i))}
   if(!g.itens.length)g.avisos.push('Nenhuma peça no orçamento (só serviços). Confira.');
   const ce=acharCliente(state,g.cliente,g.cnpj);g.cliId=ce?ce.id:null;g.cliCerto=!!ce;g.cliNovo=!ce;g.cliSug=[];
   if(!ce){const w=nCli(g.cliente).split(' ').filter(x=>x.length>=3);g.cliSug=state.clientes.filter(c=>{const cw=nCli(c.nome).split(' ');return w.some(x=>cw.includes(x))}).map(c=>c.id).slice(0,5);g.cliNovo=!g.cliSug.length}
@@ -3091,7 +3099,7 @@ function coresSecundarias(txt,p,principal){const {Wr:W,achou}=coresNoTexto(txt);
     ps=[...new Set(ps)];if(ps.length&&a.cor!==principal){const ja=out.find(x=>x.cor===a.cor);if(ja)ps.forEach(x=>{if(!ja.partes.includes(x))ja.partes.push(x)});else out.push({cor:a.cor,partes:ps})}});
   return out}
 /* Tipo de personalização escrito na ficha, mesmo abreviado ("Bord" = Bordado). */
-const SIN_TIPO={silk:'estamp',silkado:'estamp',silkada:'estamp',serigrafia:'estamp',serig:'estamp',sublim:'sublim',bord:'bordado'};
+const SIN_TIPO={silk:'estamp',silks:'estamp',silkscreen:'estamp',silkada:'estamp',silkados:'estamp',silkado:'estamp',silkada:'estamp',serigrafia:'estamp',serig:'estamp',sublim:'sublim',sublimada:'sublim',sublimado:'sublim',sublimacao:'sublim',bord:'bordado'};
 function tipoNoTexto(txt,ext){const ws=palavras(txt).filter(w=>w.length>=3).map(w=>SIN_TIPO[w]||w);const nomes={};ext.forEach(t=>[t.curto,t.nome].filter(Boolean).forEach(nm=>{const n=palavras(nm).find(y=>y.length>=3&&!['mesa','maquina'].includes(y))||'';if(n.length>=3&&!nomes[n])nomes[n]=t.id}));
   const hit=new Set();ws.forEach(w=>Object.entries(nomes).forEach(([n,id])=>{if(n.startsWith(w)||w.startsWith(n))hit.add(id)}));return hit.size===1?[...hit][0]:null}
 /* Tamanho americano vira brasileiro (pedido de 10/2026: não criar tamanhos novos). S=P, L=G, XL=GG, 2XL=XG, 3XL=XXG. */

@@ -31,6 +31,23 @@ const ORC=(num,cli,cnpj,extra=[])=>[
   ok(r.n===2&&r.it0.gen==='U'&&JSON.stringify(r.it0.g)==='{"M":5,"G":4,"GG":5}'&&!/UNISSEX/.test(r.it0.pers.join()),'grade escrita no detalhe (UNISSEX: M/5…) vira os tamanhos, sem sujar a personalização');
   ok(!r.it1.cor&&r.it1.qt===10&&!r.it1.c2&&r.it1.pers===1,'“cor a definir” fica em branco; quantidade do Conta Azul guardada');
   ok(r.fin.liquido===1284.6&&r.fin.frete===30&&r.fin.extras.length===1&&r.fin.cond.includes('30 ddl'),'valores, frete, matriz e condições no financeiro');
+  console.log('1b) Padrões de 2024: grade sem rótulo, uma linha por tamanho, cabeçalho repetido na página 2, texto institucional');
+  const o4=[...L(800,[15,'01/11/2024'],[485,'Orçamento'],[547,'9104']),...L(763,[94,'FABRICA EXEMPLO']),...L(731,[94,'FABRICA EXEMPLO LTDA'],[454,'ana@exemplo.com.br']),...L(714,[94,'CNPJ: 00.000.000/0001-00']),
+    ...L(670,[24,'ESCOLA TESTE']),...L(666,[467,'Validade da proposta']),...L(656,[277,'contato@escolateste.com'],[467,'01/11/2024']),
+    ...L(583,[22,'Texto institucional da fábrica que vai de um lado ao outro da página, com várias palavras e sem números.']),...L(572,[22,'continua o texto institucional']),
+    ...L(520,[40,'Qt.'],[87,'Produto/Serviço'],[239,'Detalhe do item'],[456,'Valor unitário'],[535,'Subtotal']),
+    ...L(500,[42,'90'],[87,'E1011INF - Camiseta Manga Curta'],[239,'2/20 - 4/40 - 6/20 - 8/10'],[487,'30,00'],[535,'2.700,00']),...L(489,[87,'Infantil Escolar'])];
+  [['02',15],['04',10],['06',10]].forEach(([z,q],k)=>o4.push(...L(470-k*30,[42,String(q)],[87,'E2002'+z+' - Bermuda em Helanca'],[239,'TACTEL'],[487,'40,00'],[535,(q*40)+',00']),...L(459-k*30,[87,'Escolar '+z])));
+  o4.push(...L(42,[15,'Continua na próxima página...'],[525,'Página 1 de 2']));
+  [...L(800,[15,'01/11/2024'],[485,'Orçamento'],[547,'9104']),...L(763,[94,'FABRICA EXEMPLO']),...L(714,[94,'CNPJ: 00.000.000/0001-00']),...L(679,[40,'Qt.'],[87,'Produto/Serviço'],[239,'Detalhe do item'],[456,'Valor unitário'],[535,'Subtotal'])].forEach(t=>o4.push({...t,y:t.y-1000}));
+  o4.push(...L(660-1000,[42,'10'],[87,'E2002P - Bermuda em Helanca'],[239,'PP - TACTEL'],[487,'40,00'],[535,'400,00']),...L(649-1000,[87,'Escolar P']),
+    ...L(620-1000,[42,'205'],[87,'APLIC1 - Aplicação de Silkscreen'],[487,'1,00'],[535,'205,00']),...L(590-1000,[443,'Total'],[533,'6.705,00']),...L(42-1000,[525,'Página 2 de 2']));
+  r=await A.evaluate(o=>{const hq=o.filter(t=>t.y<0).find(t=>/^produto\/servi/i.test(t.s));const it=o.filter(t=>!(t.y<0&&hq&&t.y>=hq.y-3));const g=grupoCA(lerContaAzul(it,'x.pdf'));
+    return {end:g.end,email:g.email,n:g.itens.length,i0:g.itens[0]&&g.itens[0].g,b:g.itens[1]&&{g:g.itens[1].g,nome:g.itens[1].caNome,cod:g.itens[1].caCod},ex:g.fin.extras.length}},o4);
+  ok(r.email==='contato@escolateste.com'&&!r.end,'texto institucional não vira endereço');
+  ok(JSON.stringify(r.i0)==='{"2":20,"4":40,"6":20,"8":10}','grade sem rótulo (2/20 - 4/40…) vira os tamanhos');
+  ok(r.n===2&&r.b&&JSON.stringify(r.b.g)==='{"2":15,"4":10,"6":10,"P":10}'&&r.b.cod==='E2002'&&!/MARTINS|EXEMPLO|Produto/.test(r.b.nome),'uma linha por tamanho (E200202, E200204…) vira uma peça com grade, mesmo passando de página');
+  ok(r.ex===1,'“Aplicação de…” vai para serviços, não vira peça');
   console.log('2) Criar o pré-pedido');
   r=await A.evaluate(o=>{const F=lerContaAzul(o,'orc.pdf');F.ca=true;openSheet({t:'imp',gi:0,grupos:[grupoCA(F)]});const g=ui.sheet.grupos[0];g.cliNovo=true;g.vend=state.pessoas.find(p=>temPapel(p,'vendas')).id;render();
     const tit=document.querySelector('.sheet h1').innerText,bt=document.querySelector('[data-a=impCriar]').innerText,val=/Valores no Conta Azul/.test(document.querySelector('.sheet').innerText);
