@@ -1,0 +1,34 @@
+// Teste: pedidos da Martins de 26/10: corte liberado por peça (tecido de cada uma), "É evento" com destaque na ficha e espaço de anotação na grade.
+// Rodar: NODE_PATH=$(npm root -g) node tests/audios-2610.test.js
+const { chromium } = require('playwright');const path=require('path');
+const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=(c,m)=>{console.log((c?'  ✔ ':'  ✘ ')+m);if(!c)falhas++};
+(async()=>{const b=await chromium.launch();const erros=[];const A=await b.newPage({viewport:{width:820,height:1100}});A.on('pageerror',e=>erros.push(e.message));
+  await A.clock.install({time:new Date('2026-10-14T15:30:00')});
+  await A.addInitScript(()=>{window.claude={use:async()=>null}});await A.goto(APP);await A.waitForTimeout(1200);
+  console.log('1) Corte liberado por peça');
+  let r=await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;ui.inicio=null;
+    const ped=state.pedidos.find(p=>!p.concluido&&lotesDe(p.id).filter(l=>!l.rework).length>=2&&new Set(lotesDe(p.id).map(l=>l.cor)).size>=2);
+    const ls=lotesDe(ped.id).filter(l=>!l.rework);ls.forEach(l=>l.steps={});const [a,b2]=ls.filter((l,i,arr)=>arr.findIndex(x=>x.cor===l.cor)===i);
+    ped.vias=true;ped.arte=true;ped.artePrep=true;ped.materiais=calcMat(ls);ped.materiais.forEach(m=>{m.conf=true;m.st='ok'});
+    const tecA=calcMat([a]).find(m=>m.un==='m').item;ped.materiais.find(m=>m.item===tecA).st='comprar';RC={};
+    const p0=s=>rp(s).steps.find(z=>!z.deps.length);const okB=ready(b2,p0(b2),ped),okA=ready(a,p0(a),ped);
+    ui.sheet={t:'pedido',id:ped.id};render();const txt=document.getElementById('sheet').innerText;
+    ped.materiais.find(m=>m.item===tecA).st='ok';RC={};const okA2=ready(a,p0(a),ped);
+    return {okA,okB,okA2,parcial:/Pode cortar 1 de|Pode cortar \d+ de/.test(txt),espera:/Espera material:/.test(txt),tecA}});
+  ok(r.okB&&!r.okA,'a peça com tecido libera o corte; a que falta tecido ('+r.tecA+') espera');
+  ok(r.parcial&&r.espera,'o pedido mostra "Pode cortar X de Y" e o que espera material');
+  ok(r.okA2,'quando o tecido chega, a outra peça libera');
+  console.log('2) É evento');
+  r=await A.evaluate(()=>{const ped=state.pedidos.find(p=>!p.concluido);A.pedEditar({id:ped.id});const w=ui.sheet.w;w.step=3;render();const tem=!!document.querySelector('#sheet [data-a=wEvento]');A.wEvento();const marcado=ui.sheet.w.evento;
+    ped.evento=true;ui.sheet=null;RC={};const f=docFicha(lotesDe(ped.id).filter(l=>!l.rework)[0],ped,1,1,1);A.fz?0:0;ui.tela='pedidos';ui.sheet=null;render();
+    return {tem,marcado,ficha:/fp-evento/.test(f)&&/EVENTO/.test(f),anot:/fp-anot/.test(f),lista:typeof listaPedidos==='function'&&/class="evt"/.test(listaPedidos())}});
+  ok(r.tem&&r.marcado,'no novo pedido / corrigir pedido tem "É evento"');
+  ok(r.ficha,'ficha de produção sai com a faixa EVENTO');
+  ok(r.lista,'lista de pedidos mostra o selo EVENTO');
+  console.log('3) Espaço de anotação na grade');
+  ok(r.anot,'ficha tem o quadro de anotações embaixo dos tamanhos');
+  r=await A.evaluate(()=>{const ped=state.pedidos.find(p=>p.evento);const box=document.createElement('div');box.innerHTML=lotesDe(ped.id).filter(l=>!l.rework).map((l,i,arr)=>docFicha(l,ped,1,i+1,arr.length)).join('');document.body.appendChild(box);ajustaFicha(box);
+    const fs=[...box.querySelectorAll('.a4.fp')];const cabe=fs.every(el=>el.scrollHeight<=el.clientHeight+1);box.remove();return {n:fs.length,cabe}});
+  ok(r.cabe,`as ${r.n} fichas continuam cabendo na folha A4`);
+  ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
+  await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();
