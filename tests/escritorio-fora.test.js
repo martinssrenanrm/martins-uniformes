@@ -29,5 +29,14 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   await A.mouse.move(a.x+20,a.y+20);await A.mouse.down();await A.mouse.move(c.x+40,c.y+30,{steps:8});await A.mouse.up();await A.waitForTimeout(150);await A.evaluate(()=>document.querySelector('[data-a=confSim]')?.click());
   const volta=await A.evaluate(f1=>{const l=state.lotes.find(x=>x.steps&&x.steps.pzm1);return l.steps.pzm1.forn===f1},r.f1);
   ok(volta,'arrastar pela alça até o outro fornecedor também passa');
+  console.log('3) Pacote "para levar" que já voltou');
+  r=await A.evaluate(()=>{const f1=state.forn[0];const ped=state.pedidos.find(p=>!p.concluido&&lotesDe(p.id).length);ped.arte=true;ped.artePrep=true;ped.vias=true;ped.materiais.forEach(m=>{m.conf=true;m.st='ok'});
+    const l=lotesDe(ped.id)[0];const p0=rp(l);l.pers=[{id:'pzv1',tipo:f1.servico,parte:'Frente',forn:f1.id}];RC={};const z=rp(l).steps.find(s=>s.id==='pzv1');if(!z)return {sem:1};
+    const R=rp(l);R.steps.forEach(s=>{if(s.id!=='pzv1'&&anc(R,'pzv1').has(s.id))l.steps[s.id]={st:'ok',ini:now()-7200000,fim:now()-3600000,op:state.pessoas[0].id}});delete l.steps.pzv1;ped.artes=ped.artes||{};
+    (rp(l).steps.filter(s=>s.pers)).forEach(s=>{ped.artes[l.id+':'+s.id]={ts:now()}});RC={};ui.sheet=null;A.fz({v:'fora'});
+    const it=[...document.querySelectorAll('.fitem.lev')].find(x=>x.querySelector('[data-a=levouVoltou][data-l="'+l.id+'"]'));if(!it)return {semItem:1,lev:document.querySelectorAll('.fitem.lev').length};
+    const lev=!!it.querySelector('[data-a=levei]');it.querySelector('[data-a=levouVoltou]').click();return {lev,st:stOf(l,'pzv1').st}});
+  ok(!r.sem&&!r.semItem&&r.lev,'pacote "para levar" tem os botões Levei e Chegou'+(r.semItem?' (não achei o item; '+r.lev+' na lista)':''));
+  ok(r.st==='ok','Chegou num pacote "para levar" marca as peças de volta na fábrica');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} falha(s).`:'\nTudo certo.');process.exit(falhas?1:0)})();
