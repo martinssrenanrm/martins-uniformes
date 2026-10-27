@@ -21,12 +21,12 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   console.log('2) É evento');
   r=await A.evaluate(()=>{const ped=state.pedidos.find(p=>!p.concluido);A.pedEditar({id:ped.id});const w=ui.sheet.w;w.step=3;render();const tem=!!document.querySelector('#sheet [data-a=wEvento]');A.wEvento();const marcado=ui.sheet.w.evento;
     ped.evento=true;ui.sheet=null;RC={};const f=docFicha(lotesDe(ped.id).filter(l=>!l.rework)[0],ped,1,1,1);A.fz?0:0;ui.tela='pedidos';ui.sheet=null;render();
-    return {tem,marcado,ficha:/fp-evento/.test(f)&&/EVENTO/.test(f),anot:/fp-anot/.test(f),lista:typeof listaPedidos==='function'&&/class="evt"/.test(listaPedidos())}});
+    return {tem,marcado,ficha:/fp-evento/.test(f)&&/EVENTO/.test(f),anot:/class="anot"/.test(f),lista:typeof listaPedidos==='function'&&/class="evt"/.test(listaPedidos())}});
   ok(r.tem&&r.marcado,'no novo pedido / corrigir pedido tem "É evento"');
   ok(r.ficha,'ficha de produção sai com a faixa EVENTO');
   ok(r.lista,'lista de pedidos mostra o selo EVENTO');
   console.log('3) Espaço de anotação na grade');
-  ok(r.anot,'ficha tem o quadro de anotações embaixo dos tamanhos');
+  ok(r.anot,'ficha tem uma linha em branco embaixo das quantidades, para anotar');
   r=await A.evaluate(()=>{const ped=state.pedidos.find(p=>p.evento);const box=document.createElement('div');box.innerHTML=lotesDe(ped.id).filter(l=>!l.rework).map((l,i,arr)=>docFicha(l,ped,1,i+1,arr.length)).join('');document.body.appendChild(box);ajustaFicha(box);
     const fs=[...box.querySelectorAll('.a4.fp')];const cabe=fs.every(el=>el.scrollHeight<=el.clientHeight+1);box.remove();return {n:fs.length,cabe}});
   ok(r.cabe,`as ${r.n} fichas continuam cabendo na folha A4`);

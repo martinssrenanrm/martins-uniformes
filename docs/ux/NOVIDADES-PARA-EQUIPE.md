@@ -545,7 +545,7 @@ O tempo de cada parte conta para quem fez, no Painel.
 **O que mudou:**
 - **Corte liberado por peça:** se falta o tecido de uma cor, as outras peças do pedido já podem ir para o corte. No pedido aparece "Pode cortar 1 de 3" e o que espera material.
 - **É evento:** no + Novo (tela Para quando?) e no Corrigir pedido. A ficha de produção sai com a faixa vermelha **EVENTO · ENTREGA ... NÃO PODE ATRASAR**, e a lista de pedidos mostra o selo EVENTO.
-- **Ficha de produção:** embaixo dos tamanhos tem um quadro **Anotações da grade** para escrever à mão (peça a mais, troca de tamanho) e depois passar para o sistema.
+- **Ficha de produção:** embaixo das quantidades de cada tamanho tem uma linha em branco para anotar à mão (peça a mais, troca de tamanho) e depois passar para o sistema.
 - O botão ↶ Desfazer não tapa mais o fim da tela.
 
 **O que NÃO mudou:**
