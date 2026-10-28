@@ -586,3 +586,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Na máquina parada, o trabalho escolhido também pode ir para um terceirizado.
 - O terceirizado segue o caminho de sempre: aparece em **Fora › para levar** e na Logística, depois **Levei** e **Chegou**.
 - Mudou de ideia? No pedido, em **O que foi feito › Corrigir**, toque em **Fazer na fábrica**.
+
+---
+
+## Lista de compras para imprimir, PDF ou WhatsApp
+
+**O que mudou:**
+- **Fábrica › Escritório › Lista de compras** (no alto): tudo que falta comprar dos pedidos abertos, somado por item. Mostra para qual pedido é e a data de entrega; o que entrega antes vem primeiro.
+- Botões: **Enviar no WhatsApp**, **Baixar PDF**, **Imprimir** e Copiar o texto.
+- O carrinho de cada item marca como comprado em todos os pedidos de uma vez.
+- Embaixo aparece o que já foi comprado e está esperando chegar.
