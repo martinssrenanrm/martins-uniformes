@@ -30,10 +30,15 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   ok(r.it[0].cor==='Marinho'&&r.it[1].cor==='Verde bandeira','cores reconhecidas');
   ok(r.it[0].mock,'mockup que estava dentro do Word foi para a peça 1');ok(r.it[1].mock,'mockup solto ("polo verde") foi para a peça certa');
   ok(r.it[0].pers.join()==='Frente,Mangas'&&r.it[1].pers.join()==='Costas','lugares da personalização reconhecidos');
-  ok(r.pend.length===1&&r.pend[0]==='quem vendeu','só falta escolher quem vendeu (não está na ficha)');
+  console.log(JSON.stringify(r.pend));ok(r.pend.includes('quem vendeu')&&r.pend.every(x=>x==='quem vendeu'||/(medida|lugar exato) da personalização/.test(x)),'só falta quem vendeu e a medida/lugar exato do logo (não estão na ficha)');
 
   console.log('2) Criar o pedido');
   await A.evaluate(()=>{const g=ui.sheet.grupos[0];g.vend=state.pessoas.find(p=>temPapel(p,'vendas')).id;render()});
+  // medida e lugar exato agora são obrigatórios: preenche pela própria tela de importação
+  r=await A.evaluate(()=>{const g=ui.sheet.grupos[0];const n=document.querySelectorAll('[data-imptam]').length;
+    for(let i=0;i<n;i++){const inp=document.querySelectorAll('[data-imptam]')[i];inp.value='8 cm';inp.dispatchEvent(new Event('change',{bubbles:true}))}
+    g.itens.forEach((it,k)=>it.pers.forEach((x,j)=>{if(!x.pos&&posDe(x.parte).length){const b=document.querySelector(`[data-a=impPos][data-k="${k}"][data-j="${j}"]`);b&&b.click()}}));return {n,pend:impPend(g)}});
+  ok(r.n>0&&!r.pend.length,'medida e lugar exato preenchidos na tela de importação ('+r.n+' logos); nada pendente'+(r.pend.length?': '+r.pend.join(', '):''));
   await A.evaluate(()=>impCriar());await A.waitForTimeout(800);
   r=await A.evaluate(()=>{const p=state.pedidos.find(x=>x.ficha==='9001');const ls=lotesDe(p.id);return {obs:p.obs,esp:(state.cats.find(c=>c.id==='esp')||{t:[]}).t,tec:prod('polo-vie').tecidos,
     q:ls.map(l=>l.qtd),ficha:docFicha(ls[0],p,1,1,ls.length)}});
@@ -66,7 +71,7 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   ok(r.polo.c2.length===1&&r.polo.c2[0].cor==='Preta'&&['Cobre gola','Punhos','Peitilho'].every(x=>r.polo.c2[0].partes.includes(x)),'cor secundária e onde ela vai preenchidas sozinhas (na polo, gola = cobre gola): '+JSON.stringify(r.polo.c2));
   ok(r.polo.tipos.every(t=>/^Bordado/.test(t||'')),'"Bord" na ficha = Bordado');
   ok(r.blusa.prod==='blusa'&&r.blusa.op.includes('capuz')&&r.blusa.op.includes('canguru'),'Blusa com capuz e bolso canguru reconhecidos');
-  const pend=await A.evaluate(()=>{const g=ui.sheet.grupos[0];g.vend=state.pessoas.find(p=>temPapel(p,'vendas')).id;const P=impPend(g);impCriar();return P});await A.waitForTimeout(600);ok(!pend.length,'nada pendente para criar: '+pend.join(', '));
+  const pend=await A.evaluate(()=>{const g=ui.sheet.grupos[0];g.vend=state.pessoas.find(p=>temPapel(p,'vendas')).id;g.itens.forEach(it=>it.pers.forEach(x=>{x.tam=x.tam||'8 cm';if(!x.pos&&posDe(x.parte).length)x.pos=posDe(x.parte)[0]}));const P=impPend(g);impCriar();return P});await A.waitForTimeout(600);ok(!pend.length,'nada pendente para criar: '+pend.join(', '));
   r=await A.evaluate(()=>{const p=state.pedidos.find(x=>/9002/.test(x.ficha||''));const ls=lotesDe(p.id);return {ficha:p.ficha,c2:ls[0].cores2,op:ls[1].opcoes}});
   ok(r.ficha==='9002 / 9003'&&r.c2.length===1&&r.op.includes('canguru'),'pedido criado com as duas fichas, a cor secundária e as opções');
   console.log('7) Mockup de peça azul-clara não é cortado');

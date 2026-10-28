@@ -54,7 +54,7 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
     document.querySelector('[data-a=wPadd]').click();const ops=[...document.querySelectorAll('#sheet [data-a=wPloc]')].map(b=>b.textContent.trim());
     const t=state.tipos.find(x=>faseG(x.grupo)==='pers').id;A.wPt({k:'0',v:t});document.getElementById('wPtam0').value='8 cm';document.getElementById('wPobs0').value='logo novo';
     document.querySelector('#sheet [data-a=wPloc][data-v="2"]').click();const tamFica=document.getElementById('wPtam0').value;document.querySelector('#sheet [data-a=wPok]').click();
-    const x=ui.sheet.w.itens[0].pers[0];const chip=document.querySelector('#sheet .depc[aria-pressed=true]')?.textContent||'';
+    const x=ui.sheet.w.itens[0].pers[0];const chip=[...document.querySelectorAll('#sheet .wpz input')].map(i=>i.value).join(' ');
     const it=ui.sheet.w.itens[0];it.cor=Object.keys(state.cores)[0];if(!p.tecidos.includes('Tecido de teste'))p.tecidos.push('Tecido de teste');it.tecido='Tecido de teste';it.g={M:2};const w=ui.sheet.w;w.entrega=now()+20*DIA;
     w.step=4;render();const conf=document.getElementById('sheet').innerText;const compraCerta=conf.includes('Tecido de teste '+it.cor)&&!conf.includes(p.tecidos[0]+' '+it.cor);const n0=state.pedidos.length;A.wCriar();const ped=state.pedidos[state.pedidos.length-1];const lz=state.pedidos.length>n0?lotesDe(ped.id)[0].pers[0]:null;
     ui.sheet=null;render();return {ops,x,tamFica,chip,lz,compraCerta}});

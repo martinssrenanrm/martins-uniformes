@@ -57,8 +57,8 @@ const ORC=(num,cli,cnpj,extra=[])=>[
   ok(r.fonte==='contaazul'&&r.pre&&r.pre.some(x=>/cor/.test(x))&&r.pre.some(x=>/tamanhos/.test(x))&&!r.lib,'pedido entra como pré-pedido e não libera o corte ('+(r.pre||[]).join(', ')+')');
   ok(r.banner&&r.fin&&r.tarefa,'no pedido: aviso com Completar, bloco de valores e tarefa no escritório');
   ok(r.tel==='(11) 4000-1234'&&r.cid==='Campinas','empresa guarda telefone e endereço');
-  r=await A.evaluate(id=>{const ls=lotesDe(id);ls.forEach(l=>{l.cor=l.cor||Object.keys(state.cores)[0];l.tecido=l.tecido||tecidosAll()[0];if(!Object.values(l.grade||{}).some(Boolean))l.grade={M:5,G:5};l.g=l.grade});const ped=pedById(id);const f=faltaPed(ped);if(f.length)ped.pre=f;else delete ped.pre;return {pre:ped.pre||null,f}},r.id);
-  ok(!r.pre,'completando cor e tamanhos, o pré-pedido some');
+  r=await A.evaluate(id=>{const ls=lotesDe(id);ls.forEach(l=>{l.cor=l.cor||Object.keys(state.cores)[0];l.tecido=l.tecido||tecidosAll()[0];if(!Object.values(l.grade||{}).some(Boolean))l.grade={M:5,G:5};l.g=l.grade;(l.pers||[]).forEach(x=>{x.tam=x.tam||'7 cm';if(!x.pos&&posDe(x.parte).length)x.pos=posDe(x.parte)[0]})});const ped=pedById(id);const f=faltaPed(ped);if(f.length)ped.pre=f;else delete ped.pre;return {pre:ped.pre||null,f}},r.id);
+  ok(!r.pre,'completando cor, tamanhos e a medida do logo, o pré-pedido some');
   console.log('3) Clientes em lote');
   r=await A.evaluate(async([a,b2,c])=>{const P={x1:a,x2:b2,x3:c};lerFicha=async f=>{const F=lerContaAzul(P[f.name.split('.')[0]],f.name);F.ca=true;return [F]};const n0=state.clientes.length,np=state.pedidos.length;
     await importarClientesCA(['x1','x2','x3'].map(n=>new File(['%PDF'],n+'.pdf',{type:'application/pdf'})));const L=ui.sheet.L.map(x=>({nome:x.nome,ex:!!x.ex,n:x.n}));

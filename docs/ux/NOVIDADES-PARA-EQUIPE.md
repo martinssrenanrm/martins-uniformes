@@ -550,3 +550,16 @@ O tempo de cada parte conta para quem fez, no Painel.
 
 **O que NÃO mudou:**
 - Vias e arte continuam valendo para o pedido inteiro.
+
+---
+
+## Masculina e feminina juntas, arquivo do bordado e medida obrigatória
+
+**O que mudou:**
+- **Masculina e feminina na mesma peça:** em "Masculina ou feminina?", escolha **Masculina e feminina**. Aparecem duas grades, uma para cada. Tecido, cor e personalização são preenchidos uma vez só. As duas saem na mesma ficha de produção.
+- **Arquivo do bordado e arte na criação:** em cada personalização tem **Pôr arquivo do bordado** e **Pôr arte**, no Novo pedido e na tela de importação.
+- **Medida e lugar exato são obrigatórios** em cada personalização. O que falta fica em laranja e o pedido não avança sem isso.
+- **Importação: Editar tudo.** Abre o formulário completo já preenchido com o que foi lido da ficha, para mudar qualquer coisa antes de criar.
+
+**O que NÃO mudou:**
+- Quem não usa masculina e feminina continua escolhendo Masculina, Feminina ou Unissex como antes.
