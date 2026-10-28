@@ -563,3 +563,16 @@ O tempo de cada parte conta para quem fez, no Painel.
 
 **O que NÃO mudou:**
 - Quem não usa masculina e feminina continua escolhendo Masculina, Feminina ou Unissex como antes.
+
+---
+
+## Corrigir o que foi feito e insumos mais espertos
+
+**O que mudou:**
+- **Corrigir qualquer etapa:** no pedido, em cada peça, toque em **O que foi feito · corrigir**. Aparece quem fez cada etapa e quando. Em **Corrigir** dá para voltar para "ainda não feita", cancelar um início, marcar como feita com o horário, ou trocar quem fez e o horário.
+- **Desfazer a entrega:** pedido entregue sem querer volta para a produção.
+- **Falta de linha ou aviamento não segura o corte**, só a costura. Falta de tecido de uma cor segura só as peças daquela cor.
+- **Três botões em cada insumo** (no pedido e nas compras do Escritório): **caixa = Já tem** (sai do estoque), **carrinho = Comprei** (libera), **alerta = Em falta** (fica na lista de compras).
+
+**O que NÃO mudou:**
+- Vias e arte continuam valendo para o pedido inteiro.
