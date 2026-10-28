@@ -576,3 +576,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 
 **O que NÃO mudou:**
 - Vias e arte continuam valendo para o pedido inteiro.
+
+---
+
+## Mais opções da máquina: passar para outra pessoa ou para um terceirizado
+
+**O que mudou:**
+- Na máquina trabalhando, em **Mais opções**: **Passar para outra pessoa** (só quem sabe fazer aquele processo) e **Mandar para um terceirizado**.
+- Na máquina parada, o trabalho escolhido também pode ir para um terceirizado.
+- O terceirizado segue o caminho de sempre: aparece em **Fora › para levar** e na Logística, depois **Levei** e **Chegou**.
+- Mudou de ideia? No pedido, em **O que foi feito › Corrigir**, toque em **Fazer na fábrica**.
