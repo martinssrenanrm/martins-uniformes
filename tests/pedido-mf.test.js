@@ -19,16 +19,16 @@ const APP='file://'+path.resolve(__dirname,'../app.html');const PNG=path.join(__
   ok(r.semMedida,'logo sem medida não entra (pede a medida)');
   ok(r.np===1,'logo com medida entra');
   // anexar o arquivo do bordado na criação
-  await A.evaluate(()=>{wRead();A.wPzArq({k:'0',j:'0',t:'bord'})});await A.setInputFiles('#fArq',PNG);await A.waitForTimeout(800);
-  r=await A.evaluate(()=>{const x=ui.sheet.w.itens[0].pers[0];return {bord:x.bord,tela:!!document.querySelector('.wpz-a')}});
+  await A.evaluate(()=>{wRead();A.wPzArq({k:'0',j:'0',t:'arqs'})});await A.setInputFiles('#fArq',PNG);await A.waitForTimeout(800);
+  r=await A.evaluate(()=>{const x=ui.sheet.w.itens[0].pers[0];return {bord:idsPz(x)[0],tela:!!document.querySelector('.wpz .anx')}});
   ok(!!r.bord&&r.tela,'arquivo do bordado anexado ainda na criação do pedido');
   // personalização sem lugar exato / medida trava o passo 2
   r=await A.evaluate(()=>{const it=ui.sheet.w.itens[0];it.pers.push({tipo:it.pers[0].tipo,parte:'Frente'});render();A.wNext();const err=ui.sheet.w.err,step=ui.sheet.w.step;it.pers.pop();render();return {err,step}});
   ok(r.step===2&&/lugar exato e da medida/.test(r.err),'personalização sem lugar exato ou medida não deixa avançar');
   r=await A.evaluate(()=>{A.wNext();const w=ui.sheet.w;w.entrega=now()+20*DIA;w.step=4;render();const resumo=document.getElementById('sheet').innerText;const n0=state.pedidos.length;A.wCriar();const ped=state.pedidos[state.pedidos.length-1];const ls=lotesDe(ped.id);
-    const G=gruposFicha(ls);const f=docFicha(G[0],ped,1,1,G.length);const a=arqById(ls[0].pers[0].bord);
+    const G=gruposFicha(ls);const f=docFicha(G[0],ped,1,1,G.length);const a=arqById(idsPz(ls[0].pers[0])[0]);
     return {criou:state.pedidos.length>n0,gens:ls.map(l=>l.gen).join(','),gM:ls[0].grade,gF:ls[1]&&ls[1].grade,mesmo:ls.length===2&&ls[0].prod===ls[1].prod&&ls[0].cor===ls[1].cor&&JSON.stringify(ls[0].pers)===JSON.stringify(ls[1].pers),
-      bord:ls.every(l=>l.pers[0].bord),cli:a&&a.cli===ped.cli,grupos:G.length,fichaMF:/MASCULINA/.test(f)&&/FEMININA/.test(f),resumoMF:/MASCULINA/.test(resumo)&&/FEMININA/.test(resumo),pid:ped.id}});
+      bord:ls.every(l=>idsPz(l.pers[0]).length),cli:a&&a.cli===ped.cli,grupos:G.length,fichaMF:/MASCULINA/.test(f)&&/FEMININA/.test(f),resumoMF:/MASCULINA/.test(resumo)&&/FEMININA/.test(resumo),pid:ped.id}});
   ok(r.criou&&r.gens==='M,F'&&r.mesmo,'vira duas peças (M e F) com as mesmas características');
   ok(r.gM&&r.gF&&Object.values(r.gM).reduce((a,b)=>a+b,0)===8&&Object.values(r.gF).reduce((a,b)=>a+b,0)===6,'cada uma com a sua grade (8 masculinas, 6 femininas)');
   ok(r.resumoMF,'a confirmação mostra masculina e feminina');
@@ -44,11 +44,11 @@ const APP='file://'+path.resolve(__dirname,'../app.html');const PNG=path.join(__
     const inp=document.querySelector('[data-imptam]');inp.value='10 cm';inp.dispatchEvent(new Event('change',{bubbles:true}));return {pend1,pend2:impPend(ui.sheet.grupos[0]),temTam,temArq,temTudo}});
   ok(r.pend1.some(x=>/medida da personalização/.test(x))&&!r.pend2.length,'importação exige a medida e aceita digitar na própria tela');
   ok(r.temArq,'importação tem "Pôr arquivo do bordado" em cada personalização');
-  await A.evaluate(()=>A.impPzArq({k:'0',j:'0',t:'bord'}));await A.setInputFiles('#fArq',PNG);await A.waitForTimeout(800);
-  r=await A.evaluate(()=>{const x=ui.sheet.grupos[0].itens[0].pers[0];const bord=!!x.bord;A.impWizard();const w=ui.sheet.w;
-    const ok1=ui.sheet.t==='novo'&&w.step===2&&w.itens.length===1&&w.itens[0].pers[0].tam==='10 cm'&&!!w.itens[0].pers[0].bord&&!!document.querySelector('[data-ptam="0|0"]');
+  await A.evaluate(()=>A.impPzArq({k:'0',j:'0',t:'arqs'}));await A.setInputFiles('#fArq',PNG);await A.waitForTimeout(800);
+  r=await A.evaluate(()=>{const x=ui.sheet.grupos[0].itens[0].pers[0];const bord=!!idsPz(x).length;A.impWizard();const w=ui.sheet.w;
+    const ok1=ui.sheet.t==='novo'&&w.step===2&&w.itens.length===1&&w.itens[0].pers[0].tam==='10 cm'&&!!idsPz(w.itens[0].pers[0]).length&&!!document.querySelector('[data-ptam="0|0"]');
     A.wGen({k:'0',v:'MF'});document.querySelector('[data-qf="0"][data-s="G"]').value=3;wRead();A.wNext();w.step=4;render();A.wCriar();const ped=state.pedidos.find(p=>p.ficha==='9701');const ls=ped?lotesDe(ped.id):[];
-    return {bord,ok1,ped:!!ped,id:ped&&ped.id,fonte:ped&&ped.fonte,gens:ls.map(l=>l.gen).join(','),bord2:ls.every(l=>l.pers[0].bord)}});
+    return {bord,ok1,ped:!!ped,id:ped&&ped.id,fonte:ped&&ped.fonte,gens:ls.map(l=>l.gen).join(','),bord2:ls.every(l=>idsPz(l.pers[0]).length)}});
   ok(r.bord,'arquivo do bordado anexado na tela de importação');
   ok(r.ok1,'"Editar tudo" abre o formulário completo com o que foi lido (medida e arquivo incluídos)');
   ok(r.ped&&r.id==='9701'&&r.fonte==='ficha'&&r.gens==='M,F'&&r.bord2,'pedido importado criado pelo formulário completo, com masculina e feminina');

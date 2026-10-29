@@ -596,3 +596,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Botões: **Enviar no WhatsApp**, **Baixar PDF**, **Imprimir** e Copiar o texto.
 - O carrinho de cada item marca como comprado em todos os pedidos de uma vez.
 - Embaixo aparece o que já foi comprado e está esperando chegar.
+
+---
+
+## Anexos: vários arquivos, num lugar só, e no QR code
+
+**O que mudou:**
+- Cada personalização aceita **vários arquivos**: imagem do que vai ser bordado, programa do bordado (.dst, .emb, .pes…), arte.
+- No pedido, o bloco **Anexos** mostra tudo num lugar só: do pedido (logo da empresa e outros) e de cada personalização, com **Baixar**, **Tirar**, **Anexar** e **Baixar todos**.
+- Na ficha que abre pelo **QR code** da etiqueta tem o botão **Anexos**: o prestador (e a fábrica) baixa os arquivos daquela peça.
