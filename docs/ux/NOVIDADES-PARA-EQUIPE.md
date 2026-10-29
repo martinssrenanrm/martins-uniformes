@@ -615,3 +615,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Cada item da lista agora tem os mesmos **3 botões** do pedido: **Já tem** (sai do estoque), **Comprei** (libera a produção) e **Em falta** (fica na lista). Vale para todos os pedidos daquele item de uma vez.
 - Item no lugar errado? Toque em **É tecido? Mover** (ou **É aviamento? Mover**) embaixo dele. Só muda a lista de compras, não o que trava o corte.
 - No Escritório, cada compra mostra se é **Tecido** ou **Aviamento**.
+
+---
+
+## Logo na manga sem travar, e filtro de pedidos com vários de uma vez
+
+**O que mudou:**
+- **Novo pedido › Personalização:** ao tocar em **Manga esquerda**, **Manga direita** ou **Costas**, aparece logo abaixo **onde exatamente** (ex.: Ombro, Meio da manga, Perto da barra). Não precisa mais apagar e criar de novo para o Próximo funcionar.
+- Pedido que já estava com "Falta: lugar exato" mostra o campo no próprio logo: é só escolher.
+- **Pedidos › Filtrar:** dá para marcar **vários** ao mesmo tempo. O atalho **Em produção** mostra Atrasando, Atenção e Em dia juntos. Toque em **Ver pedidos** para fechar. O filtro fica guardado no aparelho; para ver tudo, **Todos**.
