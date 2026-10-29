@@ -39,6 +39,8 @@ A Martins é o primeiro cliente, não o produto. O mesmo código vai servir outr
 - atualização de dados que mude conteúdo (só formato) ou que rode a cada abertura re-impondo dado apagado. Atualização nova = novo item no fim de `MIGRACOES` (v = último + 1); roda uma vez por banco e fica registrada em `schema`;
 - acesso fixo. Os primeiros acessos vêm de `clientes/<id>.json` (`admins`), só quando o banco não tem nenhum usuário.
 
+Insumos têm duas classificações separadas: **o que trava a produção** (tecido em metros trava o corte; o resto trava costura/acabamento) e **quem compra** (`catIns`: padrão tecido = metros, aviamento = resto; cada fábrica muda por item em `state.catIns`, chave = nome sem a cor). Não misture as duas.
+
 Textos que citam quem procurar usam `SUPORTE()`, `gestoresTxt()` e `NOME_EMP()`. Dados de demonstração ficam só em `seed()` e são marcados com `exemplo:true`.
 
 ## Testes

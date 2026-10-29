@@ -376,7 +376,7 @@ h2{font-size:24px;margin:0 0 10px;text-wrap:balance}
 .subtabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
 .subtab{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:10px 16px;font-weight:700;font-size:18px}
 .subtab svg.ic{width:26px;height:26px}
-.subtab[aria-current="page"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.subtab[aria-current="page"],.subtab[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .cad-row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px}
 .cad-row .m-ic{width:52px;height:52px}
 .cad-row b{display:block;font-size:20px}
@@ -987,6 +987,7 @@ body.com-undo #app{padding-bottom:80px}#undoF{position:fixed;left:max(12px,env(s
 .comp-bt{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 14px;margin:0 0 12px;border:2px solid var(--line-btn);border-radius:14px;background:var(--card,#fff);font:inherit;color:inherit;text-align:left;cursor:pointer}.comp-bt span{flex:1;display:flex;flex-direction:column}.comp-bt small{color:var(--muted);font-size:16px}
 .lc{padding:30px 40px 56px;display:flex;flex-direction:column;gap:12px}.lc-d{text-align:right;font-weight:700;font-size:18px}.lc-d small{font-weight:400;font-size:13px}.lc-t{width:100%;border-collapse:collapse;font-size:15px}.lc-t th{background:#e6e6e6;text-align:left;padding:6px 8px;font-size:13px;letter-spacing:.06em}.lc-t td{border-bottom:1px solid #999;padding:7px 8px;vertical-align:top}.lc-t .ck{width:28px;font-size:22px;text-align:center}.lc-t .q{white-space:nowrap;font-weight:700}.lc-t{table-layout:fixed}.lc-t th:nth-child(2){width:44%}.lc-t th:nth-child(3){width:20%}.lc-t th:nth-child(4){width:36%}.lc-t .lc-pp{font-size:13px}.lc-t td b{display:inline;font-size:inherit;margin:0;padding:0;text-align:left}.lc-t td:nth-child(2) b{font-size:16px}.lc-t small{color:#555}.lc-sec td{background:#f2f2f2;font-weight:700;padding-top:12px}.lc-p td{color:#555}.colorida .lc-t th{background:#E3EDFB}
 .anx-l{display:flex;flex-direction:column;gap:6px;margin-top:6px}.anx{display:flex;align-items:center;gap:10px;min-height:48px}.anx .aq-th{width:44px;height:44px;flex:none}.anx-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;display:flex;flex-direction:column;font-size:16px}.anx-n b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.anx-n small{color:var(--muted)}.anx-g{border-top:1px solid var(--line);padding:10px 0}.anx-g>small{color:var(--muted)}.anx-l>.x{align-self:flex-start}.pub-anx{margin:0 0 14px}
+.lc-mv{font-size:15px;padding:2px 10px;min-height:32px;color:var(--blue,#2563eb);display:block;margin-top:4px}
 .fin-l{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:17px}.fin-l b{white-space:nowrap}.fin-t{border-bottom:0;font-size:19px}
 </style>
 
@@ -1541,7 +1542,7 @@ function tarefasEsc(){const out=[];
     if(!ped.artePrep)T({f:'arte_prep',i:'i-arte',t:tN('arte_prep','Preparar a arte'),a:'artePrep'});
     else if(!ped.arte)T({f:'arte_aprov',i:'i-arte',t:tN('arte_aprov','Aprovar a arte com o cliente'),a:'arte'});
     {const nc=ped.materiais.filter(m=>!m.conf).length;if(nc)T({f:'conferir',i:'i-lupa',t:tN('conferir','Conferir insumos'),sub:`${nc} ${nc===1?'item':'itens'}: tecido, linhas e aviamentos`,a:'insumos'})}
-    ped.materiais.forEach((m,k)=>{if(m.conf&&m.st==='comprar')T({f:'comprar',i:'i-carrinho',t:`Comprar ${m.item}`,sub:m.falta!=null?'Faltam '+faltaTxt(m)+' (conferido no estoque)':qtdTxt(m.nec-m.est,m.un)+' · estimativa, confira o estoque',a:'comprei',k});
+    ped.materiais.forEach((m,k)=>{if(m.conf&&m.st==='comprar')T({f:'comprar',i:'i-carrinho',t:`Comprar ${m.item}`,cat:catIns(m),sub:(catIns(m)==='tecido'?'Tecido · ':'Aviamento · ')+(m.falta!=null?'Faltam '+faltaTxt(m)+' (conferido no estoque)':qtdTxt(m.nec-m.est,m.un)+' · estimativa, confira o estoque'),a:'comprei',k});
       if(m.st==='pedido')T({f:'comprar',i:'i-caminhao',t:`Receber ${m.item}`,sub:'Comprado, esperando chegar',a:'chegou',k})});
     lotesDe(ped.id).filter(l=>!l.rework).forEach(l=>rp(l).steps.filter(z=>z.pers&&!done(l,z.id)&&!arteOk(ped,l,z)).forEach(z=>{if(!arteAprovada(ped))return;const fo=isExt(z)?fornEtapa(l,z):null;
       T({f:'arte_env',i:'i-arte',t:`${tN('arte_env','Enviar arte')}: ${z.nome}`,sub:`${prod(l.prod).nome} ${modeloTxt(l)} → ${fo?fo.nome:tipo(z.posto).nome}`,a:'arteEnv',l:l.id,s:z.id})}));
@@ -2657,7 +2658,8 @@ const FAQ=[
 {c:'esc',q:'Como marco que as fichas e os mockups (vias) foram separados?',k:'vias separar fichas mockups separei',r:['Escritório › Pedidos: tarefa "Separar as vias" → toque em Separei.','Ou abra o pedido e toque em Vias separadas, em "Antes de cortar".'],ir:'fab:esc'},
 {c:'esc',q:'Como confiro os tecidos e aviamentos (insumos) de um pedido?',k:'conferir insumos tecidos aviamentos estoque material conferência',r:['Escritório › Lista de compras: "Conferir insumos" → toque em Conferir (ou abra o pedido e toque em Insumos conferidos).','Vá até o estoque e, em cada item, toque em Tem ou Falta.','No Falta, escreva quanto falta, escolha a unidade (unidade, metro ou Kg) e toque em Pôr na lista de compras.','A lista de compras mostra exatamente o que falta.','Ao lado de cada quantidade aparece para quantas peças ela é (ex.: ≈ 14 metros para 15 Blusa de Agasalho). Assim dá para conferir a conta sem abrir a ficha.','Ao tocar em Falta, aparece também quanto dá por peça (ex.: ≈ 0,93 m por peça), para ver se a quantidade está dentro do normal.']},
 {c:'esc',q:'Faltou um item na conferência. Como acrescento?',k:'faltou item acrescentar incluir zíper entretela botão conferência insumo novo',r:['Abra a conferência (Conferir insumos).','Em "Faltou algum item na lista?", escreva o nome, a quantidade e a unidade.','Toque em Pôr. Depois toque em Tem ou Falta nele.']},
-{c:'esc',q:'Onde vejo tudo que falta comprar? Dá para imprimir ou mandar no WhatsApp?',k:'lista de compras falta comprar imprimir pdf whatsapp enviar fornecedor compra tudo',r:['Fábrica › Escritório › Lista de compras (no alto da tela).','Aparece tudo que falta comprar dos pedidos abertos, somado por item, com o pedido e a data de entrega.','Toque em Enviar no WhatsApp, Baixar PDF ou Imprimir.','Comprou? Toque no carrinho do item: ele sai da lista em todos os pedidos.']},
+{c:'esc',q:'Onde vejo tudo que falta comprar? Dá para imprimir ou mandar no WhatsApp?',k:'lista de compras falta comprar imprimir pdf whatsapp enviar fornecedor compra tudo',r:['Fábrica › Escritório › Lista de compras (no alto da tela).','Aparece tudo que falta comprar dos pedidos abertos, somado por item, com o pedido e a data de entrega.','Toque em Enviar no WhatsApp, Baixar PDF ou Imprimir.','Em cada item tem os 3 botões: caixa (Já tem, sai do estoque), carrinho (Comprei, libera a produção) e alerta (Em falta, fica na lista). Vale para todos os pedidos daquele item.']},
+{c:'esc',q:'Dá para separar a lista: uma só de tecidos, outra só de aviamentos?',k:'separar dividir malharia armarinho quem compra aba mover categoria',r:['Na Lista de compras, toque em Tecidos ou em Aviamentos (no alto).','O WhatsApp, o PDF e o Imprimir mandam só o que está na aba escolhida. Assim cada um recebe só o que vai comprar.','O app lembra a última aba usada no aparelho.','Algum item caiu no lugar errado (ex.: a gola ribana que vem da malharia)? Toque em \'É tecido? Mover\' embaixo dele. Vale para todas as cores daquele item.','Mover só muda a lista de compras. O que trava o corte e a costura continua igual.']},
 {c:'esc',q:'Comprei o material. Como registro?',k:'comprei compra comprar material tecido aviamento lista de compras',r:['Escritório › Lista de compras: "Comprar …" → toque em Comprei.','Quando chegar: "Receber …" → toque em Chegou.'],ir:'fab:esc'},
 {c:'esc',q:'Como entrego o pedido ao cliente?',k:'entregar entregue finalizar pedido concluir cliente',r:['Quando tudo estiver pronto aparece a tarefa "Entregar ao cliente" (Escritório › Logística) e um botão grande no pedido.','Toque em Entregue e confirme em Sim, entregar. O pedido sai da lista de abertos.','Tocou sem querer? Na pergunta, toque em Cancelar.'],ir:'fab:esc'},
 {c:'esc',q:'O que quer dizer "Chamar app para levar"?',k:'chamar app uber motoboy aplicativo entrega',r:['A pessoa responsável faz levar e buscar chamando um aplicativo de entrega.','Isso se marca no cadastro da pessoa: "Leva e entrega chamando aplicativo".']},
@@ -3544,27 +3546,41 @@ function paginasDoc(e){const ped=pedById(e.id),ls=lotesDe(e.id).filter(l=>!l.rew
   grp.forEach(g=>{const n=todos.indexOf(g)+1,N=todos.length;for(let v=1;v<=e.vias;v++)P.push(docFicha(g,ped,v,n,N,e.cinza[g.find(x=>x.mock)?.id||g[0].id],e.pb))});
   if(e.mocks)ls.forEach((l,i)=>{if(l.mock)P.push(docMockPag(l,ped,i+1,ls.length))});return P}
 /* Lista de compras (pedido de 28/10): tudo que falta comprar, de todos os pedidos abertos, somado por item. Para imprimir, PDF ou WhatsApp. */
-function listaCompras(){const M=new Map();const add=(sec,ped,m,k)=>{const un=m.unF||m.un,q=Math.max(0,m.falta!=null?+m.falta:(m.nec-(m.est||0)));const key=sec+'|'+m.item+'|'+un;let o=M.get(key);if(!o)M.set(key,o={sec,item:m.item,un,q:0,est:false,peds:[],refs:[]});o.q+=q;if(!m.conf)o.est=true;
+/* Categoria de COMPRA do insumo (pedido de 29/10: tecido e aviamento são comprados por pessoas diferentes).
+   Padrão para qualquer confecção: o que o sistema calcula em metros (tecido da peça e cores secundárias) é Tecido; o resto é Aviamento.
+   Cada fábrica pode mudar um item (ex.: gola ribana comprada na malharia) em state.catIns[nome sem a cor]. Não muda o que trava o corte. */
+const baseIns=item=>{const c=Object.keys(state.cores||{}).sort((a,b)=>b.length-a.length).find(c=>item.toLowerCase().endsWith(' '+c.toLowerCase()));return c?item.slice(0,-c.length-1).trim():item};
+const catIns=m=>(state.catIns||{})[baseIns(m.item)]||(m.un==='m'?'tecido':'aviamento');
+/* Os 3 botões (Já tem / Comprei / Em falta) num insumo. Usado no pedido, no Kanban e na Lista de compras somada. Devolve o que saiu do estoque. */
+function marcaIns(m,modo){const est=state.estoque;if(m.baixa){est[m.item]=(est[m.item]||0)+m.baixa;delete m.baixa}delete m.falta;delete m.unF;m.conf=true;
+  if(modo==='tem'){const tem=est[m.item]||0,b=Math.min(m.nec,tem);if(b>0){est[m.item]=Math.round((tem-b)*1000)/1000;m.baixa=b}m.st='ok';return b>0?b:0}
+  if(modo==='comprei'){m.st='recebido';m.tComprado=m.tComprado||now()}else m.st='comprar';return 0}
+const CAT_INS={tecido:'Tecidos',aviamento:'Aviamentos'};
+function listaCompras(cat){const M=new Map();const add=(sec,ped,m,k)=>{const un=m.unF||m.un,q=Math.max(0,m.falta!=null?+m.falta:(m.nec-(m.est||0)));const ct=catIns(m);if(cat&&cat!=='tudo'&&ct!==cat)return;const key=sec+'|'+m.item+'|'+un;let o=M.get(key);if(!o)M.set(key,o={sec,cat:ct,item:m.item,un,q:0,est:false,peds:[],refs:[]});o.q+=q;if(!m.conf)o.est=true;
     if(!o.peds.some(p=>p.id===ped.id))o.peds.push({id:ped.id,cli:ped.cliente,ent:ped.entrega,evento:!!ped.evento});o.refs.push([ped.id,k])};
   state.pedidos.filter(p=>!p.concluido&&!p.cancelado).forEach(ped=>(ped.materiais||[]).forEach((m,k)=>{if(m.st==='comprar')add('comprar',ped,m,k);else if(m.st==='pedido')add('chegar',ped,m,k)}));
   const L=[...M.values()].map(o=>({...o,q:Math.ceil(o.q*100)/100,ent:Math.min(...o.peds.map(p=>p.ent||Infinity))}));L.sort((a,b)=>a.ent-b.ent||a.item.localeCompare(b.item));
   return {comprar:L.filter(o=>o.sec==='comprar'),chegar:L.filter(o=>o.sec==='chegar')}}
 const qtdC=o=>qtdTxt(o.q,o.un).replace('≈ ','');
 const pedsC=o=>o.peds.map(p=>`${p.evento?'★ ':''}${p.cli} (pedido ${p.id}, entrega ${p.ent?dataCurta(p.ent).slice(0,5):'—'})`).join('; ');
-function docCompras(L){const mk=marca(),hoje=dataCurta(now()),P=[],POR=20;const linhas=L.comprar.map(o=>({o,s:'c'})).concat(L.chegar.length?[{t:'Já comprado, esperando chegar'}]:[],L.chegar.map(o=>({o,s:'p'})));
+function docCompras(L,tit){const mk=marca(),hoje=dataCurta(now()),P=[],POR=20;tit=tit||'';const linhas=L.comprar.map(o=>({o,s:'c'})).concat(L.chegar.length?[{t:'Já comprado, esperando chegar'}]:[],L.chegar.map(o=>({o,s:'p'})));
   for(let i=0;i<Math.max(1,linhas.length);i+=POR){const pg=linhas.slice(i,i+POR),n=P.length+1;
-    P.push(`<div class="a4 lc"><div class="fp-top"><div><div class="fp-k">LISTA DE COMPRAS</div><div class="fp-cli">${esc(mk.nome)}</div></div><div class="lc-d">${hoje}<br><small>${L.comprar.length} ${L.comprar.length===1?'item':'itens'} para comprar</small></div></div>
+    P.push(`<div class="a4 lc"><div class="fp-top"><div><div class="fp-k">LISTA DE COMPRAS${tit?' · '+esc(tit.toUpperCase()):''}</div><div class="fp-cli">${esc(mk.nome)}</div></div><div class="lc-d">${hoje}<br><small>${L.comprar.length} ${L.comprar.length===1?'item':'itens'} para comprar</small></div></div>
       <table class="lc-t"><tr><th class="ck"></th><th>ITEM</th><th>QUANTO</th><th>PARA</th></tr>${pg.map(x=>x.t?`<tr class="lc-sec"><td colspan="4">${esc(x.t)}</td></tr>`:`<tr${x.s==='p'?' class="lc-p"':''}><td class="ck">${x.s==='p'?'✓':'☐'}</td><td><b>${esc(x.o.item)}</b>${x.o.est?'<br><small>estimativa: confira o estoque</small>':''}</td><td class="q">${esc(qtdC(x.o))}</td><td class="lc-pp">${x.o.peds.map(p=>`${p.evento?'<b>★ EVENTO</b> ':''}${esc(p.cli)} · ${esc(p.id)} · <b>${p.ent?dataCurta(p.ent).slice(0,5):'—'}</b>`).join('<br>')}</td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;padding:30px">Nada para comprar agora.</td></tr>'}</table>
       <div class="fp-rod"><span>${esc(mk.nome)} · Lista de compras · ${hoje}</span><span>Página ${n}</span></div></div>`)}
   return P}
-function textoCompras(L){const t=[`*Lista de compras · ${marca().nome} · ${dataCurta(now())}*`,''];
+function textoCompras(L,tit){const t=[`*Lista de compras${tit?' · '+tit:''} · ${marca().nome} · ${dataCurta(now())}*`,''];
   L.comprar.forEach(o=>t.push(`☐ *${o.item}*: ${qtdC(o)}${o.est?' (estimativa)':''}`,`   para ${pedsC(o)}`));if(!L.comprar.length)t.push('Nada para comprar agora.');
   if(L.chegar.length){t.push('','_Já comprado, esperando chegar:_');L.chegar.forEach(o=>t.push(`✓ ${o.item}: ${qtdC(o)}`))}return t.join('\n')}
-function sCompras(){const L=listaCompras();
+const compCat=()=>{if(!ui.compCat){try{ui.compCat=localStorage.getItem('comp-cat')||'tudo'}catch(e){ui.compCat='tudo'}}return ui.compCat};
+const compTit=()=>compCat()==='tudo'?'':CAT_INS[compCat()];
+const estC=o=>{const ms=o.refs.map(([p,k])=>pedById(p).materiais[k]);return ms.every(m=>m.conf&&m.st==='comprar')?'falta':''};
+function sCompras(){const c=compCat(),L=listaCompras(c),T=listaCompras('tecido').comprar.length,Av=listaCompras('aviamento').comprar.length;
   return `${voltar()}<h1>Lista de compras</h1><p class="sub-l">Tudo que falta comprar nos pedidos abertos, somado por item. O que entrega antes aparece primeiro.</p>
+  <div class="subtabs" role="tablist" style="margin-bottom:12px">${[['tudo','Tudo',T+Av],['tecido','Tecidos',T],['aviamento','Aviamentos',Av]].map(([v,n,q])=>`<button class="subtab" data-a="compCatV" data-v="${v}" aria-pressed="${c===v}">${n} (${q})</button>`).join('')}</div>${c!=='tudo'?`<p class="dica" style="margin:-4px 0 10px">WhatsApp, PDF e Imprimir mandam só os ${esc(CAT_INS[c].toLowerCase())}.</p>`:''}
   <div class="acoes" style="margin-top:0"><button class="big go" data-a="compWhats">${ic('i-mao')}Enviar no WhatsApp</button><button class="big neutro" data-a="compPdf">${ic('i-lista')}Baixar PDF</button><button class="big neutro" data-a="compPrint">Imprimir</button></div>
   <button class="x azul" data-a="compCopia" style="margin:0 0 12px">Copiar o texto da lista</button>
-  <div class="card"><h2>Para comprar (${L.comprar.length})</h2>${L.comprar.map(o=>`<div class="mat"><span class="m-ic">${ic('i-carrinho')}</span><div><b>${esc(o.item)}</b><span>${esc(qtdC(o))}${o.est?' · estimativa, confira o estoque':''}<br>${esc(pedsC(o))}</span></div><button class="ins3-b ins3-comprei" data-a="compComprei" data-i="${esc(o.item)}" data-u="${esc(o.un)}" title="Comprei: libera para a produção" aria-label="Comprei ${esc(o.item)}">${ic('i-carrinho')}</button></div>`).join('')||'<p class="dica">Nada para comprar agora.</p>'}</div>
+  ${insLeg()}<div class="card"><h2>Para comprar (${L.comprar.length})</h2>${L.comprar.map(o=>{const e=estC(o);return `<div class="mat ins-row"><div><b>${esc(o.item)}</b><span>${esc(qtdC(o))}${o.est?' · estimativa, confira o estoque':''}<br>${esc(pedsC(o))}</span><button class="x lc-mv" data-a="compMove" data-i="${esc(o.item)}">${o.cat==='tecido'?'É aviamento? Mover':'É tecido? Mover'}</button></div><div class="ins3" role="group" aria-label="${esc(o.item)}">${INS_B.map(([v,i,t])=>`<button class="ins3-b ins3-${v}" data-a="compMarca" data-i="${esc(o.item)}" data-u="${esc(o.un)}" data-m="${v}" aria-pressed="${e===v}" title="${t}" aria-label="${t}: ${esc(o.item)}">${ic(i)}</button>`).join('')}</div></div>`}).join('')||'<p class="dica">Nada para comprar agora.</p>'}</div>
   ${L.chegar.length?`<div class="card"><h2>Já comprado, esperando chegar (${L.chegar.length})</h2>${L.chegar.map(o=>`<div class="mat"><span class="m-ic">${ic('i-caminhao')}</span><div><b>${esc(o.item)}</b><span>${esc(qtdC(o))} · ${esc(pedsC(o))}</span></div><span></span></div>`).join('')}</div>`:''}`}
 function sDoc(){const e=ui.sheet,ped=pedById(e.id),P=paginasDoc(e);
   if(e.tipo==='etq'){const np=P.filter(h=>h.includes('tq-pac')).length;return `${voltar()}<h1>Etiquetas do corte</h1>
@@ -4094,10 +4110,15 @@ const A={
   cliApRm:d=>{const c=cliById(ui.sheet.id);snap();c.apelidos.splice(+d.j,1);commit()},
   apRm:d=>{snap();delete state.apelidos[d.k][d.v];commit()},
   compras:()=>openSheet({t:'compras'}),
-  compPdf:async()=>{const b=document.querySelector('[data-a=compPdf]');if(b)b.disabled=true;try{await gerarPdf(docCompras(listaCompras()),nomeArq(`Lista de compras ${dataCurta(now()).replace(/\//g,'-')}.pdf`))}catch(er){toast('Não consegui gerar o PDF. Verifique a internet e tente de novo, ou use Imprimir.',false)}finally{if(b)b.disabled=false}},
-  compPrint:()=>{const R=document.getElementById('docRender');R.innerHTML=docCompras(listaCompras()).join('');document.body.classList.add('imprimindo');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('imprimindo');R.innerHTML=''},500)},150)},
-  compWhats:async()=>{const t=textoCompras(listaCompras());try{if(navigator.share){await navigator.share({text:t});return}}catch(e){if(e&&e.name==='AbortError')return}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')},
-  compCopia:async()=>{const t=textoCompras(listaCompras());try{await navigator.clipboard.writeText(t);toast('Lista copiada: cole no WhatsApp',false)}catch(e){toast('Não consegui copiar. Use Enviar no WhatsApp.',false)}},
+  compCatV:d=>{ui.compCat=d.v;try{localStorage.setItem('comp-cat',d.v)}catch(e){}render()},
+  compMove:d=>{const b=baseIns(d.i),m0=state.pedidos.flatMap(p=>p.materiais||[]).find(m=>m.item===d.i);const atual=m0?catIns(m0):'aviamento',nova=atual==='tecido'?'aviamento':'tecido';snap();state.catIns={...(state.catIns||{})};const padrao=m0&&m0.un==='m'?'tecido':'aviamento';if(nova===padrao)delete state.catIns[b];else state.catIns[b]=nova;commit();toast(`${b}: agora em ${CAT_INS[nova]} (vale para todas as cores)`,true)},
+  compMarca:d=>{const o=listaCompras().comprar.find(x=>x.item===d.i&&x.un===d.u);if(!o)return;snap();let saiu=0;
+    o.refs.forEach(([pid,k])=>{saiu+=marcaIns(pedById(pid).materiais[k],d.m)});
+    RC={};commit();toast(`${d.i}: ${d.m==='tem'?'já tem'+(saiu?` (saiu ${qtdTxt(saiu,o.un)} do estoque)`:''):d.m==='comprei'?'comprado':'em falta (confirmado)'} em ${o.peds.length} ${o.peds.length>1?'pedidos':'pedido'}`,true)},
+  compPdf:async()=>{const b=document.querySelector('[data-a=compPdf]');if(b)b.disabled=true;try{await gerarPdf(docCompras(listaCompras(compCat()),compTit()),nomeArq(`Lista de compras${compTit()?' '+compTit():''} ${dataCurta(now()).replace(/\//g,'-')}.pdf`))}catch(er){toast('Não consegui gerar o PDF. Verifique a internet e tente de novo, ou use Imprimir.',false)}finally{if(b)b.disabled=false}},
+  compPrint:()=>{const R=document.getElementById('docRender');R.innerHTML=docCompras(listaCompras(compCat()),compTit()).join('');document.body.classList.add('imprimindo');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('imprimindo');R.innerHTML=''},500)},150)},
+  compWhats:async()=>{const t=textoCompras(listaCompras(compCat()),compTit());try{if(navigator.share){await navigator.share({text:t});return}}catch(e){if(e&&e.name==='AbortError')return}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')},
+  compCopia:async()=>{const t=textoCompras(listaCompras(compCat()),compTit());try{await navigator.clipboard.writeText(t);toast('Lista copiada: cole no WhatsApp',false)}catch(e){toast('Não consegui copiar. Use Enviar no WhatsApp.',false)}},
   compComprei:d=>{const L=listaCompras().comprar.find(o=>o.item===d.i&&o.un===d.u);if(!L)return;snap();L.refs.forEach(([pid,k])=>{const m=pedById(pid).materiais[k];if(m.baixa){state.estoque[m.item]=(state.estoque[m.item]||0)+m.baixa;delete m.baixa}m.conf=true;m.st='recebido';m.tComprado=m.tComprado||now()});RC={};commit();toast(`${d.i}: comprado em ${L.peds.length} ${L.peds.length>1?'pedidos':'pedido'}`,true)},
   docProd:d=>abreDoc('prod',d.id),
   docEtq:d=>abreDoc('etq',d.id),
@@ -4311,10 +4332,7 @@ const A={
   trocaSel:d=>{snap();{const t=tarefasEsc().find(x=>x.key===ui.sheet.key);if(t)registrar({tipo:'troca',f:t.f,de:t.resp||'',para:d.v||'',ped:t.ped.id,cli:t.ped.cliente,step:t.t})}if(d.v)state.atrib[ui.sheet.key]=d.v;else delete state.atrib[ui.sheet.key];ui.sheet=null;commit();toast(d.v?`Tarefa passada para ${pNome(d.v)}`:'O sistema volta a escolher')},
   xFun:d=>{eRead();const e=ui.sheet;togl(e.funcoes,d.v);if(!e.funcoes.includes(d.v))e.melhor=e.melhor.filter(x=>x!==d.v);render()},
   xApp:d=>{eRead();ui.sheet.viaApp=!ui.sheet.viaApp;render()},
-  insMarca:d=>{const p=pedById(d.id),m=p&&p.materiais[+d.k];if(!m)return;snap();const est=state.estoque;
-    if(m.baixa){est[m.item]=(est[m.item]||0)+m.baixa;delete m.baixa}delete m.falta;delete m.unF;m.conf=true;
-    if(d.m==='tem'){const tem=est[m.item]||0,b=Math.min(m.nec,tem);if(b>0){est[m.item]=Math.round((tem-b)*1000)/1000;m.baixa=b}m.st='ok'}
-    else if(d.m==='comprei'){m.st='recebido';m.tComprado=m.tComprado||now()}else m.st='comprar';
+  insMarca:d=>{const p=pedById(d.id),m=p&&p.materiais[+d.k];if(!m)return;snap();marcaIns(m,d.m);
     RC={};commit();toast(`${m.item}: ${d.m==='tem'?'já tem'+(m.baixa?` (saiu ${qtdTxt(m.baixa,m.un)} do estoque)`:''):d.m==='comprei'?'comprado, liberado':'em falta, na lista de compras'}`,true)},
   comprei:d=>{const p=pedById(d.id);snap();p.materiais[+d.k].st='pedido';commit();toast('Compra anotada',true)},
   chegou:d=>{const p=pedById(d.id);snap();p.materiais[+d.k].st='recebido';commit();toast('Material chegou',true)},

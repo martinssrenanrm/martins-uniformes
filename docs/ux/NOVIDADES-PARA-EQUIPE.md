@@ -605,3 +605,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Cada personalização aceita **vários arquivos**: imagem do que vai ser bordado, programa do bordado (.dst, .emb, .pes…), arte.
 - No pedido, o bloco **Anexos** mostra tudo num lugar só: do pedido (logo da empresa e outros) e de cada personalização, com **Baixar**, **Tirar**, **Anexar** e **Baixar todos**.
 - Na ficha que abre pelo **QR code** da etiqueta tem o botão **Anexos**: o prestador (e a fábrica) baixa os arquivos daquela peça.
+
+---
+
+## Lista de compras: Tecidos e Aviamentos separados, com os 3 botões
+
+**O que mudou:**
+- No alto da **Lista de compras** tem as abas **Tudo**, **Tecidos** e **Aviamentos**. Cada aba manda no WhatsApp, PDF e Imprimir só o que é dela: um compra o tecido, outro compra os aviamentos.
+- Cada item da lista agora tem os mesmos **3 botões** do pedido: **Já tem** (sai do estoque), **Comprei** (libera a produção) e **Em falta** (fica na lista). Vale para todos os pedidos daquele item de uma vez.
+- Item no lugar errado? Toque em **É tecido? Mover** (ou **É aviamento? Mover**) embaixo dele. Só muda a lista de compras, não o que trava o corte.
+- No Escritório, cada compra mostra se é **Tecido** ou **Aviamento**.
