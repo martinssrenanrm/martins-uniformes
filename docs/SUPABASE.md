@@ -6,7 +6,7 @@
 - **Dados levados:** 135 documentos, conferidos por coleção.
 - **Para publicar uma mudança:** rode `tools/build.js` com a URL e a chave pública do projeto, faça o commit de `site/` e o push. A automação publica em cerca de 1 minuto.
 - **Pendência:** apagar as funções desligadas `public.importar_docs` e `public.exportar_docs`, usadas só na migração. Ninguém tem permissão de usá-las. O conector do Claude não roda `drop` sem confirmação; apague pelo SQL Editor do Supabase.
-- **Banco versionado:** tudo o que existe no banco está em `supabase/migrations/` (001 tabela e regras, 002 ficha pública do QR, 003 permissões, 004 anexos no QR). Mudança nova no banco = arquivo novo numerado.
+- **Banco versionado:** tudo o que existe no banco está em `supabase/migrations/` (001 tabela e regras, 002 ficha pública do QR, 003 permissões, 004 anexos no QR, 005 sincronização leve). Mudança nova no banco = arquivo novo numerado.
 
 **Objetivo:** abrir o app em qualquer navegador, só com o e-mail e a senha do app, sem conta Claude.
 
@@ -75,3 +75,12 @@ O teste usa um Supabase simulado e confere:
 - **Senhas:** as senhas atuais não passam para o Supabase (ficam guardadas de outro jeito). Cada pessoa faz o **primeiro acesso uma vez** no endereço novo.
 - **E-mail:** o envio padrão do Supabase permite poucos e-mails por hora. Para uma equipe pequena basta. Se crescer, configure um SMTP próprio.
 - **Permissões:** só a gestão cria, muda ou apaga acessos, e isso vale no banco, não só na tela (`003_permissoes.sql`). Fora isso, quem tem acesso lê e grava os dados da fábrica; o perfil Operação separa as telas.
+
+## Tráfego (egress) — cuidado no plano grátis
+Em 10/2026 o projeto foi pausado por passar da cota de tráfego (5 GB/mês no plano grátis). Causa: cada aparelho baixava todas as coleções a cada 2 minutos e a cada mudança, e o "ao vivo" mandava a linha inteira (inclusive pedaços de imagem) para todos.
+Desde a migração 005:
+- O ao vivo escuta só `docs_sinal` (caminho + hora, ~100 bytes). O aparelho baixa só o documento que mudou.
+- Ao abrir, o app usa a cópia guardada no aparelho e baixa só o que mudou desde então (cópia completa de novo a cada 3 dias).
+- Imagens e backups (`mockp`, `backupp`) não geram sinal: só são baixados quando alguém abre.
+- O app se atualiza sozinho quando sai versão nova (confere o endereço do site, não o banco).
+Regra para quem mexe: nunca ouvir a tabela `docs` inteira nem baixar coleções inteiras em intervalo. Conferir o uso em Supabase › Organization › Usage.

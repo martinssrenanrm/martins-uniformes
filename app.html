@@ -1727,7 +1727,7 @@ var MOCKG={};
 const IDB=(()=>{let p;const abre=()=>p||(p=new Promise((ok,er)=>{try{const r=indexedDB.open('martins-mock',1);r.onupgradeneeded=()=>r.result.createObjectStore('m');r.onsuccess=()=>ok(r.result);r.onerror=()=>er(r.error)}catch(e){er(e)}}));
   const tx=(modo,fn)=>abre().then(db=>new Promise(ok=>{const t=db.transaction('m',modo),q=fn(t.objectStore('m'));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>ok(null)})).catch(()=>null);
   const LK=k=>'martins-bin:'+k;
-  return {get:async k=>{const v=await tx('readonly',o=>o.get(k));if(v)return v;try{return localStorage.getItem(LK(k))}catch(e){return null}},
+  return {put:(k,v)=>tx('readwrite',o=>o.put(v,k)),get:async k=>{const v=await tx('readonly',o=>o.get(k));if(v)return v;try{return localStorage.getItem(LK(k))}catch(e){return null}},
     set:async(k,v)=>{const ok=await tx('readwrite',o=>o.put(v,k));const back=await tx('readonly',o=>o.get(k));if(back!==v){try{localStorage.setItem(LK(k),v)}catch(e){}}return ok}}})();
 const MOCK_PEND=(()=>{try{return new Set(JSON.parse(localStorage.getItem('martins-mockpend')||'[]'))}catch(e){return new Set()}})();
 const pendSalva=()=>{try{localStorage.setItem('martins-mockpend',JSON.stringify([...MOCK_PEND]))}catch(e){}};
@@ -4634,9 +4634,9 @@ function nuvemSalvar(){if(NV.modo!=='nuvem')return;const cur=paraDocs(state);con
   Object.keys(NV.last).forEach(p=>{if(!(p in cur))NV.Q.add(p)});NV.last=nl;nuvemEnviar()}
 async function nuvemEnviar(){if(NV.busy||!NV.db||!NV.Q.size)return;NV.busy=true;syncSt('salvando');let falhou=false;
   try{while(NV.Q.size){const p=NV.Q.values().next().value;const cur=paraDocs(state)[p];const ref=NV.db.doc(p);
-      try{if(!cur){const [col,idd]=p.split('/');if(col!=='log'&&NV.acked[p]){await NV.db.doc(`lixeira/${col}~${idd}~${Date.now().toString(36)}`).set({col,id:idd,data:NV.acked[p],ts:now(),por:quemNome()||''})}await ref.delete();delete NV.acked[p]}
+      try{if(!cur){const [col,idd]=p.split('/');if(col!=='log'&&NV.acked[p]){await NV.db.doc(`lixeira/${col}~${idd}~${Date.now().toString(36)}`).set({col,id:idd,data:NV.acked[p],ts:now(),por:quemNome()||''})}await ref.delete();delete NV.acked[p];sinGuarda()}
         else{const old=NV.acked[p];const pt=old?difPatch(old,cur):null;
-          if(!old||pt===null)await ref.set(cur);else if(Object.keys(pt).length)await ref.update(pt);NV.acked[p]=cur}
+          if(!old||pt===null)await ref.set(cur);else if(Object.keys(pt).length)await ref.update(pt);NV.acked[p]=cur;sinGuarda()}
         NV.Q.delete(p)}
       catch(e){const c=e&&e.code;if(c==='invalid_argument'&&NV.acked[p]){delete NV.acked[p];continue}
         if(c==='quota_exceeded'){NV.Q.delete(p);toast('O banco de dados encheu. Avise o Nico.',false);continue}
@@ -4654,8 +4654,30 @@ function nuvemAplicar(col,snap){let mudou=false;
   if(!mudou)return;const m={};Object.entries(NV.last).forEach(([p,j])=>m[p]=JSON.parse(j));
   const novo=normalizar(deDocs(m));['atrib'].forEach(k=>{if(!novo[k])novo[k]={}});state=novo;RC={};
   try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}nuvemRender()}
-function nuvemOuvir(){NV.subs.forEach(u=>u());NV.subs=[...COLS,'config','log'].map(c=>NV.db.collection(c).onSnapshot(sn=>nuvemAplicar(c,sn),e=>{if(e&&e.code==='revoked'){NV.pronto=false;NV.erro='sem-db';render()}}))}
-async function nuvemLer(){try{const old=await NV.db.collection('mockups').get();old.docs.forEach(d=>{const v=d.exists&&d.data();if(v&&v.img&&!MOCKG[d.id]){guardaMockG(d.id,v.img)}})}catch(e){}const cs=[...COLS,'config','log'];const sn=await Promise.all(cs.map(c=>NV.db.collection(c).get()));const m={};
+function nuvemOuvir(){NV.subs.forEach(u=>u());NV.subs=[];if(NV.sinal){NV.db.sinal.ouvir(()=>{clearTimeout(NV.tS);NV.tS=setTimeout(nuvemRefrescar,250)});return}NV.subs=[...COLS,'config','log'].map(c=>NV.db.collection(c).onSnapshot(sn=>nuvemAplicar(c,sn),e=>{if(e&&e.code==='revoked'){NV.pronto=false;NV.erro='sem-db';render()}}))}
+/* ===== Sincronização leve (Supabase com docs_sinal) =====
+   Antes: cada aparelho baixava TODAS as coleções a cada 2 minutos e a cada mudança (≈ 4 MB por vez) — estourou a cota do plano grátis em 10/2026.
+   Agora: abre com a cópia guardada no aparelho e baixa só o que mudou desde então; ao vivo, baixa só o documento que mudou. */
+const SYNC_COLS=()=>[...COLS,'config','log'];
+const SYNC_K='sync-cache',SYNC_FULL=3*864e5;
+const sinMenos=t=>new Date(new Date(t).getTime()-5000).toISOString();
+async function sinBusca(){const S=NV.db.sinal,cs=new Set(SYNC_COLS());const L=await S.sinais(NV.desde?sinMenos(NV.desde):null);const del=[],mud=[];NV.sinUpd=NV.sinUpd||{};
+  L.forEach(x=>{if(!cs.has(x.path.split('/')[0]))return;if(!NV.desde||x.upd>NV.desde)NV.desde=x.upd;if(NV.sinUpd[x.path]===x.upd)return;NV.sinUpd[x.path]=x.upd;(x.del?del:mud).push(x.path)});
+  const got=mud.length?await S.porPaths(mud):[];const dados={};got.forEach(x=>dados[x.path]=limpo(x.data));mud.forEach(p=>{if(!(p in dados))del.push(p)});return {del,dados}}
+async function nuvemLerSinal(){const S=NV.db.sinal;let ca=null;try{ca=await IDB.get(SYNC_K)}catch(e){}
+  if(ca&&ca.v===1&&ca.url===SB_CFG.url&&ca.desde&&Date.now()-(ca.full||0)<SYNC_FULL&&ca.m){NV.desde=ca.desde;NV.sinUpd=ca.upd||{};NV.syncFull=ca.full;const m={...ca.m};
+    const r=await sinBusca();r.del.forEach(p=>delete m[p]);Object.assign(m,r.dados);NV.syncN=Object.keys(r.dados).length;return m}
+  const desde=await S.ultimo();const r=await S.todos(SYNC_COLS());const m={};r.forEach(x=>m[x.path]=limpo(x.data));NV.desde=desde;NV.sinUpd={};NV.syncFull=Date.now();NV.syncN=r.length;return m}
+function sinGuarda(){if(!NV.sinal)return;clearTimeout(NV.tG);NV.tG=setTimeout(()=>{try{IDB.put(SYNC_K,{v:1,url:SB_CFG.url,desde:NV.desde,upd:NV.sinUpd,full:NV.syncFull||Date.now(),m:{...NV.acked}})}catch(e){}},2000)}
+async function nuvemRefrescarSinal(){if(NV.refr){NV.refrDe=true;return}NV.refr=true;
+  try{const r=await sinBusca();let mudou=false;
+    r.del.forEach(p=>{if(NV.Q.has(p))return;if(p in NV.last){delete NV.last[p];delete NV.acked[p];mudou=true}});
+    Object.entries(r.dados).forEach(([p,d])=>{if(NV.Q.has(p))return;const j=stab(d);NV.acked[p]=d;if(NV.last[p]===j)return;NV.last[p]=j;mudou=true});
+    if(mudou){const mm={};Object.entries(NV.last).forEach(([p,j])=>mm[p]=JSON.parse(j));const novo=normalizar(deDocs(mm));if(!novo.atrib)novo.atrib={};state=novo;RC={};try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}nuvemRender()}
+    if(mudou||r.del.length||Object.keys(r.dados).length)sinGuarda()}
+  catch(e){}finally{NV.refr=false;if(NV.refrDe){NV.refrDe=false;setTimeout(nuvemRefrescar,300)}}}
+async function nuvemLer(){if(SB_CFG&&NV.db&&NV.db.sinal&&NV.sinal!==false){try{const m=await nuvemLerSinal();NV.sinal=true;return m}catch(e){if(e&&e.code==='sem-sinal')NV.sinal=false;else throw e}}
+  NV.tRefr=Date.now();try{const old=await NV.db.collection('mockups').get();old.docs.forEach(d=>{const v=d.exists&&d.data();if(v&&v.img&&!MOCKG[d.id]){guardaMockG(d.id,v.img)}})}catch(e){}const cs=[...COLS,'config','log'];const sn=await Promise.all(cs.map(c=>NV.db.collection(c).get()));const m={};
   sn.forEach((x,i)=>x.docs.forEach(d=>{if(d.exists)m[cs[i]+'/'+d.id]=limpo(d.data())}));return m}
 function soAquiGuardar(m,lix){try{const velho=state;if(!velho||!velho.pedidos)return;const naLix=new Set(lix||[]);
   const peds=velho.pedidos.filter(p=>!ehExemplo(p)&&!m['pedidos/'+idDoc('pedidos',p)]&&!naLix.has(p.id));if(!peds.length)return;
@@ -4668,7 +4690,7 @@ function soAquiEnviar(){const g=soAqui();if(!g)return;snap();let n=0;g.pedidos.f
     g.lotes.filter(l=>l.ped===velhoId).forEach(l=>{const nl={...l,ped:p.id};if(state.lotes.some(x=>x.id===nl.id))nl.id=nl.id+'-'+Date.now().toString(36);state.lotes.push(nl)})});
   g.clientes.forEach(c=>{if(!(state.clientes||[]).some(x=>x.id===c.id))(state.clientes=state.clientes||[]).push(c)});
   try{localStorage.removeItem('martins-so-aqui')}catch(e){}commit();toast(`${n} ${n>1?'pedidos enviados':'pedido enviado'} para a nuvem`,false)}
-function nuvemAdotar(m,lix){soAquiGuardar(m,lix);NV.pronto=true;NV.erro='';NV.acked=m;NV.last={};Object.entries(m).forEach(([p,v])=>NV.last[p]=stab(v));
+function nuvemAdotar(m,lix){soAquiGuardar(m,lix);NV.pronto=true;setTimeout(sinGuarda,0);NV.erro='';NV.acked=m;NV.last={};Object.entries(m).forEach(([p,v])=>NV.last[p]=stab(v));
   const st=normalizar(deDocs(m));if(!st.atrib)st.atrib={};state=st;sbSessao();if(SB_CFG&&!SESSAO){render();return}NV.modo='nuvem';syncSt(NV.soLer?'ler':'ok');
   try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}if(!NV.soLer)save();render();tick();nuvemOuvir();mockReparo();setTimeout(backupDiario,4000)}
 /* ================= Supabase (endereço próprio da Martins) =================
@@ -4698,7 +4720,16 @@ function sbDB(c){const T='docs';
         catch(e){onErr&&onErr(e)}finally{rodando=false;if(denovo){denovo=false;puxa()}}};
       const f=()=>{clearTimeout(t);t=setTimeout(puxa,200)};(SB.ouvintes[col]=SB.ouvintes[col]||[]).push(f);ouvir();puxa();
       return ()=>{vivo=false;SB.ouvintes[col]=(SB.ouvintes[col]||[]).filter(x=>x!==f)}}});
-  return {doc,collection}}
+  /* Sincronização leve (migração 005). docs_sinal guarda só "este documento mudou em tal hora" (sem os dados).
+     O aparelho escuta os sinais e baixa só o documento que mudou. Sem a tabela (banco antigo), volta ao jeito antigo. */
+  const SIN='docs_sinal';
+  const semSinal=e=>(/42P01|PGRST205|PGRST200/.test(String(e&&e.code))||/docs_sinal|does not exist|schema cache/i.test(String(e&&e.message)))?{code:'sem-sinal',message:e&&e.message}:null;
+  const sinais=async desde=>{const out=[];for(let de=0;;de+=1000){let q=c.from(SIN).select('path,del,upd');if(desde)q=q.gt('upd',desde);const {data,error}=await q.order('upd').range(de,de+999);if(error)throw semSinal(error)||falha(error);out.push(...data);if(data.length<1000)break}return out};
+  const ultimo=async()=>{const {data,error}=await c.from(SIN).select('upd').order('upd',{ascending:false}).limit(1);if(error)throw semSinal(error)||falha(error);return (data&&data[0]&&data[0].upd)||'1970-01-01T00:00:00Z'};
+  const porPaths=async ps=>{const out=[];for(let i=0;i<ps.length;i+=80){const {data,error}=await c.from(T).select('path,data').in('path',ps.slice(i,i+80));if(error)falha(error);out.push(...data)}return out};
+  const todos=async cols=>{const out=[];for(let de=0;;de+=500){const {data,error}=await c.from(T).select('path,data').in('col',cols).order('path').range(de,de+499);if(error)falha(error);out.push(...data);if(data.length<500)break}return out};
+  const ouvirSinal=cb=>{if(SB.chS)return;SB.chS=c.channel('martins-sinal').on('postgres_changes',{event:'*',schema:'public',table:SIN},pl=>cb((pl.new&&pl.new.path)||(pl.old&&pl.old.path)||'')).subscribe()};
+  return {doc,collection,sinal:{sinais,ultimo,porPaths,todos,ouvir:ouvirSinal}}}
 const sbVolta=()=>location.origin+location.pathname;
 async function sbConectar(){let c;try{c=await sbCliente()}catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000);return}
   if(!SB.auth){SB.auth=true;c.auth.onAuthStateChange(ev=>{if(ev==='PASSWORD_RECOVERY'){ui.sbLogin={passo:'nova'};NV.pronto=false;NV.erro='login';render()}})}
@@ -4712,7 +4743,7 @@ async function sbConectar(){let c;try{c=await sbCliente()}catch(e){NV.erro='rede
   catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000)}}
 function sbSessao(){if(!SB_CFG||!SB.user)return;const u=(state.usuarios||[]).find(x=>normEmail(x.email)===normEmail(SB.user.email));
   SESSAO=u?{id:u.id,email:u.email,ts:now()}:null;try{if(SESSAO)localStorage.setItem('martins-sessao',JSON.stringify(SESSAO))}catch(e){}if(!u){NV.pronto=false;NV.erro='semacesso'}}
-const sbErro=e=>{const m=String(e&&e.message||e||'');return /invalid login/i.test(m)?'E-mail ou senha errados. Confira e tente de novo.':/not confirmed/i.test(m)?'Falta confirmar o e-mail: abra o e-mail que mandamos e toque no link.':/already registered|already been registered/i.test(m)?'Esse e-mail já tem senha. Toque em Voltar e entre, ou use "Esqueci a senha".':/at least|weak|short/i.test(m)?'A senha precisa ter pelo menos 6 letras ou números.':/rate|too many|seconds/i.test(m)?'Muitas tentativas seguidas. Espere um minuto e tente de novo.':/fetch|network/i.test(m)?'Sem internet. Confira a conexão e tente de novo.':'Não deu certo: '+m};
+const sbErro=e=>{const m=String(e&&e.message||e||'');return /exceed_|restricted|spend cap|upgrade their plan/i.test(m)?'O banco de dados do app passou do limite do plano e foi pausado pelo Supabase. Ninguém consegue entrar até a gestão liberar. Avise '+SUPORTE()+'.':/invalid login/i.test(m)?'E-mail ou senha errados. Confira e tente de novo.':/not confirmed/i.test(m)?'Falta confirmar o e-mail: abra o e-mail que mandamos e toque no link.':/already registered|already been registered/i.test(m)?'Esse e-mail já tem senha. Toque em Voltar e entre, ou use "Esqueci a senha".':/at least|weak|short/i.test(m)?'A senha precisa ter pelo menos 6 letras ou números.':/rate|too many|seconds/i.test(m)?'Muitas tentativas seguidas. Espere um minuto e tente de novo.':/fetch|network/i.test(m)?'Sem internet. Confira a conexão e tente de novo.':'Não deu certo: '+m};
 function vLoginSB(){const L=ui.sbLogin=ui.sbLogin||{passo:'entrar'},P=L.passo,campoE=`<label class="rotulo" for="sbE">E-mail</label><input class="campo" id="sbE" type="email" autocomplete="username" inputmode="email" value="${esc(L.email||'')}">`;
   const erro=L.err?`<div class="aviso">${ic('i-alerta')}${esc(L.err)}</div>`:'',volta=`<button class="x azul" data-a="sbPasso" data-v="entrar">Voltar</button>`;
   const corpo=P==='primeiro'?`<h1>Primeiro acesso</h1><p class="sub-l">Escreva o e-mail que a gestão cadastrou e crie sua senha (pelo menos 6 letras ou números).</p>${campoE}
@@ -4732,15 +4763,23 @@ async function nuvemConectar(){if(SB_CFG)return sbConectar();let db=null;try{db=
     if(NV.soLer){NV.erro='vazio';render();return}ui.inicio=true;NV.pronto=true;syncSt('');render()}
   catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000)}}
 /* O celular pode dormir e perder avisos da nuvem: ao voltar para o app (e a cada 2 min) confere tudo de novo. */
-async function nuvemRefrescar(){if(NV.modo!=='nuvem'||!NV.db||NV.busy||NV.Q.size||NV.refr)return;NV.refr=true;
+async function nuvemRefrescar(forca){if(NV.modo!=='nuvem'||!NV.db)return;if(NV.sinal)return nuvemRefrescarSinal();
+  if(NV.busy||NV.Q.size||NV.refr)return;if(!forca&&Date.now()-(NV.tRefr||0)<9*60000)return;NV.tRefr=Date.now();NV.refr=true;
   try{const cs=[...COLS,'config','log'];const sn=await Promise.all(cs.map(c=>NV.db.collection(c).get()));if(NV.Q.size||NV.busy)return;
     const m={};sn.forEach((x,i)=>x.docs.forEach(d=>{if(d.exists)m[cs[i]+'/'+d.id]=limpo(d.data())}));let mudou=false;
     Object.entries(m).forEach(([p,v])=>{const j=stab(v);NV.acked[p]=v;if(NV.last[p]!==j){NV.last[p]=j;mudou=true}});
     Object.keys(NV.last).forEach(p=>{if(!(p in m)){delete NV.last[p];delete NV.acked[p];mudou=true}});
     if(mudou){const mm={};Object.entries(NV.last).forEach(([p,j])=>mm[p]=JSON.parse(j));const novo=normalizar(deDocs(mm));if(!novo.atrib)novo.atrib={};state=novo;RC={};try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}nuvemRender()}}
   catch(e){}finally{NV.refr=false}}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(NV.pronto)nuvemRefrescar();else if(NV.erro&&NV.erro!=='sem-db')nuvemConectar()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(NV.pronto)nuvemRefrescar(true);else if(NV.erro&&NV.erro!=='sem-db')nuvemConectar()}});
 setInterval(nuvemRefrescar,120000);
+/* Versão nova do app: confere o endereço do próprio app a cada 20 min (não gasta o banco). Se mudou, recarrega sozinho
+   quando ninguém está no meio de algo (sem janela aberta e tudo salvo), na volta para o app. */
+const APPV={tag:null,nova:false};
+async function appVersao(){if(!/^https?:/.test(location.protocol))return;try{const r=await fetch(location.href.split('#')[0],{method:'HEAD',cache:'no-store'});const t=r.headers.get('etag')||r.headers.get('last-modified');if(!t)return;if(APPV.tag&&APPV.tag!==t)APPV.nova=true;APPV.tag=APPV.tag||t}catch(e){}}
+const appTroca=()=>{if(APPV.nova&&!ui.sheet&&!NV.Q.size&&!NV.busy)location.reload()};
+setTimeout(appVersao,5000);setInterval(()=>appVersao().then(()=>{if(document.visibilityState==='hidden')appTroca()}),20*60000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')appTroca()});
 function vConectando(){const e=NV.erro;if(e==='login')return vLoginSB();if(e==='semacesso')return `<div class="conect"><span class="m-ic">${ic('i-cadeado')}</span><h1>Este e-mail ainda não tem acesso</h1><p>${esc(SB.user?.email||'')} entrou, mas não está na lista de acessos do app. Peça para ${esc(gestoresTxt())} cadastrar em Cadastros › Ajustes › Acessos.</p><button class="big go" data-a="sbSair">Entrar com outro e-mail</button></div>`;const box=(i,t,p,b)=>`<div class="conect"><span class="m-ic">${ic(i)}</span><h1>${t}</h1>${p}${b||''}</div>`;
   if(e==='sem-db')return box('i-alerta','Este aparelho não está ligado à nuvem',`<p>Para não trabalhar com dados diferentes dos outros aparelhos, o app só abre ligado à nuvem da ${esc(NOME_EMP())}.</p><ol><li>Abra o link no navegador <b>Chrome</b>.</li><li>Entre na <b>conta Claude</b> que recebeu acesso ao app.</li><li>Toque em <b>Tentar de novo</b>.</li></ol><p class="dica">Sem conta ou sem acesso? Fale com ${esc(SUPORTE())}.</p>`,`<button class="big go" data-a="reconectar">Tentar de novo</button>`);
   if(e==='rede')return box('i-alerta','Sem internet',`<p>O app precisa da internet para mostrar os dados certos. Tentando de novo sozinho…</p>`,`<button class="big go" data-a="reconectar">Tentar agora</button>`);
