@@ -22,8 +22,9 @@ alter policy docs_mudar  on public.docs
 alter policy docs_apagar on public.docs
   using (public.tem_acesso() and (col <> 'usuarios' or public.eh_gestao()));
 
-revoke execute on function public.importar_docs(text, jsonb) from public, anon, authenticated;
-revoke execute on function public.exportar_docs(text, text[]) from public, anon, authenticated;
+-- funções temporárias de importação/exportação (só existiram no primeiro banco): fecha se existirem
+do $$ begin revoke execute on function public.importar_docs(text, jsonb) from public, anon, authenticated; exception when undefined_function then null; end $$;
+do $$ begin revoke execute on function public.exportar_docs(text, text[]) from public, anon, authenticated; exception when undefined_function then null; end $$;
 
 revoke execute on function public.doc_update(text, jsonb) from public, anon;
 grant execute on function public.doc_update(text, jsonb) to authenticated;

@@ -2,7 +2,7 @@
 
 **Situação (14/10/2026): feita.**
 - **Endereço:** https://martinssrenanrm.github.io/martins-uniformes/
-- **Projeto Supabase:** `fmiyrnkzsurjlunfgwjq` ("Martins Uniformes App").
+- **Projeto Supabase:** `cmerriurbtrkxiemjeto` ("martinsuniformes Project", organização Roger Martins, plano grátis). Desde 01/11/2026; o antigo `fmiyrnkzsurjlunfgwjq` foi pausado por cota e os dados foram copiados para este.
 - **Dados levados:** 135 documentos, conferidos por coleção.
 - **Para publicar uma mudança:** rode `tools/build.js` com a URL e a chave pública do projeto, faça o commit de `site/` e o push. A automação publica em cerca de 1 minuto.
 - **Pendência:** apagar as funções desligadas `public.importar_docs` e `public.exportar_docs`, usadas só na migração. Ninguém tem permissão de usá-las. O conector do Claude não roda `drop` sem confirmação; apague pelo SQL Editor do Supabase.
