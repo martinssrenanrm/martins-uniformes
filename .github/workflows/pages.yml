@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   testes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
           node -e "const a=require('fs').readFileSync('app.html','utf8'),s=require('fs').readFileSync('site/index.html','utf8');if(!s.includes(a)){console.error('site/index.html está velho: rode tools/build.js');process.exit(1)}"
   publicar:
     needs: testes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
