@@ -6,7 +6,8 @@ const docs=new Map(),users=new Map(),pages=[];const avisos=[];
 const merge=(a,b)=>{if(a&&b&&typeof a==='object'&&typeof b==='object'&&!Array.isArray(a)&&!Array.isArray(b)){const o={...a};for(const k of Object.keys(b))o[k]=k in a?merge(a[k],b[k]):b[k];return o}return b};
 const acesso=e=>!!e&&[...docs].some(([p,d])=>p.startsWith('usuarios/')&&String(d.email||'').toLowerCase()===String(e).toLowerCase());
 // banco novo (migração 005): tabela de sinais. SEM_SINAL=true simula um banco antigo, sem ela.
-const sinal=new Map();let relogio=0,SEM_SINAL=false;const bytes={},pedidos={};
+const objs=new Map();let SEM_STORAGE=false;
+const sinal=new Map();let relogio=0,SEM_SINAL=false;const bytes={},pedidos={},baixou={};
 const sinaliza=(p,del)=>{const c=p.split('/')[0];if(c==='mockp'||c==='backupp')return;sinal.set(p,{path:p,col:c,upd:new Date(relogio=Math.max(Date.now(),relogio+1)).toISOString(),del:!!del})};
 async function avisa(p){for(const pg of pages)await pg.evaluate(p=>window.__sbPush&&(window.__sbPush({t:'docs',new:{path:p}}),window.__sbPush({t:'docs_sinal',new:{path:p}})),p).catch(()=>{})}
 const casa=(f,o)=>f.every(([c,v,k])=>{const x=c==='col'?o.path.split('/')[0]:o[c];return k==='in'?v.includes(x):k==='gt'?x>v:x===v});
@@ -20,6 +21,8 @@ async function sbop0(k,a,b){
     if(!pode)return {data:null,error:{code:'42501',message:'new row violates row-level security policy'}};
     if(st.op==='upsert'){(Array.isArray(st.payload)?st.payload:[st.payload]).forEach(r=>{docs.set(r.path,r.data);sinaliza(r.path)});setTimeout(()=>avisa((Array.isArray(st.payload)?st.payload[0]:st.payload).path),10);return {data:null,error:null}}
     if(st.op==='delete'){const p=(st.f.find(f=>f[0]==='path')||[])[1];docs.delete(p);sinaliza(p,true);setTimeout(()=>avisa(p),10);return {data:null,error:null}}}
+  if(k==='up'){const o=JSON.parse(b);if(SEM_STORAGE)return {data:null,error:{message:'Bucket not found',statusCode:'404'}};if(!acesso(a))return {data:null,error:{message:'new row violates row-level security policy',statusCode:'403'}};objs.set(o.bk+'/'+o.name,{type:o.type,buf:Buffer.from(o.b64,'base64')});return {data:{path:o.name},error:null}}
+  if(k==='rm'){const o=JSON.parse(b);if(!acesso(a))return {data:null,error:{message:'rls'}};o.names.forEach(n=>objs.delete(o.bk+'/'+n));return {data:[],error:null}}
   if(k==='rpc'){const {args}=JSON.parse(b);if(!acesso(a))return {data:null,error:{code:'42501',message:'row-level security'}};if(!docs.has(args.p))return {data:false,error:null};docs.set(args.p,merge(docs.get(args.p),args.patch));sinaliza(args.p);setTimeout(()=>avisa(args.p),10);return {data:true,error:null}}
   if(k==='login'){const u=users.get(a);if(!u||u.pass!==b)return {error:{message:'Invalid login credentials'}};if(!u.ok)return {error:{message:'Email not confirmed'}};return {}}
   if(k==='signup'){if(users.get(a)?.ok)return {error:{message:'User already registered'}};users.set(a,{pass:b,ok:false});avisos.push('confirmar:'+a);return {}}
@@ -40,6 +43,7 @@ const REAL=process.env.REAL||path.resolve(__dirname,'../../claude-code-scratch-r
   const html=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>window.MARTINS_SB={url:'https://teste.supabase.co',key:'anon'}</script></head><body>${app}</body></html>`;
   async function aparelho(n){const ctx=await b.newContext({viewport:{width:390,height:844}});await ctx.exposeFunction('__sbop',(k,a,b)=>sbop(k,a,b,n));
     await ctx.route('https://app.martins.test/**',r=>r.fulfill({contentType:'text/html',body:html}));
+    await ctx.route('https://teste.supabase.co/storage/v1/object/public/**',r=>{const k=decodeURIComponent(new URL(r.request().url()).pathname.replace('/storage/v1/object/public/',''));const o=objs.get(k);if(n==='A'||n==='B')baixou[n]=(baixou[n]||0)+(o?o.buf.length:0);return o?r.fulfill({status:200,contentType:o.type,headers:{'access-control-allow-origin':'*'},body:o.buf}):r.fulfill({status:400,headers:{'access-control-allow-origin':'*'},body:'{}'})});
     await ctx.route('https://cdn.jsdelivr.net/npm/@supabase/**',r=>r.fulfill({contentType:'application/javascript',body:fake}));
     const p=await ctx.newPage();p.on('pageerror',e=>er.push(n+': '+e.message));pages.push(p);await p.goto('https://app.martins.test/');await p.waitForTimeout(1500);return p}
   console.log('1) Abre em qualquer navegador, sem conta Claude');
@@ -81,6 +85,22 @@ const REAL=process.env.REAL||path.resolve(__dirname,'../../claude-code-scratch-r
   ok(await B.evaluate(id=>pedById(id)?.contato==='Depois de reabrir',pid2),'depois de reabrir continua vendo ao vivo');
   await A.evaluate(()=>{const l=state.lotes.find(x=>!x.rework&&!x.parent);snap();state.lotes=state.lotes.filter(x=>x!==l);commit();window.__apagado=l.id});const apag=await A.evaluate(()=>window.__apagado);await A.waitForTimeout(1500);
   ok(await B.evaluate(id=>!state.lotes.some(l=>l.id===id),apag),'o que um apaga some no outro');
+  console.log('4d) Arquivos no Storage, comprimidos');
+  // arquivo antigo, guardado do jeito velho (pedaços de texto dentro do banco)
+  const png=await A.evaluate(()=>{const c=document.createElement('canvas');c.width=2400;c.height=1600;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,2400,1600);for(let i=0;i<4000;i++){g.fillStyle='hsl('+(i*37%360)+',60%,'+(40+i%40)+'%)';g.beginPath();g.arc((i*997)%2400,(i*613)%1600,8+(i%30),0,7);g.fill()}return c.toDataURL('image/png')});
+  const PT=190000,np=Math.ceil(png.length/PT);for(let k=0;k<np;k++)docs.set('mockp/VELHO~'+k,{d:png.slice(k*PT,(k+1)*PT)});docs.set('mock/VELHO',{n:np,tam:png.length,ts:Date.now()});
+  const mig=await A.evaluate(async()=>{window.__migraTeste=true;return await mockMigra()});
+  const mv=docs.get('mock/VELHO')||{};const ob=mv.st&&objs.get('arquivos/'+mv.st);
+  ok(mig>=1&&!!ob&&![...docs.keys()].some(p=>p.startsWith('mockp/VELHO')),`arquivo antigo sai do banco e vai para o Storage (${mig} migrado)`);
+  ok(ob&&ob.buf.length<png.length*0.75/1.33,`imagem comprimida: ${Math.round(png.length/1024)} KB em texto viraram ${ob?Math.round(ob.buf.length/1024):'?'} KB`);
+  ok(/^b\/[0-9a-f-]{30,}$/.test(mv.st||''),'nome no Storage é aleatório (ninguém adivinha)');
+  const vb2=await B.evaluate(async()=>{delete MOCKG.VELHO;const v=await nuvemMockGet('VELHO');return v&&v.slice(0,15)});ok(vb2==='data:image/jpeg','outro aparelho abre o arquivo direto do Storage');
+  await A.evaluate(async d=>{guardaMockG('NOVO',d);await new Promise(r=>setTimeout(r,800))},png);const mn=docs.get('mock/NOVO')||{};
+  ok(!!mn.st&&!![...objs.keys()].find(k=>k.endsWith(mn.st))&&![...docs.keys()].some(p=>p.startsWith('mockp/NOVO')),'arquivo novo já vai direto para o Storage');
+  await A.evaluate(async()=>{guardaMockG('NOVO','data:application/octet-stream;base64,'+btoa('programa de bordado .dst'));await new Promise(r=>setTimeout(r,800))});
+  const mn2=docs.get('mock/NOVO')||{};ok(mn2.st&&mn2.st!==mn.st&&!objs.has('arquivos/'+mn.st)&&objs.get('arquivos/'+mn2.st).buf.toString()==='programa de bordado .dst','trocar o arquivo apaga o antigo do Storage; arquivo que não é imagem vai sem mexer');
+  SEM_STORAGE=true;await A.evaluate(async()=>{NV.arqOk=undefined;guardaMockG('SEMST','data:text/plain;base64,'+btoa('oi'));await new Promise(r=>setTimeout(r,800))});
+  ok(docs.has('mockp/SEMST~0')&&await A.evaluate(()=>NV.arqOk===false),'banco sem Storage (sem a migração 006): continua guardando do jeito antigo');SEM_STORAGE=false;await A.evaluate(()=>{NV.arqOk=undefined});
   console.log('4c) Banco antigo, sem a migração 005');
   SEM_SINAL=true;const D=await aparelho('D');await D.fill('#sbE','roger@exemplo.test');await D.fill('#sbS','roger12');await D.click('[data-a=sbEntrar]');await D.waitForTimeout(2500);
   ok(await D.evaluate(()=>NV.pronto&&NV.sinal===false&&state.pedidos.length>0),'sem a tabela de sinais, abre do jeito antigo');

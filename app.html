@@ -1732,18 +1732,47 @@ const IDB=(()=>{let p;const abre=()=>p||(p=new Promise((ok,er)=>{try{const r=ind
 const MOCK_PEND=(()=>{try{return new Set(JSON.parse(localStorage.getItem('martins-mockpend')||'[]'))}catch(e){return new Set()}})();
 const pendSalva=()=>{try{localStorage.setItem('martins-mockpend',JSON.stringify([...MOCK_PEND]))}catch(e){}};
 const PARTE=190000;
+/* ===== Arquivos fora do banco (Storage) =====
+   Imagem grande vira JPEG (ou WebP, se tiver transparência) com no máximo 2000 px: fica ~5 vezes menor e continua boa para ver e imprimir.
+   Outros arquivos (PDF, programa de bordado) vão como estão. O documento mock/<id> guarda só o nome no Storage. */
+const dataBlob=d=>{const i=d.indexOf(','),h=d.slice(0,i),b=d.slice(i+1),m=(h.match(/^data:([^;,]+)/)||[])[1]||'application/octet-stream';
+  if(!/;base64/.test(h))return new Blob([decodeURIComponent(b)],{type:m});const bin=atob(b),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);return new Blob([u],{type:m})};
+const blobData=b=>new Promise((ok,er)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=er;r.readAsDataURL(b)});
+async function comprimeImg(d){if(typeof d!=='string'||!/^data:image\/(png|jpeg|webp)/.test(d)||d.length<300000)return d;
+  try{const im=new Image();im.src=d;await im.decode();const W0=im.naturalWidth,H0=im.naturalHeight,s=Math.min(1,2000/Math.max(W0,H0));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(W0*s));c.height=Math.max(1,Math.round(H0*s));const g=c.getContext('2d');g.drawImage(im,0,0,c.width,c.height);
+    let alfa=false;try{const px=g.getImageData(0,0,c.width,c.height).data;for(let k=3;k<px.length;k+=4*61)if(px[k]<250){alfa=true;break}}catch(e){alfa=true}
+    let o;if(alfa){o=c.toDataURL('image/webp',0.86);if(!o.startsWith('data:image/webp'))o=c.toDataURL('image/png')}else o=c.toDataURL('image/jpeg',0.85);return o.length<d.length?o:d}catch(e){return d}}
+const nomeArqSt=()=>'b/'+((typeof crypto!=='undefined'&&crypto.randomUUID)?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2));
+async function arqPut(id,data){const blob=dataBlob(await comprimeImg(data)),nome=nomeArqSt();await NV.db.arq.sobe(nome,blob);
+  let velho=null;try{const v=await NV.db.doc('mock/'+id).get();if(v.exists)velho=v.data()}catch(e){}
+  await NV.db.doc('mock/'+id).set({st:nome,tam:blob.size,tipo:blob.type,ts:now()});
+  if(velho){if(velho.st&&velho.st!==nome)NV.db.arq.apaga([velho.st]).catch(()=>{});for(let k=0;k<(velho.n||0);k++)await NV.db.doc(`mockp/${id}~${k}`).delete().catch(()=>{})}}
+async function arqBaixa(st){try{const r=await fetch(NV.db&&NV.db.arq?NV.db.arq.url(st):SB_CFG.url+'/storage/v1/object/public/arquivos/'+st);if(!r.ok)return null;return await blobData(await r.blob())}catch(e){return null}}
+const usaStorage=()=>!!(SB_CFG&&NV.db&&NV.db.arq&&NV.arqOk!==false);
 async function nuvemMockPut(id,data){if(NV.modo!=='nuvem'||!NV.db){MOCK_PEND.add(id);pendSalva();return}
+  if(usaStorage()){try{await arqPut(id,data);MOCK_PEND.delete(id);pendSalva();return}catch(e){if(e&&e.semStorage)NV.arqOk=false;else{MOCK_PEND.add(id);pendSalva();return}}}
   try{const n=Math.ceil(data.length/PARTE);for(let k=0;k<n;k++)await NV.db.doc(`mockp/${id}~${k}`).set({d:data.slice(k*PARTE,(k+1)*PARTE)});await NV.db.doc(`mock/${id}`).set({n,tam:data.length,ts:now()});
     const chk=await NV.db.doc(`mock/${id}`).get();if(!chk.exists||chk.data().tam!==data.length)throw new Error('conferência');MOCK_PEND.delete(id);pendSalva()}
   catch(e){MOCK_PEND.add(id);pendSalva()}}
-async function nuvemMockGet(id){if(!NV.db||NV.modo!=='nuvem')return null;try{const m=await NV.db.doc(`mock/${id}`).get();if(!m.exists)return null;const n=m.data().n;
+async function nuvemMockGet(id){if(!NV.db||NV.modo!=='nuvem')return null;try{const m=await NV.db.doc(`mock/${id}`).get();if(!m.exists)return null;if(m.data().st)return await arqBaixa(m.data().st);const n=m.data().n;
   const ps=await Promise.all(Array.from({length:n},(_,k)=>NV.db.doc(`mockp/${id}~${k}`).get()));if(ps.some(x=>!x.exists))return null;return ps.map(x=>x.data().d).join('')}catch(e){return null}}
 let MOCK_BUSY=false;
 async function mockPendentes(){if(MOCK_BUSY||NV.modo!=='nuvem')return;MOCK_BUSY=true;try{for(const id of [...MOCK_PEND]){const v=MOCKG[id]||await IDB.get(id);if(v)await nuvemMockPut(id,v);else{MOCK_PEND.delete(id);pendSalva()}}}finally{MOCK_BUSY=false}}
 async function mockReparo(){if(NV.modo!=='nuvem'||!NV.db)return;const ids=new Set();state.lotes.forEach(l=>{if(l.mock&&!l.rework){ids.add(l.mockBin||l.id)}});(state.arquivos||[]).forEach(a=>{if(a.bin)ids.add(a.bin);if(a.vis)ids.add(a.vis)});
-  for(const id of ids)for(const k of [id,id+'~c']){try{const m=await NV.db.doc(`mock/${k}`).get();if(m.exists)continue;const v=MOCKG[k]||await IDB.get(k);if(v){MOCK_PEND.add(k);pendSalva()}}catch(e){}}mockPendentes()}
+  let tem=null;try{const L=(await NV.db.collection('mock').get()).docs;tem=new Set(L.map(d=>d.id));espacoConta(L.map(d=>d.data()||{}))}catch(e){return}
+  for(const id of ids)for(const k of [id,id+'~c']){if(tem.has(k))continue;try{const v=MOCKG[k]||await IDB.get(k);if(v){MOCK_PEND.add(k);pendSalva()}}catch(e){}}mockPendentes();setTimeout(mockMigra,15000)}
+/* Leva os arquivos antigos (pedaços dentro do banco) para o Storage, já comprimidos. Roda sozinho num computador da gestão (não no celular, para não gastar o plano de dados). */
+/* Espaço dos arquivos. Limite do plano grátis do Supabase: 1 GB no Storage (configurável em clientes/<id>.json: limiteArquivosMB). */
+const LIM_ARQ=()=>(CLIENTE.limiteArquivosMB||1024)*1048576;
+function espacoConta(L){const st=L.filter(v=>v.st).reduce((t,v)=>t+(v.tam||0),0),velho=L.filter(v=>v.n&&!v.st).reduce((t,v)=>t+(v.tam||0),0);NV.espaco={st,velho,n:L.length};
+  if(ehGestao()&&st>LIM_ARQ()*0.8){let d='';try{d=localStorage.getItem('esp-aviso')}catch(e){}if(d!==hojeISO()){try{localStorage.setItem('esp-aviso',hojeISO())}catch(e){}toast(`Os arquivos já usam ${Math.round(st/LIM_ARQ()*100)}% do espaço. Avise ${SUPORTE()}.`,false)}}}
+const mbTxt=b=>b>=1073741824?(b/1073741824).toFixed(2).replace('.',',')+' GB':Math.max(1,Math.round(b/1048576))+' MB';
+async function mockMigra(){if(!usaStorage()||NV.modo!=='nuvem'||NV.migra||!ehGestao())return;try{if(matchMedia('(pointer:coarse)').matches&&!window.__migraTeste)return}catch(e){}NV.migra=true;let n=0;
+  try{const L=(await NV.db.collection('mock').get()).docs.filter(d=>{const v=d.data();return v&&v.n&&!v.st&&!(v.mig&&now()-v.mig<15*60000)});
+    for(const d of L){if(NV.modo!=='nuvem'||NV.arqOk===false)break;const id=d.id;try{await NV.db.doc('mock/'+id).update({mig:now()});const data=await nuvemMockGet(id);if(data){await arqPut(id,data);n++}}catch(e){if(e&&e.semStorage){NV.arqOk=false;break}}await new Promise(r=>setTimeout(r,window.__migraTeste?0:400))}}
+  finally{NV.migra=false}if(n)toast(`${n} ${n>1?'arquivos levados':'arquivo levado'} para o novo armazenamento`,false);return n}
 function guardaMockG(id,g){if(g&&typeof g==='object'){guardaMockG(id,g.o);if(g.c)guardaMockG(id+'~c',g.c);return}MOCKG[id]=g;IDB.set(id,g);nuvemMockPut(id,g)}
-async function pegaBin(k){if(!k)return '';if(MOCKG[k])return MOCKG[k];let v=await IDB.get(k);if(!v&&typeof QR_PUB!=='undefined'&&QR_PUB&&SB_CFG){try{const r=await fetch(SB_CFG.url+'/rest/v1/rpc/arquivo_publico',{method:'POST',headers:{apikey:SB_CFG.key,Authorization:'Bearer '+SB_CFG.key,'Content-Type':'application/json'},body:JSON.stringify({tok:QR_PUB,k})});if(r.ok)v=await r.json()}catch(e){}}if(!v){v=await nuvemMockGet(k);if(v)IDB.set(k,v)}if(v)MOCKG[k]=v;return v||''}
+async function pegaBin(k){if(!k)return '';if(MOCKG[k])return MOCKG[k];let v=await IDB.get(k);if(!v&&typeof QR_PUB!=='undefined'&&QR_PUB&&SB_CFG){try{const r=await fetch(SB_CFG.url+'/rest/v1/rpc/arquivo_publico',{method:'POST',headers:{apikey:SB_CFG.key,Authorization:'Bearer '+SB_CFG.key,'Content-Type':'application/json'},body:JSON.stringify({tok:QR_PUB,k})});if(r.ok)v=await r.json();if(typeof v==='string'&&v.startsWith('st:'))v=await arqBaixa(v.slice(3))}catch(e){}}if(!v){v=await nuvemMockGet(k);if(v)IDB.set(k,v)}if(v)MOCKG[k]=v;return v||''}
 async function pegaMock(l){if(!l)return '';for(const id of [l.mockBin,l.id,l.parent].filter(Boolean)){if(!MOCKG[id+'~c']){const c=await IDB.get(id+'~c')||await nuvemMockGet(id+'~c');if(c){MOCKG[id+'~c']=c;IDB.set(id+'~c',c)}}if(MOCKG[id])return MOCKG[id];let v=await IDB.get(id);if(!v){v=await nuvemMockGet(id);if(v)IDB.set(id,v)}if(v){MOCKG[id]=v;return v}}return l.mock||''}
 const mockChave=l=>[l.mockBin,l.id,l.parent].filter(Boolean).find(k=>MOCKG[k]||MOCKG[k+'~c']);
 const mockGrande=l=>{if(!l)return '';const k=mockChave(l);return k?(MOCKG[k+'~c']||MOCKG[k]):(l.mock||'')};
@@ -2767,7 +2796,7 @@ const FAQ=[
 {c:'cad',q:'Como mudo o nome de uma etapa do escritório ou quem faz ela?',k:'nome etapa escritório renomear cargo vendedora quem faz arte vias compras preferência',r:['Cadastros › Ajustes › Etapas do escritório: toque em ✎ Ajustar na etapa.','Escreva o nome que a equipe usa e escolha quais cargos recebem essa etapa.','Marque se a vendedora do próprio pedido tem preferência.'],ir:'cad:ajustes#Etapas do escritório',g:1},
 {c:'cad',q:'Esta fábrica não faz arte (ou vias). Como tiro essa etapa?',k:'desligar etapa escritório arte vias conferir comprar liberar corte começar sem arte personalização',r:['Cadastros › Ajustes › Etapas do escritório: toque na etapa para desligar. Ela some das tarefas e conta como feita.','Logo abaixo, escolha o que precisa estar pronto para o corte começar: vias, arte aprovada e insumos.'],ir:'cad:ajustes#Etapas do escritório',g:1},
 {c:'cad',q:'Como levo as máquinas e os produtos desta fábrica para outra?',k:'modelo fábrica configuração copiar outra confecção começar máquinas produtos exportar importar',r:['Cadastros › Ajustes › Modelo de fábrica: Baixar o modelo desta fábrica.','O modelo leva máquinas, produtos, tamanhos, cores, tecidos, horário e prazos. Não leva pedidos, empresas, equipe, fornecedores, estoque nem acessos.','Na outra fábrica, enquanto não há pedidos de verdade: Começar com um modelo.'],ir:'cad:ajustes#Modelo de fábrica',g:1},
-{c:'cad',q:'Como faço uma cópia de segurança? E como recupero?',k:'cópia segurança backup recuperar restaurar lixeira apagado',r:['O app já faz uma cópia sozinho todo dia (guarda 14 dias).','Cadastros › Ajustes › Cópias de segurança: Fazer uma cópia agora ou Baixar cópia em arquivo.','Para recuperar algo apagado: Ver cópias e lixeira.'],ir:'cad:ajustes#Cópias de segurança',g:1},
+{c:'cad',q:'Como faço uma cópia de segurança? E como recupero?',k:'cópia segurança backup recuperar restaurar lixeira apagado',r:['O app já faz uma cópia sozinho todo dia (guarda 14 dias).','Uma vez por semana, baixe a cópia em arquivo e guarde no computador (o app lembra quem é da gestão).','Cadastros › Ajustes › Cópias de segurança: Fazer uma cópia agora ou Baixar cópia em arquivo.','Para recuperar algo apagado: Ver cópias e lixeira.'],ir:'cad:ajustes#Cópias de segurança',g:1},
 {c:'cad',q:'Como mudo o horário da fábrica, as pausas e os dias?',k:'horário expediente pausa almoço dias sábado entrada saída',r:['Cadastros › Ajustes › Horário da fábrica.','Mude Começa, Para, as pausas e os dias de trabalho. Salva sozinho.'],ir:'cad:ajustes#Horário da fábrica',g:1},
 {c:'cad',q:'Como coloco a logo e os contatos da empresa nos documentos?',k:'logo logomarca marca colocar coloco contatos documento whatsapp endereço',r:['Cadastros › Ajustes › Sua empresa nos documentos.','Toque em Pôr logo e preencha os campos. Salva sozinho.'],ir:'cad:ajustes#Sua empresa nos documentos',g:1},
 {c:'cad',q:'Como mudo o texto de condições do documento do cliente?',k:'termos condições texto documento cliente informações importantes',r:['Cadastros › Ajustes › Informações importantes do Pedido.','Edite, tire ou adicione informações.'],ir:'cad:ajustes#Informações importantes do Pedido',g:1},
@@ -3812,6 +3841,8 @@ function cardModelo(){if(!ehGestao())return '';const pode=!temPedidoReal();retur
   ${pode?'<p class="dica" style="margin:8px 0 0">Começar com um modelo troca máquinas, produtos e ajustes por os do arquivo e deixa equipe, fornecedores e estoque em branco. Antes, o app guarda uma cópia.</p>':'<p class="dica" style="margin:8px 0 0">Começar com um modelo só aparece enquanto não há pedidos de verdade.</p>'}</div>`}
 function cardSeguranca(){if(!ehGestao())return '';return `<div class="card"><h2>Cópias de segurança</h2>
   <p class="dica" style="margin:-4px 0 8px">Todo dia o sistema guarda uma cópia completa na nuvem (ficam as dos últimos 14 dias). Nada apagado some de vez: vai para a lixeira por 60 dias.</p>
+  <p class="dica" style="margin:0 0 8px"><b>Uma vez por semana, baixe a cópia em arquivo</b> e guarde no computador: é a garantia se a nuvem tiver problema. ${state.segBaixou?`Última: ${dataCurta(state.segBaixou)}${state.segBaixouPor?' por '+esc(state.segBaixouPor):''}.`:'Ainda não foi baixada.'}</p>
+  ${NV.espaco&&NV.espaco.st?`<p class="dica" style="margin:0 0 8px">Espaço dos arquivos (mockups, artes, bordados): <b>${mbTxt(NV.espaco.st)}</b> de ${mbTxt(LIM_ARQ())}${NV.espaco.velho?` · ${mbTxt(NV.espaco.velho)} ainda sendo levados para o novo armazenamento`:''}.</p>`:''}
   <div class="linha-dep"><button class="mbtn" data-a="segAgora">${ic('i-check')}Fazer uma cópia agora</button><button class="mbtn neutro2" data-a="segBaixar">${ic('i-lista')}Baixar cópia em arquivo</button><label class="mbtn neutro2" style="cursor:pointer">${ic('i-mais')}Restaurar de um arquivo<input type="file" id="fSeg" accept="application/json,.json" hidden></label><button class="mbtn neutro2" data-a="segLista">Ver cópias e lixeira</button></div></div>`}
 function sSegLista(){const e=ui.sheet;return `${voltar()}<h1>Cópias e lixeira</h1>
   <div class="card"><h2>Cópias na nuvem</h2>${e.bk?e.bk.length?e.bk.map(b=>`<div class="aj-row"><span><b>${esc(b.id)}</b><br><small class="lido">${dataCurta(b.ts)} ${tsHm(b.ts)} · ${b.pedidos??'?'} pedidos${b.por?' · '+esc(b.por):''}</small></span><button class="x azul" data-a="segRest" data-v="${esc(b.id)}">Restaurar</button></div>`).join(''):'<p class="dica">Nenhuma cópia ainda.</p>':'<p class="dica">Carregando…</p>'}</div>
@@ -4235,7 +4266,7 @@ const A={
   modAplicar:async()=>{const m=ui.modPend;ui.modPend=null;try{await aplicarModelo(m);toast('Modelo aplicado. Agora cadastre a equipe e os fornecedores.',false)}catch(e){render();toast(e.message==='tem pedidos'?'Já há pedidos de verdade: o modelo não foi aplicado':'Esse arquivo não é um modelo de fábrica',false)}},
   modCancelar:()=>{ui.modPend=null;render()},
   modBaixar:async()=>{const n=`${semAc(marca().nome||'fabrica').replace(/[^a-z0-9]+/gi,'-')} - modelo de fabrica ${hojeISO()}.json`;await baixarBlob(n,new Blob([JSON.stringify(modeloFabrica())],{type:'application/json'}))},
-  segBaixar:async()=>{const n=`${marca().nome||'Fabrica'} - copia de seguranca ${hojeISO()}.json`;await baixarBlob(n,new Blob([snapshot()],{type:'application/json'}))},
+  segBaixar:async()=>{const n=`${marca().nome||'Fabrica'} - copia de seguranca ${hojeISO()}.json`;await baixarBlob(n,new Blob([snapshot()],{type:'application/json'}));state.segBaixou=now();state.segBaixouPor=quemNome()||'';save();render()},
   segLista:async()=>{openSheet({t:'seg',bk:null,lx:null});if(NV.modo!=='nuvem'){ui.sheet.bk=[];ui.sheet.lx=[];return render()}
     try{const [B,X]=await Promise.all([NV.db.collection('backup').get(),NV.db.collection('lixeira').get()]);if(ui.sheet?.t!=='seg')return;
       ui.sheet.bk=B.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);ui.sheet.lx=X.docs.map(d=>({doc:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts).slice(0,80);render()}catch(e){ui.sheet.bk=[];ui.sheet.lx=[];render()}},
@@ -4690,7 +4721,9 @@ function soAquiEnviar(){const g=soAqui();if(!g)return;snap();let n=0;g.pedidos.f
     g.lotes.filter(l=>l.ped===velhoId).forEach(l=>{const nl={...l,ped:p.id};if(state.lotes.some(x=>x.id===nl.id))nl.id=nl.id+'-'+Date.now().toString(36);state.lotes.push(nl)})});
   g.clientes.forEach(c=>{if(!(state.clientes||[]).some(x=>x.id===c.id))(state.clientes=state.clientes||[]).push(c)});
   try{localStorage.removeItem('martins-so-aqui')}catch(e){}commit();toast(`${n} ${n>1?'pedidos enviados':'pedido enviado'} para a nuvem`,false)}
-function nuvemAdotar(m,lix){soAquiGuardar(m,lix);NV.pronto=true;setTimeout(sinGuarda,0);NV.erro='';NV.acked=m;NV.last={};Object.entries(m).forEach(([p,v])=>NV.last[p]=stab(v));
+function segLembra(){if(!ehGestao()||NV.modo!=='nuvem')return;const dias=state.segBaixou?Math.floor((now()-state.segBaixou)/864e5):99;if(dias<7)return;let d='';try{d=localStorage.getItem('seg-lembra')}catch(e){}if(d===hojeISO())return;try{localStorage.setItem('seg-lembra',hojeISO())}catch(e){}
+  toast(state.segBaixou?`Faz ${dias} dias que ninguém baixa a cópia de segurança. Cadastros › Ajustes › Cópias de segurança.`:'Baixe a cópia de segurança da semana: Cadastros › Ajustes › Cópias de segurança.',false)}
+function nuvemAdotar(m,lix){soAquiGuardar(m,lix);NV.pronto=true;setTimeout(sinGuarda,0);setTimeout(segLembra,8000);NV.erro='';NV.acked=m;NV.last={};Object.entries(m).forEach(([p,v])=>NV.last[p]=stab(v));
   const st=normalizar(deDocs(m));if(!st.atrib)st.atrib={};state=st;sbSessao();if(SB_CFG&&!SESSAO){render();return}NV.modo='nuvem';syncSt(NV.soLer?'ler':'ok');
   try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}if(!NV.soLer)save();render();tick();nuvemOuvir();mockReparo();setTimeout(backupDiario,4000)}
 /* ================= Supabase (endereço próprio da Martins) =================
@@ -4729,7 +4762,12 @@ function sbDB(c){const T='docs';
   const porPaths=async ps=>{const out=[];for(let i=0;i<ps.length;i+=80){const {data,error}=await c.from(T).select('path,data').in('path',ps.slice(i,i+80));if(error)falha(error);out.push(...data)}return out};
   const todos=async cols=>{const out=[];for(let de=0;;de+=500){const {data,error}=await c.from(T).select('path,data').in('col',cols).order('path').range(de,de+499);if(error)falha(error);out.push(...data);if(data.length<500)break}return out};
   const ouvirSinal=cb=>{if(SB.chS)return;SB.chS=c.channel('martins-sinal').on('postgres_changes',{event:'*',schema:'public',table:SIN},pl=>cb((pl.new&&pl.new.path)||(pl.old&&pl.old.path)||'')).subscribe()};
-  return {doc,collection,sinal:{sinais,ultimo,porPaths,todos,ouvir:ouvirSinal}}}
+  /* Arquivos no Storage (migração 006): bucket público só para download direto, com nomes aleatórios. */
+  const BK='arquivos';
+  const sobe=async(nome,blob)=>{const {error}=await c.storage.from(BK).upload(nome,blob,{contentType:blob.type||'application/octet-stream',cacheControl:'31536000',upsert:false});
+    if(error){if(/bucket not found/i.test(String(error.message))||String(error.statusCode)==='404')throw {semStorage:true,message:error.message};throw error}};
+  const apaga=async nomes=>{if(!nomes.length)return;const {error}=await c.storage.from(BK).remove(nomes);if(error)throw error};
+  return {doc,collection,sinal:{sinais,ultimo,porPaths,todos,ouvir:ouvirSinal},arq:{sobe,apaga,url:n=>SB_CFG.url+'/storage/v1/object/public/'+BK+'/'+n.split('/').map(encodeURIComponent).join('/')}}}
 const sbVolta=()=>location.origin+location.pathname;
 async function sbConectar(){let c;try{c=await sbCliente()}catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000);return}
   if(!SB.auth){SB.auth=true;c.auth.onAuthStateChange(ev=>{if(ev==='PASSWORD_RECOVERY'){ui.sbLogin={passo:'nova'};NV.pronto=false;NV.erro='login';render()}})}

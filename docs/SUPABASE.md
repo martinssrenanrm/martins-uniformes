@@ -6,7 +6,7 @@
 - **Dados levados:** 135 documentos, conferidos por coleção.
 - **Para publicar uma mudança:** rode `tools/build.js` com a URL e a chave pública do projeto, faça o commit de `site/` e o push. A automação publica em cerca de 1 minuto.
 - **Pendência:** apagar as funções desligadas `public.importar_docs` e `public.exportar_docs`, usadas só na migração. Ninguém tem permissão de usá-las. O conector do Claude não roda `drop` sem confirmação; apague pelo SQL Editor do Supabase.
-- **Banco versionado:** tudo o que existe no banco está em `supabase/migrations/` (001 tabela e regras, 002 ficha pública do QR, 003 permissões, 004 anexos no QR, 005 sincronização leve). Mudança nova no banco = arquivo novo numerado.
+- **Banco versionado:** tudo o que existe no banco está em `supabase/migrations/` (001 tabela e regras, 002 ficha pública do QR, 003 permissões, 004 anexos no QR, 005 sincronização leve, 006 arquivos no Storage). Mudança nova no banco = arquivo novo numerado.
 
 **Objetivo:** abrir o app em qualquer navegador, só com o e-mail e a senha do app, sem conta Claude.
 
@@ -84,3 +84,9 @@ Desde a migração 005:
 - Imagens e backups (`mockp`, `backupp`) não geram sinal: só são baixados quando alguém abre.
 - O app se atualiza sozinho quando sai versão nova (confere o endereço do site, não o banco).
 Regra para quem mexe: nunca ouvir a tabela `docs` inteira nem baixar coleções inteiras em intervalo. Conferir o uso em Supabase › Organization › Usage.
+
+## Espaço — arquivos no Storage (migração 006)
+Os arquivos (mockups, artes, programas de bordado) ficavam como texto dentro da tabela `docs` (pedaços `mockp`), gastando os 500 MB do banco.
+Desde a 006 vão para o Storage (bucket `arquivos`, 1 GB no plano grátis): imagem grande vira JPEG/WebP de até 2000 px (~5 vezes menor). `mock/<id>` guarda só `{st:'b/<nome aleatório>'}`.
+O bucket é público só para baixar um arquivo pelo nome (nomes aleatórios, ninguém lista). Enviar e apagar exigem login com acesso.
+Os arquivos antigos são levados sozinhos por um computador da gestão (não roda no celular). O espaço aparece em Cadastros › Ajustes › Cópias de segurança; acima de 80% a gestão é avisada.

@@ -8,7 +8,9 @@ window.supabase={createClient(){
     const b={select(){return b},eq(c,v){st.f.push([c,v]);return b},in(c,v){st.f.push([c,v,'in']);return b},gt(c,v){st.f.push([c,v,'gt']);return b},
       order(c,o){st.ord=[c,!(o&&o.ascending===false)];return b},limit(n){st.lim=n;return b},range(a,z){st.range=[a,z];return b},maybeSingle(){st.single=true;return b},
       upsert(p){st.op='upsert';st.payload=p;return b},delete(){st.op='delete';return b},then(ok,ruim){return op('q',tok(),JSON.stringify(st)).then(ok,ruim)}};return b};
-  return {from:qb,rpc:(fn,args)=>op('rpc',tok(),JSON.stringify({fn,args})),
+  const b64=async b=>{const u=new Uint8Array(await b.arrayBuffer());let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)};
+  const storage={from:bk=>({upload:async(name,blob,o)=>op('up',tok(),JSON.stringify({bk,name,type:(o&&o.contentType)||blob.type,b64:await b64(blob)})),remove:async names=>op('rm',tok(),JSON.stringify({bk,names}))})};
+  return {storage,from:qb,rpc:(fn,args)=>op('rpc',tok(),JSON.stringify({fn,args})),
     channel(){const c={on(ev,f,h){c.h=h;c.t=f&&f.table;return c},subscribe(){return c}};chans.push(c);return c},removeChannel(){},
     auth:{getSession:async()=>({data:{session:ses}}),onAuthStateChange(f){cbs.push(f);return {data:{subscription:{unsubscribe(){}}}}},
       async signInWithPassword({email,password}){const r=await op('login',email,password);if(r.error)return {data:{},error:r.error};ses={user:{email}};localStorage.setItem(SK,JSON.stringify(ses));return {data:{session:ses},error:null}},

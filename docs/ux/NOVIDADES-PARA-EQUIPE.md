@@ -624,3 +624,12 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Novo pedido › Personalização:** ao tocar em **Manga esquerda**, **Manga direita** ou **Costas**, aparece logo abaixo **onde exatamente** (ex.: Ombro, Meio da manga, Perto da barra). Não precisa mais apagar e criar de novo para o Próximo funcionar.
 - Pedido que já estava com "Falta: lugar exato" mostra o campo no próprio logo: é só escolher.
 - **Pedidos › Filtrar:** dá para marcar **vários** ao mesmo tempo. O atalho **Em produção** mostra Atrasando, Atenção e Em dia juntos. Toque em **Ver pedidos** para fechar. O filtro fica guardado no aparelho; para ver tudo, **Todos**.
+
+---
+
+## (Gestão) Cópia de segurança da semana
+
+**O que mudou:**
+- Uma vez por semana, quem é da gestão vê o lembrete: **Cadastros › Ajustes › Cópias de segurança › Baixar cópia em arquivo**. Guarde o arquivo no computador.
+- Na mesma tela aparece quanto espaço os arquivos (mockups, artes, bordados) estão usando.
+- As imagens agora ficam guardadas menores, sem perder qualidade para ver e imprimir.
