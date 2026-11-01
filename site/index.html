@@ -1747,7 +1747,10 @@ async function comprimeImg(d){if(typeof d!=='string'||!/^data:image\/(png|jpeg|w
     let alfa=false;try{const px=g.getImageData(0,0,c.width,c.height).data;for(let k=3;k<px.length;k+=4*61)if(px[k]<250){alfa=true;break}}catch(e){alfa=true}
     let o;if(alfa){o=c.toDataURL('image/webp',0.86);if(!o.startsWith('data:image/webp'))o=c.toDataURL('image/png')}else o=c.toDataURL('image/jpeg',0.85);return o.length<d.length?o:d}catch(e){return d}}
 const nomeArqSt=()=>'b/'+((typeof crypto!=='undefined'&&crypto.randomUUID)?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2));
-async function arqPut(id,data){const blob=dataBlob(await comprimeImg(data)),nome=nomeArqSt();await NV.db.arq.sobe(nome,blob);
+/* Só mockups e visualizações são comprimidos. Arte, logo e outros anexos vão no tamanho original: o prestador imprime a partir deles. */
+const SEM_COMPRIMIR=new Set();
+const podeComprimir=id=>{if(SEM_COMPRIMIR.has(id))return false;const a=(state.arquivos||[]).find(x=>x.bin===id);return !(a&&a.tipo!=='mockup')};
+async function arqPut(id,data){const blob=dataBlob(podeComprimir(id)?await comprimeImg(data):data),nome=nomeArqSt();await NV.db.arq.sobe(nome,blob);
   let velho=null;try{const v=await NV.db.doc('mock/'+id).get();if(v.exists)velho=v.data()}catch(e){}
   await NV.db.doc('mock/'+id).set({st:nome,tam:blob.size,tipo:blob.type,ts:now()});
   if(velho){if(velho.st&&velho.st!==nome)NV.db.arq.apaga([velho.st]).catch(()=>{});for(let k=0;k<(velho.n||0);k++)await NV.db.doc(`mockp/${id}~${k}`).delete().catch(()=>{})}}
@@ -3730,7 +3733,7 @@ async function thumbDe(src,ehPdf,N){const im=new Image();if(ehPdf){const pdf=awa
 async function arqSalvar(file,cli,tipo){if(file.size>15*1048576){toast(`${file.name} passa de 15 MB. Envie uma versão menor.`,false);return null}
   const id=uid('a'),e=extDe(file.name),mime=file.type||'';const a={id,cli,tipo,nome:file.name,mime,tam:file.size,ts:now(),bin:'A-'+id};
   if(tipo==='mockup'){const m=await mockDeArquivo(file);a.prev=m.p;a.bin='A-'+id;guardaMockG(a.bin,m.g)}
-  else{const data=await lerURL(file);guardaMockG(a.bin,data);
+  else{const data=await lerURL(file);SEM_COMPRIMIR.add(a.bin);guardaMockG(a.bin,data);
     try{if(/^image\//.test(mime)||['png','jpg','jpeg','webp','gif','svg'].includes(e)){a.prev=await thumbDe(data,false,240);a.vis=a.bin}
       else if(e==='pdf'||mime==='application/pdf'){a.prev=await thumbDe(data,true,240);const v=await thumbDe(data,true,1800);a.vis='V-'+id;guardaMockG(a.vis,v)}}catch(er){}}
   (state.arquivos=state.arquivos||[]).push(a);return a}

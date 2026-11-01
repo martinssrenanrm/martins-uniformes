@@ -99,6 +99,8 @@ const REAL=process.env.REAL||path.resolve(__dirname,'../../claude-code-scratch-r
   ok(!!mn.st&&!![...objs.keys()].find(k=>k.endsWith(mn.st))&&![...docs.keys()].some(p=>p.startsWith('mockp/NOVO')),'arquivo novo já vai direto para o Storage');
   await A.evaluate(async()=>{guardaMockG('NOVO','data:application/octet-stream;base64,'+btoa('programa de bordado .dst'));await new Promise(r=>setTimeout(r,800))});
   const mn2=docs.get('mock/NOVO')||{};ok(mn2.st&&mn2.st!==mn.st&&!objs.has('arquivos/'+mn.st)&&objs.get('arquivos/'+mn2.st).buf.toString()==='programa de bordado .dst','trocar o arquivo apaga o antigo do Storage; arquivo que não é imagem vai sem mexer');
+  await A.evaluate(async d=>{state.arquivos=state.arquivos||[];state.arquivos.push({id:'artex',tipo:'arte',bin:'A-artex',nome:'arte.png'});guardaMockG('A-artex',d);await new Promise(r=>setTimeout(r,800))},png);const ma=docs.get('mock/A-artex')||{};
+  ok(ma.st&&Math.abs(objs.get('arquivos/'+ma.st).buf.length-Buffer.from(png.split(',')[1],'base64').length)<10,'arte, logo e anexos vão no tamanho original (só mockup é comprimido)');
   SEM_STORAGE=true;await A.evaluate(async()=>{NV.arqOk=undefined;guardaMockG('SEMST','data:text/plain;base64,'+btoa('oi'));await new Promise(r=>setTimeout(r,800))});
   ok(docs.has('mockp/SEMST~0')&&await A.evaluate(()=>NV.arqOk===false),'banco sem Storage (sem a migração 006): continua guardando do jeito antigo');SEM_STORAGE=false;await A.evaluate(()=>{NV.arqOk=undefined});
   console.log('4c) Banco antigo, sem a migração 005');
