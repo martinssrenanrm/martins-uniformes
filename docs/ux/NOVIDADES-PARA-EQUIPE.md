@@ -633,3 +633,16 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Uma vez por semana, quem é da gestão vê o lembrete: **Cadastros › Ajustes › Cópias de segurança › Baixar cópia em arquivo**. Guarde o arquivo no computador.
 - Na mesma tela aparece quanto espaço os arquivos (mockups, artes, bordados) estão usando.
 - As imagens agora ficam guardadas menores, sem perder qualidade para ver e imprimir.
+
+---
+
+## Estoque certo e mais segurança nos dados
+
+**O que mudou:**
+- **Conferir tecidos e aviamentos:** tocar em **Tem** agora tira do estoque o que o pedido usa, igual ao botão **Já tem**. **Falta** devolve o que tinha saído. Antes, a conferência e os 3 botões faziam contas diferentes e o estoque ficava errado.
+- **Corrigir um pedido** não tira mais do estoque duas vezes o que já tinha saído.
+- **Produto que aparece em pedido já entregue** não pode ser apagado (o app avisa). Para parar de usar, troque o nome para "(não usar)".
+- **Etiqueta com QR:** o prestador não vê mais o preço da peça.
+- **Para a gestão:** o app passa a registrar o que acontece (quem começou, terminou, comprou, entregou). Isso aparece na aba nova **Painel › Resultados**: quanto dá para confiar nos números, prazo cumprido (e o prometido), tempo de cada processo comparado com o padrão, retrabalho, compras e onde a equipe mais desfaz. Os números começam a contar a partir de hoje.
+
+**O que NÃO mudou:** nenhum botão mudou de lugar.

@@ -9,10 +9,12 @@ const cid=process.env.CLIENTE||'martins';const cfgArq=path.join(__dirname,'..','
 if(!fs.existsSync(cfgArq)){console.error('Cliente não encontrado: '+cfgArq);process.exit(1)}
 const cli=JSON.parse(fs.readFileSync(cfgArq,'utf8'));
 const app=fs.readFileSync(path.join(__dirname,'..','app.html'),'utf8');
+// versão do app (vai junto em cada evento, para comparar antes e depois de uma mudança)
+const ver=require('crypto').createHash('sha1').update(app).digest('hex').slice(0,8);
 const html=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#16202C"><link rel="manifest" href="manifest.webmanifest">
 <title>${cli.nome}</title>
-<script>window.MARTINS_SB=${JSON.stringify({url,key})};window.CLIENTE=${JSON.stringify(cli)};</script></head><body>
+<script>window.MARTINS_SB=${JSON.stringify({url,key})};window.CLIENTE=${JSON.stringify(cli)};window.MARTINS_V=${JSON.stringify(ver)};</script></head><body>
 ${app}
 </body></html>`;
 const out=path.join(__dirname,'..','site');fs.mkdirSync(out,{recursive:true});

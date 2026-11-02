@@ -6,7 +6,7 @@
 - **Dados levados:** 135 documentos, conferidos por coleção.
 - **Para publicar uma mudança:** rode `tools/build.js` com a URL e a chave pública do projeto, faça o commit de `site/` e o push. A automação publica em cerca de 1 minuto.
 - **Pendência:** apagar as funções desligadas `public.importar_docs` e `public.exportar_docs`, usadas só na migração. Ninguém tem permissão de usá-las. O conector do Claude não roda `drop` sem confirmação; apague pelo SQL Editor do Supabase.
-- **Banco versionado:** tudo o que existe no banco está em `supabase/migrations/` (001 tabela e regras, 002 ficha pública do QR, 003 permissões, 004 anexos no QR, 005 sincronização leve, 006 arquivos no Storage). Mudança nova no banco = arquivo novo numerado.
+- **Banco versionado:** tudo o que existe no banco está em `supabase/migrations/` (001 tabela e regras, 002 ficha pública do QR, 003 permissões, 004 anexos no QR, 005 sincronização leve, 006 arquivos no Storage, 007 eventos e métricas, 008 QR sem preço). Mudança nova no banco = arquivo novo numerado.
 
 **Objetivo:** abrir o app em qualquer navegador, só com o e-mail e a senha do app, sem conta Claude.
 
@@ -90,3 +90,14 @@ Os arquivos (mockups, artes, programas de bordado) ficavam como texto dentro da 
 Desde a 006 vão para o Storage (bucket `arquivos`, 1 GB no plano grátis): imagem grande vira JPEG/WebP de até 2000 px (~5 vezes menor). `mock/<id>` guarda só `{st:'b/<nome aleatório>'}`.
 O bucket é público só para baixar um arquivo pelo nome (nomes aleatórios, ninguém lista). Enviar e apagar exigem login com acesso.
 Os arquivos antigos são levados sozinhos por um computador da gestão (não roda no celular). O espaço aparece em Cadastros › Ajustes › Cópias de segurança; acima de 80% a gestão é avisada.
+
+## Eventos e métricas (migração 007)
+- **`eventos`**: o que aconteceu, quem fez, onde e quando. Só acrescenta (ninguém altera nem apaga); reenvio não duplica (id do aparelho). Grava quem tem acesso; **lê só a gestão**.
+- **`uso`**: quantas vezes cada tela foi aberta, por dia (via `uso_conta`).
+- **Views `m_*`** e **`metricas(de, ate)`**: as contas ficam no banco; o painel recebe um JSON pequeno. Dias no fuso da fábrica (`config/main.fuso`, padrão America/Sao_Paulo).
+- Não entra no realtime nem no `docs_sinal`: eventos não voltam para os aparelhos.
+- Banco sem a 007: o app guarda os eventos no aparelho (até 5.000) e manda quando a tabela existir.
+- Testar migrações sem tocar em produção: Postgres local com a imitação do Supabase (roles `anon`/`authenticated`, `auth.jwt()`, `storage`), rodando 001 a 008 em ordem.
+
+## Página pública do QR (migração 008)
+A etiqueta vai para o prestador: a ficha pública **não leva o preço unitário nem o registro das etapas** (quem fez e quando). O mockup que já está no Storage volta como `st:<nome>` e o app baixa direto.

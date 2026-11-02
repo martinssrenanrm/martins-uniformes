@@ -1058,6 +1058,56 @@ const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto
 const pad=n=>String(n).padStart(2,'0');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const now=()=>Date.now();
+/* ===== Eventos: o que aconteceu, quem fez, onde e quando (fonte das métricas) =====
+   Estado (state) diz COMO ESTÁ. Eventos dizem O QUE ACONTECEU. Métricas saem dos eventos, calculadas no banco (migração 007).
+   Regra da casa: uma operação de negócio = uma função de domínio = um evento ev('entidade.acao',{...}).
+   Quem registra é a função que muda o dado, não o botão: assim o mesmo evento sai de qualquer tela (pedido, Kanban, lista…).
+   Os eventos ficam numa fila no aparelho e sobem em lotes para a tabela eventos. Não voltam para os outros aparelhos (não pesam no tráfego).
+   Desfazer não apaga: registra 'acao.desfeita' com os eventos que perderam valor. Campos: ver EV_CAMPOS. */
+const EV={fila:[],uso:{},tx:null,acao:null,tela:'',sem:false,busy:false,tG:null,tE:null};
+try{const f=JSON.parse(localStorage.getItem('ev-fila')||'[]');if(Array.isArray(f))EV.fila=f;const u=JSON.parse(localStorage.getItem('ev-uso')||'{}');if(u&&typeof u==='object')EV.uso=u}catch(e){}
+const APP_V=(typeof window!=='undefined'&&window.MARTINS_V)||'dev';
+const evUuid=()=>{try{if(crypto.randomUUID)return crypto.randomUUID()}catch(e){}const b=new Uint8Array(16);try{crypto.getRandomValues(b)}catch(e){for(let i=0;i<16;i++)b[i]=Math.random()*256|0}b[6]=b[6]&15|64;b[8]=b[8]&63|128;const h=[...b].map(x=>x.toString(16).padStart(2,'0')).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20)};
+function telaAtual(){try{const s=ui.sheet;if(s&&s.t)return s.t+(s.t==='novo'&&s.w&&s.w.step?'#'+s.w.step:'');const t=ui.tela||'';const sub={fabrica:ui.fz,gestor:ui.gt,cadastros:ui.gc,pedidos:ui.pv}[t];return t+(sub?'/'+sub:'')}catch(e){return ''}}
+/* o:{pessoa,ped,lote,ref,de,para,q,dur,retro,dados,ts,tela}. ts = quando o fato aconteceu (para registro feito depois: a hora informada); reg = quando foi registrado.
+   pessoa = de quem é o trabalho (pode não ser quem está com o app). acao = o toque que gerou o evento (um desfazer anula todos os eventos do toque). */
+function ev(tipo,o){o=o||{};let u=null;try{u=usuarioAtual()}catch(e){}
+  const S=v=>v==null||v===''?null:String(v);
+  const e={id:evUuid(),ts:new Date(o.ts||now()).toISOString(),reg:new Date(now()).toISOString(),acao:EV.acao||null,tipo,usuario:u?u.id:(typeof SESSAO!=='undefined'&&SESSAO&&SESSAO.id)||null,pessoa:S(o.pessoa),dv:typeof DEV!=='undefined'?DEV:null,tela:o.tela||telaAtual(),
+    ped:S(o.ped),lote:S(o.lote),ref:S(o.ref),de:S(o.de),para:S(o.para),q:o.q==null||isNaN(+o.q)?null:+o.q,dur:o.dur==null||isNaN(+o.dur)?null:Math.max(0,Math.round(+o.dur)),retro:!!o.retro,dados:o.dados&&Object.keys(o.dados).length?o.dados:null,v:1,app:APP_V};
+  EV.fila.push(e);if(EV.fila.length>5000)EV.fila.splice(0,EV.fila.length-5000);if(EV.tx)EV.tx.push(e.id);evGuarda();evAgenda();return e.id}
+function evGuarda(){clearTimeout(EV.tG);EV.tG=setTimeout(()=>{try{localStorage.setItem('ev-fila',JSON.stringify(EV.fila));localStorage.setItem('ev-uso',JSON.stringify(EV.uso))}catch(e){}},400)}
+function evAgenda(){if(EV.fila.length>=25){clearTimeout(EV.tE);EV.tE=setTimeout(evEnvia,300)}}
+/* Sobe a fila (até 200 por vez) e a contagem de telas. Reenvio não duplica (id único). Banco sem a migração 007: guarda e para de tentar. */
+async function evEnvia(){if(EV.busy||EV.sem||typeof SB_CFG==='undefined'||!SB_CFG||!NV.db||!NV.db.ev||!SB.user||NV.modo!=='nuvem')return;EV.busy=true;
+  try{while(EV.fila.length){const L=EV.fila.slice(0,200);await NV.db.ev.envia(L);const ids=new Set(L.map(x=>x.id));EV.fila=EV.fila.filter(x=>!ids.has(x.id));evGuarda()}
+    const U=Object.entries(EV.uso);if(U.length){const itens=U.map(([k,n])=>{const [dia,usuario,dv,tela]=k.split('|');return {dia,usuario,dv,tela,n}});EV.uso={};evGuarda();
+      try{await NV.db.ev.uso(itens)}catch(e){if(!(e&&e.code==='sem-eventos'))itens.forEach(x=>{const k=[x.dia,x.usuario,x.dv,x.tela].join('|');EV.uso[k]=(EV.uso[k]||0)+x.n});throw e}}}
+  catch(e){if(e&&e.code==='sem-eventos')EV.sem=true}finally{EV.busy=false}}
+/* Catálogo dos eventos: nome → o que significa. Nome novo só entra aqui (o teste confere que todo ev() usa um nome do catálogo). */
+const EV_TIPOS={
+  'pedido.criado':'Pedido criado','pedido.editado':'Pedido corrigido','pedido.prazo_alterado':'Data de entrega mudou','pedido.aprovado':'Cliente aprovou o pedido','pedido.aprovacao_desfeita':'Aprovação do pedido desfeita',
+  'pedido.entregue':'Pedido entregue','pedido.entrega_desfeita':'Entrega desfeita','pedido.cancelado':'Pedido cancelado','pedido.reativado':'Pedido voltou para a produção',
+  'vias.separadas':'Fichas e mockups separados','vias.desmarcadas':'Fichas e mockups desmarcados','arte.preparada':'Arte preparada','arte.preparo_desmarcado':'Arte preparada desmarcada',
+  'arte.aprovada':'Arte aprovada pelo cliente','arte.aprovacao_desmarcada':'Aprovação da arte desmarcada','arte.enviada':'Arte enviada para quem aplica','tarefa.atribuida':'Tarefa passada para outra pessoa',
+  'material.do_estoque':'Insumo saiu do estoque','material.comprado':'Insumo comprado','material.em_falta':'Insumo em falta','compras.lista_enviada':'Lista de compras enviada',
+  'etapa.iniciada':'Etapa começou','etapa.concluida':'Etapa terminou','etapa.pessoa_trocada':'Etapa passou para outra pessoa','etapa.pausada':'Etapa pausada','etapa.dividida':'Etapa dividida',
+  'etapa.inicio_cancelado':'Início cancelado','etapa.revertida':'Etapa voltou para ainda não feita','etapa.horario_corrigido':'Horário ou pessoa da etapa corrigidos',
+  'hora_extra.autorizada':'Hora extra marcada','hora_extra.encerrada':'Hora extra encerrada',
+  'etapa.terceirizada':'Etapa mandada para prestador','etapa.terceirizacao_desfeita':'Etapa volta para a fábrica','remessa.enviada':'Peças levadas ao prestador','remessa.retornada':'Peças voltaram do prestador',
+  'remessa.cancelada':'Peças não foram levadas','fornecedor.trocado':'Prestador trocado','conserto.aberto':'Peças mandadas para conserto',
+  'pessoa.ausente':'Pessoa fora agora','pessoa.disponivel':'Pessoa disponível','tempo_padrao.alterado':'Tempo padrão mudou','acesso.alterado':'Acesso ao app mudou',
+  'app.aberto':'App aberto','acao.desfeita':'Ação desfeita'};
+const isoOu=t=>t&&t>0?new Date(t).toISOString():null;
+/* Fotografia da etapa no momento do evento: o roteiro e os tempos padrão podem mudar depois, as métricas não. padrao = segundos por peça. */
+function evEtapa(tipo,l,s,x,o){o=o||{};let p=null,u=null;try{p=prod(l.prod);u=x&&x.maq?unidade(x.maq):null}catch(e){}
+  return ev(tipo,{ped:l.ped,lote:l.id,ref:s.id,pessoa:o.pessoa!==undefined?o.pessoa:(x&&x.op),q:o.q,dur:o.dur,retro:o.retro,ts:o.ts,de:o.de,para:o.para,
+    dados:{proc:s.nome,posto:s.posto,fase:typeof faseT==='function'?faseT(s.posto):undefined,maq:(x&&x.maq)||undefined,maqTipo:u?u.tipo:undefined,prod:p?p.nome:undefined,
+      padrao:s.min?Math.round(s.min*60):undefined,rework:l.rework||undefined,junto:(x&&x.junto)||undefined,parte:o.parte,...(o.dados||{})}})}
+function evPedidoCriado(p){if(!p)return;ev('pedido.criado',{ped:p.id,pessoa:p.vendedor,q:pecasPed(p),dados:{cli:p.cli,cliente:p.cliente,fonte:p.fonte||'manual',chegada:isoOu(p.chegada),entrega:isoOu(p.entrega),evento:p.evento||undefined,lotes:(state.lotes||[]).filter(l=>l.ped===p.id).length,pre:p.pre?1:undefined}})}
+const pecasPed=p=>sum((state.lotes||[]).filter(l=>l.ped===p.id&&!l.rework).map(l=>l.qtd||0));
+/* Uso das telas: conta cada vez que a pessoa chega numa tela (por dia), sem registrar o que viu. */
+function evUsoTela(){const t=telaAtual();if(!t||t===EV.tela)return;EV.tela=t;let u=null;try{u=usuarioAtual()}catch(e){}if(!u)return;const k=[hojeISO(),u.id,typeof DEV!=='undefined'?DEV:'?',t].join('|');EV.uso[k]=(EV.uso[k]||0)+1;evGuarda()}
 const fD=ts=>{const d=new Date(ts);return `${DOWc[d.getDay()]} ${pad(d.getDate())}/${pad(d.getMonth()+1)}`};
 /* Tempo sempre em segundos ou minutos (nunca "0,4 min"): 24 s · 1 min 30 s · 12 min · 1h27 */
 const tMin=min=>{const t=Math.max(0,Math.round((+min||0)*60));if(t<60)return `${t} s`;if(t<600){const m=Math.floor(t/60),ss=t%60;return ss?`${m} min ${ss} s`:`${m} min`}const m=Math.round(t/60);return m>=60?`${Math.floor(m/60)}h${pad(m%60)}`:`${m} min`};
@@ -1451,7 +1501,7 @@ const localTxt=x=>{if(x.parte==='Mangas')return (x.lado?LADOS[x.lado]:'Mangas')+
   return a.includes(b)||/peito|nuca|bolso|coxa|canela|gola|cos\b/.test(a)?x.pos:`${x.parte} · ${x.pos.toLowerCase()}`};
 let RC={};
 const usa=(R,x)=>x.partes&&x.partes.length?x.partes:(R.partes||[]);
-function rota(p0,pers,opc,cores){pers=pers||[];opc=opc||[];
+function rota(p0,pers,opc,cores){if(!p0||!p0.steps)return [];pers=pers||[];opc=opc||[];
   const os=(p0.opcoes||[]).filter(o=>opc.includes(o.id)).flatMap(o=>o.steps.map(z=>({...z,deps:[...z.deps],opt:o.nome})));
   const bs=[...p0.steps.map(z=>({...z,deps:[...z.deps]})),...os];
   os.forEach(z=>(z.antes||[]).forEach(a=>{const t=bs.find(y=>y.id===a);if(t&&!t.deps.includes(z.id))t.deps.push(z.id)}));
@@ -1698,7 +1748,11 @@ const MIGRACOES=[
   {v:10,nome:'Datas dos insumos: o que já existia fica com data desconhecida',fn:s=>{if(!s.tsInsV){(s.pedidos||[]).forEach(p=>{const M=p.materiais||[];M.forEach(m=>{if(m.conf&&!m.tConf)m.tConf=-1;if(m.st==='comprar'&&!m.tFalta)m.tFalta=-1;if(m.st==='pedido'&&!m.tComprado)m.tComprado=-1;if(m.st==='recebido'&&!m.tChegou)m.tChegou=-1});if(M.length&&M.every(m=>m.tConf===-1&&(m.st==='ok'||m.st==='recebido')))p.insOk=-1});s.tsInsV=1}}},
   {v:11,nome:'Setores viram cadastro',fn:s=>{if(!Array.isArray(s.setores)||!s.setores.length)s.setores=GRUPOS.map(g=>({...g,fase:g.id,porMaquina:g.id==='acab'}))}},
   {v:12,nome:'Perfil Operação antigo vira Escritório (mesmo acesso)',fn:s=>{(s.usuarios||[]).forEach(u=>{if(u.perfil==='operacao')u.perfil='escritorio'})}},
-  {v:13,nome:'Registro de personalização editada volta para a etapa certa',fn:s=>{(s.lotes||[]).forEach(l=>religaPers(l,s.forn))}}
+  {v:13,nome:'Registro de personalização editada volta para a etapa certa',fn:s=>{(s.lotes||[]).forEach(l=>religaPers(l,s.forn))}},
+  {v:14,nome:'Mockups repetidos na biblioteca da empresa viram um só',fn:s=>{const A=s.arquivos||[],G={};A.forEach(a=>{if(a.tipo!=='mockup'||!a.bin)return;const k=a.cli+'|'+a.bin;(G[k]=G[k]||[]).push(a)});const tira=new Set(),para={};
+    Object.values(G).forEach(L=>{if(L.length<2)return;const usado=L.find(a=>(s.lotes||[]).some(l=>l.mockArq===a.id))||L.slice().sort((x,y)=>(x.ts||0)-(y.ts||0))[0];L.forEach(a=>{if(a!==usado){tira.add(a.id);para[a.id]=usado.id}})});
+    if(!tira.size)return;(s.lotes||[]).forEach(l=>{if(para[l.mockArq])l.mockArq=para[l.mockArq]});(s.lotes||[]).forEach(l=>(l.pers||[]).forEach(x=>{if(Array.isArray(x.arqs))x.arqs=[...new Set(x.arqs.map(i=>para[i]||i))];['arte','bord'].forEach(k=>{if(para[x[k]])x[k]=para[x[k]]})}));
+    (s.pedidos||[]).forEach(p=>{if(Array.isArray(p.anexos))p.anexos=[...new Set(p.anexos.map(i=>para[i]||i))]});s.arquivos=A.filter(a=>!tira.has(a.id))}}
 ];
 const SCHEMA=MIGRACOES[MIGRACOES.length-1].v;
 function migrar(s){const v0=s.schema||0;MIGRACOES.forEach(m=>{if(m.v>v0)m.fn(s)});s.schema=SCHEMA}
@@ -1715,10 +1769,13 @@ function garanteCliente(nome,cnpj,contato,cliId){let c=cliId&&cliById(cliId)||ac
   else{if(!c.cnpj&&cnpj)c.cnpj=cnpj;if(!c.contato&&contato)c.contato=contato;const n=nCli(nome);if(n&&nCli(c.nome)!==n&&!(c.apelidos||[]).includes(n))(c.apelidos=c.apelidos||[]).push(n)}return c}
 function juntaClientes(s){const G={};(s.clientes||[]).forEach(c=>{const k=nCli(c.nome);(G[k]=G[k]||[]).push(c)});
   Object.values(G).forEach(L=>{if(L.length<2)return;const usados=L.filter(c=>(s.pedidos||[]).some(p=>p.cli===c.id));const fica=usados[0]||L[0];
-    L.forEach(c=>{if(c===fica)return;(s.pedidos||[]).forEach(p=>{if(p.cli===c.id)p.cli=fica.id});(s.arquivos||[]).forEach(a=>{if(a.cli===c.id)a.cli=fica.id});
+    const dg=x=>String(x||'').replace(/\D/g,''),junta=L.filter(c=>c===fica||!dg(c.cnpj)||!dg(fica.cnpj)||dg(c.cnpj)===dg(fica.cnpj));if(junta.length<2)return;
+    junta.forEach(c=>{if(c===fica)return;(s.pedidos||[]).forEach(p=>{if(p.cli===c.id)p.cli=fica.id});(s.arquivos||[]).forEach(a=>{if(a.cli===c.id)a.cli=fica.id});
       if(!fica.cnpj&&c.cnpj)fica.cnpj=c.cnpj;if(!fica.contato&&c.contato)fica.contato=c.contato;fica.apelidos=[...new Set([...(fica.apelidos||[]),...(c.apelidos||[])])]});
-    s.clientes=s.clientes.filter(c=>!L.includes(c)||c===fica)})}
-function mockNaBib(s){(s.lotes||[]).forEach(l=>{if(l.rework||!l.mock||l.mockArq)return;const p=(s.pedidos||[]).find(x=>x.id===l.ped);if(!p||!p.cli)return;const pr=(s.produtos||[]).find(x=>x.id===l.prod);const a={id:'a'+Date.now().toString(36)+Math.floor(Math.random()*1e4),cli:p.cli,tipo:'mockup',nome:`${pr?pr.nome:'Peça'} ${l.cor} · pedido ${l.ped}`,prev:l.mock,bin:l.id,ts:p.chegada||Date.now()};s.arquivos.push(a);l.mockArq=a.id})}
+    s.clientes=s.clientes.filter(c=>!junta.includes(c)||c===fica)})}
+function mockNaBib(s){(s.lotes||[]).forEach(l=>{if(l.rework||!l.mock||l.mockArq)return;const p=(s.pedidos||[]).find(x=>x.id===l.ped);if(!p||!p.cli)return;
+  const ja=(s.arquivos||[]).find(a=>a.id==='mk-'+l.id||(a.tipo==='mockup'&&a.bin===l.id&&a.cli===p.cli));if(ja){l.mockArq=ja.id;return}
+  const pr=(s.produtos||[]).find(x=>x.id===l.prod);const a={id:'mk-'+l.id,cli:p.cli,tipo:'mockup',nome:`${pr?pr.nome:'Peça'} ${l.cor} · pedido ${l.ped}`,prev:l.mock,bin:l.id,ts:p.chegada||Date.now()};s.arquivos.push(a);l.mockArq=a.id})}
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===8&&s.pedidos){normalizar(s);state=s;if(s.exemplo==null)s.exemplo=true;return}}catch(e){}seed();state.exemplo=true;normalizar(state)}
 
 /* ================= desenho dos produtos ================= */
@@ -2598,7 +2655,7 @@ function mudancasPed(w){const ped=pedById(w.edit);if(!ped)return[];const m=[],d=
     if(it.mockG)m.push(`${n}: mockup novo`)});
   ls.filter(l=>!IT.some(it=>it.lote===l.id)).forEach(l=>m.push(`Sai do pedido: ${prod(l.prod).nome} · ${modeloTxt(l)} · ${l.qtd} peças`));
   return m}
-function salvarEdicao(){const w=ui.sheet.w,ped=pedById(w.edit);if(!ped)return;const md=mudancasPed(w);if(!md.length)return;snap();
+function salvarEdicao(){const w=ui.sheet.w,ped=pedById(w.edit);if(!ped)return;const md=mudancasPed(w);if(!md.length)return;snap();const entregaAntes=ped.entrega;
   const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);
   Object.assign(ped,{cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim(),vendedor:w.vend,entrega:w.entrega});if(w.evento)ped.evento=true;else delete ped.evento;
   if((w.ficha||'').trim())ped.ficha=w.ficha.trim();else delete ped.ficha;if((w.obs||'').trim())ped.obs=w.obs.trim();else delete ped.obs;
@@ -2611,10 +2668,15 @@ function salvarEdicao(){const w=ui.sheet.w,ped=pedById(w.edit);if(!ped)return;co
     Object.assign(l,{pers,qtd,grade:{...it.g},gen:it.gen||undefined,variacao:it.variacao||undefined});if(!it.travado)Object.assign(l,{prod:it.prod,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...it.opcoes]});
     religaPers(l,state.forn);if(it.mockG){guardaMockG(l.id,it.mockG);l.mock=it.mock;delete l.mockBin}});arqsDaEmpresa(IT.flatMap(it=>it.pers),cl.id);
   const velhos=ped.materiais||[],lines=state.lotes.filter(l=>l.ped===ped.id&&!l.rework).map(l=>({prod:l.prod,cor:l.cor,cores2:l.cores2,tecido:l.tecido,opcoes:l.opcoes,g:l.grade,qtd:l.qtd}));
-  const novos=calcMat(lines).map(m=>{const o=velhos.find(x=>x.item===m.item);if(!o)return m;return {...m,conf:!!o.conf&&m.nec<=o.nec,st:o.st==='pedido'?'pedido':o.st==='ok'&&m.nec<=o.nec?'ok':m.st,...(o.falta!=null&&m.nec<=o.nec?{falta:o.falta,unF:o.unF}:{})}});
-  velhos.filter(o=>(o.extra||o.st==='pedido')&&!novos.some(m=>m.item===o.item)).forEach(o=>novos.push(o));ped.materiais=novos;
+  /* Corrigir o pedido não pode perder o que já aconteceu com cada insumo: o que saiu do estoque (baixa) e as datas da conferência e da compra.
+     Se a quantidade diminuiu, o que sobrou da baixa volta para o estoque; insumo que saiu do pedido devolve tudo. */
+  const devolve=(it,q)=>{if(q>0)state.estoque[it]=Math.round(((state.estoque[it]||0)+q)*1000)/1000};
+  const novos=calcMat(lines).map(m=>{const o=velhos.find(x=>x.item===m.item);if(!o)return m;const r={...m,conf:!!o.conf&&m.nec<=o.nec,st:o.st==='pedido'?'pedido':o.st==='ok'&&m.nec<=o.nec?'ok':m.st,...(o.falta!=null&&m.nec<=o.nec?{falta:o.falta,unF:o.unF}:{})};
+    ['tConf','tFalta','tComprado','tChegou'].forEach(k=>{if(o[k])r[k]=o[k]});if(o.baixa){const b=Math.min(o.baixa,m.nec);devolve(o.item,o.baixa-b);if(b>0)r.baixa=b}return r});
+  velhos.filter(o=>(o.extra||o.st==='pedido')&&!novos.some(m=>m.item===o.item)).forEach(o=>novos.push(o));
+  velhos.filter(o=>o.baixa&&!novos.some(m=>m.item===o.item)).forEach(o=>devolve(o.item,o.baixa));ped.materiais=novos;
   if(ped.pre){const f=faltaPed(ped);if(f.length)ped.pre=f;else delete ped.pre}
-  ped.edicoes=[...(ped.edicoes||[]),{ts:now(),por:quemNome()||usuarioAtual()?.nome||'',mud:md.slice(0,20)}].slice(-20);
+  ped.edicoes=[...(ped.edicoes||[]),{ts:now(),por:quemNome()||usuarioAtual()?.nome||'',mud:md.slice(0,20)}].slice(-20);ev('pedido.editado',{ped:ped.id,q:pecasPed(ped),dados:{mud:md.slice(0,20)}});if(entregaAntes!==ped.entrega)ev('pedido.prazo_alterado',{ped:ped.id,de:isoOu(entregaAntes),para:isoOu(ped.entrega)});
   registrar({tipo:'edicao',ped:ped.id,cli:ped.cliente,step:md.join(' | ').slice(0,300)});RC={};
   ui.sheet={t:'pedido',id:ped.id};commit();toast('Pedido corrigido')}
 /* Pausar no meio: registra quantas peças ficaram prontas, libera a máquina e o resto volta para a fila */
@@ -2692,7 +2754,7 @@ const FAQ=[
 {c:'esc',q:'Como deixo um setor sempre com a mesma pessoa?',k:'responsável fixo setor sempre dono automático compras',r:['Na aba Escritório, toque no botão redondo no canto do setor (foto ou bonequinhos).','Para cada tipo de tarefa, toque na pessoa (ou Automático, para o sistema dividir).'],ir:'fab:esc'},
 {c:'esc',q:'Alguém saiu (médico, rua). Como tiro as tarefas dela?',k:'pessoa saiu fora ausente faltou redistribuir',r:['No fim da aba Escritório, em "No escritório agora", toque no nome da pessoa.','Ela fica "fora" e as tarefas vão para outras pessoas. Toque de novo quando voltar.'],ir:'fab:esc'},
 {c:'esc',q:'Como marco que as fichas e os mockups (vias) foram separados?',k:'vias separar fichas mockups separei',r:['Escritório › Pedidos: tarefa "Separar as vias" → toque em Separei.','Ou abra o pedido e toque em Vias separadas, em "Antes de cortar".'],ir:'fab:esc'},
-{c:'esc',q:'Como confiro os tecidos e aviamentos (insumos) de um pedido?',k:'conferir insumos tecidos aviamentos estoque material conferência',r:['Escritório › Lista de compras: "Conferir insumos" → toque em Conferir (ou abra o pedido e toque em Insumos conferidos).','Vá até o estoque e, em cada item, toque em Tem ou Falta.','No Falta, escreva quanto falta, escolha a unidade (unidade, metro ou Kg) e toque em Pôr na lista de compras.','A lista de compras mostra exatamente o que falta.','Ao lado de cada quantidade aparece para quantas peças ela é (ex.: ≈ 14 metros para 15 Blusa de Agasalho). Assim dá para conferir a conta sem abrir a ficha.','Ao tocar em Falta, aparece também quanto dá por peça (ex.: ≈ 0,93 m por peça), para ver se a quantidade está dentro do normal.']},
+{c:'esc',q:'Como confiro os tecidos e aviamentos (insumos) de um pedido?',k:'conferir insumos tecidos aviamentos estoque material conferência',r:['Escritório › Lista de compras: "Conferir insumos" → toque em Conferir (ou abra o pedido e toque em Insumos conferidos).','Vá até o estoque e, em cada item, toque em Tem ou Falta. Tem tira do estoque o que o pedido usa; Falta devolve.','No Falta, escreva quanto falta, escolha a unidade (unidade, metro ou Kg) e toque em Pôr na lista de compras.','A lista de compras mostra exatamente o que falta.','Ao lado de cada quantidade aparece para quantas peças ela é (ex.: ≈ 14 metros para 15 Blusa de Agasalho). Assim dá para conferir a conta sem abrir a ficha.','Ao tocar em Falta, aparece também quanto dá por peça (ex.: ≈ 0,93 m por peça), para ver se a quantidade está dentro do normal.']},
 {c:'esc',q:'Faltou um item na conferência. Como acrescento?',k:'faltou item acrescentar incluir zíper entretela botão conferência insumo novo',r:['Abra a conferência (Conferir insumos).','Em "Faltou algum item na lista?", escreva o nome, a quantidade e a unidade.','Toque em Pôr. Depois toque em Tem ou Falta nele.']},
 {c:'esc',q:'Onde vejo tudo que falta comprar? Dá para imprimir ou mandar no WhatsApp?',k:'lista de compras falta comprar imprimir pdf whatsapp enviar fornecedor compra tudo',r:['Fábrica › Escritório › Lista de compras (no alto da tela).','Aparece tudo que falta comprar dos pedidos abertos, somado por item, com o pedido e a data de entrega.','Toque em Enviar no WhatsApp, Baixar PDF ou Imprimir.','Em cada item tem os 3 botões: caixa (Já tem, sai do estoque), carrinho (Comprei, libera a produção) e alerta (Em falta, fica na lista). Vale para todos os pedidos daquele item.']},
 {c:'esc',q:'Dá para separar a lista: uma só de tecidos, outra só de aviamentos?',k:'separar dividir malharia armarinho quem compra aba mover categoria',r:['Na Lista de compras, toque em Tecidos ou em Aviamentos (no alto).','O WhatsApp, o PDF e o Imprimir mandam só o que está na aba escolhida. Assim cada um recebe só o que vai comprar.','O app lembra a última aba usada no aparelho.','Algum item caiu no lugar errado (ex.: a gola ribana que vem da malharia)? Toque em \'É tecido? Mover\' embaixo dele. Vale para todas as cores daquele item.','Mover só muda a lista de compras. O que trava o corte e a costura continua igual.']},
@@ -3414,7 +3476,7 @@ function impCria2(e,g){
   const lines=g.itens.map(it=>({prod:it.prod,gen:it.gen||undefined,variacao:it.variacao||undefined,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...(it.opcoes||[])],pers:it.pers.map((x,j)=>({tipo:x.tipo,parte:x.parte,lado:x.parte==='Mangas'?x.lado:undefined,pos:x.pos||undefined,desc:x.desc||undefined,tam:x.tam||undefined,rot:x.rot||undefined,arte:x.arte||undefined,bord:x.bord||undefined,arqs:(x.arqs||[]).length?[...x.arqs]:undefined,id:'pz'+j})),g:{...it.g},qtd:sum(Object.values(it.g))||(g.ca?it.qtCA||0:0),mock:it.mock,mockG:it.mockG,obs:it.obs,preco:it.preco??undefined}));
   state.pedidos.push({id:num,cli:cl.id,ficha:(g.nums||[]).length>1?g.nums.join(' / '):(g.num||undefined),cliente:cl.nome,contato:g.contato.trim(),cnpj:g.cnpj.trim()||cl.cnpj||'',vendedor:g.vend,chegada:g.chegada||now(),entrega:g.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null,...(g.evento?{evento:true}:{}),fonte:g.ca?'contaazul':'ficha',obs:(g.obs||'').trim()||undefined,...(g.ca?{fin:JSON.parse(JSON.stringify(g.fin)),...(faltaItens(lines.map((x,i)=>({...g.itens[i],g:x.g}))).length?{pre:faltaItens(lines.map((x,i)=>({...g.itens[i],g:x.g})))}:{})}:{})});
   lines.forEach((x,i)=>state.lotes.push({id:`${num}-${i+1}`,ped:num,prod:x.prod,gen:x.gen,variacao:x.variacao,cor:x.cor,cores2:x.cores2,tecido:x.tecido,opcoes:x.opcoes,pers:x.pers,qtd:x.qtd,grade:x.g,desm:0,steps:{},rework:false,parent:null,mock:x.mock||undefined,obs:x.obs||undefined,preco:x.preco}));lines.forEach((x,i)=>{if(x.mockG)guardaMockG(`${num}-${i+1}`,x.mockG)});
-  e.grupos.splice(e.gi,1);if(e.grupos.length){e.gi=0;commit();toast(`${pedById(num)&&pedById(num).pre?"Pré-pedido":"Pedido"} ${num} criado. Falta ${e.grupos.length}`)}else{ui.sheet={t:'pedido',id:num};ui.tela='pedidos';commit();toast(`${pedById(num)&&pedById(num).pre?"Pré-pedido":"Pedido"} ${num} criado`)}}
+  evPedidoCriado(pedById(num));e.grupos.splice(e.gi,1);if(e.grupos.length){e.gi=0;commit();toast(`${pedById(num)&&pedById(num).pre?"Pré-pedido":"Pedido"} ${num} criado. Falta ${e.grupos.length}`)}else{ui.sheet={t:'pedido',id:num};ui.tela='pedidos';commit();toast(`${pedById(num)&&pedById(num).pre?"Pré-pedido":"Pedido"} ${num} criado`)}}
 // mockup: tira o fundo branco e a faixa de baixo, deixa quadrado
 async function mockDeArquivo(f){let src;
   if(/pdf$/i.test(f.type)||/\.pdf$/i.test(f.name)){const pdf=await pdfLib();const doc=await pdf.getDocument({data:new Uint8Array(await lerArq(f)),isEvalSupported:false}).promise;const pg=await doc.getPage(1);
@@ -3588,9 +3650,10 @@ function paginasDoc(e){const ped=pedById(e.id),ls=lotesDe(e.id).filter(l=>!l.rew
 const baseIns=item=>{const c=Object.keys(state.cores||{}).sort((a,b)=>b.length-a.length).find(c=>item.toLowerCase().endsWith(' '+c.toLowerCase()));return c?item.slice(0,-c.length-1).trim():item};
 const catIns=m=>(state.catIns||{})[baseIns(m.item)]||(m.un==='m'?'tecido':'aviamento');
 /* Os 3 botões (Já tem / Comprei / Em falta) num insumo. Usado no pedido, no Kanban e na Lista de compras somada. Devolve o que saiu do estoque. */
-function marcaIns(m,modo){const est=state.estoque;if(m.baixa){est[m.item]=(est[m.item]||0)+m.baixa;delete m.baixa}delete m.falta;delete m.unF;m.conf=true;
-  if(modo==='tem'){const tem=est[m.item]||0,b=Math.min(m.nec,tem);if(b>0){est[m.item]=Math.round((tem-b)*1000)/1000;m.baixa=b}m.st='ok';return b>0?b:0}
-  if(modo==='comprei'){m.st='recebido';m.tComprado=m.tComprado||now()}else m.st='comprar';return 0}
+function marcaIns(m,modo,ped){const est=state.estoque;if(m.baixa){est[m.item]=(est[m.item]||0)+m.baixa;delete m.baixa}delete m.falta;delete m.unF;m.conf=true;
+  const dd=()=>({un:m.un,nec:m.nec,cat:typeof catIns==='function'?catIns(m):undefined});
+  if(modo==='tem'){const tem=est[m.item]||0,b=Math.min(m.nec,tem);if(b>0){est[m.item]=Math.round((tem-b)*1000)/1000;m.baixa=b}m.st='ok';ev('material.do_estoque',{ped,ref:m.item,q:b>0?b:0,dados:dd()});return b>0?b:0}
+  if(modo==='comprei'){m.st='recebido';m.tComprado=m.tComprado||now();ev('material.comprado',{ped,ref:m.item,q:m.nec,dados:{...dd(),libera:1}})}else{m.st='comprar';ev('material.em_falta',{ped,ref:m.item,q:m.nec,dados:dd()})}return 0}
 const CAT_INS={tecido:'Tecidos',aviamento:'Aviamentos'};
 function listaCompras(cat){const M=new Map();const add=(sec,ped,m,k)=>{const un=m.unF||m.un,q=Math.max(0,m.falta!=null?+m.falta:(m.nec-(m.est||0)));const ct=catIns(m);if(cat&&cat!=='tudo'&&ct!==cat)return;const key=sec+'|'+m.item+'|'+un;let o=M.get(key);if(!o)M.set(key,o={sec,cat:ct,item:m.item,un,q:0,est:false,peds:[],refs:[]});o.q+=q;if(!m.conf)o.est=true;
     if(!o.peds.some(p=>p.id===ped.id))o.peds.push({id:ped.id,cli:ped.cliente,ent:ped.entrega,evento:!!ped.evento});o.refs.push([ped.id,k])};
@@ -3804,7 +3867,7 @@ async function backupNuvem(nome){if(NV.modo!=='nuvem'||!NV.db)return false;const
   try{for(let k=0;k<n;k++)await NV.db.doc(`backupp/${nome}~${k}`).set({d:data.slice(k*PARTE,(k+1)*PARTE)});await NV.db.doc(`backup/${nome}`).set({n,tam:data.length,ts:now(),por:quemNome()||'',pedidos:state.pedidos.length});return true}catch(e){return false}}
 async function backupDiario(){if(NV.modo!=='nuvem'||!NV.db)return;try{const hoje=hojeISO();const b=await NV.db.doc(`backup/${hoje}`).get();if(!b.exists)await backupNuvem(hoje);
   const L=await NV.db.collection('backup').get();const lim=Date.now()-15*DIA;for(const d of L.docs){const v=d.data();if(v&&v.ts<lim&&/^\d{4}-\d\d-\d\d$/.test(d.id)){for(let k=0;k<(v.n||0);k++)await NV.db.doc(`backupp/${d.id}~${k}`).delete();await NV.db.doc(`backup/${d.id}`).delete()}}
-  const X=await NV.db.collection('lixeira').get();const lx=Date.now()-60*DIA;for(const d of X.docs){if((d.data()?.ts||0)<lx)await NV.db.doc(`lixeira/${d.id}`).delete()}}catch(e){}}
+  const lx=Date.now()-60*DIA;const X=NV.db.lixIdx?await NV.db.lixIdx():(await NV.db.collection('lixeira').get()).docs.map(d=>({id:d.id,ts:d.data()?.ts||0}));for(const d of X){if((d.ts||0)<lx)await NV.db.doc(`lixeira/${d.id}`).delete()}}catch(e){}}
 async function lerBackup(nome){const m=await NV.db.doc(`backup/${nome}`).get();if(!m.exists)return null;const n=m.data().n;const ps=await Promise.all(Array.from({length:n},(_,k)=>NV.db.doc(`backupp/${nome}~${k}`).get()));if(ps.some(x=>!x.exists))return null;return JSON.parse(ps.map(x=>x.data().d).join(''))}
 async function restaurar(obj){if(!obj||!Array.isArray(obj.pedidos)||!Array.isArray(obj.produtos))throw new Error('arquivo inválido');await backupNuvem(`${hojeISO()}-antes-de-restaurar-${Date.now().toString(36)}`);
   const {_app,_ts,...st}=obj;snap();state=normalizar(st);RC={};save();render();tick()}
@@ -3940,6 +4003,42 @@ function gEquipe(desde){const D=gDados(desde),R=D.rank,tot=k=>sum(R.map(r=>r[k])
   <div class="card"><h2>Ocupação no período</h2><p class="dica" style="margin:-4px 0 8px">Parte do horário de trabalho (${fDur(D.disp)}) em que a pessoa estava com um processo em andamento. Faltas e folgas aparecem como tempo livre.</p>
     ${[...R].sort((a,b)=>b.ocup-a.ocup).map(r=>`<div class="grow"><span style="display:flex;gap:8px;align-items:center">${av(r.p.id,'s')}${esc(r.p.nome)}</span>${barra(r.ocup,1,r.ocup>=.7?'var(--go)':r.ocup>=.4?'var(--atn)':'var(--red)')}<b>${pctTxt(r.ocup)}</b></div>`).join('')}</div>
   <div class="card"><h2>Horas extras</h2>${R.some(r=>r.he>0)?[...R].filter(r=>r.he>0).sort((a,b)=>b.he-a.he).map(r=>`<div class="grow"><span style="display:flex;align-items:center;gap:8px">${av(r.p.id,'s')}${esc(r.p.nome)}</span>${barra(r.he,Math.max(...R.map(x=>x.he)),'#7A3E9D')}<b>${fDur(r.he)}</b></div>`).join('')+`<p class="dica" style="margin:8px 0 0">Total: <b>${fDur(tot('he'))}</b> no período.</p>`:'<p class="dica" style="margin:0">Nenhuma hora extra no período.</p>'}</div>`}
+/* ===== Resultados: números calculados no banco a partir dos eventos (o que aconteceu), não do estado atual ===== */
+const isoDia=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const TELA_NOME={'fabrica/maq':'Fábrica › Máquinas','fabrica/esc':'Fábrica › Escritório','fabrica/fora':'Fábrica › Fora',fabrica:'Fábrica',pedidos:'Pedidos','pedidos/ped':'Pedidos','pedidos/emp':'Empresas',
+  gestor:'Painel',cadastros:'Cadastros',pedido:'Pedido',maq:'Máquina',compras:'Lista de compras',ins:'Conferir insumos',doc:'Documentos',cli:'Empresa',etEd:'Corrigir etapa',hora:'Informar horário',
+  terc:'Mandar para prestador',prob:'Deu problema',pausa:'Pausar',div:'Dividir',he:'Hora extra',troca:'Trocar quem faz',ajuda:'Como usar',imp:'Importar ficha',mock:'Importar mockups'};
+const telaNome=t=>{if(!t)return 'outra tela';if(TELA_NOME[t])return TELA_NOME[t];const m=String(t).match(/^novo#(\d)$/);if(m)return 'Novo pedido (passo '+m[1]+')';const [a,b]=String(t).split('/');return (TELA_NOME[a]||a)+(b?' › '+b:'')};
+const minPeca=sg=>sg==null?'—':sg<90?Math.round(sg)+' s':nf(sg/60,1)+' min';
+function gResultados(per){const de=isoDia(now()-(per-1)*DIA),ate=isoDia(now());
+  if(!(typeof SB_CFG!=='undefined'&&SB_CFG&&NV.db&&NV.db.ev))return '<div class="card"><p class="dica" style="margin:0">Os resultados aparecem quando o app usa o banco próprio da fábrica.</p></div>';
+  const R0=ui.res,mesmo=R0&&R0.de===de&&R0.ate===ate;
+  if(!mesmo||(!R0.busy&&now()-R0.ts>120000)){ui.res={de,ate,ts:now(),busy:true,d:mesmo?R0.d:null};
+    NV.db.ev.metricas(de,ate).then(d=>{ui.res=d?{de,ate,ts:now(),d}:{de,ate,ts:now(),err:'gestao'}}).catch(e=>{ui.res={de,ate,ts:now(),err:e&&e.code==='sem-eventos'?'sem':'rede'}}).finally(()=>{if(ui.tela==='gestor'&&ui.gt==='res'&&!ui.sheet)render()})}
+  const R1=ui.res,d=R1&&R1.d;
+  if(!d){if(R1&&R1.err==='gestao')return '<div class="card"><p class="dica" style="margin:0">Só quem é da gestão vê os resultados.</p></div>';
+    if(R1&&R1.err==='sem')return '<div class="card"><p class="dica" style="margin:0">O banco ainda não tem a tabela de resultados. Avise '+esc(SUPORTE())+'.</p></div>';
+    if(R1&&R1.err)return '<div class="card"><p class="dica" style="margin:0">Não consegui buscar os resultados agora. Confira a internet e tente de novo.</p></div>';
+    return '<div class="card"><p class="dica" style="margin:0">Buscando os resultados…</p></div>'}
+  const P=d.pedidos||{},E=d.etapas||{},Ad=d.adesao||{},Rt=d.retrabalho||{},C=d.compras||{},pc=v=>v==null?'—':v+'%';
+  const k=(v,l)=>'<div class="kpi"><b>'+v+'</b><span>'+l+'</span></div>';
+  const conf=Ad.pct_na_hora;
+  const procs=(d.processos||[]).slice(0,12).map(p=>{const lento=p.seg_padrao&&p.seg_por_peca>p.seg_padrao*1.15;
+    return '<div class="grow"><span>'+esc(p.processo||'—')+'</span><span>'+nf(p.pecas,0)+' peças · '+minPeca(p.seg_por_peca)+'/peça'+(p.seg_padrao?' <small>(padrão '+minPeca(p.seg_padrao)+')</small>':'')+'</span><b'+(lento?' style="color:var(--red)"':'')+'>'+nf(p.horas,1)+' h</b></div>'}).join('');
+  const mot=Object.entries(Rt.motivos||{}).sort((a,b)=>b[1]-a[1]).map(([m,n])=>'<div class="grow"><span>'+esc(m)+'</span><b>'+nf(n,0)+'</b></div>').join('');
+  const desf=(d.desfazer||[]).map(x=>'<div class="grow"><span>'+esc(EV_TIPOS[x.acao]||x.acao)+'</span><span>'+esc(telaNome(x.tela))+'</span><b>'+x.n+'</b></div>').join('');
+  const uso=(d.uso||[]).slice(0,10).map(x=>'<div class="grow"><span>'+esc(telaNome(x.tela))+'</span><b>'+nf(x.n,0)+'</b></div>').join('');
+  return '<p class="dica" style="margin:0 0 10px">Desde '+fD(new Date(de+'T12:00').getTime())+'. Conta só o que foi registrado no app desde que ele passou a guardar o histórico.</p>'
+   +'<div class="card"><h2>Quanto dá para confiar nos números</h2><div class="kpis">'+k(pc(conf),'das etapas marcadas na hora')+k(pc(Ad.pct_depois),'marcadas depois')+'</div>'
+   +'<p class="dica" style="margin:6px 0 0">'+(conf==null?'Ainda não há etapas terminadas no período.':conf>=80?'Bom: a maior parte do trabalho é marcada na hora.':'Muita etapa é marcada depois. Os tempos abaixo ficam menos confiáveis até a equipe marcar Começar e Terminei na hora.')+'</p></div>'
+   +'<div class="card"><h2>Pedidos</h2><div class="kpis">'+k(P.entregues??0,'entregues')+k(pc(P.no_prazo_pct),'no prazo')+k(pc(P.no_prazo_inicial_pct),'no prazo prometido')+k(P.dias_medio==null?'—':nf(P.dias_medio,1),'dias, da entrada à entrega')+'</div>'
+   +'<p class="dica" style="margin:6px 0 0">'+(P.criados??0)+' '+((P.criados??0)===1?'pedido novo':'pedidos novos')+' e '+(P.cancelados??0)+' '+((P.cancelados??0)===1?'cancelado':'cancelados')+' no período. "No prazo prometido" compara com a primeira data combinada com o cliente, antes de qualquer mudança.</p></div>'
+   +'<div class="card"><h2>Produção</h2><div class="kpis">'+k(E.feitas??0,'etapas terminadas')+k(nf(E.horas||0,1),'horas registradas')+'</div>'
+   +(procs?'<div class="rk-l">'+procs+'</div><p class="dica" style="margin:6px 0 0">Em vermelho: mais de 15% acima do tempo padrão da época. Só etapas marcadas na hora.</p>':'')+'</div>'
+   +'<div class="card"><h2>Retrabalho</h2><div class="kpis">'+k(nf(Rt.pecas||0,0),'peças para conserto')+'</div>'+(mot?'<div class="rk-l">'+mot+'</div>':'')+'</div>'
+   +'<div class="card"><h2>Compras</h2><div class="kpis">'+k(C.itens_em_falta??0,'itens em falta')+k(C.horas_medio_ate_comprar==null?'—':nf(C.horas_medio_ate_comprar,1)+' h','da falta até comprar')+'</div></div>'
+   +(desf?'<div class="card"><h2>Onde a equipe mais desfaz</h2><p class="dica" style="margin:-4px 0 8px">Ajuda a achar o que confunde na tela.</p>'+desf+'</div>':'')
+   +(uso?'<div class="card"><h2>Telas mais usadas</h2>'+uso+'</div>':'')}
 function gAtrasos(desde){const at=state.pedidos.filter(p=>!p.concluido).map(p=>({p,f:info(p)})).sort((a,b)=>a.f.folga-b.f.folga);
   const ent=state.pedidos.filter(p=>p.concluido&&!p.cancelado&&p.concluido>=desde),late=ent.filter(p=>p.concluido>p.entrega+12*H);const esc_=tarefasEsc().filter(t=>t.late);
   return `<div class="kpis">${[[ent.length,'pedidos entregues'],[pctTxt(ent.length?(ent.length-late.length)/ent.length:null),'entregues no prazo'],[at.filter(x=>x.f.u==='crit').length,'vão atrasar'],[at.filter(x=>x.f.u==='warn').length,'prazo apertado'],[esc_.length,'terceirizados atrasados']].map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('')}</div>
@@ -3973,18 +4072,18 @@ function gTempos(){const E=calibTempos(),H=(state.temposHist||[]).slice(-5).reve
 function gConsertos(desde){const C=(state.consertos||[]).filter(c=>c.ts>=desde);if(!C.length)return '';const pm={};C.forEach(c=>pm[c.motivo]=(pm[c.motivo]||0)+c.n);const L=Object.entries(pm).sort((a,b)=>b[1]-a[1]);
   return `<div class="card"><h2>Consertos no período</h2>${L.map(([m,n])=>`<div class="grow"><span>${esc(m)}</span>${barra(n,L[0][1],'var(--red)')}<b>${n}</b></div>`).join('')}<p class="dica" style="margin:8px 0 0">${sum(L.map(x=>x[1]))} peças voltaram. O mesmo motivo repetido indica treino ou ajuste de máquina.</p></div>`}
 function vGestor(){const aba=(ui.gt==='ciclo'&&!modOn('ciclo')?'agora':ui.gt)||'agora',desde=gDesde(),per=ui.gp||7;
-  const abas=[['agora','Agora','i-alerta'],...(modOn('ciclo')?[['ciclo','Ciclo','i-grafico']]:[]),['equipe','Equipe','i-pessoas'],['atrasos','Atrasos','i-relogio'],['org','Organização','i-engr']];
+  const abas=[['agora','Agora','i-alerta'],['res','Resultados','i-grafico'],...(modOn('ciclo')?[['ciclo','Ciclo','i-grafico']]:[]),['equipe','Equipe','i-pessoas'],['atrasos','Atrasos','i-relogio'],['org','Organização','i-engr']];
   return `<div class="topo"><h1>Painel do gestor</h1>${sino()}</div>
   <div class="zonas g-abas">${abas.map(([k,n,i])=>`<button class="zona" data-a="gt" data-v="${k}" aria-pressed="${aba===k}">${ic(i)}<span>${n}</span></button>`).join('')}</div>
   ${aba==='agora'||aba==='ciclo'?'':`<div class="linha-dep" style="margin:0 0 14px">${PERIODOS.map(([d,n])=>`<button class="depc" data-a="gp" data-v="${d}" aria-pressed="${per===d}">${n}</button>`).join('')}</div>`}
-  ${aba==='agora'?gAgora():aba==='ciclo'?gCiclo():aba==='equipe'?gEquipe(desde):aba==='atrasos'?gAtrasos(desde):gOrg(desde)}
+  ${aba==='agora'?gAgora():aba==='res'?gResultados(per):aba==='ciclo'?gCiclo():aba==='equipe'?gEquipe(desde):aba==='atrasos'?gAtrasos(desde):gOrg(desde)}
   <p class="dica">Os números juntam o que foi registrado em todos os aparelhos.</p>`}
 
 /* ================= render ================= */
 const sheetId=s=>s.t+':'+(s.id||s.p||s.m||'');
 /* Link do QR code da etiqueta: #ficha=<peça> abre a ficha de produção dessa peça */
 let LINK_FICHA=(()=>{try{const m=location.hash.match(/ficha=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
-function render(){renderTela();ajBlocos();aplicaVocab()}
+function render(){renderTela();ajBlocos();aplicaVocab();evUsoTela()}
 /* Cor da marca do cliente (Ajustes › Sua empresa): vira a cor principal do app. Escurece sozinha se ficar clara demais para texto branco. */
 function aplicaCor(){const R=document.documentElement.style,c=String((state&&state.marca&&state.marca.cor)||'').trim();if(!/^#[0-9a-f]{6}$/i.test(c)){['--blue','--blue-dark','--blue-soft','--blue-line'].forEach(k=>R.removeProperty(k));return}
   let [r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));const lum=(r,g,b)=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)};
@@ -4013,13 +4112,13 @@ function renderTela(){RC={};aplicaCor();if(LINK_FICHA&&NV.pronto&&state&&usuario
   document.querySelectorAll('[aria-label]:not([title])').forEach(el=>el.title=el.getAttribute('aria-label'));
   ajustaA4();
   const f=document.getElementById('wCli');if(f&&!f.value)f.focus()}
-function snap(){undo=JSON.stringify(state)}
+function snap(){undo=JSON.stringify(state);EV.tx=[]}
 /* Aviso de sucesso: no alto da tela, some sozinho (4 s; 8 s quando tem Desfazer). Desfazer só nas ações do dia a dia sem confirmação. */
 /* Desfazer duradouro: guarda só o que a última ação mudou (por documento). Fica disponível por 15 minutos num botão fixo.
    Se alguém mexeu no mesmo pedido/peça depois, não desfaz (para não apagar o trabalho do outro). */
 let undoA=null;const UNDO_MS=15*60*1000;
 function guardaUndo(msg){if(!undo)return;try{const a=paraDocs(JSON.parse(undo)),d=paraDocs(state),P=[...new Set([...Object.keys(a),...Object.keys(d)])].filter(p=>!p.startsWith('log/')&&stab(a[p])!==stab(d[p]));
-  undoA=P.length?{msg,ts:now(),P,antes:Object.fromEntries(P.map(p=>[p,a[p]])),depois:Object.fromEntries(P.map(p=>[p,d[p]]))}:null}catch(e){undoA=null}desenhaUndo()}
+  undoA=P.length?{msg,acao:EV.acao,evs:[...(EV.tx||[])],ts:now(),P,antes:Object.fromEntries(P.map(p=>[p,a[p]])),depois:Object.fromEntries(P.map(p=>[p,d[p]]))}:null}catch(e){undoA=null}desenhaUndo()}
 function desenhaUndo(){let el=document.getElementById('undoF');if(!el){el=document.createElement('div');el.id='undoF';document.body.appendChild(el)}
   const ok=undoA&&now()-undoA.ts<UNDO_MS&&!document.querySelector('#toast [data-a=desfazer]');document.body.classList.toggle('com-undo',!!ok);el.innerHTML=ok?`<button class="undo-f" data-a="desfazer" aria-label="Desfazer: ${esc(undoA.msg)}">↶ Desfazer<span>${esc(undoA.msg.replace(/^Pronto!\s*/,''))}</span></button>`:''}
 function toast(msg,comDesfazer=false){const el=document.getElementById('toast');clearTimeout(toastT);if(comDesfazer)guardaUndo(msg);
@@ -4064,28 +4163,29 @@ const A={
   mResX:d=>{snap();delete (state.reservas||{})[d.m];ui.sheet.sel=null;commit();toast('Reserva tirada: o sistema volta a escolher')},
   pedido:d=>{ui.fx=null;openSheet({t:'pedido',id:d.id});if(avisos().some(p=>p.id===d.id))marcaVisto([d.id])},
   terminou:d=>{const t=tarefaNa(d.m);if(!t)return;if(t.grupo&&t.grupo.length){snap();const T=now(),tot=tempoUtil(t.x,T),G=[t,...t.grupo],w=G.map(g=>(g.s.min||1)*qtdEf(g.l)),W=sum(w)||1;
-      G.forEach((g,i)=>{g.x.st='ok';g.x.fim=T;const a=heAtiva(g.x,T-1);if(a)a.f=T;g.x.util=Math.round(tot*w[i]/W/MIN)});save();const n=`${pNome(t.x.op)} terminou ${G.length} ${jPal(t.s.posto)} juntos`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true);return}
-    snap();t.x.st='ok';t.x.fim=now();{const a=heAtiva(t.x,t.x.fim-1);if(a)a.f=t.x.fim}t.x.util=Math.round(tempoUtil(t.x)/MIN);if(t.pai)acertaPai(t.l,t.s.id);save();const n=t.pai?`${pNome(t.x.op)} terminou ${t.x.n} peças de ${t.s.nome}${t.pai.st==='ok'?'. Processo completo':`. Faltam ${qtdEf(t.l)-pecasFeitas(t.pai)}`}`:`${pNome(t.x.op)} terminou ${t.s.nome}`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true)},
-  comecar:d=>{if(!d.p)return;const l=lote(d.l);snap();const s=sMap(rp(l))[d.s],fora=!ready(l,s,pedById(l.ped));
+      G.forEach((g,i)=>{g.x.st='ok';g.x.fim=T;const a=heAtiva(g.x,T-1);if(a)a.f=T;g.x.util=Math.round(tot*w[i]/W/MIN);evEtapa('etapa.concluida',g.l,g.s,g.x,{q:qtdEf(g.l),dur:tot*w[i]/W/1000,dados:{peso:Math.round(w[i]/W*1000)/1000}})});save();const n=`${pNome(t.x.op)} terminou ${G.length} ${jPal(t.s.posto)} juntos`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true);return}
+    snap();t.x.st='ok';t.x.fim=now();{const a=heAtiva(t.x,t.x.fim-1);if(a)a.f=t.x.fim}const dms=tempoUtil(t.x);t.x.util=Math.round(dms/MIN);if(t.pai)acertaPai(t.l,t.s.id);evEtapa('etapa.concluida',t.l,t.s,t.x,{q:t.pai?t.x.n:qtdEf(t.l),dur:dms/1000,parte:t.pai?t.x.id:undefined,dados:{he:t.x.he&&t.x.he.length?1:undefined}});save();const n=t.pai?`${pNome(t.x.op)} terminou ${t.x.n} peças de ${t.s.nome}${t.pai.st==='ok'?'. Processo completo':`. Faltam ${qtdEf(t.l)-pecasFeitas(t.pai)}`}`:`${pNome(t.x.op)} terminou ${t.s.nome}`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true)},
+  comecar:d=>{if(!d.p)return;const l=lote(d.l);snap();const s=sMap(rp(l))[d.s],fora=!ready(l,s,pedById(l.ped));let modo0='',sug0='';
     {const P0=plano(),pl=P0.plan[d.m],rs=(state.reservas||{})[d.m],k=d.l+'|'+d.s;
-     const modo=fora?'fora':rs&&rs.l===d.l&&rs.s===d.s?'reserva':pl&&kIt(pl)===k?(pl.pessoa===d.p?'sugerido':'pessoa'):'outro';
+     const modo=fora?'fora':rs&&rs.l===d.l&&rs.s===d.s?'reserva':pl&&kIt(pl)===k?(pl.pessoa===d.p?'sugerido':'pessoa'):'outro';modo0=modo;sug0=pl?.pessoa||'';
      registrar({tipo:'inicio',modo,maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,sug:pl?.pessoa||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:s.nome})}const x0=l.steps[d.s];let alvo,retoma='';if(x0&&x0.partes){const n=restante(l,d.s);alvo={id:proxParte(x0),n,st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};x0.partes.push(alvo);acertaPai(l,d.s);retoma=` (${n} peças que faltavam)`}else alvo=l.steps[d.s]={st:'and',ini:now(),op:d.p,maq:d.m,manual:fora||undefined};let heTxt='';if(situacao().k!=='trab'){const ot=Object.values(plano().uso).map(q=>heAtiva(q.x)).filter(Boolean)[0];const ate=situacao().k==='pausa'?null:(ot?ot.f:heOpcoes()[1]||heOpcoes()[0]);if(ate){alvo.he=[{i:now(),f:ate}];heTxt=` · hora extra até ${tsHm(ate)}`}}const R_=state.reservas||{};Object.keys(R_).forEach(k=>{if(k===d.m||(R_[k].l===d.l&&R_[k].s===d.s))delete R_[k]});
     /* cortar junto: as outras peças escolhidas começam no mesmo instante, com a mesma pessoa e máquina */
     let nj=0;if(d.j){const gid=uid('j');String(d.j).split(',').filter(Boolean).forEach(k=>{const [lid,sid]=k.split('|'),l2=lote(lid);if(!l2||lid===d.l)return;const s2=sMap(rp(l2))[sid];if(!s2||stOf(l2,sid).st!=='pend'||l2.steps[sid]?.partes)return;
       const fora2=!ready(l2,s2,pedById(l2.ped));l2.steps[sid]={st:'and',ini:alvo.ini,op:d.p,maq:d.m,junto:gid,manual:fora2||undefined,...(alvo.he?{he:JSON.parse(JSON.stringify(alvo.he))}:{})};nj++;
-      registrar({tipo:'inicio',modo:'junto',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,sug:'',ped:l2.ped,cli:pedById(l2.ped).cliente,prod:prod(l2.prod).nome,step:s2.nome});Object.keys(R_).forEach(r=>{if(R_[r].l===lid&&R_[r].s===sid)delete R_[r]})});if(nj)alvo.junto=gid}
+      registrar({tipo:'inicio',modo:'junto',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,sug:'',ped:l2.ped,cli:pedById(l2.ped).cliente,prod:prod(l2.prod).nome,step:s2.nome});evEtapa('etapa.iniciada',l2,s2,l2.steps[sid],{q:qtdEf(l2),dados:{modo:'junto'}});Object.keys(R_).forEach(r=>{if(R_[r].l===lid&&R_[r].s===sid)delete R_[r]})});if(nj)alvo.junto=gid}
+    evEtapa('etapa.iniciada',l,s,alvo,{q:alvo.n||qtdEf(l),parte:alvo.n?alvo.id:undefined,dados:{modo:modo0,sug:sug0||undefined,fora:fora?1:undefined,he:alvo.he?1:undefined,juntos:nj||undefined}});
     ui.sheet=null;commit();toast(nj?`Pronto! ${pNome(d.p)} começou ${nj+1} ${jPal(s.posto)} juntos na ${unidade(d.m)?.nome||''}${heTxt}`:`Pronto! ${pNome(d.p)} começou ${s.nome}${retoma} na ${unidade(d.m)?.nome||''}${fora?' (fora da ordem)':''}${heTxt}`,true)},
   passarPessoa:d=>{const P=plano(),t=P.uso[d.m];if(!t||t.pai)return;if(P.ocup.has(d.p))return toast(`${pNome(d.p)} está ocupada em outra máquina`,false);snap();const de=t.x.op;
-    registrar({tipo:'troca',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,de,ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome});[t,...(t.grupo||[])].forEach(g=>{g.x.op=d.p});commit();toast(`${t.s.nome} passou de ${pNome(de)} para ${pNome(d.p)}`,true)},
+    registrar({tipo:'troca',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p,de,ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome});[t,...(t.grupo||[])].forEach(g=>{evEtapa('etapa.pessoa_trocada',g.l,g.s,g.x,{pessoa:d.p,de,para:d.p,dados:{dur_ate_aqui:Math.round(tempoUtil(g.x,now())/1000)}});g.x.op=d.p});commit();toast(`${t.s.nome} passou de ${pNome(de)} para ${pNome(d.p)}`,true)},
   tercAbre:d=>openSheet({t:'terc',l:d.l,s:d.s,m:d.m||null,volta:ui.sheet}),
   tercOk:d=>{const e=ui.sheet,l=lote(e.l),f=fornById(d.f);if(!l||!f)return;const x=l.steps[e.s];if(x&&x.partes)return toast('Esta etapa está em partes: termine ou pause as partes antes',false);if(x&&x.st==='ok')return toast('Esta etapa já foi feita',false);
     snap();if(x&&x.st==='and')delete l.steps[e.s];l.terc=l.terc||{};l.terc[e.s]=f.id;Object.keys(state.reservas||{}).forEach(k=>{const r=state.reservas[k];if(r.l===l.id&&r.s===e.s)delete state.reservas[k]});RC={};
-    const z=sMap(rp(l))[e.s];registrar({tipo:'terc',forn:f.id,ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:z?.nome||e.s});ui.sheet=e.m?{t:'maq',m:e.m}:(e.volta&&e.volta.t!=='etEd'?e.volta:e.volta?.volta||null);commit();toast(`${z?.nome||'Etapa'} vai para ${f.nome}: aparece em Fora › para levar`,true)},
-  tercVolta:d=>{const l=lote(d.l);if(!l||!l.terc||!l.terc[d.s]||stOf(l,d.s).st!=='pend')return;snap();delete l.terc[d.s];if(!Object.keys(l.terc).length)delete l.terc;RC={};ui.sheet=ui.sheet?.volta||null;commit();toast('A etapa volta a ser feita na fábrica',true)},
+    const z=sMap(rp(l))[e.s];if(z)evEtapa('etapa.terceirizada',l,z,x||null,{pessoa:null,dados:{forn:f.id,interrompeu:x&&x.st==='and'?1:undefined}});registrar({tipo:'terc',forn:f.id,ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:z?.nome||e.s});ui.sheet=e.m?{t:'maq',m:e.m}:(e.volta&&e.volta.t!=='etEd'?e.volta:e.volta?.volta||null);commit();toast(`${z?.nome||'Etapa'} vai para ${f.nome}: aparece em Fora › para levar`,true)},
+  tercVolta:d=>{const l=lote(d.l);if(!l||!l.terc||!l.terc[d.s]||stOf(l,d.s).st!=='pend')return;snap();ev('etapa.terceirizacao_desfeita',{ped:l.ped,lote:l.id,ref:d.s,dados:{forn:l.terc[d.s]}});delete l.terc[d.s];if(!Object.keys(l.terc).length)delete l.terc;RC={};ui.sheet=ui.sheet?.volta||null;commit();toast('A etapa volta a ser feita na fábrica',true)},
   irForn:()=>{ui.sheet=null;ui.tela='cadastros';ui.cad='forn';render()},
   etEd:d=>openSheet({t:'etEd',l:d.l,s:d.s,volta:ui.sheet}),
-  etCancIni:d=>{const l=lote(d.l),x=l&&l.steps[d.s];if(!x||x.st!=='and')return;snap();delete l.steps[d.s];RC={};ui.sheet=ui.sheet?.volta||null;commit();toast('Início cancelado: o trabalho voltou para a fila',true)},
-  etVolta:d=>{const l=lote(d.l),z=l&&sMap(rp(l))[d.s];if(!z)return;const dep=etDepois(l,z.id);pedeConfirma(dep.length?`Voltar "${z.nome}" e também ${dep.map(x=>'"'+x.nome+'"').join(', ')} para ainda não feitas?`:`Voltar "${z.nome}" para ainda não feita?`,'Sim, voltar',()=>{snap();[z,...dep].forEach(y=>{delete l.steps[y.id];Object.keys(state.reservas||{}).forEach(k=>{const r=state.reservas[k];if(r.l===l.id&&r.s===y.id)delete state.reservas[k]})});RC={};ui.sheet=ui.sheet?.volta||null;commit();toast(`${z.nome} voltou para ainda não feita`,true)})},
+  etCancIni:d=>{const l=lote(d.l),x=l&&l.steps[d.s];if(!x||x.st!=='and')return;snap();{const z=sMap(rp(l))[d.s];if(z)evEtapa('etapa.inicio_cancelado',l,z,x,{dados:{ini:isoOu(x.ini)}})}delete l.steps[d.s];RC={};ui.sheet=ui.sheet?.volta||null;commit();toast('Início cancelado: o trabalho voltou para a fila',true)},
+  etVolta:d=>{const l=lote(d.l),z=l&&sMap(rp(l))[d.s];if(!z)return;const dep=etDepois(l,z.id);pedeConfirma(dep.length?`Voltar "${z.nome}" e também ${dep.map(x=>'"'+x.nome+'"').join(', ')} para ainda não feitas?`:`Voltar "${z.nome}" para ainda não feita?`,'Sim, voltar',()=>{snap();[z,...dep].forEach(y=>{const xa=l.steps[y.id];if(xa)evEtapa('etapa.revertida',l,y,xa,{de:xa.st,dados:{fim:isoOu(xa.fim),util:xa.util}});delete l.steps[y.id];Object.keys(state.reservas||{}).forEach(k=>{const r=state.reservas[k];if(r.l===l.id&&r.s===y.id)delete state.reservas[k]})});RC={};ui.sheet=ui.sheet?.volta||null;commit();toast(`${z.nome} voltou para ainda não feita`,true)})},
   etFeita:d=>{const l=lote(d.l),z=l&&sMap(rp(l))[d.s];if(!z)return;const T=Math.floor(now()/(5*MIN))*5*MIN,est=Math.min(8*60,Math.max(5,Math.round((z.min||1)*qtdEf(l)/5)*5));openSheet({t:'hora',modo:'feito',m:null,l:d.l,s:d.s,p:(aptos(z.posto)[0]||{}).id,dia:diaIn(T),ini:hmIn(T-est*MIN),fim:hmIn(T),volta:ui.sheet?.volta})},
   etHora:d=>{const l=lote(d.l),x=l&&l.steps[d.s];if(!x||x.st!=='ok')return;openSheet({t:'hora',modo:'edit',m:x.maq||null,l:d.l,s:d.s,p:x.op,dia:diaIn(x.ini||x.fim),ini:hmIn(x.ini||x.fim),fim:hmIn(x.fim||x.ini),volta:ui.sheet?.volta})},
   jaFeito:d=>{const l=lote(d.l),z=l&&sMap(rp(l))[d.s];if(!z)return;const T=Math.floor(now()/(5*MIN))*5*MIN,est=Math.min(8*60,Math.max(5,Math.round((z.min||1)*qtdEf(l)/5)*5));openSheet({t:'hora',modo:'feito',m:d.m,l:d.l,s:d.s,p:d.p,dia:diaIn(T),ini:hmIn(T-est*MIN),fim:hmIn(T)})},
@@ -4093,15 +4193,15 @@ const A={
   horaP:d=>{const e=ui.sheet;['hDia','hIni','hFim'].forEach((id,i)=>{const n=document.getElementById(id);if(n)e[['dia','ini','fim'][i]]=n.value});e.p=d.v;render()},
   horaOk:()=>{const e=ui.sheet;['hDia','hIni','hFim'].forEach((id,i)=>{const n=document.getElementById(id);if(n)e[['dia','ini','fim'][i]]=n.value});e.err='';const l=lote(e.l),z=l&&sMap(rp(l))[e.s];if(!z)return;
     const ini=lerHm(e.dia,e.ini);if(!ini){e.err='Escolha o dia e a hora em que começou';return render()}if(ini>now()+MIN){e.err='O início não pode ser depois de agora';return render()}
-    if(e.modo==='ini'){const t=tarefaNa(e.m);if(!t||t.l.id!==l.id||t.s.id!==z.id){ui.sheet=null;return render()}snap();t.x.ini=ini;if(t.x.he)t.x.he.forEach(h=>{if(h.i<ini)h.i=ini});commit();ui.sheet={t:'maq',m:e.m};render();toast(`Início corrigido para ${tsHm(ini)}`,true);return}
+    if(e.modo==='ini'){const t=tarefaNa(e.m);if(!t||t.l.id!==l.id||t.s.id!==z.id){ui.sheet=null;return render()}snap();evEtapa('etapa.horario_corrigido',l,z,t.x,{de:isoOu(t.x.ini),para:isoOu(ini),dados:{campo:'ini'}});t.x.ini=ini;if(t.x.he)t.x.he.forEach(h=>{if(h.i<ini)h.i=ini});commit();ui.sheet={t:'maq',m:e.m};render();toast(`Início corrigido para ${tsHm(ini)}`,true);return}
     const fim=lerHm(e.dia,e.fim);if(!fim||fim<=ini){e.err='O horário em que terminou precisa ser depois do início';return render()}if(fim>now()+5*MIN){e.err='O fim não pode ser depois de agora';return render()}if(!e.p){e.err='Escolha quem fez';return render()}
-    if(e.modo==='edit'){const x=l.steps[z.id];if(!x||x.st!=='ok'){ui.sheet=e.volta||null;return render()}snap();Object.assign(x,{ini,fim,op:e.p,corrigido:{ts:now(),por:quemNome()||''}});x.util=Math.round((tempoUtil(x)||fim-ini)/MIN);RC={};ui.sheet=e.volta||null;commit();toast(`${z.nome}: ${pNome(e.p)}, das ${tsHm(ini)} às ${tsHm(fim)}`,true);return}
+    if(e.modo==='edit'){const x=l.steps[z.id];if(!x||x.st!=='ok'){ui.sheet=e.volta||null;return render()}snap();const antes={ini:x.ini,fim:x.fim,op:x.op,util:x.util};Object.assign(x,{ini,fim,op:e.p,corrigido:{ts:now(),por:quemNome()||''}});x.util=Math.round((tempoUtil(x)||fim-ini)/MIN);evEtapa('etapa.horario_corrigido',l,z,x,{pessoa:e.p,retro:true,ts:fim,dur:x.util*60,de:antes.op||'',para:e.p,dados:{campo:'feito',antes:{ini:isoOu(antes.ini),fim:isoOu(antes.fim),op:antes.op,util:antes.util},ini:isoOu(ini),fim:isoOu(fim)}});RC={};ui.sheet=e.volta||null;commit();toast(`${z.nome}: ${pNome(e.p)}, das ${tsHm(ini)} às ${tsHm(fim)}`,true);return}
     if(stOf(l,z.id).st!=='pend'||l.steps[z.id]?.partes){e.err='Essa etapa já começou ou já foi feita. Confira na máquina.';return render()}
     snap();const fora=!ready(l,z,pedById(l.ped));const x=l.steps[z.id]={st:'ok',ini,fim,op:e.p,maq:e.m||undefined,retro:true,manual:fora||undefined};x.util=Math.round((tempoUtil(x)||fim-ini)/MIN);
     const R_=state.reservas||{};Object.keys(R_).forEach(k=>{if(R_[k].l===l.id&&R_[k].s===z.id)delete R_[k]});
-    registrar({tipo:'retro',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:e.p,ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:z.nome,ini,fim});
+    registrar({tipo:'retro',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:e.p,ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:z.nome,ini,fim});evEtapa('etapa.concluida',l,z,x,{pessoa:e.p,q:qtdEf(l),dur:x.util*60,retro:true,ts:fim,dados:{ini:isoOu(ini),fora:fora?1:undefined}});
     const n=`${pNome(e.p)} fez ${z.nome} das ${tsHm(ini)} às ${tsHm(fim)}`;commit();if(e.m)openSheet({t:'maq',m:e.m,feito:n});else{ui.sheet=e.volta||null;render()}toast(n,true)},
-  etEscFeito:d=>{const l=lote(d.l),z=l&&sMap(rp(l))[d.s];if(!z||done(l,z.id))return;snap();const T=now();l.steps[z.id]={st:'ok',ini:T,fim:T,op:usuarioAtual()?.pessoa||'',por:quemNome()||''};commit();toast(`${z.nome}: feito`,true)},
+  etEscFeito:d=>{const l=lote(d.l),z=l&&sMap(rp(l))[d.s];if(!z||done(l,z.id))return;snap();const T=now();l.steps[z.id]={st:'ok',ini:T,fim:T,op:usuarioAtual()?.pessoa||'',por:quemNome()||''};evEtapa('etapa.concluida',l,z,l.steps[z.id],{q:qtdEf(l),dur:0,dados:{escritorio:1}});commit();toast(`${z.nome}: feito`,true)},
   impFichas:()=>{const i=document.getElementById('fImpF');i.value='';i.click()},
   impMocks:()=>{const i=document.getElementById('fImpM');i.value='';i.click()},
   wMock:d=>{wRead();ui.mockK=null;ui.mockL=null;ui.mockW=+d.k;const i=document.getElementById('fImpM1');i.value='';i.click()},
@@ -4152,11 +4252,11 @@ const A={
   compCatV:d=>{ui.compCat=d.v;try{localStorage.setItem('comp-cat',d.v)}catch(e){}render()},
   compMove:d=>{const b=baseIns(d.i),m0=state.pedidos.flatMap(p=>p.materiais||[]).find(m=>m.item===d.i);const atual=m0?catIns(m0):'aviamento',nova=atual==='tecido'?'aviamento':'tecido';snap();state.catIns={...(state.catIns||{})};const padrao=m0&&m0.un==='m'?'tecido':'aviamento';if(nova===padrao)delete state.catIns[b];else state.catIns[b]=nova;commit();toast(`${b}: agora em ${CAT_INS[nova]} (vale para todas as cores)`,true)},
   compMarca:d=>{const o=listaCompras().comprar.find(x=>x.item===d.i&&x.un===d.u);if(!o)return;snap();let saiu=0;
-    o.refs.forEach(([pid,k])=>{saiu+=marcaIns(pedById(pid).materiais[k],d.m)});
+    o.refs.forEach(([pid,k])=>{saiu+=marcaIns(pedById(pid).materiais[k],d.m,pid)});
     RC={};commit();toast(`${d.i}: ${d.m==='tem'?'já tem'+(saiu?` (saiu ${qtdTxt(saiu,o.un)} do estoque)`:''):d.m==='comprei'?'comprado':'em falta (confirmado)'} em ${o.peds.length} ${o.peds.length>1?'pedidos':'pedido'}`,true)},
-  compPdf:async()=>{const b=document.querySelector('[data-a=compPdf]');if(b)b.disabled=true;try{await gerarPdf(docCompras(listaCompras(compCat()),compTit()),nomeArq(`Lista de compras${compTit()?' '+compTit():''} ${dataCurta(now()).replace(/\//g,'-')}.pdf`))}catch(er){toast('Não consegui gerar o PDF. Verifique a internet e tente de novo, ou use Imprimir.',false)}finally{if(b)b.disabled=false}},
-  compPrint:()=>{const R=document.getElementById('docRender');R.innerHTML=docCompras(listaCompras(compCat()),compTit()).join('');document.body.classList.add('imprimindo');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('imprimindo');R.innerHTML=''},500)},150)},
-  compWhats:async()=>{const t=textoCompras(listaCompras(compCat()),compTit());try{if(navigator.share){await navigator.share({text:t});return}}catch(e){if(e&&e.name==='AbortError')return}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')},
+  compPdf:async()=>{ev('compras.lista_enviada',{dados:{canal:'pdf',cat:compCat(),itens:listaCompras(compCat()).comprar.length}});const b=document.querySelector('[data-a=compPdf]');if(b)b.disabled=true;try{await gerarPdf(docCompras(listaCompras(compCat()),compTit()),nomeArq(`Lista de compras${compTit()?' '+compTit():''} ${dataCurta(now()).replace(/\//g,'-')}.pdf`))}catch(er){toast('Não consegui gerar o PDF. Verifique a internet e tente de novo, ou use Imprimir.',false)}finally{if(b)b.disabled=false}},
+  compPrint:()=>{ev('compras.lista_enviada',{dados:{canal:'imprimir',cat:compCat(),itens:listaCompras(compCat()).comprar.length}});const R=document.getElementById('docRender');R.innerHTML=docCompras(listaCompras(compCat()),compTit()).join('');document.body.classList.add('imprimindo');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('imprimindo');R.innerHTML=''},500)},150)},
+  compWhats:async()=>{const t=textoCompras(listaCompras(compCat()),compTit());ev('compras.lista_enviada',{dados:{canal:'whatsapp',cat:compCat(),itens:listaCompras(compCat()).comprar.length}});try{if(navigator.share){await navigator.share({text:t});return}}catch(e){if(e&&e.name==='AbortError')return}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')},
   compCopia:async()=>{const t=textoCompras(listaCompras(compCat()),compTit());try{await navigator.clipboard.writeText(t);toast('Lista copiada: cole no WhatsApp',false)}catch(e){toast('Não consegui copiar. Use Enviar no WhatsApp.',false)}},
   compComprei:d=>{const L=listaCompras().comprar.find(o=>o.item===d.i&&o.un===d.u);if(!L)return;snap();L.refs.forEach(([pid,k])=>{const m=pedById(pid).materiais[k];if(m.baixa){state.estoque[m.item]=(state.estoque[m.item]||0)+m.baixa;delete m.baixa}m.conf=true;m.st='recebido';m.tComprado=m.tComprado||now()});RC={};commit();toast(`${d.i}: comprado em ${L.peds.length} ${L.peds.length>1?'pedidos':'pedido'}`,true)},
   docProd:d=>abreDoc('prod',d.id),
@@ -4168,19 +4268,19 @@ const A={
   docPdf:async()=>{const e=ui.sheet,ped=pedById(e.id);const b=document.querySelector('[data-a=docPdf]');if(b)b.disabled=true;
     try{await gerarPdf(paginasDoc(e),nomeArq(`${e.tipo==='pedido'?'Pedido':e.tipo==='etq'?'Etiquetas':'Producao'} ${ped.id} - ${ped.cliente}${e.so?' - peca '+e.so:''}.pdf`),e.tipo==='etq'?{w:100,h:80,pw:378,ph:302}:null)}catch(er){toast('Não consegui gerar o PDF. Verifique a internet e tente de novo, ou use Imprimir.',false)}finally{if(b)b.disabled=false}},
   docPrint:()=>{const R=document.getElementById('docRender');R.innerHTML=paginasDoc(ui.sheet).join('');document.body.classList.add('imprimindo');if(ui.sheet.tipo==='etq')ajustaEtq(R);if(ui.sheet.tipo==='prod')ajustaFicha(R);setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('imprimindo');R.innerHTML=''},500)},150)},
-  docAprov:d=>{const p=pedById(d.id);snap();p.aprov=p.aprov?undefined:{ts:now(),por:quemNome()||''};commit();toast(p.aprov?'Aprovação registrada':'Aprovação desfeita')},
+  docAprov:d=>{const p=pedById(d.id);snap();p.aprov=p.aprov?undefined:{ts:now(),por:quemNome()||''};ev(p.aprov?'pedido.aprovado':'pedido.aprovacao_desfeita',{ped:p.id});commit();toast(p.aprov?'Aprovação registrada':'Aprovação desfeita')},
   logoRm:()=>{snap();state.marca={...marca(),logo:''};commit()},
   termoAdd:()=>{snap();state.termos=[...(state.termos||TERMOS0).map(x=>[...x]),['Nova informação','Escreva aqui']];commit()},
   termoRm:d=>{snap();state.termos=(state.termos||TERMOS0).filter((_,i)=>i!==+d.i);commit()},
   insumos:d=>openSheet({t:'ins',id:d.id}),
-  insTem:d=>{const m=pedById(d.id).materiais[+d.k];snap();delete m.falta;delete m.unF;if(ui.sheet)ui.sheet.falta=null;m.conf=true;m.st=m.st==='pedido'?'recebido':'ok';commit()},
+  insTem:d=>{const m=pedById(d.id).materiais[+d.k];snap();if(ui.sheet)ui.sheet.falta=null;if(m.st==='pedido'){delete m.falta;delete m.unF;m.conf=true;m.st='recebido'}else marcaIns(m,'tem',d.id);commit()},
   insFalta:d=>{const m=pedById(d.id).materiais[+d.k];if(m.st==='pedido'){snap();m.conf=true;return commit()}const e=ui.sheet,k=+d.k;if(e.falta===k){e.falta=null;return render()}
     e.falta=k;e.ferr='';e.fq=m.falta!=null?String(m.falta).replace('.',','):String(Math.max(0,Math.ceil((m.nec||0)-(m.est||0)))||'');e.fu=(m.unF||m.un||'un')==='cone'?'un':(m.unF||m.un||'un');render();setTimeout(()=>{const i=document.getElementById('insFQ');if(i){i.focus();i.select()}},50)},
   insFU:d=>{wLerFalta();ui.sheet.fu=d.v;render()},
   insFaltaX:()=>{const e=ui.sheet;e.falta=null;e.ferr='';render()},
   insFaltaOk:d=>{wLerFalta();const e=ui.sheet,m=pedById(d.id).materiais[+d.k];const q=parseFloat(String(e.fq||'').replace(/\./g,'').replace(',','.'));
     if(!(q>0)){e.ferr='Escreva quanto falta (um número maior que zero).';return render()}
-    snap();m.conf=true;if(m.st!=='pedido')m.st='comprar';m.falta=q;m.unF=e.fu||m.un;e.falta=null;e.ferr='';commit();toast(`${m.item}: faltam ${faltaTxt(m)}. Foi para a lista de compras`)},
+    snap();const eraPed=m.st==='pedido';marcaIns(m,'falta',d.id);if(eraPed)m.st='pedido';m.falta=q;m.unF=e.fu||m.un;e.falta=null;e.ferr='';commit();toast(`${m.item}: faltam ${faltaTxt(m)}. Foi para a lista de compras`)},
   insAU:d=>{document.getElementById('insU').value=d.v;document.querySelectorAll('#insUs [data-a=insAU]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===d.v))},
   insAdd:d=>{const n=document.getElementById('insN').value.trim(),q=parseFloat(String(document.getElementById('insQ').value).replace(',','.'))||0,u=document.getElementById('insU').value;if(!n){toast('Escreva qual item');document.getElementById('insN').focus();return}if(!q){toast('Escreva quantos');document.getElementById('insQ').focus();return}snap();
     pedById(d.id).materiais.push({item:n,un:u,nec:Math.ceil(q),est:state.estoque[n]??0,st:'ok',conf:false,extra:true});commit();toast(`${n} adicionado. Agora confira se tem`)},
@@ -4236,9 +4336,9 @@ const A={
     if(!n||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast('Escreva o nome e um e-mail válido',false);return}if(state.usuarios.some(u=>normEmail(u.email)===e)){toast('Esse e-mail já tem acesso',false);return}
     snap();state.usuarios.push({id:uid('u'),email:e,nome:n,perfil:pf,pessoa:ps,hash:null,salt:null});commit();toast(`${n} pode entrar. No primeiro acesso cria a senha.`)},
   acsReset:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(SB_CFG){SB.c.auth.resetPasswordForEmail(u.email,{redirectTo:sbVolta()}).then(r=>toast(r.error?sbErro(r.error):`Mandamos para ${u.email} um link para criar uma senha nova`,false));return}snap();u.hash=null;u.salt=null;commit();toast(`${u.nome} vai criar uma senha nova no próximo acesso`)},
-  acsPerfilSel:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(!u||!PERFIS[d.v]||u.perfil===d.v)return;if(u.perfil==='gestao'&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão');return render()}snap();u.perfil=d.v;commit();toast(`${u.nome}: ${PERFIS[d.v]}`)},
+  acsPerfilSel:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(!u||!PERFIS[d.v]||u.perfil===d.v)return;if(u.perfil==='gestao'&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão');return render()}snap();ev('acesso.alterado',{ref:u.id,de:u.perfil,para:d.v});u.perfil=d.v;commit();toast(`${u.nome}: ${PERFIS[d.v]}`)},
   acsPerfil:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(u.id===usuarioAtual()?.id&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão',false);return}snap();u.perfil=u.perfil==='gestao'?'operacao':'gestao';commit()},
-  acsRm:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);snap();state.usuarios=state.usuarios.filter(x=>x.id!==d.id);commit();toast(`${u.nome} não tem mais acesso`)},
+  acsRm:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);snap();ev('acesso.alterado',{ref:u.id,de:u.perfil,para:'sem_acesso'});state.usuarios=state.usuarios.filter(x=>x.id!==d.id);commit();toast(`${u.nome} não tem mais acesso`)},
   segAgora:async()=>{toast('Guardando cópia…',false);const ok=await backupNuvem(`${hojeISO()}-manual-${tsHm(now()).replace(':','h')}`);toast(ok?'Cópia guardada na nuvem':'Sem nuvem agora. Use “Baixar cópia em arquivo”.',false)},
   setor:d=>openSheet({t:'setor',v:d.v}),
   donoSel:d=>{snap();state.donos={...(state.donos||{})};if(d.v)state.donos[d.f]=d.v;else delete state.donos[d.f];commit();toast(d.v?`${fNome(d.f)}: sempre com ${pNome(d.v)}`:`${fNome(d.f)}: automático`)},
@@ -4299,24 +4399,24 @@ const A={
   heSel:d=>{const e=ui.sheet;e.sel=e.sel.includes(d.m)?e.sel.filter(x=>x!==d.m):[...e.sel,d.m];render()},
   heAte:d=>{ui.sheet.ate=+d.v;render()},
   heOk:()=>{const e=ui.sheet,P=plano();if(!e.sel.length)return;snap();const t0=now();
-    e.sel.forEach(m=>{const t=P.uso[m];if(!t)return;const x=t.x;x.he=x.he||[];const a=heAtiva(x);if(a)a.f=e.ate;else x.he.push({i:t0,f:e.ate})});
+    e.sel.forEach(m=>{const t=P.uso[m];if(!t)return;const x=t.x;x.he=x.he||[];const a=heAtiva(x);if(a)a.f=e.ate;else x.he.push({i:t0,f:e.ate});if(t.l&&t.s)evEtapa('hora_extra.autorizada',t.l,t.s,x,{dados:{ate:isoOu(e.ate)}})});
     ui.sheet=null;commit();toast(`Hora extra até ${tsHm(e.ate)} para ${e.sel.length} ${e.sel.length>1?'pessoas':'pessoa'}`)},
-  hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`)},
+  hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();evEtapa('hora_extra.encerrada',t.l,t.s,t.x,{dur:(a.f-a.i)/1000});commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`)},
   ajPulo:d=>{ui.blk=ui.blk||{};ui.blk['aj:'+d.v]=true;render();setTimeout(()=>{const x=[...document.querySelectorAll('#app details.blk>summary h2')].find(h=>h.textContent.trim()===d.v);if(x){const c=x.closest('details');c.scrollIntoView({behavior:'smooth',block:'start'});c.classList.add('aj-luz');setTimeout(()=>c.classList.remove('aj-luz'),2500)}},40)},
   mvQuem:d=>{ui.mvP=d.v;try{localStorage.setItem('martins-mv',d.v)}catch(e){}render();window.scrollTo(0,0)},
   mvTroca:()=>{ui.mvP=null;try{localStorage.removeItem('martins-mv')}catch(e){}render()},
   chaoVer:()=>{ui.eu=false;ui.chao=true;ui.sheet=null;render();window.scrollTo(0,0)},
   chaoSair:()=>{ui.chao=false;render()},
-  tempoUsar:d=>{const [pid,sid]=String(d.k).split('|'),st=etapaProd(pid,sid),v=+d.v;if(!st||!(v>0))return;snap();(state.temposHist=state.temposHist||[]).push({ts:now(),p:pid,sid,nome:`${prod(pid)?.nome||''} · ${st.nome}`,de:st.min,para:v,por:quemNome()||''});if(state.temposHist.length>200)state.temposHist.splice(0,state.temposHist.length-200);st.min=v;RC={};commit();toast(`${st.nome}: agora ${minPc(v)} por peça`)},
+  tempoUsar:d=>{const [pid,sid]=String(d.k).split('|'),st=etapaProd(pid,sid),v=+d.v;if(!st||!(v>0))return;snap();(state.temposHist=state.temposHist||[]).push({ts:now(),p:pid,sid,nome:`${prod(pid)?.nome||''} · ${st.nome}`,de:st.min,para:v,por:quemNome()||''});if(state.temposHist.length>200)state.temposHist.splice(0,state.temposHist.length-200);ev('tempo_padrao.alterado',{ref:pid+'|'+sid,de:st.min,para:v,dados:{proc:st.nome,origem:'real'}});st.min=v;RC={};commit();toast(`${st.nome}: agora ${minPc(v)} por peça`)},
   tempoManter:d=>{snap();state.temposIgn={...(state.temposIgn||{}),[d.k]:now()};commit();toast('Mantido. O app volta a avisar se continuar diferente daqui a 30 dias')},
-  tempoUsarTodos:()=>{const E=calibTempos().slice(0,12);if(!E.length)return;snap();E.forEach(e=>{const st=etapaProd(e.p,e.sid);if(!st)return;(state.temposHist=state.temposHist||[]).push({ts:now(),p:e.p,sid:e.sid,nome:`${prod(e.p)?.nome||''} · ${st.nome}`,de:st.min,para:e.real,por:quemNome()||''});st.min=e.real});RC={};commit();toast(`${E.length} tempos atualizados com o real`)},
+  tempoUsarTodos:()=>{const E=calibTempos().slice(0,12);if(!E.length)return;snap();E.forEach(e=>{const st=etapaProd(e.p,e.sid);if(!st)return;ev('tempo_padrao.alterado',{ref:e.p+'|'+e.sid,de:st.min,para:e.real,dados:{proc:st.nome,origem:'real_todos'}});(state.temposHist=state.temposHist||[]).push({ts:now(),p:e.p,sid:e.sid,nome:`${prod(e.p)?.nome||''} · ${st.nome}`,de:st.min,para:e.real,por:quemNome()||''});st.min=e.real});RC={};commit();toast(`${E.length} tempos atualizados com o real`)},
   confSim:()=>{const c=ui.conf;ui.conf=null;desenhaConf();if(c&&c.fn)c.fn()},
   confNao:()=>{ui.conf=null;desenhaConf()},
   toastX:()=>{clearTimeout(toastT);document.getElementById('toast').innerHTML=''},
   desfazer:()=>{const U=undoA;document.getElementById('toast').innerHTML='';if(!U||now()-U.ts>UNDO_MS){undoA=null;desenhaUndo();return}
     const cur=paraDocs(state);const outro=U.P.some(p=>stab(cur[p])!==stab(U.depois[p]));undoA=null;undo=null;
     if(outro){desenhaUndo();toast('Não dá para desfazer: essa peça ou pedido já mudou depois (por você ou por outra pessoa). Corrija pelo pedido.',false);return}
-    U.P.forEach(p=>{if(U.antes[p]===undefined)delete cur[p];else cur[p]=U.antes[p]});const novo=normalizar(deDocs(cur));if(!novo.atrib)novo.atrib={};state=novo;ui.sheet=null;commit();desenhaUndo();toast('Desfeito: '+U.msg,false)},
+    U.P.forEach(p=>{if(U.antes[p]===undefined)delete cur[p];else cur[p]=U.antes[p]});const novo=normalizar(deDocs(cur));if(!novo.atrib)novo.atrib={};state=novo;ui.sheet=null;commit();desenhaUndo();EV.tx=null;ev('acao.desfeita',{ref:U.acao,dados:{ids:U.evs||[],msg:String(U.msg||'').slice(0,120)}});toast('Desfeito: '+U.msg,false)},
   problema:d=>openSheet({t:'prob',m:d.m,step:1,n:1,orig:null,mot:null}),
   pausar:d=>{const t=tarefaNa(d.m);if(!t)return;const tot=qtdDe(t),pad=t.s.min*tot*MIN,est=pad?Math.floor(tot*tempoUtil(t.x)/pad):0;openSheet({t:'pausa',m:d.m,n:Math.max(0,Math.min(tot-1,est)),err:''})},
   pzN:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('pzN')?.value,10);e.n=Math.max(0,(isNaN(v)?e.n:v)+(+d.d));e.err='';render()},
@@ -4324,7 +4424,7 @@ const A={
     if(n<0){e.err='O número não pode ser negativo.';return render()}if(n>=tot){e.err=`Se todas as ${tot} peças ficaram prontas, toque em Terminou.`;return render()}
     snap();const T=now(),x=t.x;{const a=heAtiva(x,T-1);if(a)a.f=T}const util=Math.round(tempoUtil({...x,fim:T})/MIN);
     if(!t.pai){paraPartes(x,n);const pt=x.partes[0];pt.st='ok';pt.fim=T;pt.util=util}else{x.st='ok';x.fim=T;x.util=util;x.n=n}
-    acertaPai(t.l,t.s.id);registrar({tipo:'pausa',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:x.op||t.pai?.op,ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n});
+    acertaPai(t.l,t.s.id);evEtapa('etapa.pausada',t.l,t.s,t.pai?x:(x.partes&&x.partes[0])||x,{pessoa:x.op||t.pai?.op,q:n,dur:util*60,dados:{restante:restante(t.l,t.s.id)}});registrar({tipo:'pausa',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:x.op||t.pai?.op,ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n});
     ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} pausado: ${n} prontas, ${restante(t.l,t.s.id)} voltam para a fila`)},
   dividir:d=>{const t=tarefaNa(d.m);if(!t)return;const tot=qtdDe(t);if(tot<2)return toast('Com uma peça só não dá para dividir',false);openSheet({t:'div',m:d.m,n:Math.floor(tot/2),m2:null,p2:null,err:''})},
   dvN:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('dvN')?.value,10);e.n=Math.max(1,(isNaN(v)?e.n:v)+(+d.d));e.err='';render()},
@@ -4335,18 +4435,19 @@ const A={
     snap();const x=t.x;let pai;if(!t.pai){paraPartes(x,tot-n2);pai=x}else{x.n=tot-n2;pai=t.pai}
     let txt=`${n2} peças ficam na fila para outra pessoa`;
     if(e.m2&&e.m2!=='depois'&&e.p2){const pt={id:proxParte(pai),n:n2,st:'and',ini:now(),op:e.p2,maq:e.m2};if(situacao().k!=='trab'){const a=heAtiva(t.x);if(a)pt.he=[{i:now(),f:a.f}]}pai.partes.push(pt);txt=`${pNome(e.p2)} começou ${n2} peças na ${unidade(e.m2)?.nome||''}`}
-    acertaPai(t.l,t.s.id);registrar({tipo:'divisao',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:e.p2||'',ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n:n2});
+    acertaPai(t.l,t.s.id);evEtapa('etapa.dividida',t.l,t.s,t.x,{q:n2,dados:{pessoa2:e.p2||undefined,maq2:e.m2&&e.m2!=='depois'?e.m2:undefined}});registrar({tipo:'divisao',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:e.p2||'',ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n:n2});
     ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} dividido: ${txt}`)},
   pMot:d=>{const s=ui.sheet,t=tarefaNa(s.m),pr=state.probs[+d.k];s.mot=pr.k;const opts=topo(t.p).filter(x=>(x.id===t.s.id||anc(t.p,t.s.id).has(x.id))&&faseT(x.posto)!=='corte').map(x=>x.id);s.orig=(pr.alvo||[]).find(a=>opts.includes(a))||t.s.id;s.step=2;render()},
   pN:d=>{const s=ui.sheet,t=tarefaNa(s.m);s.n=Math.min(qtdEf(t.l),Math.max(1,s.n+(+d.d)));render()},
   pNext:()=>{ui.sheet.step=3;render()},
   pOrig:d=>{ui.sheet.orig=d.s;render()},
-  pOk:()=>{const s=ui.sheet,t=tarefaNa(s.m);if(!s.orig)return;snap();makeRework(t.l,t.s.id,s.orig,s.n,s.mot,now(),t.x.op);const nome=sMap(t.p)[s.orig].nome;ui.sheet={t:'maq',m:s.m};commit();toast(`${s.n} ${s.n>1?'peças foram':'peça foi'} para conserto em ${nome}`)},
-  vias:d=>{const p=pedById(d.id);snap();p.vias=!p.vias;commit();if(p.vias)toast('Vias separadas')},
-  arte:d=>{const p=pedById(d.id);if(!p.artePrep&&!p.arte){toast('Prepare a arte antes',false);return}snap();p.arte=!p.arte;commit();if(p.arte)toast('Arte aprovada')},
-  arteEnv:d=>{const p=pedById(d.id),l=lote(d.l);if(!p.arte)return;snap();p.artes=p.artes||{};p.artes[l.id+':'+d.s]=now();commit();toast('Arte enviada')},
-  artePrep:d=>{const p=pedById(d.id);snap();p.artePrep=!p.artePrep;if(!p.artePrep)p.arte=false;commit();if(p.artePrep)toast('Arte preparada')},
-  disp:d=>{const p=pessoa(d.id);snap();p.disp=p.disp===false;commit();toast(p.disp?`${p.nome} disponível`:`${p.nome} fora agora: tarefas foram redistribuídas`)},
+  pOk:()=>{const s=ui.sheet,t=tarefaNa(s.m);if(!s.orig)return;snap();const opOrig=t.l.steps[s.orig]?.op;makeRework(t.l,t.s.id,s.orig,s.n,s.mot,now(),t.x.op);const nome=sMap(t.p)[s.orig].nome;
+    ev('conserto.aberto',{ped:t.l.ped,lote:t.l.id,ref:s.orig,q:s.n,pessoa:t.x.op,dados:{motivo:s.mot,proc_origem:nome,proc_detect:t.s.nome,etapa_detect:t.s.id,pessoa_origem:opOrig||undefined}});ui.sheet={t:'maq',m:s.m};commit();toast(`${s.n} ${s.n>1?'peças foram':'peça foi'} para conserto em ${nome}`)},
+  vias:d=>{const p=pedById(d.id);snap();p.vias=!p.vias;ev(p.vias?'vias.separadas':'vias.desmarcadas',{ped:p.id});commit();if(p.vias)toast('Vias separadas')},
+  arte:d=>{const p=pedById(d.id);if(!p.artePrep&&!p.arte){toast('Prepare a arte antes',false);return}snap();p.arte=!p.arte;ev(p.arte?'arte.aprovada':'arte.aprovacao_desmarcada',{ped:p.id});commit();if(p.arte)toast('Arte aprovada')},
+  arteEnv:d=>{const p=pedById(d.id),l=lote(d.l);if(!p.arte)return;snap();p.artes=p.artes||{};p.artes[l.id+':'+d.s]=now();ev('arte.enviada',{ped:p.id,lote:l.id,ref:d.s});commit();toast('Arte enviada')},
+  artePrep:d=>{const p=pedById(d.id);snap();const tinha=p.arte;p.artePrep=!p.artePrep;if(!p.artePrep)p.arte=false;ev(p.artePrep?'arte.preparada':'arte.preparo_desmarcado',{ped:p.id});if(tinha&&!p.arte)ev('arte.aprovacao_desmarcada',{ped:p.id});commit();if(p.artePrep)toast('Arte preparada')},
+  disp:d=>{const p=pessoa(d.id);snap();p.disp=p.disp===false;ev(p.disp?'pessoa.disponivel':'pessoa.ausente',{pessoa:p.id});commit();toast(p.disp?`${p.nome} disponível`:`${p.nome} fora agora: tarefas foram redistribuídas`)},
   troca:d=>openSheet({t:'troca',key:d.key,f:d.f}),
   tipoEd:d=>{const t=state.tipos.find(x=>x.id===d.t);openSheet(t?{t:'tipo',id:t.id,nome:t.nome,grupo:t.grupo,i:t.i,qtd:t.qtd||0,externo:!!t.externo,fechada:!!t.fechada,min:t.min||1,err:''}:{t:'tipo',id:null,nome:'',grupo:d.ext?'pers':'costura',i:d.ext?'i-bordado':'i-maquina',qtd:d.ext?0:1,externo:!!d.ext,min:1,err:''})},
   tPrazo:d=>{eRead();ui.sheet.prazo=Math.max(1,(ui.sheet.prazo||3)+(+d.d));render()},
@@ -4368,23 +4469,23 @@ const A={
     if(usoP.length){e.err=`Não dá para tirar: tem etapas em ${usoP.join(', ')}. Mude essas etapas para outra máquina antes.`;return render()}
     if(Object.keys(plano().uso).some(u=>u.startsWith(e.id+'-'))){e.err='Está em uso agora.';return render()}
     snap();state.tipos=state.tipos.filter(x=>x.id!==e.id);if(e.externo)state.forn=state.forn.filter(f=>f.servico!==e.id);state.pessoas.forEach(p=>{p.sabe=p.sabe.filter(x=>x!==e.id);p.melhor=p.melhor.filter(x=>x!==e.id)});ui.sheet=null;commit();toast(`${e.nome} tirada`)},
-  trocaSel:d=>{snap();{const t=tarefasEsc().find(x=>x.key===ui.sheet.key);if(t)registrar({tipo:'troca',f:t.f,de:t.resp||'',para:d.v||'',ped:t.ped.id,cli:t.ped.cliente,step:t.t})}if(d.v)state.atrib[ui.sheet.key]=d.v;else delete state.atrib[ui.sheet.key];ui.sheet=null;commit();toast(d.v?`Tarefa passada para ${pNome(d.v)}`:'O sistema volta a escolher')},
+  trocaSel:d=>{snap();{const t=tarefasEsc().find(x=>x.key===ui.sheet.key);if(t){registrar({tipo:'troca',f:t.f,de:t.resp||'',para:d.v||'',ped:t.ped.id,cli:t.ped.cliente,step:t.t});ev('tarefa.atribuida',{ped:t.ped.id,de:t.resp,para:d.v||'automatico',dados:{tarefa:t.f,titulo:String(t.t||'').slice(0,80)}})}}if(d.v)state.atrib[ui.sheet.key]=d.v;else delete state.atrib[ui.sheet.key];ui.sheet=null;commit();toast(d.v?`Tarefa passada para ${pNome(d.v)}`:'O sistema volta a escolher')},
   xFun:d=>{eRead();const e=ui.sheet;togl(e.funcoes,d.v);if(!e.funcoes.includes(d.v))e.melhor=e.melhor.filter(x=>x!==d.v);render()},
   xApp:d=>{eRead();ui.sheet.viaApp=!ui.sheet.viaApp;render()},
-  insMarca:d=>{const p=pedById(d.id),m=p&&p.materiais[+d.k];if(!m)return;snap();marcaIns(m,d.m);
+  insMarca:d=>{const p=pedById(d.id),m=p&&p.materiais[+d.k];if(!m)return;snap();marcaIns(m,d.m,p.id);
     RC={};commit();toast(`${m.item}: ${d.m==='tem'?'já tem'+(m.baixa?` (saiu ${qtdTxt(m.baixa,m.un)} do estoque)`:''):d.m==='comprei'?'comprado, liberado':'em falta, na lista de compras'}`,true)},
   comprei:d=>{const p=pedById(d.id);snap();p.materiais[+d.k].st='pedido';commit();toast('Compra anotada',true)},
   chegou:d=>{const p=pedById(d.id);snap();p.materiais[+d.k].st='recebido';commit();toast('Material chegou',true)},
   persOnde:d=>{const l=lote(d.l),x=(l.pers||[]).find(q=>q.id===d.s);if(!x)return;const [k,v]=String(d.v).split(':');snap();const st=l.steps[d.s];
-    if(k==='i'){x.tipo=v;delete x.forn;if(st&&st.st==='fora')delete l.steps[d.s]}
-    else{const f=fornById(v);if(!f)return;x.tipo=f.servico;x.forn=f.id;if(st&&st.st==='fora'){st.forn=f.id;st.op=f.leva}}
+    if(k==='i'){ev('fornecedor.trocado',{ped:l.ped,lote:l.id,ref:d.s,de:x.forn||x.tipo,para:'fabrica'});x.tipo=v;delete x.forn;if(st&&st.st==='fora')delete l.steps[d.s]}
+    else{const f=fornById(v);if(!f)return;ev('fornecedor.trocado',{ped:l.ped,lote:l.id,ref:d.s,de:x.forn||x.tipo,para:f.id,dados:{com_pecas_fora:st&&st.st==='fora'?1:undefined}});x.tipo=f.servico;x.forn=f.id;if(st&&st.st==='fora'){st.forn=f.id;st.op=f.leva}}
     RC={};commit();toast(k==='i'?'Vai ser feito aqui na fábrica':`Vai para ${fornById(v)?.nome}`)},
-  persDesfaz:d=>{const l=lote(d.l);if(!l.steps[d.s]||l.steps[d.s].st!=='fora')return;snap();delete l.steps[d.s];RC={};commit();toast('Desfeito: as peças continuam aqui')},
-  levei:d=>{const l=lote(d.l),s=sMap(rp(l))[d.s],f=fornEtapa(l,s);snap();l.steps[s.id]={st:'fora',saiu:now(),forn:f?.id,op:f?.leva};commit();toast(`${qtdEf(l)} peças foram para ${f?.nome||tNome(s.posto)}`,true)},
-  levouVoltou:d=>{const l=lote(d.l),s=l&&sMap(rp(l))[d.s];if(!s||stOf(l,s.id).st!=='pend')return;const f=fornEtapa(l,s);snap();const T=now();l.steps[s.id]={st:'ok',saiu:T,fim:T,forn:f?.id,op:f?.leva,semLevei:true};commit();toast(`${s.nome}: peças de volta na fábrica`,true)},
-  buscou:d=>{const l=lote(d.l),x=l&&l.steps[d.s];if(!x)return;snap();x.st='ok';x.fim=now();commit();toast('Peças de volta na fábrica',true)},
-  desEntregar:d=>{const p=pedById(d.id);if(!p||!p.concluido||p.cancelado)return;snap();p.concluido=null;registrar({tipo:'reativado',ped:p.id,cli:p.cliente,n:0});commit();toast(`Pedido de ${p.cliente} voltou para a produção`,true)},
-  entregar:d=>{const p=pedById(d.id);snap();p.concluido=now();commit();toast(`Pedido de ${p.cliente} entregue`)},
+  persDesfaz:d=>{const l=lote(d.l);if(!l.steps[d.s]||l.steps[d.s].st!=='fora')return;snap();ev('remessa.cancelada',{ped:l.ped,lote:l.id,ref:d.s,dados:{forn:l.steps[d.s].forn}});delete l.steps[d.s];RC={};commit();toast('Desfeito: as peças continuam aqui')},
+  levei:d=>{const l=lote(d.l),s=sMap(rp(l))[d.s],f=fornEtapa(l,s);snap();l.steps[s.id]={st:'fora',saiu:now(),forn:f?.id,op:f?.leva};evEtapa('remessa.enviada',l,s,l.steps[s.id],{pessoa:usuarioAtual()?.pessoa||null,q:qtdEf(l),dados:{forn:f?.id,prazo_dias:f?.prazo}});commit();toast(`${qtdEf(l)} peças foram para ${f?.nome||tNome(s.posto)}`,true)},
+  levouVoltou:d=>{const l=lote(d.l),s=l&&sMap(rp(l))[d.s];if(!s||stOf(l,s.id).st!=='pend')return;const f=fornEtapa(l,s);snap();const T=now();l.steps[s.id]={st:'ok',saiu:T,fim:T,forn:f?.id,op:f?.leva,semLevei:true};evEtapa('remessa.retornada',l,s,l.steps[s.id],{pessoa:usuarioAtual()?.pessoa||null,q:qtdEf(l),retro:true,dados:{forn:f?.id,sem_envio:1}});commit();toast(`${s.nome}: peças de volta na fábrica`,true)},
+  buscou:d=>{const l=lote(d.l),x=l&&l.steps[d.s];if(!x)return;snap();x.st='ok';x.fim=now();{const z=sMap(rp(l))[d.s];if(z)evEtapa('remessa.retornada',l,z,x,{pessoa:usuarioAtual()?.pessoa||null,q:qtdEf(l),dur:x.saiu?(x.fim-x.saiu)/1000:undefined,dados:{forn:x.forn}})}commit();toast('Peças de volta na fábrica',true)},
+  desEntregar:d=>{const p=pedById(d.id);if(!p||!p.concluido||p.cancelado)return;snap();ev('pedido.entrega_desfeita',{ped:p.id,de:isoOu(p.concluido)});p.concluido=null;registrar({tipo:'reativado',ped:p.id,cli:p.cliente,n:0});commit();toast(`Pedido de ${p.cliente} voltou para a produção`,true)},
+  entregar:d=>{const p=pedById(d.id);snap();p.concluido=now();ev('pedido.entregue',{ped:p.id,q:pecasPed(p),dados:{prazo:isoOu(p.entrega)}});commit();toast(`Pedido de ${p.cliente} entregue`)},
   /* cadastros */
   tQtd:d=>{const t=tipo(d.t),n=Math.max(0,(t.qtd||0)+(+d.d));if(n<t.qtd&&plano().uso[`${t.id}-${t.qtd}`]){toast(`A ${t.nome} ${t.qtd} está em uso agora`,false);return}snap();t.qtd=n;commit()},
   pesEd:d=>{const p=pessoa(d.id);openSheet(p?{t:'pes',id:p.id,nome:p.nome,foto:p.foto||'',papeis:[...(p.papeis||[])],sabe:[...p.sabe],melhor:[...p.melhor],funcoes:[...(p.funcoes||[])],viaApp:!!p.viaApp,disp:p.disp!==false,err:''}:{t:'pes',id:null,nome:'',papeis:['costura'],sabe:[],melhor:[],funcoes:[],viaApp:false,disp:true,err:''})},
@@ -4425,7 +4526,8 @@ const A={
   rmOpc:d=>{const p=prod(d.p);snap();p.opcoes.splice(+d.j,1);commit()},
   addOpc:d=>{const p=prod(d.p),g=id=>(document.getElementById(id)?.value||'').trim(),n=g('opN'),en=g('opE'),m=g('opM'),a=g('opA'),pt=g('opP'),mi=(parseFloat(g('opMin').replace(',','.'))||60)/60;if(!n||!en){toast('Escreva o nome do modelo e da etapa',false);return}
     snap();p.opcoes=p.opcoes||[];p.opcoes.push({id:uid('o'),nome:n,aviam:[],steps:[{...S(uid('x'),en,m,[p.steps[0].id],mi,{partes:pt?[pt]:[]}),antes:a?[a]:[]}]});commit();toast(`Modelo ${n} adicionado`)},
-  rmProd:d=>{const p=prod(d.p);if(state.lotes.some(l=>l.prod===p.id&&!pedById(l.ped)?.concluido)){toast('Tem pedido em aberto com este produto',false);return}snap();state.produtos=state.produtos.filter(x=>x.id!==p.id);ui.sheet=null;commit();toast(`${p.nome} excluído`)},
+  rmProd:d=>{const p=prod(d.p);if(!p)return;if(state.lotes.some(l=>l.prod===p.id&&!pedById(l.ped)?.concluido)){toast('Tem pedido em aberto com este produto',false);return}
+    if(state.lotes.some(l=>l.prod===p.id)){toast('Este produto aparece em pedidos já entregues ou cancelados. Para não perder o histórico, ele não pode ser apagado: troque o nome para "(não usar)".',false);return}snap();state.produtos=state.produtos.filter(x=>x.id!==p.id);ui.sheet=null;commit();toast(`${p.nome} excluído`)},
   rmEst:d=>{snap();delete state.estoque[d.v];commit()},
   addEst:()=>{const n=(document.getElementById('estN')?.value||'').trim(),q=parseFloat(document.getElementById('estQ')?.value)||0;if(!n)return;snap();state.estoque[n]=q;commit();toast(`${n} no estoque`)},
   addCat:()=>{snap();state.cats.push({id:uid('c'),nome:'Nova categoria',t:['U'],fator:1});commit()},
@@ -4540,8 +4642,8 @@ const A={
   pedCancelar:d=>{ui.cancPed=d.id;render()},
   pedCancN:()=>{ui.cancPed=null;render()},
   pedCancOk:d=>{const p=pedById(d.id);if(!p||p.concluido)return;const mot=(document.getElementById('cancMot')?.value||'').trim().slice(0,200);snap();const T=now();
-    pararPed(p,T);p.cancelado={ts:T,por:quemNome()||usuarioAtual()?.nome||'',motivo:mot};p.concluido=T;registrar({tipo:'cancelado',ped:p.id,cli:p.cliente,n:0});ui.cancPed=null;commit();toast(`Pedido de ${p.cliente} cancelado`)},
-  pedReativar:d=>{const p=pedById(d.id);if(!p||!p.cancelado)return;snap();p.concluido=null;p.cancelado=null;registrar({tipo:'reativado',ped:p.id,cli:p.cliente,n:0});commit();toast(`Pedido de ${p.cliente} voltou para a produção`)},
+    pararPed(p,T);p.cancelado={ts:T,por:quemNome()||usuarioAtual()?.nome||'',motivo:mot};p.concluido=T;ev('pedido.cancelado',{ped:p.id,q:pecasPed(p),dados:{motivo:mot||undefined}});registrar({tipo:'cancelado',ped:p.id,cli:p.cliente,n:0});ui.cancPed=null;commit();toast(`Pedido de ${p.cliente} cancelado`)},
+  pedReativar:d=>{const p=pedById(d.id);if(!p||!p.cancelado)return;snap();p.concluido=null;p.cancelado=null;ev('pedido.reativado',{ped:p.id});registrar({tipo:'reativado',ped:p.id,cli:p.cliente,n:0});commit();toast(`Pedido de ${p.cliente} voltou para a produção`)},
   pedEditar:d=>{const p=pedById(d.id);if(!p)return;openSheet({t:'novo',w:wDoPedido(p)})},
   wSalvarEd:()=>salvarEdicao(),
   wCriar:()=>{const w=ui.sheet.w,IT=expandeMF(w.itens),I=w.imp||null;snap();const numI=I&&/^\d+$/.test(I.num||'')&&!pedById(I.num)?I.num:null;const id=numI||String(state.seq++).padStart(4,'0');if(numI)state.seq=Math.max(state.seq,+numI+1);const lines=IT.map(it=>({prod:it.prod,gen:it.gen||undefined,variacao:it.variacao||undefined,cor:it.cor,cores2:JSON.parse(JSON.stringify(it.cores2||[])),tecido:it.tecido,opcoes:[...(it.opcoes||[])],pers:it.pers.map((x,j)=>({tipo:x.tipo,parte:x.parte,lado:x.lado,pos:x.pos,desc:x.desc||undefined,tam:x.tam||undefined,arte:x.arte||undefined,bord:x.bord||undefined,arqs:(x.arqs||[]).length?[...x.arqs]:undefined,rot:x.rot||undefined,id:'pz'+j})),g:{...it.g},qtd:sum(sizesAll().map(s=>it.g[s]||0))||(I&&I.ca?it.qtCA||0:0),obs:it.obs||undefined,preco:it.preco??undefined}));garanteTam(lines.flatMap(x=>Object.keys(x.g)));
@@ -4549,7 +4651,7 @@ const A={
     const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);if(I&&I.ca)dadosCliente(cl,I.cliDados||{});arqsDaEmpresa(lines.flatMap(x=>x.pers),cl.id);const preI=I&&I.ca?faltaItens(lines.map(x=>({...x,g:x.g}))):[];
     state.pedidos.push({...(I?{fonte:I.fonte,...(I.fin?{fin:JSON.parse(JSON.stringify(I.fin))}:{}),...(preI.length?{pre:preI}:{})}:{}),id,...((w.ficha||'').trim()?{ficha:w.ficha.trim()}:{}),...(w.evento?{evento:true}:{}),cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim()||cl.cnpj||'',vendedor:w.vend,chegada:(I&&I.chegada)||now(),entrega:w.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null,obs:(w.obs||'').trim()||undefined});
     IT.forEach((it,i)=>{if(it.mockG)guardaMockG(`${id}-${i+1}`,it.mockG)});lines.forEach((x,i)=>state.lotes.push({obs:x.obs,preco:x.preco,id:`${id}-${i+1}`,ped:id,mock:IT[i].mock||undefined,prod:x.prod,gen:x.gen,variacao:x.variacao,cor:x.cor,cores2:x.cores2,tecido:x.tecido,opcoes:x.opcoes,pers:x.pers,qtd:x.qtd,grade:x.g,desm:0,steps:{},rework:false,parent:null}));
-    ui.tela='pedidos';if(I&&(I.resto||[]).length){ui.sheet={t:'imp',gi:0,grupos:I.resto};commit();toast(`Pedido ${id} criado. Falta ${I.resto.length}`);return}ui.sheet={t:'pedido',id};commit();toast(preI.length?`Pré-pedido ${id} criado`:'Pedido criado')},
+    evPedidoCriado(pedById(id));ui.tela='pedidos';if(I&&(I.resto||[]).length){ui.sheet={t:'imp',gi:0,grupos:I.resto};commit();toast(`Pedido ${id} criado. Falta ${I.resto.length}`);return}ui.sheet={t:'pedido',id};commit();toast(preI.length?`Pré-pedido ${id} criado`:'Pedido criado')},
 };
 /* Confirmação na tela, com o verbo, para o que não tem volta. Cada regra devolve [pergunta, botão] ou nada (não precisa confirmar). */
 const CONF={
@@ -4578,8 +4680,8 @@ function pedeConfirma(txt,sim,fn){ui.conf={txt,sim,fn};desenhaConf()}
 function desenhaConf(){let el=document.getElementById('confirma');if(!el){el=document.createElement('div');el.id='confirma';document.body.appendChild(el)}
   const c=ui.conf;el.innerHTML=c?`<div class="conf-fundo" data-a="confNao"></div><div class="conf" role="alertdialog" aria-label="Confirmar"><p>${esc(c.txt)}</p><div class="acoes"><button class="big go" data-a="confSim">${ic('i-check')}${esc(c.sim)}</button><button class="big neutro" data-a="confNao">Cancelar</button></div></div>`:''}
 document.addEventListener('click',e=>{const z=e.target.closest('svg.mock[data-z]');if(z){e.preventDefault();e.stopPropagation();abreZoom(z.dataset.z);return}const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const nome=b.dataset.a,f=A[nome];if(!f)return;e.preventDefault();
-  if(CONF[nome]&&!b.dataset.ok){let q=null;try{q=CONF[nome](b.dataset)}catch(err){}if(q){const d={...b.dataset,ok:'1'};return pedeConfirma(q[0],q[1],()=>A[nome](d))}}
-  f(b.dataset)});
+  if(CONF[nome]&&!b.dataset.ok){let q=null;try{q=CONF[nome](b.dataset)}catch(err){}if(q){const d={...b.dataset,ok:'1'};return pedeConfirma(q[0],q[1],()=>{EV.acao=evUuid();A[nome](d)})}}
+  EV.acao=evUuid();f(b.dataset)});
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.blk){ui.blk=ui.blk||{};const era=ui.blk[d.dataset.blk];ui.blk[d.dataset.blk]=d.open;if(d.classList.contains('mapa')&&era!==d.open&&!!era!==d.open)render()}},true);
 /* Arrastar item de um fornecedor para outro (pela alça ⠿). Funciona com dedo e mouse. */
 {let arr=null;const alvo=(x,y)=>{const el=document.elementFromPoint(x,y);const f=el&&el.closest('.forn[data-forn]');return f&&f.dataset.serv===arr.serv&&!f.contains(arr.orig)?f:null};
@@ -4589,7 +4691,7 @@ document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.datas
   const fim=e=>{if(!arr)return;const a=arr;arr=null;a.g.remove();document.querySelectorAll('.f-saindo,.f-alvo').forEach(x=>x.classList.remove('f-saindo','f-alvo'));const el=document.elementFromPoint(e.clientX,e.clientY);const f=el&&el.closest('.forn[data-forn]');
     if(f&&f.dataset.serv===a.serv&&f!==a.orig){const [l,s]=a.k.split('|');A.fornMover({l,s,f:f.dataset.forn})}};
   document.addEventListener('pointerup',fim);document.addEventListener('pointercancel',e=>{if(arr){arr.g.remove();document.querySelectorAll('.f-saindo,.f-alvo').forEach(x=>x.classList.remove('f-saindo','f-alvo'));arr=null}})}
-document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)return;
+document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)return;EV.acao=evUuid();
   if(d.sel){const v=t.value;if(!v)return;if(v==='__nova'){if(d.nova)A[d.nova]({...d});return}A[d.sel]({...d,[d.key||'v']:v});return}
   if(t.id==='impNum'&&ui.sheet&&ui.sheet.t==='imp'){const g=ui.sheet.grupos[ui.sheet.gi];const ns=t.value.split(/[\/,;]|\be\b/).map(x=>x.trim()).filter(Boolean);g.num=ns[0]||'';g.nums=ns;return}
   if(t.id==='fModelo'&&t.files[0]){lerArq(t.files[0],true).then(txt=>{let m;try{m=JSON.parse(txt)}catch(e){}if(!m||m._modelo!==1)return toast('Esse arquivo não é um modelo de fábrica',false);ui.modPend=m;render()});return}
@@ -4726,8 +4828,8 @@ function soAquiEnviar(){const g=soAqui();if(!g)return;snap();let n=0;g.pedidos.f
   try{localStorage.removeItem('martins-so-aqui')}catch(e){}commit();toast(`${n} ${n>1?'pedidos enviados':'pedido enviado'} para a nuvem`,false)}
 function segLembra(){if(!ehGestao()||NV.modo!=='nuvem')return;const dias=state.segBaixou?Math.floor((now()-state.segBaixou)/864e5):99;if(dias<7)return;let d='';try{d=localStorage.getItem('seg-lembra')}catch(e){}if(d===hojeISO())return;try{localStorage.setItem('seg-lembra',hojeISO())}catch(e){}
   toast(state.segBaixou?`Faz ${dias} dias que ninguém baixa a cópia de segurança. Cadastros › Ajustes › Cópias de segurança.`:'Baixe a cópia de segurança da semana: Cadastros › Ajustes › Cópias de segurança.',false)}
-function nuvemAdotar(m,lix){soAquiGuardar(m,lix);NV.pronto=true;setTimeout(sinGuarda,0);setTimeout(segLembra,8000);NV.erro='';NV.acked=m;NV.last={};Object.entries(m).forEach(([p,v])=>NV.last[p]=stab(v));
-  const st=normalizar(deDocs(m));if(!st.atrib)st.atrib={};state=st;sbSessao();if(SB_CFG&&!SESSAO){render();return}NV.modo='nuvem';syncSt(NV.soLer?'ler':'ok');
+function nuvemAdotar(m,lix){soAquiGuardar(m,lix);NV.pronto=true;setTimeout(evEnvia,6000);setTimeout(sinGuarda,0);setTimeout(segLembra,8000);NV.erro='';NV.acked=m;NV.last={};Object.entries(m).forEach(([p,v])=>NV.last[p]=stab(v));
+  const st=normalizar(deDocs(m));if(!st.atrib)st.atrib={};state=st;sbSessao();if(SB_CFG&&!SESSAO){render();return}ev('app.aberto',{dados:{versao:APP_V,largura:typeof innerWidth!=='undefined'?innerWidth:undefined}});NV.modo='nuvem';syncSt(NV.soLer?'ler':'ok');
   try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}if(!NV.soLer)save();render();tick();nuvemOuvir();mockReparo();setTimeout(backupDiario,4000)}
 /* ================= Supabase (endereço próprio da Martins) =================
    Quando a página é aberta com window.MARTINS_SB={url,key} (index.html gerado por tools/build.js), o banco e o login
@@ -4770,7 +4872,14 @@ function sbDB(c){const T='docs';
   const sobe=async(nome,blob)=>{const {error}=await c.storage.from(BK).upload(nome,blob,{contentType:blob.type||'application/octet-stream',cacheControl:'31536000',upsert:false});
     if(error){if(/bucket not found/i.test(String(error.message))||String(error.statusCode)==='404')throw {semStorage:true,message:error.message};throw error}};
   const apaga=async nomes=>{if(!nomes.length)return;const {error}=await c.storage.from(BK).remove(nomes);if(error)throw error};
-  return {doc,collection,sinal:{sinais,ultimo,porPaths,todos,ouvir:ouvirSinal},arq:{sobe,apaga,url:n=>SB_CFG.url+'/storage/v1/object/public/'+BK+'/'+n.split('/').map(encodeURIComponent).join('/')}}}
+  /* Eventos (migração 007): só acrescenta; quem lê tudo é a gestão. */
+  const semEv=e=>(/42P01|PGRST205|PGRST202/.test(String(e&&e.code))||/eventos|uso_conta|metricas|schema cache/i.test(String(e&&e.message)))?{code:'sem-eventos',message:e&&e.message}:null;
+  const ev={envia:async rows=>{const {error}=await c.from('eventos').upsert(rows,{onConflict:'id',ignoreDuplicates:true});if(error)throw semEv(error)||error},
+    uso:async itens=>{const {error}=await c.rpc('uso_conta',{itens});if(error)throw semEv(error)||error},
+    metricas:async(de,ate)=>{const {data,error}=await c.rpc('metricas',{de,ate});if(error)throw semEv(error)||error;return data},
+    doPedido:async ped=>{const {data,error}=await c.from('eventos').select('*').eq('ped',ped).order('ts');if(error)throw semEv(error)||error;return data||[]}};
+  const lixIdx=async()=>{const out=[];for(let de=0;;de+=1000){const {data,error}=await c.from(T).select('path,ts:data->ts').eq('col','lixeira').order('path').range(de,de+999);if(error)falha(error);out.push(...data);if(data.length<1000)break}return out.map(x=>({id:x.path.slice(x.path.indexOf('/')+1),ts:+x.ts||0}))};
+  return {doc,collection,ev,lixIdx,sinal:{sinais,ultimo,porPaths,todos,ouvir:ouvirSinal},arq:{sobe,apaga,url:n=>SB_CFG.url+'/storage/v1/object/public/'+BK+'/'+n.split('/').map(encodeURIComponent).join('/')}}}
 const sbVolta=()=>location.origin+location.pathname;
 async function sbConectar(){let c;try{c=await sbCliente()}catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000);return}
   if(!SB.auth){SB.auth=true;c.auth.onAuthStateChange(ev=>{if(ev==='PASSWORD_RECOVERY'){ui.sbLogin={passo:'nova'};NV.pronto=false;NV.erro='login';render()}})}
@@ -4778,7 +4887,7 @@ async function sbConectar(){let c;try{c=await sbCliente()}catch(e){NV.erro='rede
   if(ui.sbLogin?.passo==='nova'||/type=recovery/.test(location.hash)){ui.sbLogin={passo:'nova'};NV.erro='login';render();return}
   if(!ses){NV.erro='login';NV.pronto=false;render();return}
   SB.user=ses.user;NV.db=sbDB(c);NV.erro='';
-  try{const m=await nuvemLer();let lix=[];try{lix=(await NV.db.collection('lixeira').get()).docs.map(d=>d.id.split('~')[0]==='pedidos'?d.id.split('~')[1]:null).filter(Boolean)}catch(e){}
+  try{const m=await nuvemLer();let lix=[];try{lix=(NV.db.lixIdx?await NV.db.lixIdx():(await NV.db.collection('lixeira').get()).docs.map(d=>({id:d.id}))).map(d=>d.id.split('~')[0]==='pedidos'?d.id.split('~')[1]:null).filter(Boolean)}catch(e){}
     if(!Object.keys(m).some(k=>k.startsWith('usuarios/'))){NV.erro='semacesso';render();return}
     return nuvemAdotar(m,lix)}
   catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000)}}
@@ -4799,7 +4908,7 @@ function vLoginSB(){const L=ui.sbLogin=ui.sbLogin||{passo:'entrar'},P=L.passo,ca
 async function nuvemConectar(){if(SB_CFG)return sbConectar();let db=null;try{db=await window.claude?.use?.('db')}catch(e){}
   if(!db){NV.erro='sem-db';render();return}NV.db=db;NV.erro='';
   try{const u=await window.claude.use('user');if(u){const w=await u.can('data.write');NV.soLer=w===false}}catch(e){}
-  try{const m=await nuvemLer();let lix=[];try{lix=(await NV.db.collection('lixeira').get()).docs.map(d=>d.id.split('~')[0]==='pedidos'?d.id.split('~')[1]:null).filter(Boolean)}catch(e){}
+  try{const m=await nuvemLer();let lix=[];try{lix=(NV.db.lixIdx?await NV.db.lixIdx():(await NV.db.collection('lixeira').get()).docs.map(d=>({id:d.id}))).map(d=>d.id.split('~')[0]==='pedidos'?d.id.split('~')[1]:null).filter(Boolean)}catch(e){}
     if(m['config/main']?.v||Object.keys(m).some(k=>/^(pedidos|lotes|pessoas|produtos|clientes)\//.test(k)))return nuvemAdotar(m,lix);
     if(NV.soLer){NV.erro='vazio';render();return}ui.inicio=true;NV.pronto=true;syncSt('');render()}
   catch(e){NV.erro='rede';render();clearTimeout(NV.timer);NV.timer=setTimeout(nuvemConectar,6000)}}
@@ -4814,6 +4923,7 @@ async function nuvemRefrescar(forca){if(NV.modo!=='nuvem'||!NV.db)return;if(NV.s
   catch(e){}finally{NV.refr=false}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(NV.pronto)nuvemRefrescar(true);else if(NV.erro&&NV.erro!=='sem-db')nuvemConectar()}});
 setInterval(nuvemRefrescar,120000);
+setInterval(evEnvia,20000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')evEnvia()});
 /* Versão nova do app: confere o endereço do próprio app a cada 20 min (não gasta o banco). Se mudou, recarrega sozinho
    quando ninguém está no meio de algo (sem janela aberta e tudo salvo), na volta para o app. */
 const APPV={tag:null,nova:false};

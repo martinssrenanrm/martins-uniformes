@@ -7,6 +7,8 @@ const merge=(a,b)=>{if(a&&b&&typeof a==='object'&&typeof b==='object'&&!Array.is
 const acesso=e=>!!e&&[...docs].some(([p,d])=>p.startsWith('usuarios/')&&String(d.email||'').toLowerCase()===String(e).toLowerCase());
 // banco novo (migração 005): tabela de sinais. SEM_SINAL=true simula um banco antigo, sem ela.
 const objs=new Map();let SEM_STORAGE=false;
+// eventos (migração 007): só acrescenta; SEM_EVENTOS simula banco sem a tabela
+const evs=new Map(),usoT=new Map();let SEM_EVENTOS=false,metricasPedidas=0;
 const sinal=new Map();let relogio=0,SEM_SINAL=false;const bytes={},pedidos={},baixou={};
 const sinaliza=(p,del)=>{const c=p.split('/')[0];if(c==='mockp'||c==='backupp')return;sinal.set(p,{path:p,col:c,upd:new Date(relogio=Math.max(Date.now(),relogio+1)).toISOString(),del:!!del})};
 async function avisa(p){for(const pg of pages)await pg.evaluate(p=>window.__sbPush&&(window.__sbPush({t:'docs',new:{path:p}}),window.__sbPush({t:'docs_sinal',new:{path:p}})),p).catch(()=>{})}
@@ -16,6 +18,9 @@ async function sbop0(k,a,b){
   if(k==='q'){const st=JSON.parse(b),pode=acesso(a);
     if(st.t==='docs_sinal'){if(SEM_SINAL)return {data:null,error:{code:'PGRST205',message:"Could not find the table 'public.docs_sinal' in the schema cache"}};if(!pode)return {data:[],error:null};
       let L=[...sinal.values()].filter(o=>casa(st.f,o)).map(o=>({...o}));L.sort((x,y)=>x.upd<y.upd?-1:1);if(st.ord&&!st.ord[1])L.reverse();if(st.range)L=L.slice(st.range[0],st.range[1]+1);if(st.lim)L=L.slice(0,st.lim);return {data:L,error:null}}
+    if(st.t==='eventos'){if(SEM_EVENTOS)return {data:null,error:{code:'PGRST205',message:"Could not find the table 'public.eventos' in the schema cache"}};if(!pode)return {data:null,error:{code:'42501',message:'new row violates row-level security policy'}};
+      if(st.op==='upsert'){(Array.isArray(st.payload)?st.payload:[st.payload]).forEach(e=>{if(!evs.has(e.id))evs.set(e.id,{...e,rec:new Date().toISOString()})});return {data:null,error:null}}
+      let L=[...evs.values()].filter(e=>casa(st.f.filter(f=>f[0]!=='col'),e));L.sort((x,y)=>x.ts<y.ts?-1:1);return {data:L,error:null}}
     if(st.op==='select'){if(!pode)return {data:st.single?null:[],error:null};let L=[...docs].filter(([p])=>casa(st.f,{path:p})).sort((x,y)=>x[0]<y[0]?-1:1).map(([p,d])=>({path:p,data:JSON.parse(JSON.stringify(d))}));
       if(st.range)L=L.slice(st.range[0],st.range[1]+1);return {data:st.single?(L[0]||null):L,error:null}}
     if(!pode)return {data:null,error:{code:'42501',message:'new row violates row-level security policy'}};
@@ -23,6 +28,9 @@ async function sbop0(k,a,b){
     if(st.op==='delete'){const p=(st.f.find(f=>f[0]==='path')||[])[1];docs.delete(p);sinaliza(p,true);setTimeout(()=>avisa(p),10);return {data:null,error:null}}}
   if(k==='up'){const o=JSON.parse(b);if(SEM_STORAGE)return {data:null,error:{message:'Bucket not found',statusCode:'404'}};if(!acesso(a))return {data:null,error:{message:'new row violates row-level security policy',statusCode:'403'}};objs.set(o.bk+'/'+o.name,{type:o.type,buf:Buffer.from(o.b64,'base64')});return {data:{path:o.name},error:null}}
   if(k==='rm'){const o=JSON.parse(b);if(!acesso(a))return {data:null,error:{message:'rls'}};o.names.forEach(n=>objs.delete(o.bk+'/'+n));return {data:[],error:null}}
+  if(k==='rpc'&&JSON.parse(b).fn==='metricas'){if(SEM_EVENTOS)return {data:null,error:{code:'PGRST202',message:'Could not find the function public.metricas'}};const g=[...docs].some(([p,d])=>p.startsWith('usuarios/')&&d.perfil==='gestao'&&String(d.email).toLowerCase()===String(a).toLowerCase());if(!g)return {data:null,error:null};
+    metricasPedidas++;return {data:{periodo:{de:'2026-10-27',ate:'2026-11-02',fuso:'America/Sao_Paulo'},pedidos:{criados:4,entregues:3,no_prazo_pct:67,no_prazo_inicial_pct:33,dias_medio:6.5,cancelados:0},etapas:{feitas:40,pecas:900,horas:31.5,pct_depois:25},processos:[{processo:'Costura teste',feitas:10,pecas:200,horas:8,seg_por_peca:144,seg_padrao:100}],retrabalho:{pecas:5,motivos:{'Costura torta':5}},compras:{itens_em_falta:2,horas_medio_ate_comprar:18},adesao:{pct_na_hora:75,pct_depois:25},desfazer:[{tela:'fabrica/maq',acao:'etapa.concluida',n:3}],uso:[{tela:'fabrica/maq',n:120},{tela:'pedido',n:40}]},error:null}}
+  if(k==='rpc'&&JSON.parse(b).fn==='uso_conta'){const {args}=JSON.parse(b);if(SEM_EVENTOS)return {data:null,error:{code:'PGRST202',message:'Could not find the function public.uso_conta'}};if(!acesso(a))return {data:null,error:null};(args.itens||[]).forEach(x=>{const k=[x.dia,x.usuario,x.dv,x.tela].join('|');usoT.set(k,(usoT.get(k)||0)+x.n)});return {data:null,error:null}}
   if(k==='rpc'){const {args}=JSON.parse(b);if(!acesso(a))return {data:null,error:{code:'42501',message:'row-level security'}};if(!docs.has(args.p))return {data:false,error:null};docs.set(args.p,merge(docs.get(args.p),args.patch));sinaliza(args.p);setTimeout(()=>avisa(args.p),10);return {data:true,error:null}}
   if(k==='login'){const u=users.get(a);if(!u||u.pass!==b)return {error:{message:'Invalid login credentials'}};if(!u.ok)return {error:{message:'Email not confirmed'}};return {}}
   if(k==='signup'){if(users.get(a)?.ok)return {error:{message:'User already registered'}};users.set(a,{pass:b,ok:false});avisos.push('confirmar:'+a);return {}}
@@ -103,6 +111,27 @@ const REAL=process.env.REAL||path.resolve(__dirname,'../../claude-code-scratch-r
   ok(ma.st&&Math.abs(objs.get('arquivos/'+ma.st).buf.length-Buffer.from(png.split(',')[1],'base64').length)<10,'arte, logo e anexos vão no tamanho original (só mockup é comprimido)');
   SEM_STORAGE=true;await A.evaluate(async()=>{NV.arqOk=undefined;guardaMockG('SEMST','data:text/plain;base64,'+btoa('oi'));await new Promise(r=>setTimeout(r,800))});
   ok(docs.has('mockp/SEMST~0')&&await A.evaluate(()=>NV.arqOk===false),'banco sem Storage (sem a migração 006): continua guardando do jeito antigo');SEM_STORAGE=false;await A.evaluate(()=>{NV.arqOk=undefined});
+  console.log('4e) Eventos sobem para o banco e não voltam para os aparelhos');
+  const nEv0=evs.size,sin0=[...sinal.keys()].filter(p=>p.startsWith('eventos')).length,bB0=bytes.B||0;
+  await A.evaluate(async()=>{ev('pedido.aprovado',{ped:'teste'});await evEnvia()});await B.waitForTimeout(600);
+  const evA=[...evs.values()];ok(evs.size>nEv0&&evA.some(e=>e.tipo==='pedido.aprovado'&&e.ped==='teste'&&e.usuario&&e.dv&&e.acao!==undefined),'os eventos do aparelho sobem para a tabela de eventos (com quem, onde e quando)');
+  ok(await A.evaluate(()=>EV.fila.length===0),'a fila do aparelho esvazia depois de subir');
+  ok([...sinal.keys()].filter(p=>p.startsWith('eventos')).length===sin0&&(bytes.B||0)-bB0<500,'eventos não viram aviso para os outros aparelhos (não pesam no tráfego)');
+  const n1=evs.size;await A.evaluate(async a=>{EV.fila.push(...a);await evEnvia()},evA.slice(0,3));ok(evs.size===n1,'reenviar o mesmo evento não duplica');
+  ok([...usoT.keys()].some(k=>k.includes('|A')===false),'conta as telas usadas (só o número por dia)');
+  SEM_EVENTOS=true;await A.evaluate(async()=>{EV.sem=false;ev('pedido.aprovado',{ped:'teste2'});await evEnvia()});
+  ok(await A.evaluate(()=>EV.sem===true&&EV.fila.some(e=>e.ped==='teste2')),'banco sem a migração 007: guarda no aparelho e não insiste');SEM_EVENTOS=false;await A.evaluate(()=>{EV.sem=false});
+  console.log('4f) Painel › Resultados (números calculados no banco)');
+  await A.evaluate(()=>{ui.sheet=null;ui.tela='gestor';ui.gt='res';ui.gp=7;ui.res=null;render()});await A.waitForTimeout(800);
+  const txtR=await A.evaluate(()=>document.getElementById('app').innerText);
+  ok(/Quanto dá para confiar/.test(txtR)&&/75%/.test(txtR)&&/no prazo prometido/.test(txtR)&&/33%/.test(txtR),'mostra quanto dá para confiar e o prazo prometido × final');
+  ok(/Costura teste/.test(txtR)&&/2,4 min\/peça/.test(txtR)&&/padrão 1,7 min/.test(txtR),'tempo por processo comparado com o padrão da época');
+  ok(/Costura torta/.test(txtR)&&/Onde a equipe mais desfaz/.test(txtR)&&/Fábrica › Máquinas/.test(txtR),'retrabalho por motivo, onde a equipe desfaz e telas mais usadas');
+  const n0m=metricasPedidas;await A.evaluate(()=>{render();render()});await A.waitForTimeout(300);ok(metricasPedidas===n0m,'não pede os números de novo a cada desenho da tela (no máximo a cada 2 minutos)');
+  const uB=[...docs].find(([p,d])=>p.startsWith('usuarios/')&&String(d.email).toLowerCase()==='roger@exemplo.test');const pf0=uB[1].perfil;uB[1].perfil='escritorio';
+  const tB=await B.evaluate(async()=>{ui.sheet=null;ui.tela='gestor';ui.gt='res';ui.res=null;render();await new Promise(r=>setTimeout(r,600));return document.getElementById('app').innerText});uB[1].perfil=pf0;
+  ok(!/Quanto dá para confiar/.test(tB)&&/Só quem é da gestão/.test(tB),'quem não é da gestão não recebe os números (o banco recusa)');await B.evaluate(()=>{ui.tela='fabrica';ui.gt=null;ui.res=null;render()});
+  await A.evaluate(()=>{ui.tela='fabrica';ui.gt=null;render()});
   console.log('4c) Banco antigo, sem a migração 005');
   SEM_SINAL=true;const D=await aparelho('D');await D.fill('#sbE','roger@exemplo.test');await D.fill('#sbS','roger12');await D.click('[data-a=sbEntrar]');await D.waitForTimeout(2500);
   ok(await D.evaluate(()=>NV.pronto&&NV.sinal===false&&state.pedidos.length>0),'sem a tabela de sinais, abre do jeito antigo');

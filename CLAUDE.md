@@ -39,6 +39,8 @@ A Martins é o primeiro cliente, não o produto. O mesmo código vai servir outr
 - atualização de dados que mude conteúdo (só formato) ou que rode a cada abertura re-impondo dado apagado. Atualização nova = novo item no fim de `MIGRACOES` (v = último + 1); roda uma vez por banco e fica registrada em `schema`;
 - acesso fixo. Os primeiros acessos vêm de `clientes/<id>.json` (`admins`), só quando o banco não tem nenhum usuário.
 
+**Arquitetura (ler antes de mexer): docs/ARQUITETURA.md.** Resumo: estado (docs, sincroniza) ≠ eventos (tabela eventos, só acrescenta, não sincroniza) ≠ métricas (views no banco). Toda operação de negócio registra um evento na **função que muda o dado** (`ev()`/`evEtapa()`), com nome do catálogo `EV_TIPOS`; corrigir ou desfazer gera evento novo, nunca apaga. O evento guarda a fotografia do momento (etapa, tempo padrão, máquina).
+
 Sincronização com o banco: só pelos sinais (`docs_sinal`, ver docs/SUPABASE.md › Tráfego). Nunca baixar coleções inteiras em intervalo nem ouvir a tabela `docs` inteira: estourou a cota do plano grátis em 10/2026.
 
 Insumos têm duas classificações separadas: **o que trava a produção** (tecido em metros trava o corte; o resto trava costura/acabamento) e **quem compra** (`catIns`: padrão tecido = metros, aviamento = resto; cada fábrica muda por item em `state.catIns`, chave = nome sem a cor). Não misture as duas.
@@ -80,6 +82,7 @@ NODE_PATH=$(npm root -g) node tests/terc-pessoa.test.js
 NODE_PATH=$(npm root -g) node tests/lista-compras.test.js
 NODE_PATH=$(npm root -g) node tests/anexos.test.js
 NODE_PATH=$(npm root -g) node tests/audios-2910.test.js
+NODE_PATH=$(npm root -g) node tests/eventos.test.js
 ```
 
 ## Supabase (endereço próprio)
