@@ -1079,11 +1079,11 @@ function ev(tipo,o){o=o||{};let u=null;try{u=usuarioAtual()}catch(e){}
 function evGuarda(){clearTimeout(EV.tG);EV.tG=setTimeout(()=>{try{localStorage.setItem('ev-fila',JSON.stringify(EV.fila));localStorage.setItem('ev-uso',JSON.stringify(EV.uso))}catch(e){}},400)}
 function evAgenda(){if(EV.fila.length>=25){clearTimeout(EV.tE);EV.tE=setTimeout(evEnvia,300)}}
 /* Sobe a fila (até 200 por vez) e a contagem de telas. Reenvio não duplica (id único). Banco sem a migração 007: guarda e para de tentar. */
-async function evEnvia(){if(EV.busy||EV.sem||typeof SB_CFG==='undefined'||!SB_CFG||!NV.db||!NV.db.ev||!SB.user||NV.modo!=='nuvem')return;EV.busy=true;
+async function evEnvia(){if(EV.sem&&now()-EV.sem>10*60000)EV.sem=false;if(EV.busy||EV.sem||typeof SB_CFG==='undefined'||!SB_CFG||!NV.db||!NV.db.ev||!SB.user||NV.modo!=='nuvem')return;EV.busy=true;
   try{while(EV.fila.length){const L=EV.fila.slice(0,200);await NV.db.ev.envia(L);const ids=new Set(L.map(x=>x.id));EV.fila=EV.fila.filter(x=>!ids.has(x.id));evGuarda()}
     const U=Object.entries(EV.uso);if(U.length){const itens=U.map(([k,n])=>{const [dia,usuario,dv,tela]=k.split('|');return {dia,usuario,dv,tela,n}});EV.uso={};evGuarda();
       try{await NV.db.ev.uso(itens)}catch(e){if(!(e&&e.code==='sem-eventos'))itens.forEach(x=>{const k=[x.dia,x.usuario,x.dv,x.tela].join('|');EV.uso[k]=(EV.uso[k]||0)+x.n});throw e}}}
-  catch(e){if(e&&e.code==='sem-eventos')EV.sem=true}finally{EV.busy=false}}
+  catch(e){if(e&&e.code==='sem-eventos')EV.sem=now()}finally{EV.busy=false}}
 /* Catálogo dos eventos: nome → o que significa. Nome novo só entra aqui (o teste confere que todo ev() usa um nome do catálogo). */
 const EV_TIPOS={
   'pedido.criado':'Pedido criado','pedido.editado':'Pedido corrigido','pedido.prazo_alterado':'Data de entrega mudou','pedido.aprovado':'Cliente aprovou o pedido','pedido.aprovacao_desfeita':'Aprovação do pedido desfeita',

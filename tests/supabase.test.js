@@ -120,7 +120,7 @@ const REAL=process.env.REAL||path.resolve(__dirname,'../../claude-code-scratch-r
   const n1=evs.size;await A.evaluate(async a=>{EV.fila.push(...a);await evEnvia()},evA.slice(0,3));ok(evs.size===n1,'reenviar o mesmo evento não duplica');
   ok([...usoT.keys()].some(k=>k.includes('|A')===false),'conta as telas usadas (só o número por dia)');
   SEM_EVENTOS=true;await A.evaluate(async()=>{EV.sem=false;ev('pedido.aprovado',{ped:'teste2'});await evEnvia()});
-  ok(await A.evaluate(()=>EV.sem===true&&EV.fila.some(e=>e.ped==='teste2')),'banco sem a migração 007: guarda no aparelho e não insiste');SEM_EVENTOS=false;await A.evaluate(()=>{EV.sem=false});
+  ok(await A.evaluate(()=>!!EV.sem&&EV.fila.some(e=>e.ped==='teste2')),'banco sem a migração 007: guarda no aparelho e não insiste');SEM_EVENTOS=false;ok(await A.evaluate(async()=>{EV.sem=now()-11*60000;await evEnvia();return !EV.fila.some(e=>e.ped==='teste2')}),'quando a tabela passa a existir, tenta de novo sozinho em até 10 minutos');SEM_EVENTOS=false;await A.evaluate(()=>{EV.sem=false});
   console.log('4f) Painel › Resultados (números calculados no banco)');
   await A.evaluate(()=>{ui.sheet=null;ui.tela='gestor';ui.gt='res';ui.gp=7;ui.res=null;render()});await A.waitForTimeout(800);
   const txtR=await A.evaluate(()=>document.getElementById('app').innerText);

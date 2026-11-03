@@ -1,7 +1,7 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#16202C"><link rel="manifest" href="manifest.webmanifest">
 <title>Martins Pro</title>
-<script>window.MARTINS_SB={"url":"https://cmerriurbtrkxiemjeto.supabase.co","key":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZXJyaXVyYnRya3hpZW1qZXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NTUyMDIsImV4cCI6MjEwOTAzMTIwMn0.v3WhHteqijvEQwJYxPcut64roZc3WobO6LJda596GUQ"};window.CLIENTE={"id":"martins","nome":"Martins Pro","curto":"Martins","admins":[],"suporte":"o Nico"};window.MARTINS_V="46dbf7da";</script></head><body>
+<script>window.MARTINS_SB={"url":"https://cmerriurbtrkxiemjeto.supabase.co","key":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZXJyaXVyYnRya3hpZW1qZXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NTUyMDIsImV4cCI6MjEwOTAzMTIwMn0.v3WhHteqijvEQwJYxPcut64roZc3WobO6LJda596GUQ"};window.CLIENTE={"id":"martins","nome":"Martins Pro","curto":"Martins","admins":[],"suporte":"o Nico"};window.MARTINS_V="dc236e3e";</script></head><body>
 <title>Chão de Fábrica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1083,11 +1083,11 @@ function ev(tipo,o){o=o||{};let u=null;try{u=usuarioAtual()}catch(e){}
 function evGuarda(){clearTimeout(EV.tG);EV.tG=setTimeout(()=>{try{localStorage.setItem('ev-fila',JSON.stringify(EV.fila));localStorage.setItem('ev-uso',JSON.stringify(EV.uso))}catch(e){}},400)}
 function evAgenda(){if(EV.fila.length>=25){clearTimeout(EV.tE);EV.tE=setTimeout(evEnvia,300)}}
 /* Sobe a fila (até 200 por vez) e a contagem de telas. Reenvio não duplica (id único). Banco sem a migração 007: guarda e para de tentar. */
-async function evEnvia(){if(EV.busy||EV.sem||typeof SB_CFG==='undefined'||!SB_CFG||!NV.db||!NV.db.ev||!SB.user||NV.modo!=='nuvem')return;EV.busy=true;
+async function evEnvia(){if(EV.sem&&now()-EV.sem>10*60000)EV.sem=false;if(EV.busy||EV.sem||typeof SB_CFG==='undefined'||!SB_CFG||!NV.db||!NV.db.ev||!SB.user||NV.modo!=='nuvem')return;EV.busy=true;
   try{while(EV.fila.length){const L=EV.fila.slice(0,200);await NV.db.ev.envia(L);const ids=new Set(L.map(x=>x.id));EV.fila=EV.fila.filter(x=>!ids.has(x.id));evGuarda()}
     const U=Object.entries(EV.uso);if(U.length){const itens=U.map(([k,n])=>{const [dia,usuario,dv,tela]=k.split('|');return {dia,usuario,dv,tela,n}});EV.uso={};evGuarda();
       try{await NV.db.ev.uso(itens)}catch(e){if(!(e&&e.code==='sem-eventos'))itens.forEach(x=>{const k=[x.dia,x.usuario,x.dv,x.tela].join('|');EV.uso[k]=(EV.uso[k]||0)+x.n});throw e}}}
-  catch(e){if(e&&e.code==='sem-eventos')EV.sem=true}finally{EV.busy=false}}
+  catch(e){if(e&&e.code==='sem-eventos')EV.sem=now()}finally{EV.busy=false}}
 /* Catálogo dos eventos: nome → o que significa. Nome novo só entra aqui (o teste confere que todo ev() usa um nome do catálogo). */
 const EV_TIPOS={
   'pedido.criado':'Pedido criado','pedido.editado':'Pedido corrigido','pedido.prazo_alterado':'Data de entrega mudou','pedido.aprovado':'Cliente aprovou o pedido','pedido.aprovacao_desfeita':'Aprovação do pedido desfeita',
