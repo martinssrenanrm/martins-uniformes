@@ -1,4 +1,5 @@
-// Teste: etiquetas do corte (pacote + personalização), QR que abre a ficha da peça, PDF 10 × 8 cm, letra legível.
+// Teste: etiquetas do corte (pacote por tamanho + personalização), filtro por tipo de peça, duas etiquetas de 10 × 7,5 cm por folha de 10 × 15 cm,
+// QR que abre a ficha da peça, letra legível.
 // Rodar: NODE_PATH=$(npm root -g) node tests/etiquetas.test.js
 const { chromium } = require('playwright');const fs=require('fs'),path=require('path'),os=require('os'),{execFileSync}=require('child_process');
 const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=(c,m)=>{console.log((c?'  ✔ ':'  ✘ ')+m);if(!c)falhas++};
@@ -17,32 +18,71 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   // um pedido com peça masculina, feminina e várias personalizações
   const id=await A.evaluate(()=>{const p=state.pedidos.find(p=>!p.concluido&&!p.cancelado&&lotesDe(p.id).some(l=>(l.pers||[]).length));const l=lotesDe(p.id)[0];l.gen='F';l.variacao='Manga longa';
     l.pers=[{tipo:'bordado',parte:'Frente',pos:'Peito esquerdo',desc:'Logo 8 cm',id:'pz0'},{tipo:'bordado',parte:'Mangas',lado:'dir',desc:'Bandeira do Brasil',id:'pz1'},{tipo:'bordado',parte:'Mangas',lado:'esq',desc:'Bandeira USA',id:'pz2'},{tipo:'sublimacao',parte:'Costas',desc:'Logo grande 28 cm',id:'pz3'}];
-    l.grade={'0':10,'2':10,'4':10,'6':10,'8':10,'10':10,'12':5,'14':5,PP:10,P:10,M:10,G:5};l.qtd=105;save();return p.id});
+    l.grade={'0':10,'2':10,'4':10,'6':10,'8':10,'10':10,'12':5,'14':5,PP:10,P:10,M:10,G:5};l.qtd=105;
+    // segunda peça, de outro tipo, com 10 P, 20 M e 15 G (o exemplo do pedido)
+    const outro=state.produtos.find(x=>x.id!==l.prod);const l2=JSON.parse(JSON.stringify(l));Object.assign(l2,{id:l.id+'-b',prod:outro.id,gen:'U',variacao:'',pers:[],grade:{P:10,M:20,G:15},qtd:45});delete l2.qr;state.lotes.push(l2);
+    save();return p.id});
+  const tam=sel=>A.evaluate(s=>[...document.querySelectorAll(s)].map(e=>({z:e.querySelector('.tq-tz em')?.textContent,q:+(e.querySelector('.tq-tam span:not(.tq-tz) em')?.textContent||0),txt:e.textContent})),sel);
 
   console.log('1) Botão Etiquetas ao lado do PDF de produção');
   await A.evaluate(id=>A.pedido({id}),id);await A.waitForTimeout(300);
   ok(await A.evaluate(()=>{const a=document.querySelector('[data-a=docProd]'),b=document.querySelector('[data-a=docEtq]');return !!a&&!!b&&a.nextElementSibling===b}),'o botão Etiquetas fica logo depois do PDF de produção');
   await A.click('[data-a=docEtq]');await A.waitForFunction(()=>ui.sheet&&ui.sheet.tipo==='etq',null,{timeout:15000});await A.waitForTimeout(400);
-  let r=await A.evaluate(id=>{const ls=lotesDe(id).filter(l=>!l.rework);const nPz=ls.reduce((a,l)=>a+gruposPers(l).length,0);return {ls:ls.length,nPz,pac:document.querySelectorAll('.tq-pac').length,pers:document.querySelectorAll('.tq-pers').length,qr:document.querySelectorAll('.tq-qr svg').length,
-    txt:document.querySelector('.tq-pac').textContent,mangas:[...document.querySelectorAll('.tq-pers')].map(e=>e.textContent).find(t=>/Mangas/i.test(t))||''}},id);
-  ok(r.pac===r.ls,`uma etiqueta de pacote por peça (${r.pac})`);ok(r.pers===r.nPz,`uma de personalização por parte e serviço (${r.pers})`);
+
+  console.log('2) Pacote de costura: uma etiqueta por tamanho, com a quantidade daquele tamanho');
+  let r=await A.evaluate(id=>{const ls=lotesDe(id).filter(l=>!l.rework);const nPz=ls.reduce((a,l)=>a+gruposPers(l).length,0);const nTam=ls.reduce((a,l)=>a+Object.values(l.grade||{}).filter(q=>q>0).length,0);
+    return {nTam,nPz,pac:document.querySelectorAll('.tq-pac').length,pers:document.querySelectorAll('.tq-pers').length,qr:document.querySelectorAll('.tq-qr svg').length,
+    mangas:[...document.querySelectorAll('.tq-pers')].map(e=>e.textContent).find(t=>/Mangas/i.test(t))||'',persTxt:document.querySelector('.tq-pers').textContent}},id);
+  ok(r.pac===r.nTam,`uma etiqueta de pacote para cada tamanho com peças (${r.pac} de ${r.nTam})`);ok(r.pers===r.nPz,`uma de personalização por parte e serviço (${r.pers})`);
   ok(r.qr===r.pac+r.pers,'todas têm QR code');
-  ok(/FEMININA/.test(r.txt)&&/Manga longa/.test(r.txt)&&/TOTAL/.test(r.txt)&&/105/.test(r.txt),'o pacote mostra FEMININA, a variação e o total');
+  let T=await tam('.tq-pac');const Bx=T.filter(t=>!/FEMININA/.test(t.txt)),F=T.filter(t=>/FEMININA/.test(t.txt));
+  ok(Bx.length===3&&Bx.map(t=>t.z+'='+t.q).join(' ')==='P=10 M=20 G=15','10 P, 20 M e 15 G geram 3 etiquetas: P com 10, M com 20 e G com 15');
+  ok(F.length===12&&F.reduce((a,t)=>a+t.q,0)===105,'a peça com 12 tamanhos gera 12 etiquetas que somam as 105 peças');
+  ok(T.every(t=>!/TOTAL/.test(t.txt)&&!t.txt.includes('PP')||t.z==='PP'),'cada etiqueta de pacote mostra só o seu tamanho (sem a grade inteira)');
+  ok(F.every(t=>/FEMININA/.test(t.txt)&&/Manga longa/.test(t.txt)&&/Cor/.test(t.txt)&&/Tecido/.test(t.txt)&&/Personalização/.test(t.txt)&&/Entrega/.test(t.txt)&&/Peça/.test(t.txt)),'o pacote continua com cliente, peça, FEMININA, variação, cor, tecido, personalização, entrega e número da peça');
+  ok(/TOTAL/.test(r.persTxt)&&/105/.test(r.persTxt),'a de personalização continua com a grade e o total');
   ok(/Manga direita/.test(r.mangas)&&/Manga esquerda/.test(r.mangas),'mangas direita e esquerda vão na mesma etiqueta de MANGAS');
 
-  console.log('2) Cabe e dá para ler');
-  r=await A.evaluate(()=>{const els=[...document.querySelectorAll('.tq')];const mm=96/25.4;let menor=99;els.forEach(el=>el.querySelectorAll('*').forEach(x=>{if(x.childNodes.length&&[...x.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())){const f=parseFloat(getComputedStyle(x).fontSize)/mm;if(f<menor)menor=f}}));
-    return {estoura:els.filter(el=>el.scrollHeight>el.clientHeight+1).length,menor:+menor.toFixed(2),w:els[0].getBoundingClientRect().width/mm,h:els[0].getBoundingClientRect().height/mm}});
-  ok(r.estoura===0,'nenhuma etiqueta corta o conteúdo, mesmo com 12 tamanhos');ok(r.menor>=3.4,`a menor letra tem ${r.menor} mm (pelo menos 3,4 mm, uns 10 pontos)`);
-  ok(Math.abs(r.w-100)<1&&Math.abs(r.h-80)<1,'tamanho real de 10 × 8 cm');
+  console.log('3) Duas etiquetas por folha de 10 × 15 cm, em ordem, sem repetir');
+  const folhas=()=>A.evaluate(()=>{const mm=96/25.4;const pg=[...document.querySelectorAll('.tq-mesa .tq-pg')];const E=[...document.querySelectorAll('.tq-mesa .tq')];
+    return {pg:pg.length,por:pg.map(p=>p.querySelectorAll('.tq').length),n:E.length,unicas:new Set(E.map(e=>e.querySelector('.tq-bar').textContent+'|'+e.textContent)).size,
+      w:E[0].getBoundingClientRect().width/mm,h:E[0].getBoundingClientRect().height/mm,pw:pg[0].getBoundingClientRect().width/mm,ph:pg[0].getBoundingClientRect().height/mm}});
+  // a prévia pode estar em escala; mede sem escala
+  await A.evaluate(()=>document.querySelectorAll('.tq-wrap>.tq-pg').forEach(x=>x.style.transform=''));
+  r=await folhas();
+  ok(r.pg===Math.ceil(r.n/2)&&r.por.every(x=>x>=1&&x<=2),`${r.n} etiquetas em ${r.pg} folhas, até duas por folha`);ok(r.unicas===r.n,'nenhuma etiqueta repetida');
+  ok(Math.abs(r.w-100)<1&&Math.abs(r.h-75)<1,`cada etiqueta tem 10 × 7,5 cm (${r.w.toFixed(1)} × ${r.h.toFixed(1)} mm)`);ok(Math.abs(r.pw-100)<1&&Math.abs(r.ph-150)<1,'cada folha tem 10 × 15 cm');
+  ok(await A.evaluate(()=>[...document.styleSheets].some(s=>{try{return [...s.cssRules].some(x=>/@page etiqueta/.test(x.cssText)&&/100mm 150mm/.test(x.cssText)&&/margin: 0/.test(x.cssText))}catch(e){return false}})),'impressão no tamanho real: página 100 × 150 mm, sem margem');
 
-  console.log('3) PDF no tamanho da etiqueta');
+  console.log('4) Cabe e dá para ler');
+  r=await A.evaluate(()=>{const els=[...document.querySelectorAll('.tq-mesa .tq')];const mm=96/25.4;let menor=99;els.forEach(el=>el.querySelectorAll('*').forEach(x=>{if(x.childNodes.length&&[...x.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())){const f=parseFloat(getComputedStyle(x).fontSize)/mm;if(f<menor)menor=f}}));
+    const qr=els.map(e=>e.querySelector('.tq-qr').getBoundingClientRect().width/mm);
+    // nada escondido: cada parte da etiqueta fica inteira, sem encolher nem passar por cima da outra
+    const espreme=els.filter(el=>{const fb=el.getBoundingClientRect();const K=[...el.children];return K.some((c,i)=>{const r=c.getBoundingClientRect();return r.bottom>fb.bottom+.5||c.scrollHeight>c.clientHeight+1&&!/-webkit-box/.test(getComputedStyle(c).display)||i&&r.top<K[i-1].getBoundingClientRect().bottom-.5})}).length;
+    return {estoura:els.filter(el=>el.scrollHeight>el.clientHeight+1).length+espreme,menor:+menor.toFixed(2),qr:Math.min(...qr),tam:Math.min(...[...document.querySelectorAll('.tq-tam em')].map(e=>parseFloat(getComputedStyle(e).fontSize)/mm))}});
+  ok(r.estoura===0,'nenhuma etiqueta corta o conteúdo, mesmo com 12 tamanhos');ok(r.menor>=3.4,`a menor letra tem ${r.menor} mm (pelo menos 3,4 mm, uns 10 pontos)`);
+  ok(r.qr>=15.9,`QR code com pelo menos 16 mm (${r.qr.toFixed(1)} mm), dá para ler com o celular`);ok(r.tam>=7,`tamanho e quantidade em letra grande (${r.tam.toFixed(1)} mm)`);
+
+  console.log('5) Filtro por tipo de peça: na tela, no PDF e na impressão');
+  const tipos=await A.evaluate(id=>tiposEtqDe(pedById(id)),id);ok(tipos.length===2,'o pedido tem 2 tipos de peça para escolher');
+  const b2=tipos.find(t=>t.id!==tipos[0].id);
+  await A.click(`[data-a=etqTipo][data-v="${b2.id}"]`);await A.waitForTimeout(300);
+  T=await tam('.tq-mesa .tq-pac');r=await A.evaluate(()=>({n:document.querySelectorAll('.tq-mesa .tq').length,pers:document.querySelectorAll('.tq-mesa .tq-pers').length,pg:document.querySelectorAll('.tq-mesa .tq-pg').length,
+    on:[...document.querySelectorAll('[data-a=etqTipo]')].filter(b=>b.getAttribute('aria-pressed')==='true').map(b=>b.dataset.v),imp:paginasDoc(ui.sheet).join('').split('class="tq ').length-1,dica:document.querySelector('.tq-mesa').previousElementSibling.textContent}));
+  ok(T.length===3&&r.pers===0&&r.n===3,`só a ${b2.nome}: 3 etiquetas, sem as da outra peça`);ok(r.on.length===1&&r.on[0]===b2.id,'o botão da peça escolhida fica marcado (e "Todas" não)');
+  ok(r.imp===3,'a impressão usa o mesmo filtro (3 etiquetas)');ok(r.pg===2,'3 etiquetas = 2 folhas, a última com a metade de baixo em branco');
+  ok(await A.evaluate(()=>{const p=[...document.querySelectorAll('.tq-mesa .tq-pg')].pop();return p.querySelectorAll('.tq').length===1}),'a última folha tem só uma etiqueta');
   const [dl]=await Promise.all([A.waitForEvent('download',{timeout:60000}),A.click('[data-a=docPdf]')]);const pdf=fs.readFileSync(await dl.path()).toString('latin1');
   const box=(pdf.match(/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)/)||[]).slice(1).map(Number);
-  ok(/Etiquetas/.test(dl.suggestedFilename()),'o arquivo se chama Etiquetas …');ok(Math.abs(box[0]-283.46)<1&&Math.abs(box[1]-226.77)<1,`cada página tem 100 × 80 mm (${box.join(' × ')} pt)`);
-  ok((pdf.match(/\/Type\s*\/Page[^s]/g)||[]).length===await A.evaluate(()=>document.querySelectorAll('.tq').length),'uma página por etiqueta');
+  ok(/Etiquetas/.test(dl.suggestedFilename()),'o arquivo se chama Etiquetas …');ok(Math.abs(box[0]-283.46)<1&&Math.abs(box[1]-425.2)<1,`cada página do PDF tem 100 × 150 mm (${box.map(x=>x.toFixed(1)).join(' × ')} pt)`);
+  ok((pdf.match(/\/Type\s*\/Page[^s]/g)||[]).length===2,'o PDF sai só com as folhas do filtro (2)');
+  await A.click(`[data-a=etqTipo][data-v="${tipos[0].id}"]`);await A.waitForTimeout(300);
+  r=await A.evaluate(()=>({n:document.querySelectorAll('.tq-mesa .tq').length,on:[...document.querySelectorAll('[data-a=etqTipo]')].filter(b=>b.getAttribute('aria-pressed')==='true').length}));
+  const todas=await A.evaluate(id=>etiquetasDe(pedById(id)).length,id);ok(r.n===todas&&r.on===2,'marcando as duas peças, aparecem as etiquetas das duas');
+  await A.click('[data-a=etqTipo][data-v=""]');await A.waitForTimeout(300);
+  ok(await A.evaluate(()=>ui.sheet.tipos===null&&document.querySelector('[data-a=etqTipo][data-v=""]').getAttribute('aria-pressed')==='true'),'"Todas as peças" volta a mostrar tudo');
 
-  console.log('4) O QR code abre a ficha daquela peça, para qualquer pessoa');
+  console.log('6) O QR code abre a ficha daquela peça, para qualquer pessoa');
   r=await A.evaluate(id=>{const ls=lotesDe(id).filter(l=>!l.rework);return {qr:ls.map(l=>l.qr),link:linkFicha(ls[0]),lid:ls[0].id}},id);
   ok(r.qr.every(q=>/^[0-9a-f]{30}$/.test(q))&&new Set(r.qr).size===r.qr.length,'cada peça ganhou um código secreto diferente');
   ok(r.link.endsWith('#f='+r.qr[0])&&!r.link.includes(r.lid),'o QR leva o código secreto, não o número da peça');
@@ -57,7 +97,7 @@ const cdn=url=>{const f=path.join(cache,url.replace(/[^a-z0-9.]+/gi,'_'));if(!fs
   await B.goto('about:blank');await B.goto(APP+'#f='+'0'.repeat(30));await B.waitForSelector('.conect',{timeout:20000});await B.waitForTimeout(500);
   ok(/não encontrada/.test(await B.textContent('#app')),'código errado não mostra nada do sistema');await C.close();
 
-  console.log('5) Central de dúvidas');
+  console.log('7) Central de dúvidas');
   ok(await A.evaluate(()=>ajBusca('etiqueta')[0]?.f.q==='Como imprimo as etiquetas do corte?'),'"etiqueta" acha a resposta certa');
   ok(await A.evaluate(()=>ajBusca('paninho cortador escrever')[0]?.f.q==='Como imprimo as etiquetas do corte?'),'"paninho cortador escrever" acha a resposta certa');
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros[0]:''));
