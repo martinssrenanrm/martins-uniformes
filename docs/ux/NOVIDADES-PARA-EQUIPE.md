@@ -646,3 +646,19 @@ O tempo de cada parte conta para quem fez, no Painel.
 - **Para a gestão:** o app passa a registrar o que acontece (quem começou, terminou, comprou, entregou). Isso aparece na aba nova **Painel › Resultados**: quanto dá para confiar nos números, prazo cumprido (e o prometido), tempo de cada processo comparado com o padrão, retrabalho, compras e onde a equipe mais desfaz. Os números começam a contar a partir de hoje.
 
 **O que NÃO mudou:** nenhum botão mudou de lugar.
+
+---
+
+## Desfazer sempre no alto de Pedidos (e Ctrl + Z no computador)
+
+**O que mudou:**
+- Na tela de **Pedidos**, o botão **↶ Desfazer** fica **sempre no alto**, ao lado do sininho. Quando não tem nada para desfazer, ele fica cinza, no mesmo lugar.
+- Embaixo dele aparece a faixa **Última ação**, que diz o que vai voltar. Ex.: "Última ação: Sônia começou Arremate e revisão na Mesa de arremate".
+- Agora dá para desfazer **até as 5 últimas ações dos últimos 15 minutos**: cada toque volta uma.
+- Depois de desfazer, o aviso tem **Refazer**, para quem tocou sem querer.
+- **No computador:** **Ctrl + Z** desfaz e **Ctrl + Y** refaz (no Mac, Cmd). Enquanto você digita num campo, o Ctrl + Z continua apagando o texto, como sempre.
+
+**O que NÃO mudou:**
+- Desfaz as mesmas ações de antes: Começar, Terminou, Comprei, Chegou, Levei e Feito. Entregar, cancelar e tirar continuam com a pergunta de confirmação e com o caminho próprio de voltar (ex.: "Desfazer a entrega").
+- Se outra pessoa mexeu no mesmo pedido depois, o app não desfaz e avisa.
+- Nas outras telas, o botão ↶ Desfazer continua no canto de baixo.
