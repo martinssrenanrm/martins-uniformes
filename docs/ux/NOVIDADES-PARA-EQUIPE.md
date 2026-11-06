@@ -707,3 +707,10 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 - O nome da empresa no alto do pedido ficou mais fácil de tocar.
 
 **O que NÃO mudou:** nenhum botão mudou de lugar.
+
+## O que a produção fez hoje
+
+**O que mudou:** na tela Hoje, um quadro verde mostra **quantos processos a produção terminou hoje**, a **meta do dia** (quando a equipe da produção tem horário cadastrado) e, na semana, os processos terminados e os **pedidos entregues**.
+
+- Conta só o que foi marcado no app: quanto mais na hora, mais certo fica.
+- Não compara pessoas. Não tem pontos nem medalhas.

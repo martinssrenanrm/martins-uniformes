@@ -113,3 +113,8 @@
 | Aviso depois de cancelar/pausar/dividir/conserto/hora extra/arte | ✅ | ✅ Desfazer no aviso | ✅ | ✅ | ✅ Desfazer (teste) | ✅ |
 | Fábrica (Escritório, 1ª vez) | ✅ abre no Escritório | ✅ | ✅ | n/a | ✅ | ✅ |
 Varredura em 360×640 (Hoje, Máquinas, Fora, Escritório, Pedidos, Pedido, folha da máquina, Painel, Estoque): nada passa da largura; único alvo abaixo de 44px era o nome da empresa no Pedido (corrigido).
+
+### Onda 5: o que foi feito
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Hoje › quadro verde | ✅ frase curta | n/a (só leitura) | n/a | ✅ cresce conforme marca | ✅ | ✅ sem "ranking"/pontos (teste) |

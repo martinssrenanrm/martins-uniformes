@@ -898,6 +898,10 @@ body.com-hoje:not(.operacao) .nb.mais-nb{display:flex}
 .hj-sug .hj-sub+.hsug{border-top:0;padding-top:4px}
 .hsug>svg.ic{width:28px;height:28px;color:var(--blue)}.sug-t b{display:block;font-size:18px;overflow-wrap:anywhere}.sug-t small{display:block;font-size:16px;color:var(--ink2);margin-top:2px;overflow-wrap:anywhere}
 .sug-b{margin-top:8px}.sug-b .mbtn{min-height:48px}
+.hj-feito{background:var(--go-soft);border:1px solid var(--go);border-radius:18px;padding:12px 14px;margin:0 0 14px;color:var(--ink)}
+.ft-l{display:flex;gap:10px;align-items:flex-start}.ft-l>svg.ic{width:28px;height:28px;flex:none;color:var(--go-dark)}.ft-t b{display:block;font-size:18px}.ft-t small{display:block;font-size:16px;color:var(--ink2)}
+.ft-meta{margin-top:10px}.ft-mt{display:flex;justify-content:space-between;font-size:16px;margin-bottom:4px}.ft-mt b{font-size:18px}.ft-meta small{display:block;font-size:16px;color:var(--go-dark);margin-top:4px}
+.ft-sem{display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-size:16px;color:var(--ink2)}.ft-sem svg.ic{width:20px;height:20px;flex:none;color:var(--go-dark)}
 body.chao .nav{display:none!important}body.chao main{padding-bottom:40px}
 .mv{max-width:640px;margin:0 auto;display:grid;gap:14px}.mv-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .mv-eu{display:flex;align-items:center;gap:14px}.mv-eu .av{width:64px!important;height:64px!important;font-size:28px}.mv-eu small{display:block;color:var(--ink2);font-size:18px}.mv-eu b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.02em}
@@ -2042,7 +2046,22 @@ function sugBloco(P,esc_,pid){const S=sugestoes(P,esc_,pid,ehGestao());if(!S.len
   return `<section class="hj-sec hj-sug" id="hj-sug"><h2 class="hj-h">${ic('i-ideia')}<span>Sugestões para agora</span></h2><p class="hj-sub">O app calcula pelo prazo, pelo que falta fazer e por quem está livre.</p>
     ${ver.map(s=>`<div class="hsug" data-k="${s.k}">${ic(s.i)}<div class="sug-t"><b>${esc(s.txt)}</b><small>${esc(s.por)}</small>${s.bt?`<div class="sug-b">${s.bt}</div>`:''}</div></div>`).join('')}
     ${S.length>3?`<button class="mbtn neutro2 hj-mais" data-a="sugTodas">${ui.sugTodas?'Ver menos':`Ver mais ${S.length-3} ${S.length-3>1?'sugestões':'sugestão'}`}</button>`:''}</section>`}
-function hojeTopo(P,esc_,pid){return sugBloco(P,esc_,pid)}
+/* ================= Feito hoje (Onda UX 5, 11/2026) =================
+   Reconhecimento do que a fábrica fez, sem pontos, medalhas nem comparação entre pessoas.
+   Conta o que foi MARCADO no app (quem marca depois aparece depois); a meta do dia só aparece quando há pessoas da produção com horário. */
+function feitoPeriodo(a,b){let proc=0,pecas=0,pad=0;state.lotes.forEach(l=>{const m=sMap(rp(l));Object.entries(l.steps||{}).forEach(([sid,x])=>{const s=m[sid];if(!s||isEsc(s))return;
+  (x.partes?x.partes:[x]).forEach(q=>{if(q.st==='ok'&&q.fim>=a&&q.fim<b){proc++;const n=q.n||qtdEf(l);if(!isExt(s))pecas+=n;pad+=(s.min||0)*n}})})});return {proc,pecas,pad}}
+function feitoHoje(){const a=sod(now()).getTime(),sem=a-((new Date(now()).getDay()+6)%7)*DIA;const H=feitoPeriodo(a,a+DIA),S=feitoPeriodo(sem,a+DIA);
+  const ent=state.pedidos.filter(p=>p.concluido&&!p.cancelado&&p.concluido>=sem).length;
+  const gente=state.pessoas.filter(p=>p.disp!==false&&(p.papeis||[]).some(k=>PAPEIS_CHAO.includes(k)));
+  const alvo=sum(gente.map(p=>metaPessoaDia(p.id).alvo));return {H,S,ent,alvo,pct:alvo&&H.pad?Math.round(H.pad/alvo*100):0}}
+function feitoBloco(){const F=feitoHoje(),h=F.H;
+  const linha=h.proc?`<b>${h.proc} ${h.proc===1?'processo terminado':'processos terminados'} hoje</b><small>${h.pecas?`${nf(h.pecas,0)} peças trabalhadas, somando todos · `:''}marcado no app</small>`
+    :`<b>Ainda nada marcado hoje</b><small>Conforme a produção for marcando, aparece aqui.</small>`;
+  const meta=F.alvo&&h.proc?`<div class="ft-meta"><div class="ft-mt"><span>Meta do dia da produção</span><b>${Math.min(999,F.pct)}%</b></div><div class="hj-bar" role="img" aria-label="${F.pct}% da meta do dia"><i style="width:${Math.min(100,F.pct)}%"></i></div>${F.pct>=100?'<small>Meta do dia alcançada.</small>':''}</div>`:'';
+  const semana=F.S.proc||F.ent?`<div class="ft-sem">${ic('i-check')}<span>Nesta semana: ${F.S.proc?`<b>${F.S.proc}</b> ${F.S.proc===1?'processo terminado':'processos terminados'}`:''}${F.S.proc&&F.ent?' · ':''}${F.ent?`<b>${F.ent}</b> ${F.ent===1?'pedido entregue':'pedidos entregues'}`:''}</span></div>`:'';
+  return `<section class="hj-feito" id="hj-feito"><div class="ft-l">${ic('i-fabrica')}<span class="ft-t">${linha}</span></div>${meta}${semana}</section>`}
+function hojeTopo(P,esc_,pid){return sugBloco(P,esc_,pid)+feitoBloco()}
 /* Q6: a Fábrica abre na última aba usada neste aparelho; na primeira vez, o Escritório abre no Escritório. */
 function fzInicial(){let v='';try{v=localStorage.getItem('fab-zona')||''}catch(e){}return ['maq','fora','esc'].includes(v)?v:ehGestao()?'maq':'esc'}
 /* Q5: o "voltar" do Android (e do navegador) fecha o que está aberto por cima: confirmação, janelinha, folha.
@@ -2994,6 +3013,7 @@ const FAQ=[
 {c:'cad',q:'O que quem é do Escritório pode fazer no app?',k:'permissão permissões escritório vendedora cancelar entregar corrigir bloquear liberar só a gestão perfil responsabilidade',r:['Cadastros › Ajustes › Acessos ao sistema › O que o Escritório pode fazer.','Toque em cada linha para ligar ou desligar: entregar pedido, cancelar pedido, corrigir o que a produção já fez.','Quem é da gestão pode tudo. Cadastros e Painel do gestor são sempre só da gestão.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'comeco',q:'O que é a tela Hoje?',m:'hoje',k:'hoje primeira tela início começo o que fazer agora prioridade urgente resumo do dia bom dia',r:['É a primeira tela do app. Mostra o que importa para você hoje, o mais urgente primeiro.','Gestão: pedidos com risco de atraso, o que precisa ir para a rua, o que pôr em cada máquina e as vendas da semana.','Escritório: as suas tarefas primeiro e os pedidos com risco de atraso.','Cada linha tem um botão que leva direto para resolver.'],ir:'hoje'},
 {c:'comeco',q:'De onde vêm as sugestões da tela Hoje?',m:'hoje',k:'sugestões sugestão dica app sugere próximo calcula como sabe inteligente',r:['O próprio app calcula, com o que já está registrado: data de entrega, quanto do pedido já foi feito, quem está livre, o que falta comprar e o prazo de cada prestador.','Aparecem as 3 mais urgentes. Toque em "Ver mais" para ver as outras.','Cada sugestão tem um botão que leva para resolver. Se ela não faz sentido, é sinal de que algo não foi marcado no app.'],ir:'hoje'},
+{c:'comeco',q:'O que é o quadro verde "processos terminados hoje"?',m:'hoje',k:'feito hoje processos terminados peças meta do dia produção quanto fizemos semana entregues reconhecimento verde',r:['Fica na tela Hoje e mostra o que a produção terminou hoje e nesta semana, e os pedidos entregues na semana.','Conta o que foi marcado no app. O que for marcado depois aparece depois.','A meta do dia compara o tempo padrão do que foi feito com as horas da equipe da produção. Não compara pessoas.'],ir:'hoje'},
 {c:'comeco',q:'Onde ficaram o Painel do gestor e os Cadastros?',m:'hoje',g:1,k:'mais painel gestor cadastros sumiu onde ficou barra de baixo empresas',r:['Na barra de baixo, toque em Mais (o último botão).','Lá estão Painel do gestor, Cadastros e Empresas.'],ir:'eu'},
 {c:'cad',q:'Como desligo a tela Hoje e volto a barra de antes?',m:'hoje',g:1,k:'desligar tela hoje voltar barra antiga como era antes partes do app',r:['Cadastros › Ajustes › Partes do app.','Desligue "Tela Hoje". A barra volta a ser Fábrica, Pedidos, Novo, Gestor e Cadastros.'],ir:'cad:ajustes#Partes do app'},
 {c:'comeco',q:'O botão voltar do celular fecha o app?',k:'voltar botão voltar celular android seta fechar sair do app sem querer',r:['Não. O voltar do celular fecha o que está aberto por cima: a confirmação, a janelinha ou a folha.','Numa aba que não é a primeira, ele volta para a primeira tela.','Só sai do app quando você já está na primeira tela sem nada aberto.']},
