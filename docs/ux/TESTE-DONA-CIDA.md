@@ -84,3 +84,12 @@
 - **Novo pedido (5c):** "Outras cores" e "Personalização" em blocos; abre sozinho quando a peça costuma ter personalização; cores mais usadas primeiro.
 - **Ajustes (5d):** blocos que abrem e fecham; ≈ 32 → 5 telas. Perguntas 1 e 2 passam.
 - **Visual novo:** tipografia Inter, superfícies leves, hierarquia de botões. Mantidos: letra ≥ 16px, alvos ≥ 48px, contraste AA, botão sempre com contorno.
+
+## Ondas de 11/2026 (rascunho, não publicado). Prints em `prints/ondas-2026-11/`
+
+### Onda 1: permissões por responsabilidade
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Corrigir processo (Escritório) | ✅ diz que é da gestão | ✅ nada para errar | ✅ | n/a | ✅ Voltar no alto | ✅ |
+| Pedido (Escritório) | ✅ | ✅ | ✅ Cancelar não fica mais perto de Corrigir | ✅ | ✅ | ✅ |
+| Ajustes › Acessos › O que o Escritório pode fazer | ✅ título diz | ✅ toque liga/desliga | ✅ 56px+ | ✅ "Pronto! …" | ✅ toque de novo volta | ✅ |

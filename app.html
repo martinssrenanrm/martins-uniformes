@@ -224,6 +224,10 @@ h2{font-size:24px;margin:0 0 10px;text-wrap:balance}
 .chk[aria-pressed="true"]{border-color:var(--go);background:var(--go-soft);color:var(--go-dark)}
 .chk[aria-pressed="true"] .box{background:var(--go);border-color:var(--go);color:#fff}
 .chk[aria-pressed="true"] .box svg.ic{visibility:visible}
+.perm-c{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}.perm-c h3{margin:0 0 4px;font-size:19px}
+.perm-c .checks{grid-template-columns:1fr}.perm-c .chk{grid-template-columns:auto 1fr auto;justify-items:start;text-align:left;align-items:center;min-height:56px;font-size:18px}
+.perm-c .chk svg.ic{width:28px;height:28px}.perm-s{display:block;font-weight:400;font-size:16px;color:var(--ink2)}
+.perm-dica{display:flex;gap:8px;align-items:flex-start}.perm-dica svg.ic{width:22px;height:22px;flex:none}
 .mat{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:2px solid var(--grey-soft)}
 .mat svg.ic{width:34px;height:34px;color:var(--atn-ink)}
 .mat b{display:block;font-size:19px}
@@ -2120,7 +2124,7 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     <div class="doc-bts">${ped.cancelado?'':`<button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button>`}<button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button><button class="mbtn neutro2 mod-etq" data-a="docEtq" data-id="${id}">${ic('i-lista')}Etiquetas</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
     ${tEnt?`<div class="acoes"><button class="big go" data-a="entregar" data-id="${id}">${ic('i-caminhao')}${esc(tarTxt(tEnt))}${tEnt.resp?' · '+esc(pNome(tEnt.resp)):''}</button></div>`:''}</div>
   ${ped.fin?finCard(ped.fin):''}
-  ${ped.concluido?'':`<div class="card">${ui.cancPed===id?`<h2>Cancelar este pedido?</h2><div class="aviso">${ic('i-alerta')}<span>O pedido de <b>${esc(ped.cliente)}</b> sai da produção, das máquinas e das tarefas do escritório. Ele fica guardado em Pedidos › Filtrar › Cancelados e pode voltar depois.</span></div>
+  ${ped.concluido||!permOn('cancelar')?'':`<div class="card">${ui.cancPed===id?`<h2>Cancelar este pedido?</h2><div class="aviso">${ic('i-alerta')}<span>O pedido de <b>${esc(ped.cliente)}</b> sai da produção, das máquinas e das tarefas do escritório. Ele fica guardado em Pedidos › Filtrar › Cancelados e pode voltar depois.</span></div>
     <div class="rotulo">Motivo (se quiser)</div><input class="campo" id="cancMot" placeholder="Ex.: cliente desistiu" autocomplete="off">
     <div class="acoes"><button class="big" style="background:var(--red);color:#fff" data-a="pedCancOk" data-id="${id}">Sim, cancelar pedido</button><button class="big neutro" data-a="pedCancN">Não</button></div>`
     :`<button class="mbtn neutro2" data-a="pedCancelar" data-id="${id}">${ic('i-alerta')}Cancelar pedido</button>`}</div>`}
@@ -2508,8 +2512,8 @@ function sEtEd(){const e=ui.sheet,l=lote(e.l),z=l&&sMap(rp(l))[e.s];if(!z)return
   if(x.st!=='pend')ops.push(bt('etVolta',ic('i-voltar')+(depois.length?`Voltar esta e as seguintes para "ainda não"`:'Voltar para "ainda não feita"'),'big neutro'));
   return `${voltar()}<h1>${esc(z.nome)}</h1><div class="card" style="margin:0 0 12px"><b>${esc(nomePeca(l))} ${esc(l.cor||'')}</b> · ${qtdEf(l)} peças<br><span class="lido">${esc(ped.cliente)} · pedido ${esc(ped.id)}</span></div>
     <div class="lib ${sit.c==='ok'?'u-ok':sit.c?'u-warn':''}">${esc(sit.t)}</div>
-    ${depois.length&&x.st!=='pend'?`<p class="dica">Já andaram depois desta: ${esc(depois.map(d=>d.nome).join(', '))}. Voltar esta etapa volta também essas.</p>`:''}
-    <div class="acoes" style="flex-direction:column">${ops.join('')}</div>${ops.length?'':'<p class="dica">Nada para corrigir aqui.</p>'}`}
+    ${depois.length&&x.st!=='pend'&&permOn('corrigirProd')?`<p class="dica">Já andaram depois desta: ${esc(depois.map(d=>d.nome).join(', '))}. Voltar esta etapa volta também essas.</p>`:''}
+    <div class="acoes" style="flex-direction:column">${ops.filter(o=>{const m=o.match(/data-a="(\w+)"/);return !m||podeAcao(m[1])}).join('')}</div>${!permOn('corrigirProd')&&['ok','and'].includes(x.st)?`<p class="dica perm-dica">${ic('i-cadeado')}Para corrigir o que a produção já fez, chame quem é da gestão (${esc(gestoresTxt())}).</p>`:ops.length?'':'<p class="dica">Nada para corrigir aqui.</p>'}`}
 /* etapas que já começaram e dependem desta (direta ou indiretamente) */
 function etDepois(l,sid){const p=rp(l),D=desc(p,sid);return p.steps.filter(z=>D.has(z.id)&&z.id!==sid&&stOf(l,z.id).st!=='pend')}
 function sHora(){const e=ui.sheet,l=lote(e.l),z=l&&sMap(rp(l))[e.s],u=unidade(e.m);if(!z)return voltar();const ped=pedById(l.ped);
@@ -2862,6 +2866,8 @@ const FAQ=[
 {c:'cad',q:'Comprei (ou vendi) uma máquina. Como atualizo?',k:'máquina nova quantidade comprar vender mesa',r:['Cadastros › Máquinas.','Use + e − para a quantidade, ou Adicionar máquina ou mesa para um tipo novo.'],ir:'cad:maquinas',g:1},
 {c:'cad',q:'Como cadastro um produto novo?',k:'produto novo peça modelo cadastrar camiseta',r:['Cadastros › Produtos › Cadastrar produto.','Escreva o nome, escolha o desenho, os tecidos e de qual produto copiar os processos.','Depois ajuste os processos, tempos e aviamentos dentro dele.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
+{c:'cad',q:'O que quem é do Escritório pode fazer no app?',k:'permissão permissões escritório vendedora cancelar entregar corrigir bloquear liberar só a gestão perfil responsabilidade',r:['Cadastros › Ajustes › Acessos ao sistema › O que o Escritório pode fazer.','Toque em cada linha para ligar ou desligar: entregar pedido, cancelar pedido, corrigir o que a produção já fez.','Quem é da gestão pode tudo. Cadastros e Painel do gestor são sempre só da gestão.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
+{c:'comeco',q:'Por que não aparece o botão de cancelar ou de corrigir?',k:'não aparece sumiu botão cancelar corrigir horário voltar processo cadastro painel bloqueado permissão gestão',r:['Algumas ações são de quem é da gestão: Cadastros, Painel do gestor e, se a fábrica escolheu assim, cancelar pedido e corrigir o que a produção já fez.','Para essas, o botão não aparece para quem é do Escritório.','Precisa fazer? Chame quem é da gestão. Ela pode liberar em Ajustes › Acessos.']},
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
 {c:'cad',q:'Como mudo a ordem, incluo ou excluo uma etapa de um produto?',k:'etapa processo ordem mudar subir descer excluir tirar incluir inserir produto roteiro costura',r:['Em Cadastros › Produtos, toque no produto e desça até Etapas em ordem.','↑ e ↓ mudam a ordem. Inserir etapa depois desta coloca uma nova no meio. Excluir tira a etapa, e quem vinha depois passa a esperar a anterior.','Etapa que está sendo feita agora não pode ser excluída: termine antes.']},
@@ -3872,6 +3878,19 @@ const normEmail=e=>String(e||'').trim().toLowerCase();
 let SESSAO=(()=>{try{return JSON.parse(localStorage.getItem('martins-sessao')||'null')}catch(e){return null}})();
 const usuarioAtual=()=>SESSAO&&state&&(state.usuarios||[]).find(u=>u.id===SESSAO.id&&normEmail(u.email)===normEmail(SESSAO.email))||null;
 const ehGestao=()=>usuarioAtual()?.perfil==='gestao';
+/* Permissões por responsabilidade (Onda UX 1, 11/2026). A gestão pode tudo. O que o Escritório pode fazer é escolha de cada fábrica
+   (Ajustes › Acessos), com padrão neutro: despachar (entregar) é do escritório; cancelar e corrigir o que a produção já fez é da gestão.
+   A tela esconde o botão e a ação recusa; a migração 011 repete a regra no banco. */
+const PERMS=[
+  {k:'entregar',nome:'Entregar pedido ao cliente (e desfazer a entrega)',acoes:['entregar','desEntregar'],padrao:true},
+  {k:'cancelar',nome:'Cancelar pedido (e voltar um cancelado)',acoes:['pedCancelar','pedCancOk','pedReativar'],padrao:false},
+  {k:'corrigirProd',nome:'Corrigir o que a produção já fez (voltar processo, mudar horário, cancelar um começo)',acoes:['etVolta','etHora','etCancIni'],padrao:false}];
+const ACAO_PERM=Object.fromEntries(PERMS.flatMap(p=>p.acoes.map(a=>[a,p.k])));
+const permOn=k=>{const u=usuarioAtual();if(!u||u.perfil==='gestao')return true;const P=PERMS.find(x=>x.k===k);if(!P)return true;const c=((typeof state!=='undefined'&&state&&state.permissoes)||{})[k];return c==null?P.padrao:!!c};
+/* atalhos que levam a telas só da gestão (Q1): somem para os outros perfis */
+const ATALHO_GESTAO=(a,d)=>['irEquipe','irForn'].includes(a)||(a==='ir'&&/^(cad|pes|gest):/.test((d&&d.to)||''))||(a==='tela'&&TELAS_GESTAO.includes((d&&d.t)||''));
+const podeAcao=(a,d)=>{if(ATALHO_GESTAO(a,d)&&usuarioAtual()&&!ehGestao())return false;return !ACAO_PERM[a]||permOn(ACAO_PERM[a])};
+const TELAS_GESTAO=['cadastros','gestor'];
 async function hashSenha(senha,salt){const enc=new TextEncoder();const k=await crypto.subtle.importKey('raw',enc.encode(senha),'PBKDF2',false,['deriveBits']);
   const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:150000,hash:'SHA-256'},k,256);return [...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 const novoSalt=()=>[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');
@@ -3893,7 +3912,10 @@ function cardAcessos(){if(!ehGestao())return '';const us=state.usuarios||[];
   return `<div class="card"><h2>Acessos ao sistema</h2><p class="dica" style="margin:-4px 0 8px">Quem pode entrar com e-mail e senha. No primeiro acesso, a própria pessoa cria a senha${SB_CFG?' (toca em "É meu primeiro acesso" e confirma pelo e-mail)':''}.</p>
   ${us.map(u=>`<div class="aj-row acs"><span><b>${esc(u.nome)}</b><br><small class="lido">${esc(u.email)} · ${esc(PERFIS[u.perfil]||u.perfil)}${SB_CFG?'':u.hash?'':' · ainda não criou a senha'}</small></span>
     <span class="aq-b">${SB_CFG?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Mandar link de senha nova</button>`:u.hash?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Redefinir senha</button>`:''}${selOp('acsPerfilSel',`data-id="${u.id}"`,u.perfil,Object.entries(PERFIS),'Perfil')}${u.id!==usuarioAtual()?.id?`<button class="x" data-a="acsRm" data-id="${u.id}">Tirar</button>`:''}</span></div>`).join('')}
-  <div class="acs-novo"><input class="campo" id="acsNome" placeholder="Nome"><input class="campo" id="acsEmail" type="email" placeholder="E-mail"><select class="campo" id="acsPerfil">${Object.entries(PERFIS).map(([k,n])=>`<option value="${k}" ${k==='escritorio'?'selected':''}>${n}</option>`).join('')}</select><select class="campo" id="acsPes"><option value="">Pessoa da equipe (opcional)</option>${state.pessoas.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select><button class="mbtn" data-a="acsAdd">${ic('i-mais')}Dar acesso</button></div></div>`}
+  <div class="acs-novo"><input class="campo" id="acsNome" placeholder="Nome"><input class="campo" id="acsEmail" type="email" placeholder="E-mail"><select class="campo" id="acsPerfil">${Object.entries(PERFIS).map(([k,n])=>`<option value="${k}" ${k==='escritorio'?'selected':''}>${n}</option>`).join('')}</select><select class="campo" id="acsPes"><option value="">Pessoa da equipe (opcional)</option>${state.pessoas.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select><button class="mbtn" data-a="acsAdd">${ic('i-mais')}Dar acesso</button></div>${permCard()}</div>`}
+/* Ajustes › Acessos: o que quem é do Escritório pode fazer (a gestão pode tudo). */
+function permCard(){return `<div class="perm-c" id="Permissoes"><h3>O que o Escritório pode fazer</h3><p class="dica" style="margin:0 0 8px">Quem é da gestão pode tudo. Cadastros e Painel do gestor são só da gestão. Toque para ligar ou desligar.</p>
+  <div class="checks">${PERMS.map(p=>{const on=!!((state.permissoes||{})[p.k]??p.padrao);return `<button class="chk" data-a="permTog" data-v="${p.k}" aria-pressed="${!!on}">${ic(on?'i-check':'i-cadeado')}<span>${esc(p.nome)}<small class="perm-s">${on?'Escritório pode':'Só a gestão'}</small></span><span class="box">${ic('i-check')}</span></button>`}).join('')}</div></div>`}
 
 /* ================= cópias de segurança ================= */
 const ehExemplo=p=>!!(p&&p.exemplo);
@@ -4119,7 +4141,9 @@ function vGestor(){const aba=(ui.gt==='ciclo'&&!modOn('ciclo')?'agora':ui.gt)||'
 const sheetId=s=>s.t+':'+(s.id||s.p||s.m||'');
 /* Link do QR code da etiqueta: #ficha=<peça> abre a ficha de produção dessa peça */
 let LINK_FICHA=(()=>{try{const m=location.hash.match(/ficha=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
-function render(){renderTela();ajBlocos();aplicaVocab();evUsoTela()}
+function render(){renderTela();permEsconde();ajBlocos();aplicaVocab();evUsoTela()}
+/* Some da tela o botão que o perfil não pode usar (a ação também recusa, e o banco também). */
+function permEsconde(){if(!usuarioAtual()||ehGestao())return;document.querySelectorAll('#app [data-a],#sheet [data-a],#pop [data-a]').forEach(b=>{if(!podeAcao(b.dataset.a,b.dataset))b.remove()})}
 /* Cor da marca do cliente (Ajustes › Sua empresa): vira a cor principal do app. Escurece sozinha se ficar clara demais para texto branco. */
 function aplicaCor(){const R=document.documentElement.style,c=String((state&&state.marca&&state.marca.cor)||'').trim();if(!/^#[0-9a-f]{6}$/i.test(c)){['--blue','--blue-dark','--blue-soft','--blue-line'].forEach(k=>R.removeProperty(k));return}
   let [r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));const lum=(r,g,b)=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)};
@@ -4136,6 +4160,7 @@ function renderTela(){RC={};aplicaCor();if(LINK_FICHA&&NV.pronto&&state&&usuario
   document.querySelectorAll('.nb[data-t]').forEach(b=>b.setAttribute('aria-current',b.dataset.t===ui.tela?'page':'false'));
   if(!NV.pronto){document.body.classList.add('sem-login');document.getElementById('app').innerHTML=vConectando();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());MODULOS.forEach(([k])=>document.body.classList.toggle('sem-'+k,!modOn(k)));
+  if(logado&&!ehGestao()&&TELAS_GESTAO.includes(ui.tela)){ui.tela='fabrica';ui.sheet=null}
   if(!logado){document.getElementById('app').innerHTML=vLogin();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   document.body.classList.toggle('chao',ehChao());document.getElementById('app').innerHTML=ehChao()&&!ui.inicio?vMinhaVez():ui.inicio?vInicio():ui.tela==='avisos'?vAvisos():ui.tela==='gestor'?vGestor():ui.tela==='pedidos'?vPedidos():ui.tela==='cadastros'?vCadastros():vFabrica();
   {const pp=document.getElementById('pop');if(pp)pp.innerHTML=ui.sheet?'':ui.sino?popAvisos():ui.eu?popEu():''}
@@ -4386,6 +4411,7 @@ const A={
   acsReset:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(SB_CFG){SB.c.auth.resetPasswordForEmail(u.email,{redirectTo:sbVolta()}).then(r=>toast(r.error?sbErro(r.error):`Mandamos para ${u.email} um link para criar uma senha nova`,false));return}snap();u.hash=null;u.salt=null;commit();toast(`${u.nome} vai criar uma senha nova no próximo acesso`)},
   acsPerfilSel:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(!u||!PERFIS[d.v]||u.perfil===d.v)return;if(u.perfil==='gestao'&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão');return render()}snap();ev('acesso.alterado',{ref:u.id,de:u.perfil,para:d.v});u.perfil=d.v;commit();toast(`${u.nome}: ${PERFIS[d.v]}`)},
   acsPerfil:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(u.id===usuarioAtual()?.id&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão',false);return}snap();u.perfil=u.perfil==='gestao'?'operacao':'gestao';commit()},
+  permTog:d=>{if(!ehGestao())return;const P=PERMS.find(x=>x.k===d.v);if(!P)return;const era=(state.permissoes||{})[P.k]??P.padrao;snap();state.permissoes={...(state.permissoes||{}),[P.k]:!era};ev('acesso.alterado',{ref:'escritorio:'+P.k,de:era?'pode':'gestao',para:!era?'pode':'gestao'});commit();toast(`Pronto! ${P.nome}: ${!era?'Escritório pode':'só a gestão'}`)},
   acsRm:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);snap();ev('acesso.alterado',{ref:u.id,de:u.perfil,para:'sem_acesso'});state.usuarios=state.usuarios.filter(x=>x.id!==d.id);commit();toast(`${u.nome} não tem mais acesso`)},
   segAgora:async()=>{toast('Guardando cópia…',false);const ok=await backupNuvem(`${hojeISO()}-manual-${tsHm(now()).replace(':','h')}`);toast(ok?'Cópia guardada na nuvem':'Sem nuvem agora. Use “Baixar cópia em arquivo”.',false)},
   setor:d=>openSheet({t:'setor',v:d.v}),
@@ -4733,6 +4759,7 @@ function pedeConfirma(txt,sim,fn){ui.conf={txt,sim,fn};desenhaConf()}
 function desenhaConf(){let el=document.getElementById('confirma');if(!el){el=document.createElement('div');el.id='confirma';document.body.appendChild(el)}
   const c=ui.conf;el.innerHTML=c?`<div class="conf-fundo" data-a="confNao"></div><div class="conf" role="alertdialog" aria-label="Confirmar"><p>${esc(c.txt)}</p><div class="acoes"><button class="big go" data-a="confSim">${ic('i-check')}${esc(c.sim)}</button><button class="big neutro" data-a="confNao">Cancelar</button></div></div>`:''}
 document.addEventListener('click',e=>{const z=e.target.closest('svg.mock[data-z]');if(z){e.preventDefault();e.stopPropagation();abreZoom(z.dataset.z);return}const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const nome=b.dataset.a,f=A[nome];if(!f)return;e.preventDefault();
+  if(!podeAcao(nome,b.dataset)){toast(`Isso é feito por quem é da gestão (${gestoresTxt()}).`,false);return}
   if(CONF[nome]&&!b.dataset.ok){let q=null;try{q=CONF[nome](b.dataset)}catch(err){}if(q){const d={...b.dataset,ok:'1'};return pedeConfirma(q[0],q[1],()=>{EV.acao=evUuid();A[nome](d)})}}
   EV.acao=evUuid();f(b.dataset)});
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.blk){ui.blk=ui.blk||{};const era=ui.blk[d.dataset.blk];ui.blk[d.dataset.blk]=d.open;if(d.classList.contains('mapa')&&era!==d.open&&!!era!==d.open)render()}},true);

@@ -662,3 +662,15 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Desfaz as mesmas ações de antes: Começar, Terminou, Comprei, Chegou, Levei e Feito. Entregar, cancelar e tirar continuam com a pergunta de confirmação e com o caminho próprio de voltar (ex.: "Desfazer a entrega").
 - Se outra pessoa mexeu no mesmo pedido depois, o app não desfaz e avisa.
 - Nas outras telas, o botão ↶ Desfazer continua no canto de baixo.
+---
+
+# RASCUNHO, ainda não publicado (ondas de 11/2026, esperando aprovação do Renan)
+
+## Cada um vê o que é da sua responsabilidade
+
+**O que mudou:**
+- Quem é do **Escritório** não vê mais o botão **Cancelar pedido** nem os botões de **corrigir o que a produção já fez** (voltar processo, mudar quem fez e o horário). Para isso, chame quem é da gestão.
+- **Entregar pedido** continua com o Escritório.
+- A gestão escolhe o que o Escritório pode fazer em **Cadastros › Ajustes › Acessos ao sistema › O que o Escritório pode fazer**.
+
+**O que NÃO mudou:** para quem é da gestão, tudo continua igual. Nenhum botão mudou de lugar.
