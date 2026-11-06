@@ -93,3 +93,10 @@
 | Corrigir processo (Escritório) | ✅ diz que é da gestão | ✅ nada para errar | ✅ | n/a | ✅ Voltar no alto | ✅ |
 | Pedido (Escritório) | ✅ | ✅ | ✅ Cancelar não fica mais perto de Corrigir | ✅ | ✅ | ✅ |
 | Ajustes › Acessos › O que o Escritório pode fazer | ✅ título diz | ✅ toque liga/desliga | ✅ 56px+ | ✅ "Pronto! …" | ✅ toque de novo volta | ✅ |
+
+### Onda 2: tela Hoje
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Hoje (gestão) | ✅ "Bom dia" + blocos com título | ✅ cada linha tem o botão dela | ✅ 48px, 360px sem corte (teste) | n/a (só leva à ação) | ✅ voltar pela barra | ✅ sem palavra proibida |
+| Hoje (Escritório) | ✅ "Suas tarefas" primeiro | ✅ botão da tarefa igual ao do Escritório | ✅ | ✅ (mesmo aviso de antes) | ✅ | 🔜 Onda 3 de vocabulário ("vias") |
+| Mais (gestão) | ✅ | ✅ | ✅ | n/a | ✅ Fechar no alto | ✅ |

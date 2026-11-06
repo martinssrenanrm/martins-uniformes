@@ -6,7 +6,7 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
 (async()=>{const b=await chromium.launch();const erros=[];const A=await b.newPage({viewport:{width:820,height:1100}});A.on('pageerror',e=>erros.push(e.message));
   await A.clock.install({time:new Date('2026-10-14T15:30:00')});
   await A.addInitScript(()=>{window.claude={use:async()=>null}});await A.goto(APP);await A.waitForTimeout(1200);
-  await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;ui.inicio=null;
+  await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;ui.tela=ui.tela||'fabrica';ui.inicio=null;
     state.pedidos.forEach(p=>{p.vias=true;p.arte=true;p.artePrep=true;p.materiais.forEach(m=>{m.conf=true;m.st='ok'})});RC={};
     if(!state.forn.some(f=>faseT(f.servico)==='costura')){const t=state.tipos.find(x=>x.externo&&faseG(x.grupo)==='costura')||state.tipos.find(x=>x.externo);state.forn.push({id:'ffac',nome:'Facção Teste',servico:t.id,prazo:4,leva:state.pessoas[0].id})}render()});
   console.log('1) Passar para outra pessoa');

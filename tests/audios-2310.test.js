@@ -5,7 +5,7 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
 (async()=>{const b=await chromium.launch();const erros=[];const A=await b.newPage({viewport:{width:820,height:1100}});A.on('pageerror',e=>erros.push(e.message));
   await A.clock.install({time:new Date('2026-10-14T15:30:00')});
   await A.addInitScript(()=>{window.claude={use:async()=>null}});await A.goto(APP);await A.waitForTimeout(1200);
-  await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;ui.inicio=null;
+  await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;ui.tela=ui.tela||'fabrica';ui.inicio=null;
     state.pedidos.forEach(p=>{p.vias=true;p.arte=true;p.artePrep=true;p.materiais.forEach(m=>{m.conf=true;m.st='ok'})});RC={};render()});
   console.log('1) Desfazer fica disponível');
   let r=await A.evaluate(()=>{const m=unidades().find(x=>faseT(x.tipo)==='corte').id;ui.sheet={t:'maq',m};render();const bt=document.querySelector('#sheet [data-a=comecar]');const l=bt.dataset.l,s=bt.dataset.s;bt.click();

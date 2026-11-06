@@ -865,6 +865,34 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 details.sub{border-top:1px solid var(--line);padding-top:10px}details.sub>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;cursor:pointer}details.sub>summary::-webkit-details-marker{display:none}
 details.sub .sub-r{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-weight:600;font-size:17px}details.sub .sub-r svg.ic{width:22px;height:22px;transition:transform .15s}details.sub[open] .sub-r svg.ic{transform:rotate(90deg)}details.sub[open]>summary{margin-bottom:8px}details.sub>summary .passo-n{color:var(--ink)}
 .aj-idx{margin:0 0 16px}.aj-idx .linha-dep{gap:8px}.aj-idx .pulo{font-size:16px;min-height:44px;border-radius:999px}
+/* Hoje (Onda UX 2) */
+.nb.hj-nb,.nb.mais-nb{display:none}
+body.com-hoje .nb.hj-nb{display:flex}
+body.com-hoje:not(.operacao) .nb.lg{display:none}
+body.com-hoje:not(.operacao) .nb.mais-nb{display:flex}
+.hj-topo{align-items:flex-start}.hj-tt{flex:1;min-width:0}.hj-tt h1{margin:0;font-size:26px;line-height:1.2}.hj-tt span{display:block;color:var(--ink2);font-size:17px;margin-top:2px}
+.hj-sec{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px 10px;margin:0 0 14px}
+.hj-sec.hj-vazio{padding-bottom:4px}
+.hj-h{display:flex;align-items:center;gap:10px;margin:0 0 10px;font-size:20px}.hj-h svg.ic{width:26px;height:26px;flex:none}.hj-h span{flex:1;min-width:0}
+.hj-h em{font-style:normal;background:var(--warn,#B45309);color:#fff;border-radius:999px;min-width:30px;height:30px;display:inline-grid;place-items:center;padding:0 8px;font-size:17px}
+#hj-riscos .hj-h em{background:var(--red)}
+.hj-ok{display:flex;gap:8px;align-items:flex-start;margin:0 0 8px;color:var(--go-dark);font-size:17px}.hj-ok svg.ic{width:22px;height:22px;flex:none}
+.hj-sub{margin:-2px 0 8px;color:var(--ink2);font-size:16px}
+.hj-ped{border-top:1px solid var(--line);padding:12px 0 6px;display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:start}
+.hj-ped:first-of-type{border-top:0;padding-top:2px}
+.hj-pt b{display:block;font-size:18px;overflow-wrap:anywhere}.hj-pt span{display:block;color:var(--ink2);font-size:16px}
+.hj-bar{grid-column:1/-1;height:12px;border-radius:999px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}
+.hj-bar i{display:block;height:100%;background:var(--go);border-radius:999px}.hj-ped.hj-crit .hj-bar i{background:var(--red)}.hj-ped.hj-warn .hj-bar i{background:#D97706}
+.hj-pe{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:16px;color:var(--ink2)}
+.hj-l{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px 10px;border-top:1px solid var(--line);padding:10px 0}
+.hj-sec .hj-l:first-of-type,.hj-sub+.hj-l{border-top:0}
+.hj-l>svg.ic{width:26px;height:26px;flex:none;color:var(--ink2)}.hj-lt{flex:1;min-width:0}.hj-lt b{display:block;font-size:18px;overflow-wrap:anywhere}.hj-lt small{display:block;font-size:16px;color:var(--ink2);overflow-wrap:anywhere}
+.hj-l .mbtn,.hj-pe .mbtn{flex:none;min-height:48px}
+.hj-mais{width:100%;margin:6px 0 4px;min-height:48px}
+.hj-nota{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:2px 14px;margin:0 0 14px}.hj-nota .hj-l{border-top:0}
+.hj-tars .tar2:first-child{border-top:0}
+@media (max-width:420px){.hj-l{grid-template-columns:auto minmax(0,1fr)}.hj-l>.mbtn{grid-column:2;justify-self:start}}
+@media (max-width:640px){body.operacao .nav .nb,body.operacao .nav .nb.novo{flex:1 1 0}}
 body.chao .nav{display:none!important}body.chao main{padding-bottom:40px}
 .mv{max-width:640px;margin:0 auto;display:grid;gap:14px}.mv-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .mv-eu{display:flex;align-items:center;gap:14px}.mv-eu .av{width:64px!important;height:64px!important;font-size:28px}.mv-eu small{display:block;color:var(--ink2);font-size:18px}.mv-eu b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.02em}
@@ -1053,17 +1081,21 @@ body.com-undo #app{padding-bottom:80px}#undoF{position:fixed;left:max(12px,env(s
   <symbol id="i-dormir" viewBox="0 0 48 48"><path d="M8 10h12L8 24h12M26 22h10L26 34h10"/></symbol>
   <symbol id="i-fabrica" viewBox="0 0 48 48"><path d="M4 42V20l10 7v-7l10 7v-7l10 7V8h8v34z"/><path d="M4 42h40M12 34h4M22 34h4"/></symbol>
   <symbol id="i-camera" viewBox="0 0 48 48"><path d="M6 16h8l4-6h12l4 6h8v24H6z"/><circle cx="24" cy="27" r="8"/></symbol>
+  <symbol id="i-hoje" viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="32" rx="4"/><path d="M6 20h36M16 6v8M32 6v8M15 29h6v6h-6z"/></symbol>
+  <symbol id="i-mais3" viewBox="0 0 48 48"><circle cx="10" cy="24" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="38" cy="24" r="3"/></symbol>
   <symbol id="i-engr" viewBox="0 0 48 48"><circle cx="24" cy="24" r="6"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7M10 10l5 5M33 33l5 5M38 10l-5 5M15 33l-5 5"/></symbol>
 </svg>
 
 <input type="file" id="fArq" multiple hidden><input type="file" id="fImpF" accept="application/pdf,.pdf,.docx,.doc,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" multiple hidden><input type="file" id="fImpM" accept="image/*,application/pdf" multiple hidden><input type="file" id="fImpC" accept="application/pdf,.pdf" multiple hidden><input type="file" id="fImpM1" accept="image/*,application/pdf" hidden>
 <main><div class="wrap"><div id="sync" class="sync"></div></div><div class="wrap" id="app"></div></main>
 <nav class="nav" aria-label="Menu"><div class="wrap">
+  <button class="nb hj-nb" data-a="tela" data-t="hoje"><svg class="ic"><use href="#i-hoje"/></svg>Hoje</button>
   <button class="nb" data-a="tela" data-t="fabrica"><svg class="ic"><use href="#i-fabrica"/></svg>Fábrica</button>
   <button class="nb" data-a="tela" data-t="pedidos"><svg class="ic"><use href="#i-lista"/></svg>Pedidos</button>
   <button class="nb novo" data-a="novo" aria-label="Novo pedido"><span class="nb-mais"><svg class="ic"><use href="#i-mais"/></svg></span><span class="nb-l">Novo pedido</span></button>
   <button class="nb lg" data-a="tela" data-t="gestor"><svg class="ic"><use href="#i-grafico"/></svg>Gestor</button>
   <button class="nb lg" data-a="tela" data-t="cadastros"><svg class="ic"><use href="#i-engr"/></svg>Cadastros</button>
+  <button class="nb mais-nb" data-a="menu" aria-label="Mais: Painel do gestor, Cadastros e Empresas"><svg class="ic"><use href="#i-mais3"/></svg>Mais</button>
 </div></nav>
 <div id="sheet"></div>
 <div id="pop"></div>
@@ -1191,7 +1223,7 @@ const GRUPOS=[{id:'corte',nome:'Corte',i:'i-corte'},{id:'pers',nome:'Personaliza
    corte = abre o lote · pers = personalização · costura = montagem · acab = acabamento/fecha a peça. */
 /* Módulos: partes do app que cada fábrica liga ou desliga (state.modOff). Desligado só esconde da tela e da ajuda; os dados ficam. */
 const MODULOS=[['pers','Personalização (estampa, bordado, artes)','i-estampa'],['etq','Etiquetas do corte com QR','i-etiqueta'],['junto','Juntar pedidos (cortar e costurar de uma vez)','i-corte'],
-  ['hora','Hora extra','i-relogio'],['imp','Importar fichas (PDF/Word)','i-lista'],['ciclo','Painel do ciclo (tempo por fase)','i-grafico']];
+  ['hora','Hora extra','i-relogio'],['imp','Importar fichas (PDF/Word)','i-lista'],['ciclo','Painel do ciclo (tempo por fase)','i-grafico'],['hoje','Tela Hoje (o que importa primeiro para cada pessoa)','i-hoje']];
 const modOn=k=>!((typeof state!=='undefined'&&state&&state.modOff)||[]).includes(k);
 const faqOn=f=>!f.m||(f.m==='polo'?((typeof state!=='undefined'&&state&&state.produtos)||[]).some(p=>(p.partes||[]).includes('Peitilho')):modOn(f.m));
 const FASES_SETOR=[['corte','Abre o lote (corte)'],['pers','Personalização'],['costura','Montagem / costura'],['acab','Acabamento (fecha a peça)']];
@@ -1446,7 +1478,7 @@ const NOME_EMP=()=>(typeof state!=='undefined'&&state&&state.marca&&state.marca.
 const gestoresTxt=()=>{const n=((typeof state!=='undefined'&&state&&state.usuarios)||[]).filter(u=>u.perfil==='gestao').map(u=>u.nome).filter(Boolean);return n.length?n.slice(0,3).join(' ou '):'alguém da gestão'};
 const KEY='martins-v8';
 let state,undo=null,toastT=null;
-let ui={tela:'fabrica',sheet:null,fx:null,cad:'maquinas'};
+let ui={tela:'',sheet:null,fx:null,cad:'maquinas'};
 const prod=id=>state.produtos.find(p=>p.id===id);
 const pedById=id=>state.pedidos.find(p=>p.id===id);
 const lote=id=>state.lotes.find(l=>l.id===id);
@@ -1929,6 +1961,45 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
   ${z==='fora'?`<section class="grupo" id="g-fora"><p class="sub-l">Só a parte que saiu fica esperando. O resto continua.</p>
     <div class="forns">${state.forn.map(f=>fornCard(f,esc_)).join('')}</div></section>`:''}
   ${z==='esc'?vEscritorio(esc_):''}<div class="fim-ajuda"><button class="x azul" data-a="ajuda" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px">${ic('i-duvida')}Como usar o app</button></div>`}
+/* ================= HOJE (Onda UX 2, 11/2026) =================
+   Primeira tela de cada perfil: o que importa a ele, o mais urgente primeiro. Só lê o estado; cada linha leva à ação.
+   É o módulo "hoje" (Partes do app): desligado, o app volta à navegação de antes. */
+const hojeOn=()=>modOn('hoje');
+function hojeRiscos(){return state.pedidos.filter(p=>!p.concluido&&!p.cancelado).map(p=>({p,i:info(p)})).filter(x=>['crit','warn'].includes(x.i.u)).sort((a,b)=>a.i.score-b.i.score)}
+function hojeMaquinas(P){return Object.entries(P.plan).filter(([m])=>!P.uso[m]).map(([m,it])=>({m,u:unidade(m),it})).filter(x=>x.u).sort((a,b)=>a.it.inf.score-b.it.inf.score)}
+const prazoTxt=du=>du<0?'já passou da data':du===0?'vence hoje':du===1?'falta 1 dia útil':`faltam ${du} dias úteis`;
+function hojePed(x){const pct=Math.max(0,Math.min(100,Math.round((x.i.prog||0)*100)));
+  return `<div class="hj-ped hj-${x.i.u}"><div class="hj-pt"><b>${esc(x.p.cliente)}</b><span>Entrega ${fD(x.p.entrega)} · ${prazoTxt(x.i.du)}</span></div>${upill(x.i.u)}
+  <div class="hj-bar" role="img" aria-label="${pct}% feito"><i style="width:${pct}%"></i></div><div class="hj-pe"><span>${pct}% feito</span><button class="mbtn neutro2" data-a="pedido" data-id="${x.p.id}">Ver pedido ›</button></div></div>`}
+const hjSec=(id,i,tit,n,corpo,vazio)=>`<section class="hj-sec${n?'':' hj-vazio'}" id="hj-${id}"><h2 class="hj-h">${ic(i)}<span>${tit}</span>${n?`<em>${n}</em>`:''}</h2>${n?corpo:`<p class="hj-ok">${ic('i-check')}<span>${vazio}</span></p>`}</section>`;
+const hjLinha=(i,txt,sub,bt)=>`<div class="hj-l">${ic(i)}<span class="hj-lt"><b>${txt}</b>${sub?`<small>${sub}</small>`:''}</span>${bt}</div>`;
+const hjBt=(v,txt,cls='mbtn neutro2')=>`<button class="${cls}" data-a="hojeIr" data-v="${v}">${txt}</button>`;
+function vHoje(){const u=usuarioAtual(),g=ehGestao(),P=plano(),esc_=tarefasEsc(),pid=u&&u.pessoa&&pessoa(u.pessoa)?u.pessoa:null;
+  const d=new Date(now()),h=d.getHours(),oi=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite',nome=String(quemNome()||u?.nome||'').split(' ')[0];
+  const topo=`<div class="topo hj-topo"><div class="hj-tt"><h1>${oi}${nome?', '+esc(nome):''}</h1><span>${DOW[d.getDay()]}, ${d.getDate()} de ${MES[d.getMonth()]}</span></div>${sino()}</div>${avisoConfig()}${faixasTopo()}`;
+  const extra=typeof hojeTopo==='function'?hojeTopo(P,esc_,pid):'';
+  const R=hojeRiscos();
+  const riscos=hjSec('riscos','i-alerta','Pedidos com risco de atraso',R.length,R.slice(0,5).map(hojePed).join('')+(R.length>5?hjBt('pedidos',`Ver os ${R.length} em Pedidos`,'mbtn neutro2 hj-mais'):''),'Nenhum pedido com risco de atraso.');
+  const mine=pid?esc_.filter(t=>t.resp===pid):[],lista=pid?mine:esc_;
+  const minhas=hjSec('minhas','i-vias',pid?'Suas tarefas':'Tarefas do escritório',lista.length,`<div class="hj-tars">${lista.slice(0,6).map(tarRow).join('')}</div>${lista.length>6?hjBt('esc',`Ver as ${lista.length} tarefas`,'mbtn neutro2 hj-mais'):''}`,pid?'Nada pendente com você.':'Nada pendente no escritório.');
+  const outras=esc_.length-lista.length,resumoEsc=outras>0?`<div class="hj-nota">${hjLinha('i-pessoas',`Mais ${outras} ${outras>1?'tarefas':'tarefa'} do escritório com outras pessoas`,'',hjBt('esc','Ver todas'))}</div>`:'';
+  if(!g)return `${topo}${extra}${minhas}${resumoEsc}${riscos}`;
+  /* gestão: rua, máquinas, escritório, vendas */
+  const late=esc_.filter(t=>t.a==='buscou'&&t.late),levar=esc_.filter(t=>t.a==='levei'),comprar=listaCompras().comprar.length;
+  const nRua=late.length+(comprar?1:0)+(levar.length?1:0);
+  const rua=hjSec('rua','i-caminhao','Precisa ir para a rua',nRua,
+    late.slice(0,3).map(t=>hjLinha('i-alerta',esc(tarTxt(t)),'Passou do prazo do prestador · '+esc(t.ped.cliente),hjBt('fora','Ver na rua'))).join('')+
+    (comprar?hjLinha('i-carrinho',`${comprar} ${comprar>1?'itens':'item'} para comprar`,'Tecidos e aviamentos que faltam','<button class="mbtn neutro2" data-a="compras">Lista de compras</button>'):'')+
+    (levar.length?hjLinha('i-caminhao',`${levar.length} ${levar.length>1?'pacotes':'pacote'} para levar ao prestador`,esc([...new Set(levar.map(t=>t.forn&&t.forn.nome).filter(Boolean))].slice(0,3).join(', ')),hjBt('fora','Ver na rua')):''),
+    'Nada atrasado na rua e nada para comprar.');
+  const M=hojeMaquinas(P),nTrab=Object.keys(P.uso).length;
+  const maq=hjSec('maq','i-maquina','O que pôr em cada máquina',M.length,
+    `<p class="hj-sub">${nTrab} ${nTrab===1?'máquina trabalhando':'máquinas trabalhando'} agora. Estas estão livres e já têm o próximo trabalho:</p>`+
+    M.slice(0,6).map(x=>hjLinha(tipo(x.u.tipo).i||'i-maquina',esc(x.u.nome),`${esc(pNome(x.it.pessoa))} · ${esc(x.it.s.nome)} · ${esc(x.it.ped.cliente)}`,`<button class="mbtn" data-a="maq" data-m="${x.m}">Abrir</button>`)).join('')+(M.length>6?hjBt('maq',`Ver as ${M.length} máquinas`,'mbtn neutro2 hj-mais'):''),
+    nTrab?`${nTrab} ${nTrab===1?'máquina trabalhando':'máquinas trabalhando'}. Nenhuma máquina livre com trabalho esperando.`:'Nenhum trabalho esperando máquina.');
+  const ini=sod(now()).getTime()-((new Date(now()).getDay()+6)%7)*DIA,novos=state.pedidos.filter(p=>!p.cancelado&&(p.chegada||0)>=ini),pc=sum(novos.map(p=>sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd))));
+  const vendas=`<section class="hj-sec" id="hj-vendas"><h2 class="hj-h">${ic('i-grafico')}<span>Vendas da semana</span></h2>${hjLinha('i-lista',`${novos.length} ${novos.length===1?'pedido novo':'pedidos novos'} desde segunda`,pc?`${pc} peças`:'',hjBt('res','Ver faturamento'))}</section>`;
+  return `${topo}${extra}${riscos}${rua}${maq}${pid&&mine.length?minhas:''}${esc_.length?`<div class="hj-nota">${hjLinha('i-vias',`${esc_.length} ${esc_.length>1?'tarefas':'tarefa'} no escritório`,pid&&mine.length?`${mine.length} com você`:'',hjBt('esc','Ver escritório'))}</div>`:''}${vendas}`}
 /* Escritório por pedido (pedido da Martins, 10/2026): um cartão por pedido com a lista curta das tarefas; tarefas iguais juntas. */
 const LAB_T={etEscFeito:'Feito',pedEditar:'Completar',insumos:'Conferir',vias:'Separei',artePrep:'Pronta',arte:'Aprovada',arteEnv:'Enviei',comprei:'Comprei',chegou:'Chegou',levei:'Levei',buscou:'Chegou',entregar:'Entregue'};
 function tarMini(t){const lab=t.a==='levei'&&viaApp(t)?'Enviado':LAB_T[t.a];const quem=t.resp?pNome(t.resp):'';
@@ -2867,6 +2938,9 @@ const FAQ=[
 {c:'cad',q:'Como cadastro um produto novo?',k:'produto novo peça modelo cadastrar camiseta',r:['Cadastros › Produtos › Cadastrar produto.','Escreva o nome, escolha o desenho, os tecidos e de qual produto copiar os processos.','Depois ajuste os processos, tempos e aviamentos dentro dele.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'O que quem é do Escritório pode fazer no app?',k:'permissão permissões escritório vendedora cancelar entregar corrigir bloquear liberar só a gestão perfil responsabilidade',r:['Cadastros › Ajustes › Acessos ao sistema › O que o Escritório pode fazer.','Toque em cada linha para ligar ou desligar: entregar pedido, cancelar pedido, corrigir o que a produção já fez.','Quem é da gestão pode tudo. Cadastros e Painel do gestor são sempre só da gestão.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
+{c:'comeco',q:'O que é a tela Hoje?',m:'hoje',k:'hoje primeira tela início começo o que fazer agora prioridade urgente resumo do dia bom dia',r:['É a primeira tela do app. Mostra o que importa para você hoje, o mais urgente primeiro.','Gestão: pedidos com risco de atraso, o que precisa ir para a rua, o que pôr em cada máquina e as vendas da semana.','Escritório: as suas tarefas primeiro e os pedidos com risco de atraso.','Cada linha tem um botão que leva direto para resolver.'],ir:'hoje'},
+{c:'comeco',q:'Onde ficaram o Painel do gestor e os Cadastros?',m:'hoje',g:1,k:'mais painel gestor cadastros sumiu onde ficou barra de baixo empresas',r:['Na barra de baixo, toque em Mais (o último botão).','Lá estão Painel do gestor, Cadastros e Empresas.'],ir:'eu'},
+{c:'cad',q:'Como desligo a tela Hoje e volto a barra de antes?',m:'hoje',g:1,k:'desligar tela hoje voltar barra antiga como era antes partes do app',r:['Cadastros › Ajustes › Partes do app.','Desligue "Tela Hoje". A barra volta a ser Fábrica, Pedidos, Novo, Gestor e Cadastros.'],ir:'cad:ajustes#Partes do app'},
 {c:'comeco',q:'Por que não aparece o botão de cancelar ou de corrigir?',k:'não aparece sumiu botão cancelar corrigir horário voltar processo cadastro painel bloqueado permissão gestão',r:['Algumas ações são de quem é da gestão: Cadastros, Painel do gestor e, se a fábrica escolheu assim, cancelar pedido e corrigir o que a produção já fez.','Para essas, o botão não aparece para quem é do Escritório.','Precisa fazer? Chame quem é da gestão. Ela pode liberar em Ajustes › Acessos.']},
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
@@ -4162,7 +4236,9 @@ function renderTela(){RC={};aplicaCor();if(LINK_FICHA&&NV.pronto&&state&&usuario
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());MODULOS.forEach(([k])=>document.body.classList.toggle('sem-'+k,!modOn(k)));
   if(logado&&!ehGestao()&&TELAS_GESTAO.includes(ui.tela)){ui.tela='fabrica';ui.sheet=null}
   if(!logado){document.getElementById('app').innerHTML=vLogin();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
-  document.body.classList.toggle('chao',ehChao());document.getElementById('app').innerHTML=ehChao()&&!ui.inicio?vMinhaVez():ui.inicio?vInicio():ui.tela==='avisos'?vAvisos():ui.tela==='gestor'?vGestor():ui.tela==='pedidos'?vPedidos():ui.tela==='cadastros'?vCadastros():vFabrica();
+  document.body.classList.toggle('chao',ehChao());document.body.classList.toggle('com-hoje',hojeOn());if(!ui.tela)ui.tela=hojeOn()?'hoje':'fabrica';if(ui.tela==='hoje'&&!hojeOn())ui.tela='fabrica';
+  {const mb=document.querySelector('.mais-nb');if(mb)mb.setAttribute('aria-current',TELAS_GESTAO.includes(ui.tela)?'page':'false')}
+  document.getElementById('app').innerHTML=ehChao()&&!ui.inicio?vMinhaVez():ui.inicio?vInicio():ui.tela==='avisos'?vAvisos():ui.tela==='hoje'?vHoje():ui.tela==='gestor'?vGestor():ui.tela==='pedidos'?vPedidos():ui.tela==='cadastros'?vCadastros():vFabrica();
   {const pp=document.getElementById('pop');if(pp)pp.innerHTML=ui.sheet?'':ui.sino?popAvisos():ui.eu?popEu():''}
   const sh=document.getElementById('sheet');const s=ui.sheet;
   if(!s){sh.innerHTML='';document.body.style.overflow='';return}
@@ -4208,12 +4284,13 @@ const A={
   avQuem:d=>{snap();const a=new Set(state.avisarNovos||[]);if(a.has(d.v))a.delete(d.v);else{a.add(d.v);state.pedidos.forEach(p=>{p.vistoPor=p.vistoPor||{};if(!p.vistoPor[d.v])p.vistoPor[d.v]=1})}state.avisarNovos=[...a];commit()},
   tela:d=>{if(['cadastros','gestor'].includes(d.t)&&!ehGestao())return;ui.tela=d.t;ui.sheet=null;render();window.scrollTo(0,0)},
   cad:d=>{ui.cad=d.k;render()},
+  hojeIr:d=>{const v=d.v;ui.sheet=null;if(v==='pedidos'){ui.tela='pedidos';ui.pv='ped'}else if(['esc','fora','maq'].includes(v)){ui.tela='fabrica';ui.fz=v}else if(v==='res'&&ehGestao()){ui.tela='gestor';ui.gt='res'}render();scrollTo(0,0)},
   irEquipe:()=>{ui.tela='cadastros';ui.cad='equipe';ui.sheet=null;render();window.scrollTo(0,0)},
   fechar:()=>{const s=ui.sheet;if(s?.t==='etapa'){ui.sheet={t:'produto',p:s.p};return render()}if(s?.t==='prob'&&s.step>1){s.step--;return render()}if(s?.t==='novo'&&s.w.step>1){wRead();s.w.step--;s.w.err='';return render()}if(s?.t==='novo'&&s.w.edit){ui.sheet={t:'pedido',id:s.w.edit};return render()}ui.sheet=null;render()},
   ajuda:()=>openSheet({t:'ajuda',q:'',ab:null}),
   ajAss:d=>{ui.sheet.ab=ui.sheet.ab===d.v?null:d.v;render()},
   ajIr:d=>{const [a,b0]=String(d.v).split(':'),[b,alvo]=(b0||'').split('#');ui.sheet=null;ui.sino=false;ui.eu=false;
-    if(a==='fab'){ui.tela='fabrica';ui.fz=b||'maq'}else if(a==='ped'||a==='emp'){ui.tela='pedidos';ui.pv=a==='emp'?'emp':'ped'}
+    if(a==='hoje'){ui.tela='hoje'}else if(a==='fab'){ui.tela='fabrica';ui.fz=b||'maq'}else if(a==='ped'||a==='emp'){ui.tela='pedidos';ui.pv=a==='emp'?'emp':'ped'}
     else if(a==='novo'){ui.tela='pedidos';render();return A.novo()}else if(a==='sino'){ui.sino=true}else if(a==='eu'){ui.eu=true}
     else if(a==='cad'&&ehGestao()){ui.tela='cadastros';ui.cad=b}else if(a==='gest'&&ehGestao()){ui.tela='gestor';ui.gt=b}
     if(alvo){ui.blk=ui.blk||{};ui.blk['aj:'+alvo]=true}render();scrollTo(0,0);if(alvo)setTimeout(()=>{const h=[...document.querySelectorAll('#app h2')].find(x=>x.textContent.trim().startsWith(alvo));if(h){const dd=h.closest('details');if(dd&&!dd.open){dd.open=true}}if(h){h.scrollIntoView({behavior:'smooth',block:'start'});const c=h.closest('.card');if(c){c.classList.add('aj-luz');setTimeout(()=>c.classList.remove('aj-luz'),2500)}}},60)},

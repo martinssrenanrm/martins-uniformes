@@ -6,7 +6,7 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
 (async()=>{const b=await chromium.launch();const erros=[];const A=await b.newPage({viewport:{width:820,height:1100}});A.on('pageerror',e=>erros.push(e.message));
   await A.clock.install({time:new Date('2026-10-14T15:30:00')});
   await A.addInitScript(()=>{window.claude={use:async()=>null}});await A.goto(APP);await A.waitForTimeout(1200);
-  await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;ui.inicio=null;
+  await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;ui.tela=ui.tela||'fabrica';ui.inicio=null;
     window.PED=state.pedidos.find(p=>!p.concluido&&new Set(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.cor)).size>=2);const ped=PED,ls=lotesDe(ped.id).filter(l=>!l.rework);ls.forEach(l=>l.steps={});
     ped.vias=true;ped.arte=true;ped.artePrep=true;ped.materiais=calcMat(ls);ped.materiais.forEach(m=>{m.conf=true;m.st='ok'});RC={};render()});
   console.log('1) Linha em falta trava só a costura');

@@ -674,3 +674,15 @@ O tempo de cada parte conta para quem fez, no Painel.
 - A gestão escolhe o que o Escritório pode fazer em **Cadastros › Ajustes › Acessos ao sistema › O que o Escritório pode fazer**.
 
 **O que NÃO mudou:** para quem é da gestão, tudo continua igual. Nenhum botão mudou de lugar.
+
+## Tela Hoje: o app abre no que importa para você
+
+**O que mudou:**
+- O app agora **abre na tela Hoje**. Ela mostra o que é mais urgente primeiro, e cada linha tem um botão que leva direto para resolver.
+- **Para a gestão:** pedidos com risco de atraso (com quanto já foi feito), o que precisa ir para a rua (compras e prestador atrasado), o que pôr em cada máquina livre e os pedidos novos da semana.
+- **Para o Escritório:** as **suas tarefas primeiro**, depois os pedidos com risco de atraso.
+- Na barra de baixo da gestão, **Gestor** e **Cadastros** ficam dentro de **Mais** (o último botão).
+
+**O que NÃO mudou:** a Fábrica, os Pedidos e o Novo pedido continuam iguais e no mesmo lugar na barra.
+
+**Se a equipe estranhar:** a gestão desliga em Cadastros › Ajustes › Partes do app › Tela Hoje, e a barra volta a ser a de antes.
