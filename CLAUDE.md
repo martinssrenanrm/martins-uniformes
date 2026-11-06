@@ -84,6 +84,11 @@ NODE_PATH=$(npm root -g) node tests/anexos.test.js
 NODE_PATH=$(npm root -g) node tests/audios-2910.test.js
 NODE_PATH=$(npm root -g) node tests/eventos.test.js
 NODE_PATH=$(npm root -g) node tests/desfazer-pedidos.test.js
+NODE_PATH=$(npm root -g) node tests/permissoes.test.js   # PGLITE=<pasta> testa também a migração 011
+NODE_PATH=$(npm root -g) node tests/hoje.test.js
+NODE_PATH=$(npm root -g) node tests/sugestoes.test.js
+NODE_PATH=$(npm root -g) node tests/celular.test.js
+NODE_PATH=$(npm root -g) node tests/feito-hoje.test.js
 ```
 
 ## Supabase (endereço próprio)
