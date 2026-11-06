@@ -106,7 +106,7 @@ Sete regras sobre o que já está no app, cada uma com o porquê e um botão:
 
 ## Testes
 
-- `NODE_PATH=$(npm root -g) bash tests/rodar-todos.sh` passou **verde ao fim de cada onda** (39 arquivos).
+- `NODE_PATH=$(npm root -g) bash tests/rodar-todos.sh` passou **verde ao fim de cada onda** (38 arquivos).
 - São 5 testes novos.
 - A parte de banco de `tests/permissoes.test.js` só roda com o PGlite instalado (`PGLITE=<pasta>`). No GitHub ela é pulada e avisa.
 - `site/` **não** foi gerado, porque isso é passo de publicação.
