@@ -714,3 +714,13 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 
 - Conta só o que foi marcado no app: quanto mais na hora, mais certo fica.
 - Não compara pessoas. Não tem pontos nem medalhas.
+
+## Tela Hoje virou uma lista do que resolver
+
+**O que mudou:** a tela Hoje agora é **uma lista só**, da coisa mais urgente para a menos.
+- A **cor na beira** de cada linha diz a urgência: vermelho (atrasando), amarelo (atenção, compras), azul (máquina livre, pronto para entregar) e cinza (para acompanhar).
+- **Cada linha tem o botão dela.** O primeiro, o mais urgente, é azul cheio.
+- Para quem é do **Escritório**, as **suas tarefas vêm primeiro**, com o mesmo botão do Escritório (Separei, Pronta, Feito…).
+- No fim: a **faixa verde** com o que a produção fez, as **vendas da semana** e, se faltar, **Configurar a fábrica**.
+
+**O que NÃO mudou:** as informações e os botões são os mesmos. Nada mudou de lugar na barra de baixo.

@@ -118,3 +118,9 @@ Varredura em 360×640 (Hoje, Máquinas, Fora, Escritório, Pedidos, Pedido, folh
 | Tela | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
 | Hoje › quadro verde | ✅ frase curta | n/a (só leitura) | n/a | ✅ cresce conforme marca | ✅ | ✅ sem "ranking"/pontos (teste) |
+
+### Onda 6: visual da Hoje em fila de ações (direção B)
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Hoje (gestão) | ✅ "8 coisas para resolver" | ✅ 1º item com botão azul, sem rolar (teste) | ✅ 48px, 360px sem corte (teste) | ✅ | ✅ | ✅ |
+| Hoje (Escritório) | ✅ tarefas dela primeiro | ✅ botão da própria tarefa | ✅ | ✅ (mesmo aviso do Escritório) | ✅ Desfazer | 🔜 Onda 3 de vocabulário ("vias") |

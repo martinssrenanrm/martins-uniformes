@@ -150,3 +150,48 @@ Regras comuns às três:
 - o urgente cabe sem rolar.
 
 **Nada foi implementado no app.** Depois da escolha, a direção vira uma onda só de visual, com prints e o Teste da Dona Cida.
+
+## Onda 6: Hoje em fila de ações (direção B, escolhida pelo Renan em 06/11)
+
+**Risco de estranhamento: médio.** É só visual: o que aparece e os botões são os mesmos da Hoje das Ondas 2, 3 e 5, e nada mudou de lugar na barra.
+
+- **Uma lista só**, ordenada por urgência: vermelho → amarelo → azul → cinza. Cada linha tem uma faixa de cor, um ícone, um título, no máximo uma linha de apoio e o botão dela.
+- **Os blocos e as sugestões viraram linhas, sem repetir nada** (o teste confere):
+
+  | Linha | Cor | Vem de |
+  |---|---|---|
+  | Pedido atrasando | vermelho | Onda 2 |
+  | Pedido em atenção | amarelo | Onda 2 |
+  | Pedido que vence esta semana abaixo da metade | amarelo | sugestão da Onda 3 |
+  | Prestador atrasado | amarelo | Onda 2 e Onda 3 |
+  | Tarefa que trava o corte | amarelo | Onda 3 |
+  | Compras (com o item que falta em mais pedidos) | amarelo | Onda 2 e Onda 3 |
+  | Máquina livre (até 4) | azul | Onda 2 e Onda 3 |
+  | Levar ao prestador | azul | Onda 2 |
+  | Pronto para entregar | azul | Onda 3 |
+  | Fila (onde a produção segura) | cinza | Onda 3 |
+  | Máquina parada sem ninguém que saiba | cinza | Onda 3 |
+  | Tarefas do escritório | cinza | Onda 2 |
+
+- **Até 8 linhas à vista;** o resto fica em "Ver mais".
+- **Botões:**
+  - azul cheio só no primeiro item, contorno em todos os outros;
+  - o mesmo cartão (fino, cantos de 14px) vale para o quadro "O que o Escritório pode fazer", da Onda 1.
+- **Escritório:** as próprias tarefas primeiro, com o mesmo botão do Escritório. Depois, as tarefas com outras pessoas e os pedidos em risco.
+- **Fim da tela:**
+  - a faixa verde da produção (pedidos em dia · processos hoje e % da meta · semana · entregues);
+  - vendas da semana;
+  - "Configurar a fábrica", em linha tracejada.
+- O cartão "Vamos deixar o app com a cara da sua fábrica" saiu do topo da Hoje. Na Fábrica, ele continua onde estava.
+- Código sem uso depois da mudança foi tirado: os blocos antigos da Hoje, o quadro de sugestões e o quadro verde. Os testes das Ondas 2, 3 e 5 foram reescritos para a fila.
+- Prints em 360×640:
+  - antes: `onda-5-depois/gestao-hoje.png` e `escritorio-hoje.png`;
+  - depois: `onda-6-depois/gestao-hoje.png` e `escritorio-hoje.png` (sem rolar) e as versões `-inteira`.
+
+**O que do mockup não coube igual no app:**
+- **Faixa verde:** o mockup mostrava "16 processos hoje (60% da meta)". O app mostra o que foi marcado **no dia**. Com os dados de demonstração vistos em 06/11, aparece "ainda nada marcado hoje · 42 na semana", porque os processos de demonstração são do dia anterior.
+- **Compras:** a linha de apoio só diz "X falta em N pedidos" quando um item conferido falta em 2 ou mais pedidos. Nos dados de demonstração não há, e aparece o primeiro item da lista ("Fio de costura Verde e mais 10").
+- **Tarefas do escritório:** em vez de "Vias, arte e conferência", fixo, o app lista os tipos que existem de verdade naquele dia.
+- **Comprei e Chegou:** no Escritório, essas tarefas têm três botões (Já tem, Comprei, Em falta). Na fila, viram um botão "Abrir", que leva ao pedido. Os três botões continuam no Escritório.
+- **Quem faz:** a foto de quem faz cada tarefa (tocar para trocar) não aparece na fila. Continua no Escritório.
+- Os títulos com nome de empresa longo quebram em duas linhas, como no mockup.
