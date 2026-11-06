@@ -686,3 +686,13 @@ O tempo de cada parte conta para quem fez, no Painel.
 **O que NÃO mudou:** a Fábrica, os Pedidos e o Novo pedido continuam iguais e no mesmo lugar na barra.
 
 **Se a equipe estranhar:** a gestão desliga em Cadastros › Ajustes › Partes do app › Tela Hoje, e a barra volta a ser a de antes.
+
+## Sugestões para agora
+
+**O que mudou:** no alto da tela Hoje aparecem até **3 sugestões**, as mais urgentes primeiro. Exemplos:
+- "2 pedidos vencem esta semana e estão abaixo da metade"
+- "Zíper 20cm falta em 3 pedidos: comprando de uma vez, libera todos"
+- "Próximo para a Overlock 2: Pregar gola. A Rosa está livre e sabe fazer"
+- "1 pacote passou do prazo no prestador: vale ligar para cobrar"
+
+Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem calcula é o próprio app, com o que já está marcado. Se uma sugestão não fizer sentido, é sinal de que algo não foi marcado.

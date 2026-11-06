@@ -6,7 +6,7 @@ const CASOS=[['como faço hora extra','hora extra'],['esqueci a senha','Esqueci 
  ['mudar costureira de máquina','Galoneira'],['dividir processo pra duas pessoas','divido'],['parar no meio e retomar depois','pauso'],['peça com defeito','conserto'],['levar no terceirizado','Levei peças'],
  ['as peças voltaram da bordadeira','voltaram'],['como coloco a logo','logo'],['como entrego o pedido','entrego'],['cadastrar funcionária nova','pessoa nova'],
  ['como imprimo a ficha','fichas de produção'],['errei o pedido','corrijo'],['cor nova','cor que preciso'],['como dou acesso pra vendedora','acesso'],['backup','cópia de segurança'],
- ['faltou zíper na conferência','Faltou um item'],['comprei o tecido','Comprei'],['sair do app','saio'],['sininho','sininho'],['onde fica na rua','prestador'],['insumos','insumos'],['o que é essa tela hoje','tela Hoje'],['cadê o painel do gestor','Painel do gestor']];
+ ['faltou zíper na conferência','Faltou um item'],['comprei o tecido','Comprei'],['sair do app','saio'],['sininho','sininho'],['onde fica na rua','prestador'],['insumos','insumos'],['o que é essa tela hoje','tela Hoje'],['cadê o painel do gestor','Painel do gestor'],['de onde vem a sugestão','sugestões']];
 (async()=>{const b=await chromium.launch();const ctx=await b.newContext();await ctx.exposeFunction('__dbop',async o=>o==='list'?[]:o==='get'?{data:null}:{});
   await ctx.addInitScript(fs.readFileSync(path.join(__dirname,'fakedb.js'),'utf8'));const p=await ctx.newPage();const er=[];p.on('pageerror',e=>er.push(e.message));
   await p.goto(APP);await p.waitForTimeout(1200);

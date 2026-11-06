@@ -100,3 +100,8 @@
 | Hoje (gestão) | ✅ "Bom dia" + blocos com título | ✅ cada linha tem o botão dela | ✅ 48px, 360px sem corte (teste) | n/a (só leva à ação) | ✅ voltar pela barra | ✅ sem palavra proibida |
 | Hoje (Escritório) | ✅ "Suas tarefas" primeiro | ✅ botão da tarefa igual ao do Escritório | ✅ | ✅ (mesmo aviso de antes) | ✅ | 🔜 Onda 3 de vocabulário ("vias") |
 | Mais (gestão) | ✅ | ✅ | ✅ | n/a | ✅ Fechar no alto | ✅ |
+
+### Onda 3: sugestões para agora
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Hoje › Sugestões | ✅ frase curta + porquê | ✅ um botão por sugestão | ✅ 48px (teste) | n/a | ✅ só leva à tela, não muda nada | ✅ sem "IA" nem termo técnico (teste) |

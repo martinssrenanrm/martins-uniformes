@@ -15,7 +15,7 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
     return {largo,peq,letra}});
   console.log('1) Gestão');
   await entra('gestao');
-  let r=await A.evaluate(()=>({tela:ui.tela,secs:[...document.querySelectorAll('#app .hj-sec')].map(s=>s.id),nav:[...document.querySelectorAll('.nav .nb')].filter(n=>getComputedStyle(n).display!=='none').map(n=>n.textContent.trim())}));
+  let r=await A.evaluate(()=>({tela:ui.tela,secs:[...document.querySelectorAll('#app .hj-sec')].map(s=>s.id).filter(x=>x!=='hj-sug'),nav:[...document.querySelectorAll('.nav .nb')].filter(n=>getComputedStyle(n).display!=='none').map(n=>n.textContent.trim())}));
   ok(r.tela==='hoje','o app abre em Hoje');
   ok(r.secs.join()==='hj-riscos,hj-rua,hj-maq,hj-vendas','ordem: riscos, rua, máquinas, vendas ('+r.secs.join(', ')+')');
   ok(r.nav.join('|')==='Hoje|Fábrica|Pedidos|Novo pedido|Mais'||r.nav.length===5&&r.nav[0]==='Hoje'&&r.nav[4]==='Mais','barra com 5 itens: Hoje … Mais ('+r.nav.join(' · ')+')');
@@ -35,7 +35,7 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   ok(!m.peq.length,'botões com 48px ou mais'+(m.peq.length?': '+m.peq.join(' | '):''));ok(!m.letra.length,'letra de 16px ou mais'+(m.letra.length?': '+m.letra.join(' | '):''));
   console.log('2) Escritório');
   await entra('escritorio');
-  r=await A.evaluate(()=>{const u=usuarioAtual(),mine=tarefasEsc().filter(t=>t.resp===u.pessoa);return {tela:ui.tela,secs:[...document.querySelectorAll('#app .hj-sec')].map(s=>s.id),n:document.querySelectorAll('#hj-minhas .tar2').length,mine:mine.length,
+  r=await A.evaluate(()=>{const u=usuarioAtual(),mine=tarefasEsc().filter(t=>t.resp===u.pessoa);return {tela:ui.tela,secs:[...document.querySelectorAll('#app .hj-sec')].map(s=>s.id).filter(x=>x!=='hj-sug'),n:document.querySelectorAll('#hj-minhas .tar2').length,mine:mine.length,
     nav:[...document.querySelectorAll('.nav .nb')].filter(n=>getComputedStyle(n).display!=='none').map(n=>n.textContent.trim()),novo:document.querySelector('.nav .nb.novo').getBoundingClientRect().right<=window.innerWidth}});
   ok(r.tela==='hoje'&&r.secs[0]==='hj-minhas','Escritório abre em Hoje com as próprias tarefas primeiro');
   ok(r.n===Math.min(6,r.mine),`só as tarefas da pessoa (${r.n} de ${r.mine})`);

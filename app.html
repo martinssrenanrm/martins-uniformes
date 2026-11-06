@@ -893,6 +893,11 @@ body.com-hoje:not(.operacao) .nb.mais-nb{display:flex}
 .hj-tars .tar2:first-child{border-top:0}
 @media (max-width:420px){.hj-l{grid-template-columns:auto minmax(0,1fr)}.hj-l>.mbtn{grid-column:2;justify-self:start}}
 @media (max-width:640px){body.operacao .nav .nb,body.operacao .nav .nb.novo{flex:1 1 0}}
+.hj-sug{border:2px solid var(--blue-line);background:var(--blue-soft)}
+.hsug{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;border-top:1px solid var(--blue-line);padding:12px 0}
+.hj-sug .hj-sub+.hsug{border-top:0;padding-top:4px}
+.hsug>svg.ic{width:28px;height:28px;color:var(--blue)}.sug-t b{display:block;font-size:18px;overflow-wrap:anywhere}.sug-t small{display:block;font-size:16px;color:var(--ink2);margin-top:2px;overflow-wrap:anywhere}
+.sug-b{margin-top:8px}.sug-b .mbtn{min-height:48px}
 body.chao .nav{display:none!important}body.chao main{padding-bottom:40px}
 .mv{max-width:640px;margin:0 auto;display:grid;gap:14px}.mv-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .mv-eu{display:flex;align-items:center;gap:14px}.mv-eu .av{width:64px!important;height:64px!important;font-size:28px}.mv-eu small{display:block;color:var(--ink2);font-size:18px}.mv-eu b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.02em}
@@ -1083,6 +1088,7 @@ body.com-undo #app{padding-bottom:80px}#undoF{position:fixed;left:max(12px,env(s
   <symbol id="i-camera" viewBox="0 0 48 48"><path d="M6 16h8l4-6h12l4 6h8v24H6z"/><circle cx="24" cy="27" r="8"/></symbol>
   <symbol id="i-hoje" viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="32" rx="4"/><path d="M6 20h36M16 6v8M32 6v8M15 29h6v6h-6z"/></symbol>
   <symbol id="i-mais3" viewBox="0 0 48 48"><circle cx="10" cy="24" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="38" cy="24" r="3"/></symbol>
+  <symbol id="i-ideia" viewBox="0 0 48 48"><path d="M17 30c-3-3-5-6-5-11a12 12 0 0 1 24 0c0 5-2 8-5 11v5H17z"/><path d="M18 40h12M20 44h8"/></symbol>
   <symbol id="i-engr" viewBox="0 0 48 48"><circle cx="24" cy="24" r="6"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7M10 10l5 5M33 33l5 5M38 10l-5 5M15 33l-5 5"/></symbol>
 </svg>
 
@@ -2000,6 +2006,43 @@ function vHoje(){const u=usuarioAtual(),g=ehGestao(),P=plano(),esc_=tarefasEsc()
   const ini=sod(now()).getTime()-((new Date(now()).getDay()+6)%7)*DIA,novos=state.pedidos.filter(p=>!p.cancelado&&(p.chegada||0)>=ini),pc=sum(novos.map(p=>sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd))));
   const vendas=`<section class="hj-sec" id="hj-vendas"><h2 class="hj-h">${ic('i-grafico')}<span>Vendas da semana</span></h2>${hjLinha('i-lista',`${novos.length} ${novos.length===1?'pedido novo':'pedidos novos'} desde segunda`,pc?`${pc} peças`:'',hjBt('res','Ver faturamento'))}</section>`;
   return `${topo}${extra}${riscos}${rua}${maq}${pid&&mine.length?minhas:''}${esc_.length?`<div class="hj-nota">${hjLinha('i-vias',`${esc_.length} ${esc_.length>1?'tarefas':'tarefa'} no escritório`,pid&&mine.length?`${mine.length} com você`:'',hjBt('esc','Ver escritório'))}</div>`:''}${vendas}`}
+/* ================= Sugestões (Onda UX 3, 11/2026) =================
+   "Inteligência" sem custo: o próprio app olha o estado (prazos, plano das máquinas, compras, prestadores, tarefas)
+   e escreve frases curtas com o porquê e um toque que leva à ação. Nada sai do aparelho; nenhuma chave externa.
+   Cada regra devolve {k, peso (maior = mais urgente), i, txt, por, bt}. Perfil: g = gestão; e = escritório. */
+const nomesLista=(a,n=2)=>{const u=[...new Set(a)];return u.length<=n?u.join(' e '):u.slice(0,n).join(', ')+` e mais ${u.length-n}`};
+const fimSemana=()=>{const d=sod(now());const dw=d.getDay();d.setDate(d.getDate()+((7-dw)%7||0));d.setHours(23,59,59,0);return d.getTime()};
+function sugestoes(P,esc_,pid,g){const S=[],add=(perfis,o)=>{if(perfis.includes(g?'g':'e'))S.push(o)};
+  const ativos=state.pedidos.filter(p=>!p.concluido&&!p.cancelado).map(p=>({p,i:info(p)}));
+  /* 1. vencem esta semana e estão abaixo da metade */
+  {const fim=fimSemana(),L=ativos.filter(x=>x.p.entrega<=fim&&x.i.ab.length&&(x.i.prog||0)<.5).sort((a,b)=>a.p.entrega-b.p.entrega);
+    if(L.length)add(['g','e'],{k:'semana',peso:90+L.length,i:'i-alerta',txt:L.length>1?`${L.length} pedidos vencem esta semana e estão abaixo da metade`:`${L[0].p.cliente} vence esta semana e está abaixo da metade`,
+      por:`${nomesLista(L.map(x=>x.p.cliente))}. O mais apertado é ${L[0].p.cliente} (${Math.round((L[0].i.prog||0)*100)}% feito, entrega ${fD(L[0].p.entrega)}).`,bt:`<button class="mbtn" data-a="pedido" data-id="${L[0].p.id}">Ver o mais apertado</button>`})}
+  /* 2. o mesmo tecido ou aviamento falta em 2 ou mais pedidos */
+  {const M={};ativos.forEach(x=>(x.p.materiais||[]).forEach(m=>{if(m.conf&&m.st==='comprar')(M[m.item]=M[m.item]||[]).push(x.p.cliente)}));
+    const top=Object.entries(M).filter(([,c])=>c.length>=2).sort((a,b)=>b[1].length-a[1].length);
+    if(top.length){const [it,c]=top[0];add(['g','e'],{k:'falta',peso:70+c.length,i:'i-carrinho',txt:`${it} falta em ${c.length} pedidos`,por:`${nomesLista(c)}. Comprando de uma vez, libera todos.${top.length>1?` Também falta ${top[1][0]} em ${top[1][1].length}.`:''}`,bt:'<button class="mbtn" data-a="compras">Lista de compras</button>'})}}
+  /* 3. trabalho que tranca o corte: escritório com tarefa de pedido em risco */
+  {const trava=esc_.filter(t=>['vias','arte_prep','arte_aprov','conferir'].includes(t.f)&&['crit','warn'].includes(t.inf.u)).sort((a,b)=>a.inf.score-b.inf.score);
+    const meu=pid?trava.filter(t=>t.resp===pid):[],L=meu.length?meu:trava;
+    if(L.length){const t=L[0];add(['g','e'],{k:'trava',peso:85,i:'i-vias',txt:`${tarTxt(t)}: ${t.ped.cliente} está ${ULAB[t.inf.u].toLowerCase()}`,por:`O corte deste pedido espera esta tarefa${t.resp?`, que está com ${pNome(t.resp)}`:''}.${L.length>1?` Há mais ${L.length-1} assim.`:''}`,bt:`<button class="mbtn" data-a="pedido" data-id="${t.ped.id}">Abrir o pedido</button>`})}}
+  /* 4. próxima máquina: a livre cujo trabalho é do pedido mais apertado */
+  {const M=hojeMaquinas(P);if(M.length){const x=M[0];add(['g'],{k:'maq',peso:60+(['crit','warn'].includes(x.it.inf.u)?20:0),i:'i-maquina',txt:`Próximo para a ${x.u.nome}: ${x.it.s.nome}`,por:`${pNome(x.it.pessoa)} está livre e sabe fazer. É do pedido mais apertado que já pode ir para ela (${x.it.ped.cliente}).`,bt:`<button class="mbtn" data-a="maq" data-m="${x.m}">Abrir a máquina</button>`})}}
+  /* 5. gargalo: muito trabalho esperando um tipo de máquina, ou máquina livre sem ninguém que saiba */
+  {const E=Object.entries(P.espera||{}).map(([t,l])=>[t,l.length]).filter(([,n])=>n>=3).sort((a,b)=>b[1]-a[1]);
+    if(E.length){const [t,n]=E[0],u=(P.us||[]).find(x=>x.tipo===t);add(['g'],{k:'fila',peso:55+n,i:'i-relogio',txt:`${n} trabalhos esperando ${tipo(t).nome}`,por:`Todas as ${tipo(t).nome.toLowerCase()} estão ocupadas. É aqui que a produção está segurando agora.`,bt:u?`<button class="mbtn neutro2" data-a="maq" data-m="${u.id}">Ver a fila</button>`:''})}
+    const SP=Object.entries(P.semPessoa||{}).filter(([,l])=>l.length);
+    if(SP.length){const [t,l]=SP[0];add(['g'],{k:'sempessoa',peso:58,i:'i-pessoas',txt:`${tipo(t).nome} livre, mas ninguém livre sabe usar`,por:`${l.length} ${l.length>1?'trabalhos esperam':'trabalho espera'}. Veja quem pode aprender ou trocar de máquina.`,bt:'<button class="mbtn neutro2" data-a="irEquipe">Ver a equipe</button>'})}}
+  /* 6. prestador atrasado */
+  {const L=esc_.filter(t=>t.a==='buscou'&&t.late);if(L.length){const fs=L.map(t=>t.forn&&t.forn.nome).filter(Boolean);add(['g','e'],{k:'prestador',peso:75+L.length,i:'i-caminhao',txt:`${L.length} ${L.length>1?'pacotes passaram':'pacote passou'} do prazo no prestador`,por:`${fs.length?nomesLista(fs)+'. ':''}Vale ligar para cobrar.`,bt:'<button class="mbtn" data-a="hojeIr" data-v="fora">Ver na rua</button>'})}}
+  /* 7. pronto e não entregue */
+  {const L=ativos.filter(x=>!x.i.ab.length&&lotesDe(x.p.id).length);if(L.length)add(['g','e'],{k:'pronto',peso:50+L.length,i:'i-check',txt:L.length>1?`${L.length} pedidos prontos esperando entrega`:`${L[0].p.cliente} está pronto esperando entrega`,por:`${nomesLista(L.map(x=>x.p.cliente))}. Entregar libera espaço e fecha o pedido.`,bt:`<button class="mbtn" data-a="pedido" data-id="${L[0].p.id}">Abrir ${L.length>1?'o primeiro':'o pedido'}</button>`})}
+  return S.sort((a,b)=>b.peso-a.peso)}
+function sugBloco(P,esc_,pid){const S=sugestoes(P,esc_,pid,ehGestao());if(!S.length)return '';const ver=ui.sugTodas?S:S.slice(0,3);
+  return `<section class="hj-sec hj-sug" id="hj-sug"><h2 class="hj-h">${ic('i-ideia')}<span>Sugestões para agora</span></h2><p class="hj-sub">O app calcula pelo prazo, pelo que falta fazer e por quem está livre.</p>
+    ${ver.map(s=>`<div class="hsug" data-k="${s.k}">${ic(s.i)}<div class="sug-t"><b>${esc(s.txt)}</b><small>${esc(s.por)}</small>${s.bt?`<div class="sug-b">${s.bt}</div>`:''}</div></div>`).join('')}
+    ${S.length>3?`<button class="mbtn neutro2 hj-mais" data-a="sugTodas">${ui.sugTodas?'Ver menos':`Ver mais ${S.length-3} ${S.length-3>1?'sugestões':'sugestão'}`}</button>`:''}</section>`}
+function hojeTopo(P,esc_,pid){return sugBloco(P,esc_,pid)}
 /* Escritório por pedido (pedido da Martins, 10/2026): um cartão por pedido com a lista curta das tarefas; tarefas iguais juntas. */
 const LAB_T={etEscFeito:'Feito',pedEditar:'Completar',insumos:'Conferir',vias:'Separei',artePrep:'Pronta',arte:'Aprovada',arteEnv:'Enviei',comprei:'Comprei',chegou:'Chegou',levei:'Levei',buscou:'Chegou',entregar:'Entregue'};
 function tarMini(t){const lab=t.a==='levei'&&viaApp(t)?'Enviado':LAB_T[t.a];const quem=t.resp?pNome(t.resp):'';
@@ -2939,6 +2982,7 @@ const FAQ=[
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'O que quem é do Escritório pode fazer no app?',k:'permissão permissões escritório vendedora cancelar entregar corrigir bloquear liberar só a gestão perfil responsabilidade',r:['Cadastros › Ajustes › Acessos ao sistema › O que o Escritório pode fazer.','Toque em cada linha para ligar ou desligar: entregar pedido, cancelar pedido, corrigir o que a produção já fez.','Quem é da gestão pode tudo. Cadastros e Painel do gestor são sempre só da gestão.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'comeco',q:'O que é a tela Hoje?',m:'hoje',k:'hoje primeira tela início começo o que fazer agora prioridade urgente resumo do dia bom dia',r:['É a primeira tela do app. Mostra o que importa para você hoje, o mais urgente primeiro.','Gestão: pedidos com risco de atraso, o que precisa ir para a rua, o que pôr em cada máquina e as vendas da semana.','Escritório: as suas tarefas primeiro e os pedidos com risco de atraso.','Cada linha tem um botão que leva direto para resolver.'],ir:'hoje'},
+{c:'comeco',q:'De onde vêm as sugestões da tela Hoje?',m:'hoje',k:'sugestões sugestão dica app sugere próximo calcula como sabe inteligente',r:['O próprio app calcula, com o que já está registrado: data de entrega, quanto do pedido já foi feito, quem está livre, o que falta comprar e o prazo de cada prestador.','Aparecem as 3 mais urgentes. Toque em "Ver mais" para ver as outras.','Cada sugestão tem um botão que leva para resolver. Se ela não faz sentido, é sinal de que algo não foi marcado no app.'],ir:'hoje'},
 {c:'comeco',q:'Onde ficaram o Painel do gestor e os Cadastros?',m:'hoje',g:1,k:'mais painel gestor cadastros sumiu onde ficou barra de baixo empresas',r:['Na barra de baixo, toque em Mais (o último botão).','Lá estão Painel do gestor, Cadastros e Empresas.'],ir:'eu'},
 {c:'cad',q:'Como desligo a tela Hoje e volto a barra de antes?',m:'hoje',g:1,k:'desligar tela hoje voltar barra antiga como era antes partes do app',r:['Cadastros › Ajustes › Partes do app.','Desligue "Tela Hoje". A barra volta a ser Fábrica, Pedidos, Novo, Gestor e Cadastros.'],ir:'cad:ajustes#Partes do app'},
 {c:'comeco',q:'Por que não aparece o botão de cancelar ou de corrigir?',k:'não aparece sumiu botão cancelar corrigir horário voltar processo cadastro painel bloqueado permissão gestão',r:['Algumas ações são de quem é da gestão: Cadastros, Painel do gestor e, se a fábrica escolheu assim, cancelar pedido e corrigir o que a produção já fez.','Para essas, o botão não aparece para quem é do Escritório.','Precisa fazer? Chame quem é da gestão. Ela pode liberar em Ajustes › Acessos.']},
@@ -4284,6 +4328,7 @@ const A={
   avQuem:d=>{snap();const a=new Set(state.avisarNovos||[]);if(a.has(d.v))a.delete(d.v);else{a.add(d.v);state.pedidos.forEach(p=>{p.vistoPor=p.vistoPor||{};if(!p.vistoPor[d.v])p.vistoPor[d.v]=1})}state.avisarNovos=[...a];commit()},
   tela:d=>{if(['cadastros','gestor'].includes(d.t)&&!ehGestao())return;ui.tela=d.t;ui.sheet=null;render();window.scrollTo(0,0)},
   cad:d=>{ui.cad=d.k;render()},
+  sugTodas:()=>{ui.sugTodas=!ui.sugTodas;render()},
   hojeIr:d=>{const v=d.v;ui.sheet=null;if(v==='pedidos'){ui.tela='pedidos';ui.pv='ped'}else if(['esc','fora','maq'].includes(v)){ui.tela='fabrica';ui.fz=v}else if(v==='res'&&ehGestao()){ui.tela='gestor';ui.gt='res'}render();scrollTo(0,0)},
   irEquipe:()=>{ui.tela='cadastros';ui.cad='equipe';ui.sheet=null;render();window.scrollTo(0,0)},
   fechar:()=>{const s=ui.sheet;if(s?.t==='etapa'){ui.sheet={t:'produto',p:s.p};return render()}if(s?.t==='prob'&&s.step>1){s.step--;return render()}if(s?.t==='novo'&&s.w.step>1){wRead();s.w.step--;s.w.err='';return render()}if(s?.t==='novo'&&s.w.edit){ui.sheet={t:'pedido',id:s.w.edit};return render()}ui.sheet=null;render()},
