@@ -169,15 +169,15 @@ Aba **Resultados** no Painel do gestor, lendo `metricas()`: quanto dá para conf
 ### Fase 3: interface sem mudar nada de lugar (baixo risco)
 | # | O quê |
 |---|---|
-| Q1 | trava de perfil: Escritório não entra em Cadastros/Gestor por atalhos |
+| Q1 | trava de perfil: Escritório não entra em Cadastros/Gestor por atalhos (**feito na branch das ondas UX de 11/2026**, com permissões por responsabilidade e migração 011) |
 | Q2 | o chão fica na Minha vez depois de "Terminei" |
-| Q4 | "Desfazer" onde falta: conserto, pausar, dividir, hora extra, "Enviei", cancelar |
-| Q5 | o "voltar" do Android fecha a folha em vez de sair do app |
-| Q6 | o app lembra a aba da Fábrica (e o Escritório abre no Escritório) |
+| Q4 | "Desfazer" onde falta: conserto, pausar, dividir, hora extra, "Enviei", cancelar (**feito, ondas UX 11/2026**) |
+| Q5 | o "voltar" do Android fecha a folha em vez de sair do app (**feito, ondas UX 11/2026**) |
+| Q6 | o app lembra a aba da Fábrica (e o Escritório abre no Escritório) (**feito, ondas UX 11/2026**) |
 | Q7 | os nomes configurados das etapas do escritório valem em todos os lugares |
 | Q10 | o alerta do Painel abre o pedido sem trocar de tela |
 | Q11 | tirar código morto e o caminho duplicado de criar pedido |
-| Q12 | um padrão só de confirmação |
+| Q12 | um padrão só de confirmação (**feito para arquivo e restaurar cópia; cancelar pedido segue com o quadro próprio, que pede o motivo**) |
 
 Cada item é publicado fora do expediente, com nota em `NOVIDADES-PARA-EQUIPE.md`.
 
@@ -199,5 +199,5 @@ Cada item é publicado fora do expediente, com nota em `NOVIDADES-PARA-EQUIPE.md
 ### Riscos ainda abertos (conhecidos)
 - Número de pedido duplicado entre aparelhos (fase 5): raro, mas perde um pedido.
 - Estoque: dois aparelhos mexendo no mesmo item ao mesmo tempo, vale o último.
-- O perfil Escritório pode cancelar, entregar e corrigir o histórico de produção (fase 3, Q1, e regra no banco).
+- O perfil Escritório pode cancelar, entregar e corrigir o histórico de produção: **resolvido na tela** (ondas UX 11/2026, `PERMS`); no banco, a migração `011_permissoes_responsabilidade.sql` está escrita e testada em PGlite, **falta aplicar**.
 - `usuarios.hash/salt` (login do modo antigo) ficam legíveis para quem tem acesso; no Supabase não são usados e podem ser apagados.

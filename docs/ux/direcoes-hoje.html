@@ -1,0 +1,240 @@
+<title>Tela Hoje: três caminhos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: três celulares lado a lado (dobra 360×640 em cima, tela inteira embaixo); empilham no celular. */
+:root{
+  /* página */
+  --pg-bg:#E9EDF3;--pg-fg:#0F172A;--pg-fg2:#3B4658;--pg-line:#CBD3DE;--pg-card:#FFFFFF;--pg-acc:#2350D8;
+  /* app (Visual v2 do Martins Pro: fica igual nos dois temas, é o que a Helena vê) */
+  --bg:#F3F5F9;--card:#FFFFFF;--ink:#0F172A;--ink2:#334155;--line:#E3E8EF;--line-btn:#AEB8C6;
+  --blue:#2350D8;--blue-dark:#1A3DA8;--blue-soft:#EBF0FF;
+  --go:#14874A;--go-dark:#0C6B39;--go-soft:#E6F5EC;
+  --red:#C2362B;--red-soft:#FDECEA;--atn:#B76E00;--atn-ink:#6B4100;--atn-soft:#FFF3D6;
+  --font:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pg-bg:#121722;--pg-fg:#E8ECF3;--pg-fg2:#AAB4C3;--pg-line:#2E3747;--pg-card:#1A2130;--pg-acc:#8FA8FF;color-scheme:dark}}
+:root[data-theme="dark"]{--pg-bg:#121722;--pg-fg:#E8ECF3;--pg-fg2:#AAB4C3;--pg-line:#2E3747;--pg-card:#1A2130;--pg-acc:#8FA8FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--pg-bg);color:var(--pg-fg);font-family:var(--font);font-size:16px;line-height:1.45;margin:0}
+.pagina{max-width:1240px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.cab h1{font-size:30px;line-height:1.15;margin:0 0 8px;text-wrap:balance;letter-spacing:-.01em}
+.cab p{margin:0 0 6px;color:var(--pg-fg2);max-width:70ch}
+.regras{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 26px;padding:0;list-style:none}
+.regras li{border:1px solid var(--pg-line);background:var(--pg-card);border-radius:999px;padding:6px 12px;font-size:15px;color:var(--pg-fg2)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:28px;align-items:start}
+@media (max-width:420px){.cols{grid-template-columns:minmax(0,1fr)}}
+.col{min-width:0;display:grid;gap:12px;justify-items:center}
+.col-h{width:100%;max-width:360px}
+.col-h .letra{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--pg-acc);color:var(--pg-card);font-weight:800;margin-right:8px;vertical-align:middle}
+.col-h h2{display:inline;font-size:21px;vertical-align:middle}
+.col-h p{margin:8px 0 0;color:var(--pg-fg2);font-size:15px}
+.rot{width:100%;max-width:360px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--pg-fg2);margin-top:6px}
+.pros{width:100%;max-width:360px;margin:4px 0 0;padding:0;list-style:none;display:grid;gap:6px;font-size:15px;color:var(--pg-fg2)}
+.pros b{color:var(--pg-fg)}
+.fim{margin-top:36px;border-top:1px solid var(--pg-line);padding-top:18px;color:var(--pg-fg2);max-width:70ch}
+.fim b{color:var(--pg-fg)}
+
+/* ===== moldura do celular ===== */
+.tel{width:360px;max-width:100%;background:var(--bg);color:var(--ink);border-radius:26px;box-shadow:0 0 0 1px rgba(15,23,42,.12),0 18px 40px rgba(15,23,42,.18);overflow:hidden;position:relative;font-size:16px}
+.tel.dobra{height:640px}
+.tel .tela{padding:14px 16px 16px}
+.tel.dobra .tela{height:calc(640px - 74px);overflow:hidden}
+.tel.dobra::after{content:"fim da tela";position:absolute;left:0;right:0;bottom:74px;text-align:center;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#64748B;background:linear-gradient(transparent,var(--bg) 70%);padding-top:22px;pointer-events:none}
+.nav{display:flex;background:rgba(255,255,255,.96);border-top:1px solid var(--line);height:74px;padding:6px 4px}
+.tel.dobra .nav{position:absolute;left:0;right:0;bottom:0}
+.nb{flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:15px;font-weight:700;color:var(--ink2);border-radius:14px}
+.nb.on{background:var(--blue-soft);color:var(--blue)}
+.nb.novo .mais{width:46px;height:46px;border-radius:50%;background:var(--go);color:#fff;display:grid;place-items:center;margin-top:-20px;box-shadow:0 4px 12px rgba(20,110,60,.35)}
+.nb.novo{color:var(--go-dark)}
+svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* peças comuns do app */
+.topo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.topo .tt{flex:1;min-width:0}.topo h3{margin:0;font-size:22px;line-height:1.2}.topo small{display:block;color:var(--ink2);font-size:16px}
+.redondo{width:48px;height:48px;border-radius:50%;border:1.5px solid var(--line-btn);background:var(--card);display:grid;place-items:center;font-weight:700;flex:none;position:relative}
+.redondo em{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-style:normal;font-size:13px;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center}
+.bt{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 16px;border-radius:12px;font:700 17px/1 var(--font);white-space:nowrap}
+.bt.p{background:var(--blue);color:#fff;box-shadow:0 1px 2px rgba(35,80,216,.35)}
+.bt.s{background:var(--card);color:var(--blue);border:1.5px solid var(--line-btn)}
+.bt.largo{width:100%;min-height:56px;font-size:19px}
+.bar{height:10px;border-radius:999px;background:#E2E7EE;overflow:hidden}.bar i{display:block;height:100%;border-radius:999px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-weight:700;font-size:16px;white-space:nowrap}
+.pill.crit{background:var(--red-soft);color:var(--red)}.pill.warn{background:var(--atn-soft);color:var(--atn-ink)}
+.pill::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+.sec-t{font-size:16px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin:18px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+.sec-t a{font-size:16px;letter-spacing:0;text-transform:none;color:var(--blue);font-weight:700}
+.linha-cfg{display:flex;align-items:center;gap:10px;min-height:56px;margin-top:18px;padding:8px 14px;border-radius:14px;border:1px dashed var(--line-btn);color:var(--ink2);font-size:16px}
+.linha-cfg b{color:var(--ink)}.linha-cfg span{flex:1}
+
+/* ===== A: painel de relance ===== */
+.a-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.a-t{border-radius:16px;padding:10px 8px 10px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;background:var(--card);border:1.5px solid var(--line)}
+.a-t b{font-size:40px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.a-t span{font-size:16px;font-weight:600;line-height:1.2}
+.a-t.crit{background:var(--red-soft);border-color:#F3C3BE;color:var(--red)}.a-t.crit span{color:#7F1D16}
+.a-t.atn{background:var(--atn-soft);border-color:#F1D38E;color:var(--atn-ink)}
+.a-t.azul{background:var(--blue-soft);border-color:#C7D4FB;color:var(--blue-dark)}
+.a-lista{background:var(--card);border-radius:16px;border:1px solid var(--line)}
+.a-r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
+.a-r:first-child{border-top:0}
+.a-r b{font-size:17px;display:block}.a-r small{font-size:16px;color:var(--ink2);display:block}
+.a-r .bar{grid-column:1/-1}
+.a-prod{display:flex;align-items:center;gap:12px;margin-top:18px;padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.a-prod .bar{flex:1}.a-prod b{font-size:17px;white-space:nowrap}
+.a-mais{display:grid;gap:8px;margin-top:8px}
+.a-mais .a-r{background:var(--card);border:1px solid var(--line);border-radius:14px}
+
+/* ===== B: fila de ações ===== */
+.b-res{font-size:18px;margin:0 0 12px;color:var(--ink2)}.b-res b{color:var(--ink)}
+.b-f{display:grid;gap:8px}
+.b-i{display:grid;grid-template-columns:6px auto minmax(0,1fr);gap:0 12px;align-items:center;background:var(--card);border-radius:14px;border:1px solid var(--line);overflow:hidden;min-height:76px}
+.b-i .st{align-self:stretch}.b-i.crit .st{background:var(--red)}.b-i.warn .st{background:#E09400}.b-i.azul .st{background:var(--blue)}.b-i.cinza .st{background:#AEB8C6}
+.b-i .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+.b-i.crit .ic{background:var(--red-soft);color:var(--red)}.b-i.warn .ic{background:var(--atn-soft);color:var(--atn-ink)}.b-i.azul .ic{background:var(--blue-soft);color:var(--blue)}.b-i.cinza .ic{background:#EEF1F5;color:var(--ink2)}
+.b-i .tx{padding:10px 12px 10px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
+.b-i .tx b{font-size:17px;line-height:1.25}.b-i .tx small{grid-column:1;font-size:16px;color:var(--ink2);line-height:1.3}
+.b-i .tx .bt{grid-row:1/3;grid-column:2}
+.b-i.prim{border:2px solid var(--red)}
+.b-ok{display:flex;gap:10px;align-items:center;margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--go-soft);color:var(--go-dark);font-weight:600}
+.b-ok b{font-variant-numeric:tabular-nums}
+
+/* ===== C: um de cada vez ===== */
+.c-ag{background:var(--card);border-radius:20px;border:2px solid var(--red);padding:16px;display:grid;gap:12px}
+.c-ag .eyebrow{font-size:16px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--red)}
+.c-ag h4{margin:0;font-size:24px;line-height:1.2}
+.c-ag .lin{display:flex;justify-content:space-between;font-size:16px;color:var(--ink2)}
+.c-ag .lin b{color:var(--ink);font-variant-numeric:tabular-nums}
+.c-ag .bar{height:14px}
+.c-dep{display:grid;gap:0;background:var(--card);border-radius:16px;border:1px solid var(--line)}
+.c-d{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line);min-height:68px}
+.c-d:first-child{border-top:0}
+.c-d .n{width:30px;height:30px;border-radius:50%;background:#EEF1F5;color:var(--ink2);display:grid;place-items:center;font-weight:700;font-size:16px}
+.c-d b{font-size:17px;display:block;line-height:1.25}.c-d small{font-size:16px;color:var(--ink2);display:block}
+.c-dia{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;margin-top:18px;padding:12px 14px;background:var(--card);border-radius:16px;border:1px solid var(--line)}
+.anel{width:64px;height:64px}
+.c-dia b{font-size:18px;display:block}.c-dia small{font-size:16px;color:var(--ink2)}
+.c-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.c-chip{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 14px;border-radius:12px;background:var(--card);border:1.5px solid var(--line-btn);font-weight:700;color:var(--ink)}
+.c-chip em{font-style:normal;background:#EEF1F5;border-radius:999px;padding:1px 8px;font-size:15px}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="alerta" viewBox="0 0 48 48"><path d="M24 6 3 42h42z"/><path d="M24 19v11M24 35v1"/></symbol>
+  <symbol id="carrinho" viewBox="0 0 48 48"><path d="M4 8h6l5 22h24l4-15H12"/><circle cx="18" cy="38" r="3"/><circle cx="36" cy="38" r="3"/></symbol>
+  <symbol id="maquina" viewBox="0 0 48 48"><path d="M6 40h36M10 40V14h22v8h8v18M16 22h8M16 30h8"/></symbol>
+  <symbol id="pessoas" viewBox="0 0 48 48"><circle cx="18" cy="16" r="7"/><path d="M4 40c1-8 7-12 14-12s13 4 14 12M32 10a6 6 0 0 1 0 12M36 28c5 1 8 5 8 12"/></symbol>
+  <symbol id="vias" viewBox="0 0 48 48"><rect x="10" y="6" width="26" height="34" rx="3"/><path d="M16 16h14M16 24h14M16 32h8"/></symbol>
+  <symbol id="check" viewBox="0 0 48 48"><path d="M9 25l10 10 20-22"/></symbol>
+  <symbol id="sino" viewBox="0 0 48 48"><path d="M12 34V22a12 12 0 0 1 24 0v12l4 4H8z"/><path d="M20 42h8"/></symbol>
+  <symbol id="hoje" viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="32" rx="4"/><path d="M6 20h36M16 6v8M32 6v8"/></symbol>
+  <symbol id="fabrica" viewBox="0 0 48 48"><path d="M4 42V20l10 7v-7l10 7v-7l10 7V8h8v34z"/></symbol>
+  <symbol id="lista" viewBox="0 0 48 48"><rect x="10" y="6" width="28" height="36" rx="3"/><path d="M16 16h16M16 24h16M16 32h10"/></symbol>
+  <symbol id="mais" viewBox="0 0 48 48"><path d="M24 10v28M10 24h28"/></symbol>
+  <symbol id="tres" viewBox="0 0 48 48"><circle cx="10" cy="24" r="2.5"/><circle cx="24" cy="24" r="2.5"/><circle cx="38" cy="24" r="2.5"/></symbol>
+  <symbol id="engr" viewBox="0 0 48 48"><circle cx="24" cy="24" r="6"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7M10 10l5 5M33 33l5 5M38 10l-5 5M15 33l-5 5"/></symbol>
+</svg>
+
+<div class="pagina">
+  <header class="cab">
+    <h1>Tela Hoje: três caminhos</h1>
+    <p>É a primeira tela da Helena (gestão) no celular. As três usam os mesmos dados de demonstração do app, num celular de 360 por 640. Em cima, o que aparece sem rolar. Embaixo, a tela inteira.</p>
+    <p>Nada mudou no app ainda. Escolha uma letra, ou misture ("A, com a lista da B").</p>
+    <ul class="regras" aria-label="Regras que valem para as três">
+      <li>Letra de 16px ou mais</li><li>Botões de 48px ou mais</li><li>No máximo uma linha de apoio por bloco</li><li>Um botão principal (azul cheio) e um secundário (contorno)</li><li>O urgente cabe sem rolar</li><li>"Configurar a fábrica" saiu do topo</li>
+    </ul>
+  </header>
+  <div class="cols" id="cols"></div>
+  <p class="fim"><b>O que muda só no visual:</b> as informações e os botões são os mesmos da tela Hoje que já está na branch (pedidos com risco, compras, máquinas livres, escritório, produção do dia, vendas). Nenhuma função entra ou sai. Depois da escolha, a direção vira uma onda própria, com prints e o Teste da Dona Cida.</p>
+</div>
+
+<script>
+const ic=n=>`<svg class="i"><use href="#${n}"/></svg>`;
+const topo=`<div class="topo"><div class="tt"><h3>Boa tarde, Regina</h3><small>quinta, 5 de novembro</small></div><span class="redondo">R</span><span class="redondo">${ic('sino')}<em>2</em></span></div>`;
+const nav=`<nav class="nav" aria-label="Barra de baixo"><span class="nb on">${ic('hoje')}Hoje</span><span class="nb">${ic('fabrica')}Fábrica</span><span class="nb">${ic('lista')}Pedidos</span><span class="nb novo"><span class="mais">${ic('mais')}</span>Novo</span><span class="nb">${ic('tres')}Mais</span></nav>`;
+const cfg=`<div class="linha-cfg">${ic('engr')}<span><b>Configurar a fábrica</b><br>Falta 1 passo</span><span class="bt s">Ver</span></div>`;
+
+const A=`${topo}
+<div class="a-tiles">
+  <div class="a-t crit"><b>2</b><span>pedidos atrasando</span></div>
+  <div class="a-t atn"><b>11</b><span>itens para comprar</span></div>
+  <div class="a-t azul"><b>3</b><span>máquinas livres</span></div>
+</div>
+<div class="sec-t">Pedidos com risco <a>Ver todos</a></div>
+<div class="a-lista">
+  <div class="a-r"><div><b>Construtora Horizonte</b><small>52% feito · entrega qua 11/11</small></div><span class="pill crit">Atrasando</span><div class="bar"><i style="width:52%;background:var(--red)"></i></div></div>
+  <div class="a-r"><div><b>Transportes Rota Sul</b><small>93% feito · entrega seg 09/11</small></div><span class="pill warn">Atenção</span><div class="bar"><i style="width:93%;background:#E09400"></i></div></div>
+</div>
+<div class="sec-t">Pôr nas máquinas</div>
+<div class="a-lista">
+  <div class="a-r"><div><b>Overlock 2</b><small>Rosa · Pregar gola</small></div><span class="bt s">Abrir</span></div>
+  <div class="a-r"><div><b>Mesa de arremate</b><small>Sônia · Arremate e revisão</small></div><span class="bt s">Abrir</span></div>
+  <div class="a-r"><div><b>Mesa de corte</b><small>Carlos · Corte</small></div><span class="bt s">Abrir</span></div>
+</div>
+<div class="sec-t">Comprar</div>
+<div class="a-lista"><div class="a-r"><div><b>11 itens</b><small>Piquet Verde, Gola polo Verde e mais 9</small></div><span class="bt p">Lista</span></div></div>
+<div class="a-prod">${ic('check')}<div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;font-size:16px;margin-bottom:6px"><span>Produção hoje: <b>16 processos</b></span><b>60%</b></div><div class="bar"><i style="width:60%;background:var(--go)"></i></div></div></div>
+<div class="a-mais">
+  <div class="a-r"><div><b>Escritório</b><small>7 tarefas</small></div><span class="bt s">Ver</span></div>
+  <div class="a-r"><div><b>Vendas da semana</b><small>1 pedido novo · 60 peças</small></div><span class="bt s">Faturamento</span></div>
+</div>
+${cfg}`;
+
+const B=`${topo}
+<p class="b-res"><b>6 coisas</b> para resolver, da mais urgente para a menos.</p>
+<div class="b-f">
+  <div class="b-i crit prim"><span class="st"></span><span class="ic">${ic('alerta')}</span><div class="tx"><b>Construtora Horizonte atrasando</b><small>52% feito · entrega qua 11/11</small><span class="bt p">Ver</span></div></div>
+  <div class="b-i warn"><span class="st"></span><span class="ic">${ic('alerta')}</span><div class="tx"><b>Transportes Rota Sul em atenção</b><small>93% feito · entrega seg 09/11</small><span class="bt s">Ver</span></div></div>
+  <div class="b-i warn"><span class="st"></span><span class="ic">${ic('carrinho')}</span><div class="tx"><b>Comprar 11 itens</b><small>Piquet Verde, Gola polo e mais 9</small><span class="bt s">Lista</span></div></div>
+  <div class="b-i azul"><span class="st"></span><span class="ic">${ic('maquina')}</span><div class="tx"><b>Overlock 2 está livre</b><small>Rosa · Pregar gola</small><span class="bt s">Abrir</span></div></div>
+  <div class="b-i azul"><span class="st"></span><span class="ic">${ic('maquina')}</span><div class="tx"><b>Mesa de arremate livre</b><small>Sônia · Arremate e revisão</small><span class="bt s">Abrir</span></div></div>
+  <div class="b-i azul"><span class="st"></span><span class="ic">${ic('maquina')}</span><div class="tx"><b>Mesa de corte livre</b><small>Carlos · Corte</small><span class="bt s">Abrir</span></div></div>
+  <div class="b-i cinza"><span class="st"></span><span class="ic">${ic('pessoas')}</span><div class="tx"><b>Reta parada: ninguém livre sabe usar</b><small>3 trabalhos esperam</small><span class="bt s">Equipe</span></div></div>
+  <div class="b-i cinza"><span class="st"></span><span class="ic">${ic('vias')}</span><div class="tx"><b>7 tarefas no escritório</b><small>Vias, arte e conferência</small><span class="bt s">Ver</span></div></div>
+</div>
+<div class="b-ok">${ic('check')}<span><b>5 pedidos</b> em dia · <b>16 processos</b> hoje (60% da meta)</span></div>
+<div class="a-mais" style="margin-top:8px"><div class="a-r"><div><b>Vendas da semana</b><small>1 pedido novo · 60 peças</small></div><span class="bt s">Faturamento</span></div></div>
+${cfg}`;
+
+const anel=p=>{const r=26,c=2*Math.PI*r;return `<svg class="anel" viewBox="0 0 64 64" role="img" aria-label="${p}% da meta"><circle cx="32" cy="32" r="${r}" fill="none" stroke="#E2E7EE" stroke-width="8"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--go)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" font-size="16" font-weight="800" fill="var(--ink)" font-family="Inter,sans-serif">${p}%</text></svg>`};
+const C=`${topo}
+<div class="c-ag">
+  <span class="eyebrow">Primeiro</span>
+  <h4>Construtora Horizonte está atrasando</h4>
+  <div class="lin"><span>Entrega qua 11/11</span><b>52% feito</b></div>
+  <div class="bar"><i style="width:52%;background:var(--red)"></i></div>
+  <span class="bt p largo">Ver o pedido</span>
+</div>
+<div class="sec-t">Depois</div>
+<div class="c-dep">
+  <div class="c-d"><span class="n">2</span><div><b>Transportes Rota Sul</b><small>Atenção · 93% feito</small></div><span class="bt s">Ver</span></div>
+  <div class="c-d"><span class="n">3</span><div><b>Overlock 2 livre</b><small>Rosa · Pregar gola</small></div><span class="bt s">Abrir</span></div>
+  <div class="c-d"><span class="n">4</span><div><b>Comprar 11 itens</b><small>Piquet Verde e mais 10</small></div><span class="bt s">Lista</span></div>
+</div>
+<div class="c-chips"><span class="c-chip">Máquinas <em>3 livres</em></span><span class="c-chip">Escritório <em>7</em></span><span class="c-chip">Na rua <em>0</em></span></div>
+<div class="c-dia">${anel(60)}<div><b>16 processos hoje</b><small>meta do dia da produção · 42 na semana</small></div></div>
+<div class="sec-t">Mais coisas de hoje</div>
+<div class="c-dep">
+  <div class="c-d"><span class="n">5</span><div><b>Mesa de arremate livre</b><small>Sônia · Arremate e revisão</small></div><span class="bt s">Abrir</span></div>
+  <div class="c-d"><span class="n">6</span><div><b>Mesa de corte livre</b><small>Carlos · Corte</small></div><span class="bt s">Abrir</span></div>
+  <div class="c-d"><span class="n">7</span><div><b>Reta parada</b><small>Ninguém livre sabe usar</small></div><span class="bt s">Equipe</span></div>
+  <div class="c-d"><span class="n">${ic('check')}</span><div><b>Vendas da semana</b><small>1 pedido novo · 60 peças</small></div><span class="bt s">Ver</span></div>
+</div>
+${cfg}`;
+
+const D=[
+  {l:'A',n:'Painel de relance',d:'Três números grandes no topo (atrasando, comprar, máquinas livres) e listas curtas embaixo, por assunto.',
+   pros:['<b>Bom para:</b> saber em 2 segundos como está o dia.','<b>Cuidado:</b> os números não são botões de ação; ela ainda precisa achar a linha certa.'],h:A},
+  {l:'B',n:'Fila de ações',d:'Uma lista só, do mais urgente para o menos. Cada linha é uma coisa a fazer, com o botão dela.',
+   pros:['<b>Bom para:</b> quem quer ir resolvendo de cima para baixo, sem pensar em assunto.','<b>Cuidado:</b> com dia cheio, a lista fica longa e o que é informativo (vendas) fica no fim.'],h:B},
+  {l:'C',n:'Um de cada vez',d:'A coisa mais urgente sozinha, grande, com um botão. Embaixo, as próximas numeradas e o anel da produção.',
+   pros:['<b>Bom para:</b> a Dona Cida: uma ação principal por tela, nada para escolher.','<b>Cuidado:</b> quem quer o retrato do dia inteiro precisa rolar.'],h:C}];
+document.getElementById('cols').innerHTML=D.map(x=>`<section class="col" aria-labelledby="t${x.l}">
+  <div class="col-h"><span class="letra">${x.l}</span><h2 id="t${x.l}">${x.n}</h2><p>${x.d}</p></div>
+  <div class="rot">Sem rolar (360 × 640)</div>
+  <div class="tel dobra" aria-label="Direção ${x.l}, primeira tela"><div class="tela">${x.h}</div>${nav}</div>
+  <ul class="pros">${x.pros.map(p=>`<li>${p}</li>`).join('')}</ul>
+  <div class="rot">Tela inteira</div>
+  <div class="tel" aria-label="Direção ${x.l}, tela inteira"><div class="tela">${x.h}</div>${nav}</div>
+</section>`).join('');
+</script>

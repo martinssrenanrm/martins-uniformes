@@ -224,6 +224,10 @@ h2{font-size:24px;margin:0 0 10px;text-wrap:balance}
 .chk[aria-pressed="true"]{border-color:var(--go);background:var(--go-soft);color:var(--go-dark)}
 .chk[aria-pressed="true"] .box{background:var(--go);border-color:var(--go);color:#fff}
 .chk[aria-pressed="true"] .box svg.ic{visibility:visible}
+.perm-c{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}.perm-c h3{margin:0 0 4px;font-size:19px}
+.perm-c .checks{grid-template-columns:1fr;gap:8px}.perm-c .chk{grid-template-columns:auto 1fr auto;justify-items:start;text-align:left;align-items:center;min-height:64px;font-size:17px;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.perm-c .chk svg.ic{width:28px;height:28px}.perm-s{display:block;font-weight:400;font-size:16px;color:var(--ink2)}
+.perm-dica{display:flex;gap:8px;align-items:flex-start}.perm-dica svg.ic{width:22px;height:22px;flex:none}
 .mat{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:2px solid var(--grey-soft)}
 .mat svg.ic{width:34px;height:34px;color:var(--atn-ink)}
 .mat b{display:block;font-size:19px}
@@ -571,7 +575,7 @@ svg.prod.mock{background:#fff;border-radius:12px}
 .pv{grid-template-columns:1fr 1fr;margin-bottom:14px;position:static}
 .pergunta{background:var(--blue-soft);border-radius:12px;padding:10px 14px;margin:8px 0;font-size:17px;display:grid;gap:8px}
 .emp-al{display:flex;gap:12px;font-size:15px;font-weight:700;margin-top:2px}.emp-al span{display:inline-flex;align-items:center;gap:5px}.emp-al .dot{width:10px;height:10px}
-.h1-link{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}.h1-link svg.ic{width:26px;height:26px;color:var(--muted)}
+.h1-link{border:0;background:none;padding:0;min-height:48px;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}.h1-link svg.ic{width:26px;height:26px;color:var(--muted)}
 .rk-p svg.prod{width:44px;height:44px}
 
 .imp-box{display:grid;gap:4px;background:var(--blue-soft);border:2px solid #BFD2F2;border-radius:16px;padding:14px 16px;margin:4px 0 18px}.imp-box span{color:var(--ink2);font-size:16px}.imp-box .mbtn{display:inline-flex;align-items:center;gap:8px}.imp-box svg.ic{width:24px;height:24px}
@@ -864,6 +868,34 @@ input[type=color],.cor-pick{min-width:48px;min-height:48px}
 details.sub{border-top:1px solid var(--line);padding-top:10px}details.sub>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;cursor:pointer}details.sub>summary::-webkit-details-marker{display:none}
 details.sub .sub-r{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-weight:600;font-size:17px}details.sub .sub-r svg.ic{width:22px;height:22px;transition:transform .15s}details.sub[open] .sub-r svg.ic{transform:rotate(90deg)}details.sub[open]>summary{margin-bottom:8px}details.sub>summary .passo-n{color:var(--ink)}
 .aj-idx{margin:0 0 16px}.aj-idx .linha-dep{gap:8px}.aj-idx .pulo{font-size:16px;min-height:44px;border-radius:999px}
+/* Hoje (Onda UX 2) */
+.nb.hj-nb,.nb.mais-nb{display:none}
+body.com-hoje .nb.hj-nb{display:flex}
+body.com-hoje:not(.operacao) .nb.lg{display:none}
+body.com-hoje:not(.operacao) .nb.mais-nb{display:flex}
+.hj-topo{align-items:flex-start}.hj-tt{flex:1;min-width:0}.hj-tt h1{margin:0;font-size:23px;line-height:1.2}.hj-tt span{display:block;color:var(--ink2);font-size:17px;margin-top:2px}
+/* Onda UX 6: fila de ações (direção B). Um botão principal (azul cheio, só no 1º item) e um secundário (contorno). */
+.fl-res{margin:0 0 12px;font-size:18px;color:var(--ink2)}.fl-res b{color:var(--ink)}
+.fl{display:grid;gap:8px}
+.fl-i{display:grid;grid-template-columns:6px auto minmax(0,1fr);column-gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:76px}
+.fl-st{align-self:stretch}.fl-crit .fl-st{background:var(--red)}.fl-warn .fl-st{background:#E09400}.fl-azul .fl-st{background:var(--blue)}.fl-cinza .fl-st{background:var(--line-btn,#AEB8C6)}
+.fl-ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center}.fl-ic svg.ic{width:24px;height:24px}
+.fl-crit .fl-ic{background:var(--red-soft);color:var(--red)}.fl-warn .fl-ic{background:var(--atn-soft);color:var(--atn-ink)}.fl-azul .fl-ic{background:var(--blue-soft);color:var(--blue)}.fl-cinza .fl-ic{background:var(--grey-soft,#EEF1F5);color:var(--ink2)}
+.fl-tx{padding:10px 10px 10px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:center;min-width:0}
+.fl-tx b{font-size:17px;line-height:1.25;overflow-wrap:anywhere}.fl-tx small{grid-column:1;font-size:16px;color:var(--ink2);line-height:1.3;overflow-wrap:anywhere}
+.fl-tx .fl-bt{grid-row:1/3;grid-column:2}
+.fl-prim.fl-crit{border:2px solid var(--red)}.fl-prim.fl-warn{border:2px solid #E09400}.fl-prim.fl-azul{border:2px solid var(--blue)}
+.fl-bt{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 14px;border-radius:12px;font-weight:700;font-size:17px;white-space:nowrap;cursor:pointer}
+.fl-bt.p{background:var(--blue);color:#fff;border:0;box-shadow:0 1px 2px rgba(35,80,216,.35)}
+.fl-bt.s{background:var(--card);color:var(--blue);border:1.5px solid var(--line-btn,#AEB8C6)}
+.fl-mais{width:100%;min-height:48px;margin-top:8px}
+.fl-vazio{display:flex;gap:10px;align-items:center;padding:16px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:18px}.fl-vazio svg.ic{width:26px;height:26px;color:var(--go-dark)}
+.fl-ok{display:flex;gap:10px;align-items:center;margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--go-soft);color:var(--go-dark);font-weight:600;font-size:16px}.fl-ok svg.ic{width:24px;height:24px;flex:none}.fl-ok b{font-variant-numeric:tabular-nums}
+.fl-sec{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:8px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.fl-sec b{display:block;font-size:17px}.fl-sec small{display:block;font-size:16px;color:var(--ink2)}
+.fl-cfg{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;min-height:56px;margin-top:18px;padding:8px 14px;border-radius:14px;border:1.5px dashed var(--line-btn,#AEB8C6);color:var(--ink2)}
+.fl-cfg svg.ic{width:24px;height:24px}.fl-cfg b{display:block;color:var(--ink);font-size:17px}.fl-cfg small{font-size:16px}
+@media (max-width:640px){body.operacao .nav .nb,body.operacao .nav .nb.novo{flex:1 1 0}}
 body.chao .nav{display:none!important}body.chao main{padding-bottom:40px}
 .mv{max-width:640px;margin:0 auto;display:grid;gap:14px}.mv-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .mv-eu{display:flex;align-items:center;gap:14px}.mv-eu .av{width:64px!important;height:64px!important;font-size:28px}.mv-eu small{display:block;color:var(--ink2);font-size:18px}.mv-eu b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.02em}
@@ -1052,17 +1084,22 @@ body.com-undo #app{padding-bottom:80px}#undoF{position:fixed;left:max(12px,env(s
   <symbol id="i-dormir" viewBox="0 0 48 48"><path d="M8 10h12L8 24h12M26 22h10L26 34h10"/></symbol>
   <symbol id="i-fabrica" viewBox="0 0 48 48"><path d="M4 42V20l10 7v-7l10 7v-7l10 7V8h8v34z"/><path d="M4 42h40M12 34h4M22 34h4"/></symbol>
   <symbol id="i-camera" viewBox="0 0 48 48"><path d="M6 16h8l4-6h12l4 6h8v24H6z"/><circle cx="24" cy="27" r="8"/></symbol>
+  <symbol id="i-hoje" viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="32" rx="4"/><path d="M6 20h36M16 6v8M32 6v8M15 29h6v6h-6z"/></symbol>
+  <symbol id="i-mais3" viewBox="0 0 48 48"><circle cx="10" cy="24" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="38" cy="24" r="3"/></symbol>
+  <symbol id="i-ideia" viewBox="0 0 48 48"><path d="M17 30c-3-3-5-6-5-11a12 12 0 0 1 24 0c0 5-2 8-5 11v5H17z"/><path d="M18 40h12M20 44h8"/></symbol>
   <symbol id="i-engr" viewBox="0 0 48 48"><circle cx="24" cy="24" r="6"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7M10 10l5 5M33 33l5 5M38 10l-5 5M15 33l-5 5"/></symbol>
 </svg>
 
 <input type="file" id="fArq" multiple hidden><input type="file" id="fImpF" accept="application/pdf,.pdf,.docx,.doc,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" multiple hidden><input type="file" id="fImpM" accept="image/*,application/pdf" multiple hidden><input type="file" id="fImpC" accept="application/pdf,.pdf" multiple hidden><input type="file" id="fImpM1" accept="image/*,application/pdf" hidden>
 <main><div class="wrap"><div id="sync" class="sync"></div></div><div class="wrap" id="app"></div></main>
 <nav class="nav" aria-label="Menu"><div class="wrap">
+  <button class="nb hj-nb" data-a="tela" data-t="hoje"><svg class="ic"><use href="#i-hoje"/></svg>Hoje</button>
   <button class="nb" data-a="tela" data-t="fabrica"><svg class="ic"><use href="#i-fabrica"/></svg>Fábrica</button>
   <button class="nb" data-a="tela" data-t="pedidos"><svg class="ic"><use href="#i-lista"/></svg>Pedidos</button>
   <button class="nb novo" data-a="novo" aria-label="Novo pedido"><span class="nb-mais"><svg class="ic"><use href="#i-mais"/></svg></span><span class="nb-l">Novo pedido</span></button>
   <button class="nb lg" data-a="tela" data-t="gestor"><svg class="ic"><use href="#i-grafico"/></svg>Gestor</button>
   <button class="nb lg" data-a="tela" data-t="cadastros"><svg class="ic"><use href="#i-engr"/></svg>Cadastros</button>
+  <button class="nb mais-nb" data-a="menu" aria-label="Mais: Painel do gestor, Cadastros e Empresas"><svg class="ic"><use href="#i-mais3"/></svg>Mais</button>
 </div></nav>
 <div id="sheet"></div>
 <div id="pop"></div>
@@ -1190,7 +1227,7 @@ const GRUPOS=[{id:'corte',nome:'Corte',i:'i-corte'},{id:'pers',nome:'Personaliza
    corte = abre o lote · pers = personalização · costura = montagem · acab = acabamento/fecha a peça. */
 /* Módulos: partes do app que cada fábrica liga ou desliga (state.modOff). Desligado só esconde da tela e da ajuda; os dados ficam. */
 const MODULOS=[['pers','Personalização (estampa, bordado, artes)','i-estampa'],['etq','Etiquetas do corte com QR','i-etiqueta'],['junto','Juntar pedidos (cortar e costurar de uma vez)','i-corte'],
-  ['hora','Hora extra','i-relogio'],['imp','Importar fichas (PDF/Word)','i-lista'],['ciclo','Painel do ciclo (tempo por fase)','i-grafico']];
+  ['hora','Hora extra','i-relogio'],['imp','Importar fichas (PDF/Word)','i-lista'],['ciclo','Painel do ciclo (tempo por fase)','i-grafico'],['hoje','Tela Hoje (o que importa primeiro para cada pessoa)','i-hoje']];
 const modOn=k=>!((typeof state!=='undefined'&&state&&state.modOff)||[]).includes(k);
 const faqOn=f=>!f.m||(f.m==='polo'?((typeof state!=='undefined'&&state&&state.produtos)||[]).some(p=>(p.partes||[]).includes('Peitilho')):modOn(f.m));
 const FASES_SETOR=[['corte','Abre o lote (corte)'],['pers','Personalização'],['costura','Montagem / costura'],['acab','Acabamento (fecha a peça)']];
@@ -1445,7 +1482,7 @@ const NOME_EMP=()=>(typeof state!=='undefined'&&state&&state.marca&&state.marca.
 const gestoresTxt=()=>{const n=((typeof state!=='undefined'&&state&&state.usuarios)||[]).filter(u=>u.perfil==='gestao').map(u=>u.nome).filter(Boolean);return n.length?n.slice(0,3).join(' ou '):'alguém da gestão'};
 const KEY='martins-v8';
 let state,undo=null,toastT=null;
-let ui={tela:'fabrica',sheet:null,fx:null,cad:'maquinas'};
+let ui={tela:'',sheet:null,fx:null,cad:'maquinas'};
 const prod=id=>state.produtos.find(p=>p.id===id);
 const pedById=id=>state.pedidos.find(p=>p.id===id);
 const lote=id=>state.lotes.find(l=>l.id===id);
@@ -1911,7 +1948,7 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
   const livres=state.pessoas.filter(p=>p.sabe.length&&!P.ocup.has(p.id)&&!P.usados.has(p.id));
   const foraN=sum(state.lotes.map(l=>Object.values(l.steps).filter(x=>x.st==='fora').length));
   const nTrab=P.us.filter(u=>P.uso[u.id]).length,nIni=P.us.filter(u=>!P.uso[u.id]&&P.plan[u.id]).length;
-  const z=ui.fz||'maq';
+  const z=ui.fz||(ui.fz=fzInicial());
   const zonas=[['maq','Máquinas','i-maquina',nIni],['fora','Fora','i-caminhao',foraN],['esc','Escritório','i-vias',esc_.length]];
   return `${quemNome()||usuarioAtual()||!state.pessoas.length?'':`<button class="faixa quem-f" data-a="quem">${ic('i-pessoas')}<span><b>Quem está usando este aparelho?</b> Toque para escolher seu nome.</span></button>`}<div class="topo"><button class="ped-l" data-a="tela" data-t="pedidos"><span class="pl-t">Pedidos</span>${res||'<span class="pl-i">nenhum aberto</span>'}<span class="pl-go">›</span></button>${sino()}</div>${avisoConfig()}${faixasTopo()}${faixaHora(P)}
   <div class="zonas" role="tablist">${zonas.map(([k,n,i,c])=>`<button class="zona" role="tab" data-a="fz" data-v="${k}" aria-pressed="${z===k}">${ic(i)}<span>${n}</span>${c?`<em>${c}</em>`:''}</button>`).join('')}</div>
@@ -1928,6 +1965,94 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
   ${z==='fora'?`<section class="grupo" id="g-fora"><p class="sub-l">Só a parte que saiu fica esperando. O resto continua.</p>
     <div class="forns">${state.forn.map(f=>fornCard(f,esc_)).join('')}</div></section>`:''}
   ${z==='esc'?vEscritorio(esc_):''}<div class="fim-ajuda"><button class="x azul" data-a="ajuda" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px">${ic('i-duvida')}Como usar o app</button></div>`}
+/* ================= HOJE (Onda UX 2, 11/2026) =================
+   Primeira tela de cada perfil: o que importa a ele, o mais urgente primeiro. Só lê o estado; cada linha leva à ação.
+   É o módulo "hoje" (Partes do app): desligado, o app volta à navegação de antes. */
+const hojeOn=()=>modOn('hoje');
+function hojeRiscos(){return state.pedidos.filter(p=>!p.concluido&&!p.cancelado).map(p=>({p,i:info(p)})).filter(x=>['crit','warn'].includes(x.i.u)).sort((a,b)=>a.i.score-b.i.score)}
+function hojeMaquinas(P){return Object.entries(P.plan).filter(([m])=>!P.uso[m]).map(([m,it])=>({m,u:unidade(m),it})).filter(x=>x.u).sort((a,b)=>a.it.inf.score-b.it.inf.score)}
+const prazoTxt=du=>du<0?'já passou da data':du===0?'vence hoje':du===1?'falta 1 dia útil':`faltam ${du} dias úteis`;
+/* ================= Sugestões (Onda UX 3, 11/2026) =================
+   "Inteligência" sem custo: o próprio app olha o estado (prazos, plano das máquinas, compras, prestadores, tarefas)
+   e transforma em coisas a fazer. Nada sai do aparelho; nenhuma chave externa. Desde a Onda 6, as regras ficam em filaHoje(). */
+const fimSemana=()=>{const d=sod(now());const dw=d.getDay();d.setDate(d.getDate()+((7-dw)%7||0));d.setHours(23,59,59,0);return d.getTime()};
+/* ================= Feito hoje (Onda UX 5, 11/2026) =================
+   Reconhecimento do que a fábrica fez, sem pontos, medalhas nem comparação entre pessoas.
+   Conta o que foi MARCADO no app (quem marca depois aparece depois); a meta do dia só aparece quando há pessoas da produção com horário. */
+function feitoPeriodo(a,b){let proc=0,pecas=0,pad=0;state.lotes.forEach(l=>{const m=sMap(rp(l));Object.entries(l.steps||{}).forEach(([sid,x])=>{const s=m[sid];if(!s||isEsc(s))return;
+  (x.partes?x.partes:[x]).forEach(q=>{if(q.st==='ok'&&q.fim>=a&&q.fim<b){proc++;const n=q.n||qtdEf(l);if(!isExt(s))pecas+=n;pad+=(s.min||0)*n}})})});return {proc,pecas,pad}}
+function feitoHoje(){const a=sod(now()).getTime(),sem=a-((new Date(now()).getDay()+6)%7)*DIA;const H=feitoPeriodo(a,a+DIA),S=feitoPeriodo(sem,a+DIA);
+  const ent=state.pedidos.filter(p=>p.concluido&&!p.cancelado&&p.concluido>=sem).length;
+  const gente=state.pessoas.filter(p=>p.disp!==false&&(p.papeis||[]).some(k=>PAPEIS_CHAO.includes(k)));
+  const alvo=sum(gente.map(p=>metaPessoaDia(p.id).alvo));return {H,S,ent,alvo,pct:alvo&&H.pad?Math.round(H.pad/alvo*100):0}}
+/* Q6: a Fábrica abre na última aba usada neste aparelho; na primeira vez, o Escritório abre no Escritório. */
+function fzInicial(){let v='';try{v=localStorage.getItem('fab-zona')||''}catch(e){}return ['maq','fora','esc'].includes(v)?v:ehGestao()?'maq':'esc'}
+/* Q5: o "voltar" do Android (e do navegador) fecha o que está aberto por cima: confirmação, janelinha, folha.
+   Numa aba que não é a primeira, volta para a primeira. Só sai do app quando já está na primeira tela sem nada aberto. */
+const HIST={on:false,pulo:0};
+const telaCasa=()=>hojeOn()?'hoje':'fabrica';
+const temCamada=()=>!!(ui.conf||ui.sheet||ui.sino||ui.eu||(ui.tela&&ui.tela!==telaCasa()));
+function histSync(){try{if(!NV.pronto||!usuarioAtual()||ehChao())return;const c=temCamada();if(c&&!HIST.on){history.pushState({martins:1},'');HIST.on=true}else if(!c&&HIST.on){HIST.on=false;HIST.pulo++;history.back()}}catch(e){}}
+addEventListener('popstate',()=>{if(HIST.pulo){HIST.pulo--;return}HIST.on=false;if(!NV.pronto||!usuarioAtual())return;
+  if(ui.conf){ui.conf=null;desenhaConf()}else if(ui.sino||ui.eu){ui.sino=false;ui.eu=false;render()}else if(ui.sheet){A.fechar()}else if(ui.tela!==telaCasa()){ui.tela=telaCasa();render();scrollTo(0,0)}
+  histSync()});
+/* Onda UX 6 (visual, 11/2026, direção B escolhida pelo Renan): a Hoje é uma FILA DE AÇÕES.
+   Uma linha por coisa a fazer, com o botão dela, do mais urgente para o menos: vermelho → amarelo → azul → cinza.
+   Os blocos da Onda 2 e as sugestões da Onda 3 viram linhas, sem repetir a mesma coisa em dois lugares.
+   Só o primeiro item tem botão azul cheio; o resto, contorno. No fim: faixa verde da produção, vendas e "Configurar a fábrica". */
+const FILA_ORDEM={crit:0,warn:1,azul:2,cinza:3};
+const filaAttr=o=>Object.entries(o||{}).map(([k,v])=>`data-${k}="${esc(String(v))}"`).join(' ');
+function filaLinha(x,prim){return `<div class="fl-i fl-${x.sev}${prim?' fl-prim':''}" data-k="${esc(x.k)}"><span class="fl-st" aria-hidden="true"></span><span class="fl-ic" aria-hidden="true">${ic(x.i)}</span>
+  <div class="fl-tx"><b>${esc(x.txt)}</b>${x.sub?`<small>${esc(x.sub)}</small>`:''}<button class="fl-bt ${prim?'p':'s'}" data-a="${x.a}" ${filaAttr(x.d)} aria-label="${esc(x.bt+': '+x.txt)}">${esc(x.bt)}</button></div></div>`}
+const LAB_FILA={etEscFeito:'Feito',pedEditar:'Completar',insumos:'Conferir',vias:'Separei',artePrep:'Pronta',arte:'Aprovada',arteEnv:'Enviei',levei:'Levei',buscou:'Chegou',entregar:'Entregue'};
+function filaHoje(P,esc_,pid,g){const F=[],vistos=new Set(),add=x=>{F.push(x)};
+  const ativos=state.pedidos.filter(p=>!p.concluido&&!p.cancelado).map(p=>({p,i:info(p)}));
+  const pedRow=(x,sev,txt,peso)=>{vistos.add(x.p.id);add({k:'ped:'+x.p.id,sev,peso,i:'i-alerta',txt,sub:`${Math.round((x.i.prog||0)*100)}% feito · entrega ${fD(x.p.entrega)}`,a:'pedido',d:{id:x.p.id},bt:'Ver'})};
+  const mine=pid?esc_.filter(t=>t.resp===pid):[];
+  /* Escritório: as próprias tarefas primeiro, cada uma com o botão dela */
+  if(!g){const lista=pid?mine:esc_;lista.slice(0,ui.filaTodas?99:8).forEach((t,j)=>{const sev=t.inf.u==='crit'?'crit':t.inf.u==='warn'?'warn':'azul';const lab=t.a==='levei'&&viaApp(t)?'Enviado':LAB_FILA[t.a];
+      add({k:'tar:'+t.key,sev,peso:100-j-(sev==='azul'?0:0),i:t.i||'i-vias',txt:tarTxt(t),sub:t.ped.cliente,a:lab?t.a:'pedido',d:lab?{id:t.ped.id,k:t.k??'',l:t.l||'',s:t.s||''}:{id:t.ped.id},bt:lab||'Abrir'})});
+    const outras=esc_.length-lista.length;if(outras>0)add({k:'outras',sev:'cinza',peso:5,i:'i-pessoas',txt:`Mais ${outras} ${outras>1?'tarefas':'tarefa'} com outras pessoas`,sub:'Do escritório',a:'hojeIr',d:{v:'esc'},bt:'Ver'})}
+  /* pedidos com risco de atraso */
+  ativos.filter(x=>x.i.u==='crit').sort((a,b)=>a.i.score-b.i.score).forEach(x=>pedRow(x,'crit',`${x.p.cliente} atrasando`,90));
+  ativos.filter(x=>x.i.u==='warn').sort((a,b)=>a.i.score-b.i.score).forEach(x=>pedRow(x,'warn',`${x.p.cliente} em atenção`,80));
+  /* vence esta semana e está abaixo da metade (sugestão da Onda 3), se ainda não apareceu */
+  {const fim=fimSemana();ativos.filter(x=>!vistos.has(x.p.id)&&x.p.entrega<=fim&&x.i.ab.length&&(x.i.prog||0)<.5).forEach(x=>pedRow(x,'warn',`${x.p.cliente} vence esta semana`,78))}
+  /* prestador atrasado */
+  esc_.filter(t=>t.a==='buscou'&&t.late).forEach(t=>add({k:'late:'+t.key,sev:'warn',peso:76,i:'i-caminhao',txt:`${tarTxt(t)}: passou do prazo`,sub:t.ped.cliente,a:'hojeIr',d:{v:'fora'},bt:'Ver'}));
+  /* tarefa do escritório que trava o corte de pedido em risco (gestão; o Escritório já vê as dele) */
+  if(g){const trava=esc_.filter(t=>['vias','arte_prep','arte_aprov','conferir'].includes(t.f)&&['crit','warn'].includes(t.inf.u)).sort((a,b)=>a.inf.score-b.inf.score);
+    if(trava.length){const t=trava[0];add({k:'trava',sev:'warn',peso:74,i:'i-vias',txt:`${tarTxt(t)}: o corte espera`,sub:`${t.ped.cliente}${t.resp?' · com '+pNome(t.resp):''}${trava.length>1?` · e mais ${trava.length-1}`:''}`,a:'pedido',d:{id:t.ped.id},bt:'Abrir'})}}
+  /* compras (com o item que falta em mais pedidos) */
+  {const LC=listaCompras().comprar,n=LC.length;if(n&&(g||esc_.some(t=>t.f==='comprar'&&(!pid||t.resp===pid)))){const M={};ativos.forEach(x=>(x.p.materiais||[]).forEach(m=>{if(m.conf&&m.st==='comprar')(M[m.item]=M[m.item]||new Set()).add(x.p.id)}));
+    const top=Object.entries(M).sort((a,b)=>b[1].size-a[1].size)[0];
+    add({k:'compras',sev:'warn',peso:72,i:'i-carrinho',txt:`Comprar ${n} ${n>1?'itens':'item'}`,sub:top&&top[1].size>1?`${top[0]} falta em ${top[1].size} pedidos`:top?`${top[0]}${n>1?` e mais ${n-1}`:''}`:LC[0]&&LC[0].item?`${LC[0].item}${n>1?` e mais ${n-1}`:''}`:'Tecidos e aviamentos',a:'compras',bt:'Lista'})}}
+  /* gestão: o que pôr em cada máquina, levar ao prestador, prontos, fila e equipe */
+  if(g){const M=hojeMaquinas(P);M.slice(0,ui.filaTodas?99:4).forEach((x,j)=>add({k:'maq:'+x.m,sev:'azul',peso:60-j,i:'i-maquina',txt:`${x.u.nome} está livre`,sub:`${pNome(x.it.pessoa)} · ${x.it.s.nome}`,a:'maq',d:{m:x.m},bt:'Abrir'}));
+    if(M.length>4&&!ui.filaTodas)add({k:'maqs',sev:'azul',peso:55,i:'i-maquina',txt:`Mais ${M.length-4} máquinas livres`,sub:'Com o próximo trabalho já escolhido',a:'hojeIr',d:{v:'maq'},bt:'Ver'});
+    const lev=esc_.filter(t=>t.a==='levei');if(lev.length)add({k:'levar',sev:'azul',peso:54,i:'i-caminhao',txt:`Levar ${lev.length} ${lev.length>1?'pacotes':'pacote'} ao prestador`,sub:[...new Set(lev.map(t=>t.forn&&t.forn.nome).filter(Boolean))].slice(0,2).join(', '),a:'hojeIr',d:{v:'fora'},bt:'Ver'})}
+  ativos.filter(x=>!x.i.ab.length&&lotesDe(x.p.id).length&&!vistos.has(x.p.id)).forEach(x=>{vistos.add(x.p.id);add({k:'pronto:'+x.p.id,sev:'azul',peso:52,i:'i-check',txt:`${x.p.cliente} pronto para entregar`,sub:'Todas as peças prontas',a:'pedido',d:{id:x.p.id},bt:'Ver'})});
+  if(g){const E=Object.entries(P.espera||{}).map(([t,l])=>[t,l.length]).filter(([,n])=>n>=3).sort((a,b)=>b[1]-a[1]);
+    if(E.length){const [t,n]=E[0],u=(P.us||[]).find(x=>x.tipo===t);if(u)add({k:'fila',sev:'cinza',peso:40,i:'i-relogio',txt:`${n} trabalhos esperando ${tipo(t).nome}`,sub:'É onde a produção está segurando',a:'maq',d:{m:u.id},bt:'Ver'})}
+    const SP=Object.entries(P.semPessoa||{}).filter(([,l])=>l.length);
+    if(SP.length){const [t,l]=SP[0];add({k:'sempessoa',sev:'cinza',peso:38,i:'i-pessoas',txt:`${tipo(t).nome} parada: ninguém livre sabe usar`,sub:`${l.length} ${l.length>1?'trabalhos esperam':'trabalho espera'}`,a:'irEquipe',bt:'Equipe'})}
+    if(esc_.length){const tipos=[...new Set(esc_.map(t=>({vias:'vias',arte_prep:'arte',arte_aprov:'arte',arte_env:'arte',conferir:'conferência',comprar:'compras',levar:'rua',entregar:'entrega'})[t.f]).filter(Boolean))];
+      add({k:'esc',sev:'cinza',peso:30,i:'i-vias',txt:`${esc_.length} ${esc_.length>1?'tarefas':'tarefa'} no escritório`,sub:mine.length?`${mine.length} com você`:tipos.slice(0,3).join(', ').replace(/^./,c=>c.toUpperCase()),a:'hojeIr',d:{v:'esc'},bt:'Ver'})}}
+  return F.sort((a,b)=>(g?0:(a.k.startsWith('tar:')?0:1)-(b.k.startsWith('tar:')?0:1))||FILA_ORDEM[a.sev]-FILA_ORDEM[b.sev]||b.peso-a.peso)}
+function vHoje(){const u=usuarioAtual(),g=ehGestao(),P=plano(),esc_=tarefasEsc(),pid=u&&u.pessoa&&pessoa(u.pessoa)?u.pessoa:null;
+  const d=new Date(now()),h=d.getHours(),oi=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite',nome=String(quemNome()||u?.nome||'').split(' ')[0];
+  const topo=`<div class="topo hj-topo"><div class="hj-tt"><h1>${oi}${nome?', '+esc(nome):''}</h1><span>${DOW[d.getDay()]}, ${d.getDate()} de ${MES[d.getMonth()]}</span></div>${sino()}</div>${faixasTopo()}`;
+  const F=filaHoje(P,esc_,pid,g),MAX=8,ver=ui.filaTodas?F:F.slice(0,MAX);
+  const res=F.length?`<p class="fl-res"><b>${F.length} ${F.length>1?'coisas':'coisa'}</b> para resolver, da mais urgente para a menos.</p>`:'';
+  const fila=F.length?`<div class="fl" id="hj-fila">${ver.map((x,j)=>filaLinha(x,j===0)).join('')}</div>${F.length>MAX?`<button class="mbtn neutro2 fl-mais" data-a="filaTodas">${ui.filaTodas?'Ver menos':`Ver mais ${F.length-MAX}`}</button>`:''}`
+    :`<div class="fl-vazio">${ic('i-check')}<b>Nada para resolver agora</b></div>`;
+  const FH=feitoHoje(),emDia=state.pedidos.filter(p=>!p.concluido&&!p.cancelado&&info(p).u==='ok').length;
+  const ok=`<div class="fl-ok" id="hj-feito">${ic('i-check')}<span>${emDia?`<b>${emDia} ${emDia>1?'pedidos':'pedido'}</b> em dia · `:''}${FH.H.proc?`<b>${FH.H.proc} ${FH.H.proc>1?'processos':'processo'}</b> hoje${FH.alvo?` (${Math.min(999,FH.pct)}% da meta)`:''}`:'ainda nada marcado hoje'}${FH.S.proc>FH.H.proc?` · ${FH.S.proc} na semana`:''}${FH.ent?` · ${FH.ent} ${FH.ent>1?'entregues':'entregue'} na semana`:''}</span></div>`;
+  let vendas='';if(g){const ini=sod(now()).getTime()-((d.getDay()+6)%7)*DIA,novos=state.pedidos.filter(p=>!p.cancelado&&(p.chegada||0)>=ini),pc=sum(novos.map(p=>sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd))));
+    vendas=`<div class="fl-sec" id="hj-vendas"><div><b>Vendas da semana</b><small>${novos.length} ${novos.length===1?'pedido novo':'pedidos novos'}${pc?` · ${pc} peças`:''}</small></div><button class="fl-bt s" data-a="hojeIr" data-v="res">Faturamento</button></div>`}
+  const cf=g&&!temPedidoReal()?passosConfig().filter(x=>!x.ok&&!x.opc).length:0;
+  const cfg=cf?`<div class="fl-cfg">${ic('i-engr')}<span><b>Configurar a fábrica</b><small>Falta${cf>1?'m':''} ${cf} ${cf>1?'passos':'passo'}</small></span><button class="fl-bt s" data-a="ajIr" data-v="cad:config">Ver</button></div>`:'';
+  return `${topo}${res}${fila}${ok}${vendas}${cfg}`}
 /* Escritório por pedido (pedido da Martins, 10/2026): um cartão por pedido com a lista curta das tarefas; tarefas iguais juntas. */
 const LAB_T={etEscFeito:'Feito',pedEditar:'Completar',insumos:'Conferir',vias:'Separei',artePrep:'Pronta',arte:'Aprovada',arteEnv:'Enviei',comprei:'Comprei',chegou:'Chegou',levei:'Levei',buscou:'Chegou',entregar:'Entregue'};
 function tarMini(t){const lab=t.a==='levei'&&viaApp(t)?'Enviado':LAB_T[t.a];const quem=t.resp?pNome(t.resp):'';
@@ -2123,7 +2248,7 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     <div class="doc-bts">${ped.cancelado?'':`<button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button>`}<button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button><button class="mbtn neutro2 mod-etq" data-a="docEtq" data-id="${id}">${ic('i-lista')}Etiquetas</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
     ${tEnt?`<div class="acoes"><button class="big go" data-a="entregar" data-id="${id}">${ic('i-caminhao')}${esc(tarTxt(tEnt))}${tEnt.resp?' · '+esc(pNome(tEnt.resp)):''}</button></div>`:''}</div>
   ${ped.fin?finCard(ped.fin):''}
-  ${ped.concluido?'':`<div class="card">${ui.cancPed===id?`<h2>Cancelar este pedido?</h2><div class="aviso">${ic('i-alerta')}<span>O pedido de <b>${esc(ped.cliente)}</b> sai da produção, das máquinas e das tarefas do escritório. Ele fica guardado em Pedidos › Filtrar › Cancelados e pode voltar depois.</span></div>
+  ${ped.concluido||!permOn('cancelar')?'':`<div class="card">${ui.cancPed===id?`<h2>Cancelar este pedido?</h2><div class="aviso">${ic('i-alerta')}<span>O pedido de <b>${esc(ped.cliente)}</b> sai da produção, das máquinas e das tarefas do escritório. Ele fica guardado em Pedidos › Filtrar › Cancelados e pode voltar depois.</span></div>
     <div class="rotulo">Motivo (se quiser)</div><input class="campo" id="cancMot" placeholder="Ex.: cliente desistiu" autocomplete="off">
     <div class="acoes"><button class="big" style="background:var(--red);color:#fff" data-a="pedCancOk" data-id="${id}">Sim, cancelar pedido</button><button class="big neutro" data-a="pedCancN">Não</button></div>`
     :`<button class="mbtn neutro2" data-a="pedCancelar" data-id="${id}">${ic('i-alerta')}Cancelar pedido</button>`}</div>`}
@@ -2511,8 +2636,8 @@ function sEtEd(){const e=ui.sheet,l=lote(e.l),z=l&&sMap(rp(l))[e.s];if(!z)return
   if(x.st!=='pend')ops.push(bt('etVolta',ic('i-voltar')+(depois.length?`Voltar esta e as seguintes para "ainda não"`:'Voltar para "ainda não feita"'),'big neutro'));
   return `${voltar()}<h1>${esc(z.nome)}</h1><div class="card" style="margin:0 0 12px"><b>${esc(nomePeca(l))} ${esc(l.cor||'')}</b> · ${qtdEf(l)} peças<br><span class="lido">${esc(ped.cliente)} · pedido ${esc(ped.id)}</span></div>
     <div class="lib ${sit.c==='ok'?'u-ok':sit.c?'u-warn':''}">${esc(sit.t)}</div>
-    ${depois.length&&x.st!=='pend'?`<p class="dica">Já andaram depois desta: ${esc(depois.map(d=>d.nome).join(', '))}. Voltar esta etapa volta também essas.</p>`:''}
-    <div class="acoes" style="flex-direction:column">${ops.join('')}</div>${ops.length?'':'<p class="dica">Nada para corrigir aqui.</p>'}`}
+    ${depois.length&&x.st!=='pend'&&permOn('corrigirProd')?`<p class="dica">Já andaram depois desta: ${esc(depois.map(d=>d.nome).join(', '))}. Voltar esta etapa volta também essas.</p>`:''}
+    <div class="acoes" style="flex-direction:column">${ops.filter(o=>{const m=o.match(/data-a="(\w+)"/);return !m||podeAcao(m[1])}).join('')}</div>${!permOn('corrigirProd')&&['ok','and'].includes(x.st)?`<p class="dica perm-dica">${ic('i-cadeado')}Para corrigir o que a produção já fez, chame quem é da gestão (${esc(gestoresTxt())}).</p>`:ops.length?'':'<p class="dica">Nada para corrigir aqui.</p>'}`}
 /* etapas que já começaram e dependem desta (direta ou indiretamente) */
 function etDepois(l,sid){const p=rp(l),D=desc(p,sid);return p.steps.filter(z=>D.has(z.id)&&z.id!==sid&&stOf(l,z.id).st!=='pend')}
 function sHora(){const e=ui.sheet,l=lote(e.l),z=l&&sMap(rp(l))[e.s],u=unidade(e.m);if(!z)return voltar();const ped=pedById(l.ped);
@@ -2866,6 +2991,15 @@ const FAQ=[
 {c:'cad',q:'Comprei (ou vendi) uma máquina. Como atualizo?',k:'máquina nova quantidade comprar vender mesa',r:['Cadastros › Máquinas.','Use + e − para a quantidade, ou Adicionar máquina ou mesa para um tipo novo.'],ir:'cad:maquinas',g:1},
 {c:'cad',q:'Como cadastro um produto novo?',k:'produto novo peça modelo cadastrar camiseta',r:['Cadastros › Produtos › Cadastrar produto.','Escreva o nome, escolha o desenho, os tecidos e de qual produto copiar os processos.','Depois ajuste os processos, tempos e aviamentos dentro dele.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Como mudo o tempo de um processo?',k:'tempo processo etapa minutos por peça ajustar tempo',r:['Cadastros › Produtos › toque no produto.','Em "Como é feita", toque no processo e em Editar etapa.','Ajuste o Tempo por peça e toque em Salvar etapa.'],ir:'cad:produtos',g:1},
+{c:'cad',q:'O que quem é do Escritório pode fazer no app?',k:'permissão permissões escritório vendedora cancelar entregar corrigir bloquear liberar só a gestão perfil responsabilidade',r:['Cadastros › Ajustes › Acessos ao sistema › O que o Escritório pode fazer.','Toque em cada linha para ligar ou desligar: entregar pedido, cancelar pedido, corrigir o que a produção já fez.','Quem é da gestão pode tudo. Cadastros e Painel do gestor são sempre só da gestão.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
+{c:'comeco',q:'O que é a tela Hoje?',m:'hoje',k:'hoje primeira tela início começo o que fazer agora prioridade urgente resumo do dia bom dia',r:['É a primeira tela do app: uma lista do que resolver hoje, da coisa mais urgente para a menos.','A cor na beira de cada linha diz a urgência: vermelho, amarelo, azul e cinza.','Cada linha tem o botão dela. O primeiro, mais urgente, é azul cheio.','Escritório: as suas tarefas vêm primeiro. Gestão: pedidos em risco, compras, máquinas livres e escritório.','No fim: a faixa verde do que a produção fez, as vendas da semana e, se faltar, Configurar a fábrica.'],ir:'hoje'},
+{c:'comeco',q:'Como o app sabe o que pôr na lista da tela Hoje?',m:'hoje',k:'sugestões sugestão dica app sugere próximo calcula como sabe inteligente',r:['O próprio app monta a lista com o que já está registrado: data de entrega, quanto do pedido já foi feito, quem está livre, o que falta comprar e o prazo de cada prestador.','Aparecem as 8 mais urgentes. Toque em "Ver mais" para ver as outras.','Se uma linha não faz sentido, é sinal de que algo não foi marcado no app.'],ir:'hoje'},
+{c:'comeco',q:'O que é a faixa verde no fim da tela Hoje?',m:'hoje',k:'feito hoje processos terminados peças meta do dia produção quanto fizemos semana entregues reconhecimento verde faixa quadro',r:['Mostra quantos pedidos estão em dia, quantos processos a produção terminou hoje e na semana, e os pedidos entregues na semana.','Conta o que foi marcado no app. O que for marcado depois aparece depois.','A meta do dia compara o tempo padrão do que foi feito com as horas da equipe da produção. Não compara pessoas.'],ir:'hoje'},
+{c:'comeco',q:'Onde ficaram o Painel do gestor e os Cadastros?',m:'hoje',g:1,k:'mais painel gestor cadastros sumiu onde ficou barra de baixo empresas',r:['Na barra de baixo, toque em Mais (o último botão).','Lá estão Painel do gestor, Cadastros e Empresas.'],ir:'eu'},
+{c:'cad',q:'Como desligo a tela Hoje e volto a barra de antes?',m:'hoje',g:1,k:'desligar tela hoje voltar barra antiga como era antes partes do app',r:['Cadastros › Ajustes › Partes do app.','Desligue "Tela Hoje". A barra volta a ser Fábrica, Pedidos, Novo, Gestor e Cadastros.'],ir:'cad:ajustes#Partes do app'},
+{c:'comeco',q:'O botão voltar do celular fecha o app?',k:'voltar botão voltar celular android seta fechar sair do app sem querer',r:['Não. O voltar do celular fecha o que está aberto por cima: a confirmação, a janelinha ou a folha.','Numa aba que não é a primeira, ele volta para a primeira tela.','Só sai do app quando você já está na primeira tela sem nada aberto.']},
+{c:'comeco',q:'Errei: cancelei, pausei ou mandei para conserto sem querer. Como desfaço?',k:'desfazer errei sem querer cancelei pausei dividi conserto hora extra enviei arte voltar atrás',r:['Logo depois de fazer, aparece o aviso no alto com o botão Desfazer.','Em Pedidos, o botão Desfazer fica sempre no alto e volta até as 5 últimas ações dos últimos 15 minutos.','Passou disso? Corrija pelo próprio pedido ou chame quem é da gestão.']},
+{c:'comeco',q:'Por que não aparece o botão de cancelar ou de corrigir?',k:'não aparece sumiu botão cancelar corrigir horário voltar processo cadastro painel bloqueado permissão gestão',r:['Algumas ações são de quem é da gestão: Cadastros, Painel do gestor e, se a fábrica escolheu assim, cancelar pedido e corrigir o que a produção já fez.','Para essas, o botão não aparece para quem é do Escritório.','Precisa fazer? Chame quem é da gestão. Ela pode liberar em Ajustes › Acessos.']},
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
 {c:'cad',q:'Como mudo a ordem, incluo ou excluo uma etapa de um produto?',k:'etapa processo ordem mudar subir descer excluir tirar incluir inserir produto roteiro costura',r:['Em Cadastros › Produtos, toque no produto e desça até Etapas em ordem.','↑ e ↓ mudam a ordem. Inserir etapa depois desta coloca uma nova no meio. Excluir tira a etapa, e quem vinha depois passa a esperar a anterior.','Etapa que está sendo feita agora não pode ser excluída: termine antes.']},
@@ -3876,6 +4010,19 @@ const normEmail=e=>String(e||'').trim().toLowerCase();
 let SESSAO=(()=>{try{return JSON.parse(localStorage.getItem('martins-sessao')||'null')}catch(e){return null}})();
 const usuarioAtual=()=>SESSAO&&state&&(state.usuarios||[]).find(u=>u.id===SESSAO.id&&normEmail(u.email)===normEmail(SESSAO.email))||null;
 const ehGestao=()=>usuarioAtual()?.perfil==='gestao';
+/* Permissões por responsabilidade (Onda UX 1, 11/2026). A gestão pode tudo. O que o Escritório pode fazer é escolha de cada fábrica
+   (Ajustes › Acessos), com padrão neutro: despachar (entregar) é do escritório; cancelar e corrigir o que a produção já fez é da gestão.
+   A tela esconde o botão e a ação recusa; a migração 011 repete a regra no banco. */
+const PERMS=[
+  {k:'entregar',nome:'Entregar pedido ao cliente (e desfazer a entrega)',acoes:['entregar','desEntregar'],padrao:true},
+  {k:'cancelar',nome:'Cancelar pedido (e voltar um cancelado)',acoes:['pedCancelar','pedCancOk','pedReativar'],padrao:false},
+  {k:'corrigirProd',nome:'Corrigir o que a produção já fez (voltar processo, mudar horário, cancelar um começo)',acoes:['etVolta','etHora','etCancIni'],padrao:false}];
+const ACAO_PERM=Object.fromEntries(PERMS.flatMap(p=>p.acoes.map(a=>[a,p.k])));
+const permOn=k=>{const u=usuarioAtual();if(!u||u.perfil==='gestao')return true;const P=PERMS.find(x=>x.k===k);if(!P)return true;const c=((typeof state!=='undefined'&&state&&state.permissoes)||{})[k];return c==null?P.padrao:!!c};
+/* atalhos que levam a telas só da gestão (Q1): somem para os outros perfis */
+const ATALHO_GESTAO=(a,d)=>['irEquipe','irForn'].includes(a)||(a==='ir'&&/^(cad|pes|gest):/.test((d&&d.to)||''))||(a==='tela'&&TELAS_GESTAO.includes((d&&d.t)||''));
+const podeAcao=(a,d)=>{if(ATALHO_GESTAO(a,d)&&usuarioAtual()&&!ehGestao())return false;return !ACAO_PERM[a]||permOn(ACAO_PERM[a])};
+const TELAS_GESTAO=['cadastros','gestor'];
 async function hashSenha(senha,salt){const enc=new TextEncoder();const k=await crypto.subtle.importKey('raw',enc.encode(senha),'PBKDF2',false,['deriveBits']);
   const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:150000,hash:'SHA-256'},k,256);return [...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 const novoSalt=()=>[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');
@@ -3897,7 +4044,10 @@ function cardAcessos(){if(!ehGestao())return '';const us=state.usuarios||[];
   return `<div class="card"><h2>Acessos ao sistema</h2><p class="dica" style="margin:-4px 0 8px">Quem pode entrar com e-mail e senha. No primeiro acesso, a própria pessoa cria a senha${SB_CFG?' (toca em "É meu primeiro acesso" e confirma pelo e-mail)':''}.</p>
   ${us.map(u=>`<div class="aj-row acs"><span><b>${esc(u.nome)}</b><br><small class="lido">${esc(u.email)} · ${esc(PERFIS[u.perfil]||u.perfil)}${SB_CFG?'':u.hash?'':' · ainda não criou a senha'}</small></span>
     <span class="aq-b">${SB_CFG?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Mandar link de senha nova</button>`:u.hash?`<button class="x azul" data-a="acsReset" data-id="${u.id}">Redefinir senha</button>`:''}${selOp('acsPerfilSel',`data-id="${u.id}"`,u.perfil,Object.entries(PERFIS),'Perfil')}${u.id!==usuarioAtual()?.id?`<button class="x" data-a="acsRm" data-id="${u.id}">Tirar</button>`:''}</span></div>`).join('')}
-  <div class="acs-novo"><input class="campo" id="acsNome" placeholder="Nome"><input class="campo" id="acsEmail" type="email" placeholder="E-mail"><select class="campo" id="acsPerfil">${Object.entries(PERFIS).map(([k,n])=>`<option value="${k}" ${k==='escritorio'?'selected':''}>${n}</option>`).join('')}</select><select class="campo" id="acsPes"><option value="">Pessoa da equipe (opcional)</option>${state.pessoas.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select><button class="mbtn" data-a="acsAdd">${ic('i-mais')}Dar acesso</button></div></div>`}
+  <div class="acs-novo"><input class="campo" id="acsNome" placeholder="Nome"><input class="campo" id="acsEmail" type="email" placeholder="E-mail"><select class="campo" id="acsPerfil">${Object.entries(PERFIS).map(([k,n])=>`<option value="${k}" ${k==='escritorio'?'selected':''}>${n}</option>`).join('')}</select><select class="campo" id="acsPes"><option value="">Pessoa da equipe (opcional)</option>${state.pessoas.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select><button class="mbtn" data-a="acsAdd">${ic('i-mais')}Dar acesso</button></div>${permCard()}</div>`}
+/* Ajustes › Acessos: o que quem é do Escritório pode fazer (a gestão pode tudo). */
+function permCard(){return `<div class="perm-c" id="Permissoes"><h3>O que o Escritório pode fazer</h3><p class="dica" style="margin:0 0 8px">Quem é da gestão pode tudo. Cadastros e Painel do gestor são só da gestão. Toque para ligar ou desligar.</p>
+  <div class="checks">${PERMS.map(p=>{const on=!!((state.permissoes||{})[p.k]??p.padrao);return `<button class="chk" data-a="permTog" data-v="${p.k}" aria-pressed="${!!on}">${ic(on?'i-check':'i-cadeado')}<span>${esc(p.nome)}<small class="perm-s">${on?'Escritório pode':'Só a gestão'}</small></span><span class="box">${ic('i-check')}</span></button>`}).join('')}</div></div>`}
 
 /* ================= cópias de segurança ================= */
 const ehExemplo=p=>!!(p&&p.exemplo);
@@ -4147,7 +4297,9 @@ function vGestor(){const aba=(ui.gt==='ciclo'&&!modOn('ciclo')?'agora':ui.gt)||'
 const sheetId=s=>s.t+':'+(s.id||s.p||s.m||'');
 /* Link do QR code da etiqueta: #ficha=<peça> abre a ficha de produção dessa peça */
 let LINK_FICHA=(()=>{try{const m=location.hash.match(/ficha=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
-function render(){renderTela();ajBlocos();aplicaVocab();evUsoTela()}
+function render(){renderTela();permEsconde();ajBlocos();aplicaVocab();evUsoTela();histSync()}
+/* Some da tela o botão que o perfil não pode usar (a ação também recusa, e o banco também). */
+function permEsconde(){if(!usuarioAtual()||ehGestao())return;document.querySelectorAll('#app [data-a],#sheet [data-a],#pop [data-a]').forEach(b=>{if(!podeAcao(b.dataset.a,b.dataset))b.remove()})}
 /* Cor da marca do cliente (Ajustes › Sua empresa): vira a cor principal do app. Escurece sozinha se ficar clara demais para texto branco. */
 function aplicaCor(){const R=document.documentElement.style,c=String((state&&state.marca&&state.marca.cor)||'').trim();if(!/^#[0-9a-f]{6}$/i.test(c)){['--blue','--blue-dark','--blue-soft','--blue-line'].forEach(k=>R.removeProperty(k));return}
   let [r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));const lum=(r,g,b)=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)};
@@ -4164,8 +4316,11 @@ function renderTela(){RC={};aplicaCor();if(LINK_FICHA&&NV.pronto&&state&&usuario
   document.querySelectorAll('.nb[data-t]').forEach(b=>b.setAttribute('aria-current',b.dataset.t===ui.tela?'page':'false'));
   if(!NV.pronto){document.body.classList.add('sem-login');document.getElementById('app').innerHTML=vConectando();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());MODULOS.forEach(([k])=>document.body.classList.toggle('sem-'+k,!modOn(k)));
+  if(logado&&!ehGestao()&&TELAS_GESTAO.includes(ui.tela)){ui.tela='fabrica';ui.sheet=null}
   if(!logado){document.getElementById('app').innerHTML=vLogin();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
-  document.body.classList.toggle('chao',ehChao());document.getElementById('app').innerHTML=ehChao()&&!ui.inicio?vMinhaVez():ui.inicio?vInicio():ui.tela==='avisos'?vAvisos():ui.tela==='gestor'?vGestor():ui.tela==='pedidos'?vPedidos():ui.tela==='cadastros'?vCadastros():vFabrica();
+  document.body.classList.toggle('chao',ehChao());document.body.classList.toggle('com-hoje',hojeOn());if(!ui.tela)ui.tela=hojeOn()?'hoje':'fabrica';if(ui.tela==='hoje'&&!hojeOn())ui.tela='fabrica';
+  {const mb=document.querySelector('.mais-nb');if(mb)mb.setAttribute('aria-current',TELAS_GESTAO.includes(ui.tela)?'page':'false')}
+  document.getElementById('app').innerHTML=ehChao()&&!ui.inicio?vMinhaVez():ui.inicio?vInicio():ui.tela==='avisos'?vAvisos():ui.tela==='hoje'?vHoje():ui.tela==='gestor'?vGestor():ui.tela==='pedidos'?vPedidos():ui.tela==='cadastros'?vCadastros():vFabrica();
   {const pp=document.getElementById('pop');if(pp)pp.innerHTML=ui.sheet?'':ui.sino?popAvisos():ui.eu?popEu():''}
   const sh=document.getElementById('sheet');const s=ui.sheet;
   if(!s){sh.innerHTML='';document.body.style.overflow='';return}
@@ -4211,12 +4366,14 @@ const A={
   avQuem:d=>{snap();const a=new Set(state.avisarNovos||[]);if(a.has(d.v))a.delete(d.v);else{a.add(d.v);state.pedidos.forEach(p=>{p.vistoPor=p.vistoPor||{};if(!p.vistoPor[d.v])p.vistoPor[d.v]=1})}state.avisarNovos=[...a];commit()},
   tela:d=>{if(['cadastros','gestor'].includes(d.t)&&!ehGestao())return;ui.tela=d.t;ui.sheet=null;render();window.scrollTo(0,0)},
   cad:d=>{ui.cad=d.k;render()},
+  filaTodas:()=>{ui.filaTodas=!ui.filaTodas;render()},
+  hojeIr:d=>{const v=d.v;ui.sheet=null;if(v==='pedidos'){ui.tela='pedidos';ui.pv='ped'}else if(['esc','fora','maq'].includes(v)){ui.tela='fabrica';ui.fz=v}else if(v==='res'&&ehGestao()){ui.tela='gestor';ui.gt='res'}render();scrollTo(0,0)},
   irEquipe:()=>{ui.tela='cadastros';ui.cad='equipe';ui.sheet=null;render();window.scrollTo(0,0)},
   fechar:()=>{const s=ui.sheet;if(s?.t==='etapa'){ui.sheet={t:'produto',p:s.p};return render()}if(s?.t==='prob'&&s.step>1){s.step--;return render()}if(s?.t==='novo'&&s.w.step>1){wRead();s.w.step--;s.w.err='';return render()}if(s?.t==='novo'&&s.w.edit){ui.sheet={t:'pedido',id:s.w.edit};return render()}ui.sheet=null;render()},
   ajuda:()=>openSheet({t:'ajuda',q:'',ab:null}),
   ajAss:d=>{ui.sheet.ab=ui.sheet.ab===d.v?null:d.v;render()},
   ajIr:d=>{const [a,b0]=String(d.v).split(':'),[b,alvo]=(b0||'').split('#');ui.sheet=null;ui.sino=false;ui.eu=false;
-    if(a==='fab'){ui.tela='fabrica';ui.fz=b||'maq'}else if(a==='ped'||a==='emp'){ui.tela='pedidos';ui.pv=a==='emp'?'emp':'ped'}
+    if(a==='hoje'){ui.tela='hoje'}else if(a==='fab'){ui.tela='fabrica';ui.fz=b||'maq'}else if(a==='ped'||a==='emp'){ui.tela='pedidos';ui.pv=a==='emp'?'emp':'ped'}
     else if(a==='novo'){ui.tela='pedidos';render();return A.novo()}else if(a==='sino'){ui.sino=true}else if(a==='eu'){ui.eu=true}
     else if(a==='cad'&&ehGestao()){ui.tela='cadastros';ui.cad=b}else if(a==='gest'&&ehGestao()){ui.tela='gestor';ui.gt=b}
     if(alvo){ui.blk=ui.blk||{};ui.blk['aj:'+alvo]=true}render();scrollTo(0,0);if(alvo)setTimeout(()=>{const h=[...document.querySelectorAll('#app h2')].find(x=>x.textContent.trim().startsWith(alvo));if(h){const dd=h.closest('details');if(dd&&!dd.open){dd.open=true}}if(h){h.scrollIntoView({behavior:'smooth',block:'start'});const c=h.closest('.card');if(c){c.classList.add('aj-luz');setTimeout(()=>c.classList.remove('aj-luz'),2500)}}},60)},
@@ -4375,7 +4532,7 @@ const A={
   arqVer:d=>abreZoom('A:'+d.id),
   arqBaixar:d=>{const a=arqById(d.id);if(a)baixarArqs([a])},
   arqsPed:d=>{const ped=pedById(d.id);baixarArqs(arqsDoPedido(ped),nomeArq(`Arquivos pedido ${ped.id} - ${ped.cliente}.zip`))},
-  arqRm:d=>{const a=arqById(d.id);if(!a)return;const u=usoArq(a);if(u.length&&!ui.arqRmOk?.[a.id]){ui.arqRmOk={[a.id]:1};toast(`Está em ${u.length} ${u.length===1?'pedido':'pedidos'}. Toque em Tirar de novo para confirmar.`,false);return}
+  arqRm:d=>{const a=arqById(d.id);if(!a)return;const u=usoArq(a);if(u.length&&!d.ok&&!ui.arqRmOk?.[a.id]){ui.arqRmOk={[a.id]:1};toast(`Está em ${u.length} ${u.length===1?'pedido':'pedidos'}. Toque em Tirar de novo para confirmar.`,false);return}
     snap();state.arquivos=state.arquivos.filter(x=>x.id!==a.id);state.lotes.forEach(l=>{if(l.mockArq===a.id)l.mockArq=undefined;(l.pers||[]).forEach(x=>{if(x.arte===a.id)x.arte=undefined;if(x.bord===a.id)x.bord=undefined})});ui.arqRmOk=null;commit();toast('Arquivo tirado')},
   ir:d=>{const [k,v]=d.to.split(':');ui.sheet=null;
     if(k==='ped'){ui.tela='pedidos';render();openSheet({t:'pedido',id:v})}
@@ -4415,6 +4572,7 @@ const A={
   acsReset:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(SB_CFG){SB.c.auth.resetPasswordForEmail(u.email,{redirectTo:sbVolta()}).then(r=>toast(r.error?sbErro(r.error):`Mandamos para ${u.email} um link para criar uma senha nova`,false));return}snap();u.hash=null;u.salt=null;commit();toast(`${u.nome} vai criar uma senha nova no próximo acesso`)},
   acsPerfilSel:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(!u||!PERFIS[d.v]||u.perfil===d.v)return;if(u.perfil==='gestao'&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão');return render()}snap();ev('acesso.alterado',{ref:u.id,de:u.perfil,para:d.v});u.perfil=d.v;commit();toast(`${u.nome}: ${PERFIS[d.v]}`)},
   acsPerfil:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);if(u.id===usuarioAtual()?.id&&state.usuarios.filter(x=>x.perfil==='gestao').length<2){toast('Precisa ficar pelo menos uma pessoa na gestão',false);return}snap();u.perfil=u.perfil==='gestao'?'operacao':'gestao';commit()},
+  permTog:d=>{if(!ehGestao())return;const P=PERMS.find(x=>x.k===d.v);if(!P)return;const era=(state.permissoes||{})[P.k]??P.padrao;snap();state.permissoes={...(state.permissoes||{}),[P.k]:!era};ev('acesso.alterado',{ref:'escritorio:'+P.k,de:era?'pode':'gestao',para:!era?'pode':'gestao'});commit();toast(`Pronto! ${P.nome}: ${!era?'Escritório pode':'só a gestão'}`)},
   acsRm:d=>{if(!ehGestao())return;const u=state.usuarios.find(x=>x.id===d.id);snap();ev('acesso.alterado',{ref:u.id,de:u.perfil,para:'sem_acesso'});state.usuarios=state.usuarios.filter(x=>x.id!==d.id);commit();toast(`${u.nome} não tem mais acesso`)},
   segAgora:async()=>{toast('Guardando cópia…',false);const ok=await backupNuvem(`${hojeISO()}-manual-${tsHm(now()).replace(':','h')}`);toast(ok?'Cópia guardada na nuvem':'Sem nuvem agora. Use “Baixar cópia em arquivo”.',false)},
   setor:d=>openSheet({t:'setor',v:d.v}),
@@ -4450,7 +4608,7 @@ const A={
   segLista:async()=>{openSheet({t:'seg',bk:null,lx:null});if(NV.modo!=='nuvem'){ui.sheet.bk=[];ui.sheet.lx=[];return render()}
     try{const [B,X]=await Promise.all([NV.db.collection('backup').get(),NV.db.collection('lixeira').get()]);if(ui.sheet?.t!=='seg')return;
       ui.sheet.bk=B.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);ui.sheet.lx=X.docs.map(d=>({doc:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts).slice(0,80);render()}catch(e){ui.sheet.bk=[];ui.sheet.lx=[];render()}},
-  segRest:async d=>{if(!ui.segOk||ui.segOk!==d.v){ui.segOk=d.v;toast('Toque em Restaurar de novo para confirmar. O estado atual vira uma cópia antes.',false);return}ui.segOk=null;toast('Restaurando…',false);
+  segRest:async d=>{if(!d.ok&&(!ui.segOk||ui.segOk!==d.v)){ui.segOk=d.v;toast('Toque em Restaurar de novo para confirmar. O estado atual vira uma cópia antes.',false);return}ui.segOk=null;toast('Restaurando…',false);
     try{const o=await lerBackup(d.v);await restaurar(o);ui.sheet=null;render();toast('Cópia restaurada',false)}catch(e){toast('Não consegui restaurar essa cópia',false)}},
   lixRest:async d=>{try{const x=(await NV.db.doc(`lixeira/${d.v}`).get()).data();if(!x||!COLS.includes(x.col))return;const {_o,...ent}=x.data;snap();
       if(!state[x.col].some(e=>(x.col==='consertos'?e.r:e.id)===(x.col==='consertos'?ent.r:ent.id)))state[x.col].push(ent);await NV.db.doc(`lixeira/${d.v}`).delete();commit();toast('Restaurado');A.segLista()}catch(e){toast('Não consegui restaurar',false)}},
@@ -4477,8 +4635,8 @@ const A={
   heAte:d=>{ui.sheet.ate=+d.v;render()},
   heOk:()=>{const e=ui.sheet,P=plano();if(!e.sel.length)return;snap();const t0=now();
     e.sel.forEach(m=>{const t=P.uso[m];if(!t)return;const x=t.x;x.he=x.he||[];const a=heAtiva(x);if(a)a.f=e.ate;else x.he.push({i:t0,f:e.ate});if(t.l&&t.s)evEtapa('hora_extra.autorizada',t.l,t.s,x,{dados:{ate:isoOu(e.ate)}})});
-    ui.sheet=null;commit();toast(`Hora extra até ${tsHm(e.ate)} para ${e.sel.length} ${e.sel.length>1?'pessoas':'pessoa'}`)},
-  hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();evEtapa('hora_extra.encerrada',t.l,t.s,t.x,{dur:(a.f-a.i)/1000});commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`)},
+    ui.sheet=null;commit();toast(`Hora extra até ${tsHm(e.ate)} para ${e.sel.length} ${e.sel.length>1?'pessoas':'pessoa'}`,true)},
+  hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();evEtapa('hora_extra.encerrada',t.l,t.s,t.x,{dur:(a.f-a.i)/1000});commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`,true)},
   ajPulo:d=>{ui.blk=ui.blk||{};ui.blk['aj:'+d.v]=true;render();setTimeout(()=>{const x=[...document.querySelectorAll('#app details.blk>summary h2')].find(h=>h.textContent.trim()===d.v);if(x){const c=x.closest('details');c.scrollIntoView({behavior:'smooth',block:'start'});c.classList.add('aj-luz');setTimeout(()=>c.classList.remove('aj-luz'),2500)}},40)},
   mvQuem:d=>{ui.mvP=d.v;try{localStorage.setItem('martins-mv',d.v)}catch(e){}render();window.scrollTo(0,0)},
   mvTroca:()=>{ui.mvP=null;try{localStorage.removeItem('martins-mv')}catch(e){}render()},
@@ -4507,7 +4665,7 @@ const A={
     snap();const T=now(),x=t.x;{const a=heAtiva(x,T-1);if(a)a.f=T}const util=Math.round(tempoUtil({...x,fim:T})/MIN);
     if(!t.pai){paraPartes(x,n);const pt=x.partes[0];pt.st='ok';pt.fim=T;pt.util=util}else{x.st='ok';x.fim=T;x.util=util;x.n=n}
     acertaPai(t.l,t.s.id);evEtapa('etapa.pausada',t.l,t.s,t.pai?x:(x.partes&&x.partes[0])||x,{pessoa:x.op||t.pai?.op,q:n,dur:util*60,dados:{restante:restante(t.l,t.s.id)}});registrar({tipo:'pausa',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:x.op||t.pai?.op,ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n});
-    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} pausado: ${n} prontas, ${restante(t.l,t.s.id)} voltam para a fila`)},
+    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} pausado: ${n} prontas, ${restante(t.l,t.s.id)} voltam para a fila`,true)},
   dividir:d=>{const t=tarefaNa(d.m);if(!t)return;const tot=qtdDe(t);if(tot<2)return toast('Com uma peça só não dá para dividir',false);openSheet({t:'div',m:d.m,n:Math.floor(tot/2),m2:null,p2:null,err:''})},
   dvN:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('dvN')?.value,10);e.n=Math.max(1,(isNaN(v)?e.n:v)+(+d.d));e.err='';render()},
   dvM:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('dvN')?.value,10);if(!isNaN(v))e.n=v;e.m2=d.v;e.p2=null;render()},
@@ -4518,16 +4676,16 @@ const A={
     let txt=`${n2} peças ficam na fila para outra pessoa`;
     if(e.m2&&e.m2!=='depois'&&e.p2){const pt={id:proxParte(pai),n:n2,st:'and',ini:now(),op:e.p2,maq:e.m2};if(situacao().k!=='trab'){const a=heAtiva(t.x);if(a)pt.he=[{i:now(),f:a.f}]}pai.partes.push(pt);txt=`${pNome(e.p2)} começou ${n2} peças na ${unidade(e.m2)?.nome||''}`}
     acertaPai(t.l,t.s.id);evEtapa('etapa.dividida',t.l,t.s,t.x,{q:n2,dados:{pessoa2:e.p2||undefined,maq2:e.m2&&e.m2!=='depois'?e.m2:undefined}});registrar({tipo:'divisao',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:e.p2||'',ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n:n2});
-    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} dividido: ${txt}`)},
+    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} dividido: ${txt}`,true)},
   pMot:d=>{const s=ui.sheet,t=tarefaNa(s.m),pr=state.probs[+d.k];s.mot=pr.k;const opts=topo(t.p).filter(x=>(x.id===t.s.id||anc(t.p,t.s.id).has(x.id))&&faseT(x.posto)!=='corte').map(x=>x.id);s.orig=(pr.alvo||[]).find(a=>opts.includes(a))||t.s.id;s.step=2;render()},
   pN:d=>{const s=ui.sheet,t=tarefaNa(s.m);s.n=Math.min(qtdEf(t.l),Math.max(1,s.n+(+d.d)));render()},
   pNext:()=>{ui.sheet.step=3;render()},
   pOrig:d=>{ui.sheet.orig=d.s;render()},
   pOk:()=>{const s=ui.sheet,t=tarefaNa(s.m);if(!s.orig)return;snap();const opOrig=t.l.steps[s.orig]?.op;makeRework(t.l,t.s.id,s.orig,s.n,s.mot,now(),t.x.op);const nome=sMap(t.p)[s.orig].nome;
-    ev('conserto.aberto',{ped:t.l.ped,lote:t.l.id,ref:s.orig,q:s.n,pessoa:t.x.op,dados:{motivo:s.mot,proc_origem:nome,proc_detect:t.s.nome,etapa_detect:t.s.id,pessoa_origem:opOrig||undefined}});ui.sheet={t:'maq',m:s.m};commit();toast(`${s.n} ${s.n>1?'peças foram':'peça foi'} para conserto em ${nome}`)},
+    ev('conserto.aberto',{ped:t.l.ped,lote:t.l.id,ref:s.orig,q:s.n,pessoa:t.x.op,dados:{motivo:s.mot,proc_origem:nome,proc_detect:t.s.nome,etapa_detect:t.s.id,pessoa_origem:opOrig||undefined}});ui.sheet={t:'maq',m:s.m};commit();toast(`${s.n} ${s.n>1?'peças foram':'peça foi'} para conserto em ${nome}`,true)},
   vias:d=>{const p=pedById(d.id);snap();p.vias=!p.vias;ev(p.vias?'vias.separadas':'vias.desmarcadas',{ped:p.id});commit();if(p.vias)toast('Vias separadas')},
   arte:d=>{const p=pedById(d.id);if(!p.artePrep&&!p.arte){toast('Prepare a arte antes',false);return}snap();p.arte=!p.arte;ev(p.arte?'arte.aprovada':'arte.aprovacao_desmarcada',{ped:p.id});commit();if(p.arte)toast('Arte aprovada')},
-  arteEnv:d=>{const p=pedById(d.id),l=lote(d.l);if(!p.arte)return;snap();p.artes=p.artes||{};p.artes[l.id+':'+d.s]=now();ev('arte.enviada',{ped:p.id,lote:l.id,ref:d.s});commit();toast('Arte enviada')},
+  arteEnv:d=>{const p=pedById(d.id),l=lote(d.l);if(!p.arte)return;snap();p.artes=p.artes||{};p.artes[l.id+':'+d.s]=now();ev('arte.enviada',{ped:p.id,lote:l.id,ref:d.s});commit();toast('Arte enviada',true)},
   artePrep:d=>{const p=pedById(d.id);snap();const tinha=p.arte;p.artePrep=!p.artePrep;if(!p.artePrep)p.arte=false;ev(p.artePrep?'arte.preparada':'arte.preparo_desmarcado',{ped:p.id});if(tinha&&!p.arte)ev('arte.aprovacao_desmarcada',{ped:p.id});commit();if(p.artePrep)toast('Arte preparada')},
   disp:d=>{const p=pessoa(d.id);snap();p.disp=p.disp===false;ev(p.disp?'pessoa.disponivel':'pessoa.ausente',{pessoa:p.id});commit();toast(p.disp?`${p.nome} disponível`:`${p.nome} fora agora: tarefas foram redistribuídas`)},
   troca:d=>openSheet({t:'troca',key:d.key,f:d.f}),
@@ -4624,7 +4782,7 @@ const A={
   addProb:()=>{const n=(document.getElementById('probN')?.value||'').trim();if(!n)return;snap();state.probs.push({k:n,i:'i-duvida',alvo:[]});commit()},
   addPapel:()=>{const n=(document.getElementById('papN')?.value||'').trim();if(!n)return;snap();state.papeis[uid('c')]=n;commit()},
   ff:d=>{ui.ff=d.v;render()},
-  fz:d=>{ui.fz=d.v;render();scrollTo(0,0)},
+  fz:d=>{ui.fz=d.v;try{localStorage.setItem('fab-zona',d.v)}catch(e){}render();scrollTo(0,0)},
   escVer:d=>{ui.escVer=d.v;try{localStorage.setItem('esc-ver',d.v)}catch(e){}render()},
   fornMover:d=>{const l=lote(d.l),x=l&&(l.pers||[]).find(q=>q.id===d.s),f=fornById(d.f);if(!x||!f)return;const st=l.steps[d.s],de=fornById(st?.forn)||fornEtapa(l,sMap(rp(l))[d.s]);if(de&&de.id===f.id)return;
     const vai=()=>{A.persOnde({l:d.l,s:d.s,v:'f:'+f.id});toast(`${pedById(l.ped)?.cliente||''}: ${sMap(rp(l))[d.s]?.nome||'personalização'} agora com ${f.nome}`,true)};
@@ -4724,7 +4882,7 @@ const A={
   pedCancelar:d=>{ui.cancPed=d.id;render()},
   pedCancN:()=>{ui.cancPed=null;render()},
   pedCancOk:d=>{const p=pedById(d.id);if(!p||p.concluido)return;const mot=(document.getElementById('cancMot')?.value||'').trim().slice(0,200);snap();const T=now();
-    pararPed(p,T);p.cancelado={ts:T,por:quemNome()||usuarioAtual()?.nome||'',motivo:mot};p.concluido=T;ev('pedido.cancelado',{ped:p.id,q:pecasPed(p),dados:{motivo:mot||undefined}});registrar({tipo:'cancelado',ped:p.id,cli:p.cliente,n:0});ui.cancPed=null;commit();toast(`Pedido de ${p.cliente} cancelado`)},
+    pararPed(p,T);p.cancelado={ts:T,por:quemNome()||usuarioAtual()?.nome||'',motivo:mot};p.concluido=T;ev('pedido.cancelado',{ped:p.id,q:pecasPed(p),dados:{motivo:mot||undefined}});registrar({tipo:'cancelado',ped:p.id,cli:p.cliente,n:0});ui.cancPed=null;commit();toast(`Pedido de ${p.cliente} cancelado`,true)},
   pedReativar:d=>{const p=pedById(d.id);if(!p||!p.cancelado)return;snap();p.concluido=null;p.cancelado=null;ev('pedido.reativado',{ped:p.id});registrar({tipo:'reativado',ped:p.id,cli:p.cliente,n:0});commit();toast(`Pedido de ${p.cliente} voltou para a produção`)},
   pedEditar:d=>{const p=pedById(d.id);if(!p)return;openSheet({t:'novo',w:wDoPedido(p)})},
   wSalvarEd:()=>salvarEdicao(),
@@ -4737,6 +4895,9 @@ const A={
 };
 /* Confirmação na tela, com o verbo, para o que não tem volta. Cada regra devolve [pergunta, botão] ou nada (não precisa confirmar). */
 const CONF={
+  /* Q12: um padrão só de confirmação (antes, estes dois pediam "toque de novo") */
+  arqRm:d=>{const a=arqById(d.id),u=a?usoArq(a):[];return u.length?[`Este arquivo está em ${u.length} ${u.length===1?'pedido':'pedidos'}. Tirar mesmo assim?`,'Sim, tirar']:null},
+  segRest:()=>['Restaurar esta cópia? O que está agora no app vira uma cópia antes, para não perder nada.','Sim, restaurar'],
   desEntregar:d=>{const p=pedById(d.id);return p&&[`Desfazer a entrega do pedido ${p.id} (${p.cliente})? Ele volta para a produção.`,'Sim, desfazer']},
   entregar:d=>{const p=pedById(d.id);return p&&[`Entregar o pedido ${p.id} (${p.cliente}) ao cliente? Ele sai da produção.`,'Sim, entregar']},
   sair:()=>['Sair do app neste aparelho?','Sim, sair'],euSair:()=>['Sair do app neste aparelho?','Sim, sair'],sbSair:()=>['Sair do app neste aparelho?','Sim, sair'],
@@ -4760,8 +4921,9 @@ const CONF={
   cliApRm:()=>['Tirar este outro nome da empresa?','Sim, tirar'],apRm:()=>['Esquecer este nome aprendido?','Sim, esquecer']};
 function pedeConfirma(txt,sim,fn){ui.conf={txt,sim,fn};desenhaConf()}
 function desenhaConf(){let el=document.getElementById('confirma');if(!el){el=document.createElement('div');el.id='confirma';document.body.appendChild(el)}
-  const c=ui.conf;el.innerHTML=c?`<div class="conf-fundo" data-a="confNao"></div><div class="conf" role="alertdialog" aria-label="Confirmar"><p>${esc(c.txt)}</p><div class="acoes"><button class="big go" data-a="confSim">${ic('i-check')}${esc(c.sim)}</button><button class="big neutro" data-a="confNao">Cancelar</button></div></div>`:''}
+  const c=ui.conf;el.innerHTML=c?`<div class="conf-fundo" data-a="confNao"></div><div class="conf" role="alertdialog" aria-label="Confirmar"><p>${esc(c.txt)}</p><div class="acoes"><button class="big go" data-a="confSim">${ic('i-check')}${esc(c.sim)}</button><button class="big neutro" data-a="confNao">Cancelar</button></div></div>`:'';if(typeof histSync==='function')histSync()}
 document.addEventListener('click',e=>{const z=e.target.closest('svg.mock[data-z]');if(z){e.preventDefault();e.stopPropagation();abreZoom(z.dataset.z);return}const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const nome=b.dataset.a,f=A[nome];if(!f)return;e.preventDefault();
+  if(!podeAcao(nome,b.dataset)){toast(`Isso é feito por quem é da gestão (${gestoresTxt()}).`,false);return}
   if(CONF[nome]&&!b.dataset.ok){let q=null;try{q=CONF[nome](b.dataset)}catch(err){}if(q){const d={...b.dataset,ok:'1'};return pedeConfirma(q[0],q[1],()=>{EV.acao=evUuid();A[nome](d)})}}
   EV.acao=evUuid();f(b.dataset)});
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.blk){ui.blk=ui.blk||{};const era=ui.blk[d.dataset.blk];ui.blk[d.dataset.blk]=d.open;if(d.classList.contains('mapa')&&era!==d.open&&!!era!==d.open)render()}},true);

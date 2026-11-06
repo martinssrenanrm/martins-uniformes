@@ -84,3 +84,43 @@
 - **Novo pedido (5c):** "Outras cores" e "Personalização" em blocos; abre sozinho quando a peça costuma ter personalização; cores mais usadas primeiro.
 - **Ajustes (5d):** blocos que abrem e fecham; ≈ 32 → 5 telas. Perguntas 1 e 2 passam.
 - **Visual novo:** tipografia Inter, superfícies leves, hierarquia de botões. Mantidos: letra ≥ 16px, alvos ≥ 48px, contraste AA, botão sempre com contorno.
+
+## Ondas de 11/2026 (rascunho, não publicado). Prints em `prints/ondas-2026-11/`
+
+### Onda 1: permissões por responsabilidade
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Corrigir processo (Escritório) | ✅ diz que é da gestão | ✅ nada para errar | ✅ | n/a | ✅ Voltar no alto | ✅ |
+| Pedido (Escritório) | ✅ | ✅ | ✅ Cancelar não fica mais perto de Corrigir | ✅ | ✅ | ✅ |
+| Ajustes › Acessos › O que o Escritório pode fazer | ✅ título diz | ✅ toque liga/desliga | ✅ 56px+ | ✅ "Pronto! …" | ✅ toque de novo volta | ✅ |
+
+### Onda 2: tela Hoje
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Hoje (gestão) | ✅ "Bom dia" + blocos com título | ✅ cada linha tem o botão dela | ✅ 48px, 360px sem corte (teste) | n/a (só leva à ação) | ✅ voltar pela barra | ✅ sem palavra proibida |
+| Hoje (Escritório) | ✅ "Suas tarefas" primeiro | ✅ botão da tarefa igual ao do Escritório | ✅ | ✅ (mesmo aviso de antes) | ✅ | 🔜 Onda 3 de vocabulário ("vias") |
+| Mais (gestão) | ✅ | ✅ | ✅ | n/a | ✅ Fechar no alto | ✅ |
+
+### Onda 3: sugestões para agora
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Hoje › Sugestões | ✅ frase curta + porquê | ✅ um botão por sugestão | ✅ 48px (teste) | n/a | ✅ só leva à tela, não muda nada | ✅ sem "IA" nem termo técnico (teste) |
+
+### Onda 4: celular primeiro
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Qualquer folha (voltar do celular) | ✅ | ✅ | ✅ | ✅ | ✅ voltar fecha a folha, não o app (teste) | ✅ |
+| Aviso depois de cancelar/pausar/dividir/conserto/hora extra/arte | ✅ | ✅ Desfazer no aviso | ✅ | ✅ | ✅ Desfazer (teste) | ✅ |
+| Fábrica (Escritório, 1ª vez) | ✅ abre no Escritório | ✅ | ✅ | n/a | ✅ | ✅ |
+Varredura em 360×640 (Hoje, Máquinas, Fora, Escritório, Pedidos, Pedido, folha da máquina, Painel, Estoque): nada passa da largura; único alvo abaixo de 44px era o nome da empresa no Pedido (corrigido).
+
+### Onda 5: o que foi feito
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Hoje › quadro verde | ✅ frase curta | n/a (só leitura) | n/a | ✅ cresce conforme marca | ✅ | ✅ sem "ranking"/pontos (teste) |
+
+### Onda 6: visual da Hoje em fila de ações (direção B)
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Hoje (gestão) | ✅ "8 coisas para resolver" | ✅ 1º item com botão azul, sem rolar (teste) | ✅ 48px, 360px sem corte (teste) | ✅ | ✅ | ✅ |
+| Hoje (Escritório) | ✅ tarefas dela primeiro | ✅ botão da própria tarefa | ✅ | ✅ (mesmo aviso do Escritório) | ✅ Desfazer | 🔜 Onda 3 de vocabulário ("vias") |

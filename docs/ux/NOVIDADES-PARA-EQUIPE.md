@@ -675,3 +675,66 @@ O tempo de cada parte conta para quem fez, no Painel.
 **O que NÃO mudou:**
 - Nada mudou de lugar. Os outros quadros de Resultados continuam iguais e na mesma ordem.
 - Só quem é da gestão vê.
+
+---
+
+# Publicado em 06/11/2026, à noite (ondas de usabilidade de 11/2026)
+
+## Cada um vê o que é da sua responsabilidade
+
+**O que mudou:**
+- Quem é do **Escritório** não vê mais o botão **Cancelar pedido** nem os botões de **corrigir o que a produção já fez** (voltar processo, mudar quem fez e o horário). Para isso, chame quem é da gestão.
+- **Entregar pedido** continua com o Escritório.
+- A gestão escolhe o que o Escritório pode fazer em **Cadastros › Ajustes › Acessos ao sistema › O que o Escritório pode fazer**.
+
+**O que NÃO mudou:** para quem é da gestão, tudo continua igual. Nenhum botão mudou de lugar.
+
+## Tela Hoje: o app abre no que importa para você
+
+**O que mudou:**
+- O app agora **abre na tela Hoje**. Ela mostra o que é mais urgente primeiro, e cada linha tem um botão que leva direto para resolver.
+- **Para a gestão:** pedidos com risco de atraso (com quanto já foi feito), o que precisa ir para a rua (compras e prestador atrasado), o que pôr em cada máquina livre e os pedidos novos da semana.
+- **Para o Escritório:** as **suas tarefas primeiro**, depois os pedidos com risco de atraso.
+- Na barra de baixo da gestão, **Gestor** e **Cadastros** ficam dentro de **Mais** (o último botão).
+
+**O que NÃO mudou:** a Fábrica, os Pedidos e o Novo pedido continuam iguais e no mesmo lugar na barra.
+
+**Se a equipe estranhar:** a gestão desliga em Cadastros › Ajustes › Partes do app › Tela Hoje, e a barra volta a ser a de antes.
+
+## Sugestões para agora
+
+**O que mudou:** no alto da tela Hoje aparecem até **3 sugestões**, as mais urgentes primeiro. Exemplos:
+- "2 pedidos vencem esta semana e estão abaixo da metade"
+- "Zíper 20cm falta em 3 pedidos: comprando de uma vez, libera todos"
+- "Próximo para a Overlock 2: Pregar gola. A Rosa está livre e sabe fazer"
+- "1 pacote passou do prazo no prestador: vale ligar para cobrar"
+
+Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem calcula é o próprio app, com o que já está marcado. Se uma sugestão não fizer sentido, é sinal de que algo não foi marcado.
+
+## No celular: o "voltar" não fecha mais o app
+
+**O que mudou:**
+- O botão **voltar do celular** fecha o que está aberto por cima (a confirmação, a janelinha, o pedido, a máquina). No Novo pedido, volta um passo sem perder o que foi escrito. Só sai do app quando você já está na primeira tela.
+- A **Fábrica abre na última aba usada** neste celular (Máquinas, Fora ou Escritório). Para quem é do Escritório, na primeira vez abre no Escritório.
+- Agora dá para **Desfazer** logo depois de: cancelar pedido, pausar, dividir, mandar para conserto, marcar e parar hora extra e "Enviei a arte".
+- Tirar um arquivo que está em pedido e restaurar cópia passam a perguntar **na tela**, como o resto do app (antes era "toque de novo").
+- O nome da empresa no alto do pedido ficou mais fácil de tocar.
+
+**O que NÃO mudou:** nenhum botão mudou de lugar.
+
+## O que a produção fez hoje
+
+**O que mudou:** na tela Hoje, um quadro verde mostra **quantos processos a produção terminou hoje**, a **meta do dia** (quando a equipe da produção tem horário cadastrado) e, na semana, os processos terminados e os **pedidos entregues**.
+
+- Conta só o que foi marcado no app: quanto mais na hora, mais certo fica.
+- Não compara pessoas. Não tem pontos nem medalhas.
+
+## Tela Hoje virou uma lista do que resolver
+
+**O que mudou:** a tela Hoje agora é **uma lista só**, da coisa mais urgente para a menos.
+- A **cor na beira** de cada linha diz a urgência: vermelho (atrasando), amarelo (atenção, compras), azul (máquina livre, pronto para entregar) e cinza (para acompanhar).
+- **Cada linha tem o botão dela.** O primeiro, o mais urgente, é azul cheio.
+- Para quem é do **Escritório**, as **suas tarefas vêm primeiro**, com o mesmo botão do Escritório (Separei, Pronta, Feito…).
+- No fim: a **faixa verde** com o que a produção fez, as **vendas da semana** e, se faltar, **Configurar a fábrica**.
+
+**O que NÃO mudou:** as informações e os botões são os mesmos. Nada mudou de lugar na barra de baixo.

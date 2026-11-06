@@ -4,7 +4,7 @@ const { chromium } = require('playwright');const path=require('path');
 const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=(c,m)=>{console.log((c?'  ✔ ':'  ✘ ')+m);if(!c)falhas++};
 (async()=>{const b=await chromium.launch();const erros=[];const A=await b.newPage({viewport:{width:820,height:1100}});A.on('pageerror',e=>erros.push(e.message));
   await A.addInitScript(()=>{window.claude={use:async()=>null}});await A.goto(APP);await A.waitForTimeout(1200);
-  await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;
+  await A.evaluate(()=>{seed();state=normalizar(state);const u=state.usuarios[0];SESSAO={id:u.id,email:u.email};NV.pronto=true;ui.tela=ui.tela||'fabrica';
     state.pedidos.forEach(p=>{p.vias=true;p.arte=true;p.artePrep=true;p.materiais.forEach(m=>{m.conf=true;m.st='ok'})});
     // corte e personalização feitos: a costura tem vários trabalhos prontos
     state.lotes.forEach(l=>{if(l.rework)return;RC={};rp(l).steps.forEach(z=>{if((faseT(z.posto)==='corte'||z.pers)&&stOf(l,z.id).st==='pend')l.steps[z.id]={st:'ok',ini:now()-7200000,fim:now()-3600000,op:'x'}})});
