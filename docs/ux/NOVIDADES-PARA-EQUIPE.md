@@ -738,3 +738,13 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 - No fim: a **faixa verde** com o que a produção fez, as **vendas da semana** e, se faltar, **Configurar a fábrica**.
 
 **O que NÃO mudou:** as informações e os botões são os mesmos. Nada mudou de lugar na barra de baixo.
+
+## Marcar todas as etapas de uma peça como feitas
+
+**O que mudou:** no pedido, em **O que foi feito · corrigir**, apareceu no fim da lista o botão verde **Marcar todas como feitas**.
+- O app pergunta antes de marcar.
+- Só marca as etapas que ainda não começaram. O que está sendo feito ou está no fornecedor fica como está.
+- Errou? Toque em **Desfazer** logo depois.
+- Aparece só para quem pode corrigir a produção (normalmente a gestão).
+
+**O que NÃO mudou:** os botões **Corrigir** de cada etapa continuam no mesmo lugar.
