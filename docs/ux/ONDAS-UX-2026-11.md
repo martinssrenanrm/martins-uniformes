@@ -126,3 +126,27 @@ Sete regras sobre o que já está no app, cada uma com o porquê e um botão:
 - **Meta por setor** (ROTEIRO passo 1, "pessoas × horas × tempo padrão" por setor): a Onda 5 mostra a meta da produção inteira. Por setor fica para a próxima fase.
 - **Letra do sistema em 130%:** a medida foi feita com a letra padrão. Falta conferir num Android real com a letra aumentada.
 - **Teste no celular de verdade** com a Helena: os prints são do navegador em 360×640.
+
+## Onda visual da tela Hoje (06/11/2026): esperando a escolha do Renan
+
+O Renan viu os prints da Onda 5 e achou a Hoje feia. Os problemas:
+- longa demais;
+- só texto;
+- todo bloco com o mesmo cartão;
+- botões de estilos diferentes;
+- o cartão de configuração em cima.
+
+As ondas ficam. Antes de mexer no app, preparei **três direções visuais**, com os mesmos dados de demonstração e em 360×640 (o que aparece sem rolar e a tela inteira): https://claude.ai/artifact/83uEHq3K3EhJEnVMudkA7g (privado; o arquivo está em `docs/ux/direcoes-hoje.html`).
+
+- **A, painel de relance:** 3 números grandes (atrasando · comprar · máquinas livres) e listas curtas.
+- **B, fila de ações:** uma lista só, do mais urgente para o menos, cada linha com o seu botão.
+- **C, um de cada vez:** a coisa mais urgente sozinha, grande, com um botão; as próximas numeradas; anel da produção.
+
+Regras comuns às três:
+- no máximo uma linha de apoio por bloco;
+- números em destaque;
+- um botão principal (azul cheio) e um secundário (contorno);
+- "Configurar a fábrica" vai para o fim;
+- o urgente cabe sem rolar.
+
+**Nada foi implementado no app.** Depois da escolha, a direção vira uma onda só de visual, com prints e o Teste da Dona Cida.
