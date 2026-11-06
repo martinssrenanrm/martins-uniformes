@@ -105,3 +105,11 @@
 | Tela | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
 | Hoje › Sugestões | ✅ frase curta + porquê | ✅ um botão por sugestão | ✅ 48px (teste) | n/a | ✅ só leva à tela, não muda nada | ✅ sem "IA" nem termo técnico (teste) |
+
+### Onda 4: celular primeiro
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Qualquer folha (voltar do celular) | ✅ | ✅ | ✅ | ✅ | ✅ voltar fecha a folha, não o app (teste) | ✅ |
+| Aviso depois de cancelar/pausar/dividir/conserto/hora extra/arte | ✅ | ✅ Desfazer no aviso | ✅ | ✅ | ✅ Desfazer (teste) | ✅ |
+| Fábrica (Escritório, 1ª vez) | ✅ abre no Escritório | ✅ | ✅ | n/a | ✅ | ✅ |
+Varredura em 360×640 (Hoje, Máquinas, Fora, Escritório, Pedidos, Pedido, folha da máquina, Painel, Estoque): nada passa da largura; único alvo abaixo de 44px era o nome da empresa no Pedido (corrigido).

@@ -696,3 +696,14 @@ O tempo de cada parte conta para quem fez, no Painel.
 - "1 pacote passou do prazo no prestador: vale ligar para cobrar"
 
 Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem calcula é o próprio app, com o que já está marcado. Se uma sugestão não fizer sentido, é sinal de que algo não foi marcado.
+
+## No celular: o "voltar" não fecha mais o app
+
+**O que mudou:**
+- O botão **voltar do celular** fecha o que está aberto por cima (a confirmação, a janelinha, o pedido, a máquina). No Novo pedido, volta um passo sem perder o que foi escrito. Só sai do app quando você já está na primeira tela.
+- A **Fábrica abre na última aba usada** neste celular (Máquinas, Fora ou Escritório). Para quem é do Escritório, na primeira vez abre no Escritório.
+- Agora dá para **Desfazer** logo depois de: cancelar pedido, pausar, dividir, mandar para conserto, marcar e parar hora extra e "Enviei a arte".
+- Tirar um arquivo que está em pedido e restaurar cópia passam a perguntar **na tela**, como o resto do app (antes era "toque de novo").
+- O nome da empresa no alto do pedido ficou mais fácil de tocar.
+
+**O que NÃO mudou:** nenhum botão mudou de lugar.

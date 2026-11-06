@@ -572,7 +572,7 @@ svg.prod.mock{background:#fff;border-radius:12px}
 .pv{grid-template-columns:1fr 1fr;margin-bottom:14px;position:static}
 .pergunta{background:var(--blue-soft);border-radius:12px;padding:10px 14px;margin:8px 0;font-size:17px;display:grid;gap:8px}
 .emp-al{display:flex;gap:12px;font-size:15px;font-weight:700;margin-top:2px}.emp-al span{display:inline-flex;align-items:center;gap:5px}.emp-al .dot{width:10px;height:10px}
-.h1-link{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}.h1-link svg.ic{width:26px;height:26px;color:var(--muted)}
+.h1-link{border:0;background:none;padding:0;min-height:48px;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}.h1-link svg.ic{width:26px;height:26px;color:var(--muted)}
 .rk-p svg.prod{width:44px;height:44px}
 
 .imp-box{display:grid;gap:4px;background:var(--blue-soft);border:2px solid #BFD2F2;border-radius:16px;padding:14px 16px;margin:4px 0 18px}.imp-box span{color:var(--ink2);font-size:16px}.imp-box .mbtn{display:inline-flex;align-items:center;gap:8px}.imp-box svg.ic{width:24px;height:24px}
@@ -1950,7 +1950,7 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
   const livres=state.pessoas.filter(p=>p.sabe.length&&!P.ocup.has(p.id)&&!P.usados.has(p.id));
   const foraN=sum(state.lotes.map(l=>Object.values(l.steps).filter(x=>x.st==='fora').length));
   const nTrab=P.us.filter(u=>P.uso[u.id]).length,nIni=P.us.filter(u=>!P.uso[u.id]&&P.plan[u.id]).length;
-  const z=ui.fz||'maq';
+  const z=ui.fz||(ui.fz=fzInicial());
   const zonas=[['maq','Máquinas','i-maquina',nIni],['fora','Fora','i-caminhao',foraN],['esc','Escritório','i-vias',esc_.length]];
   return `${quemNome()||usuarioAtual()||!state.pessoas.length?'':`<button class="faixa quem-f" data-a="quem">${ic('i-pessoas')}<span><b>Quem está usando este aparelho?</b> Toque para escolher seu nome.</span></button>`}<div class="topo"><button class="ped-l" data-a="tela" data-t="pedidos"><span class="pl-t">Pedidos</span>${res||'<span class="pl-i">nenhum aberto</span>'}<span class="pl-go">›</span></button>${sino()}</div>${avisoConfig()}${faixasTopo()}${faixaHora(P)}
   <div class="zonas" role="tablist">${zonas.map(([k,n,i,c])=>`<button class="zona" role="tab" data-a="fz" data-v="${k}" aria-pressed="${z===k}">${ic(i)}<span>${n}</span>${c?`<em>${c}</em>`:''}</button>`).join('')}</div>
@@ -2043,6 +2043,17 @@ function sugBloco(P,esc_,pid){const S=sugestoes(P,esc_,pid,ehGestao());if(!S.len
     ${ver.map(s=>`<div class="hsug" data-k="${s.k}">${ic(s.i)}<div class="sug-t"><b>${esc(s.txt)}</b><small>${esc(s.por)}</small>${s.bt?`<div class="sug-b">${s.bt}</div>`:''}</div></div>`).join('')}
     ${S.length>3?`<button class="mbtn neutro2 hj-mais" data-a="sugTodas">${ui.sugTodas?'Ver menos':`Ver mais ${S.length-3} ${S.length-3>1?'sugestões':'sugestão'}`}</button>`:''}</section>`}
 function hojeTopo(P,esc_,pid){return sugBloco(P,esc_,pid)}
+/* Q6: a Fábrica abre na última aba usada neste aparelho; na primeira vez, o Escritório abre no Escritório. */
+function fzInicial(){let v='';try{v=localStorage.getItem('fab-zona')||''}catch(e){}return ['maq','fora','esc'].includes(v)?v:ehGestao()?'maq':'esc'}
+/* Q5: o "voltar" do Android (e do navegador) fecha o que está aberto por cima: confirmação, janelinha, folha.
+   Numa aba que não é a primeira, volta para a primeira. Só sai do app quando já está na primeira tela sem nada aberto. */
+const HIST={on:false,pulo:0};
+const telaCasa=()=>hojeOn()?'hoje':'fabrica';
+const temCamada=()=>!!(ui.conf||ui.sheet||ui.sino||ui.eu||(ui.tela&&ui.tela!==telaCasa()));
+function histSync(){try{if(!NV.pronto||!usuarioAtual()||ehChao())return;const c=temCamada();if(c&&!HIST.on){history.pushState({martins:1},'');HIST.on=true}else if(!c&&HIST.on){HIST.on=false;HIST.pulo++;history.back()}}catch(e){}}
+addEventListener('popstate',()=>{if(HIST.pulo){HIST.pulo--;return}HIST.on=false;if(!NV.pronto||!usuarioAtual())return;
+  if(ui.conf){ui.conf=null;desenhaConf()}else if(ui.sino||ui.eu){ui.sino=false;ui.eu=false;render()}else if(ui.sheet){A.fechar()}else if(ui.tela!==telaCasa()){ui.tela=telaCasa();render();scrollTo(0,0)}
+  histSync()});
 /* Escritório por pedido (pedido da Martins, 10/2026): um cartão por pedido com a lista curta das tarefas; tarefas iguais juntas. */
 const LAB_T={etEscFeito:'Feito',pedEditar:'Completar',insumos:'Conferir',vias:'Separei',artePrep:'Pronta',arte:'Aprovada',arteEnv:'Enviei',comprei:'Comprei',chegou:'Chegou',levei:'Levei',buscou:'Chegou',entregar:'Entregue'};
 function tarMini(t){const lab=t.a==='levei'&&viaApp(t)?'Enviado':LAB_T[t.a];const quem=t.resp?pNome(t.resp):'';
@@ -2985,6 +2996,8 @@ const FAQ=[
 {c:'comeco',q:'De onde vêm as sugestões da tela Hoje?',m:'hoje',k:'sugestões sugestão dica app sugere próximo calcula como sabe inteligente',r:['O próprio app calcula, com o que já está registrado: data de entrega, quanto do pedido já foi feito, quem está livre, o que falta comprar e o prazo de cada prestador.','Aparecem as 3 mais urgentes. Toque em "Ver mais" para ver as outras.','Cada sugestão tem um botão que leva para resolver. Se ela não faz sentido, é sinal de que algo não foi marcado no app.'],ir:'hoje'},
 {c:'comeco',q:'Onde ficaram o Painel do gestor e os Cadastros?',m:'hoje',g:1,k:'mais painel gestor cadastros sumiu onde ficou barra de baixo empresas',r:['Na barra de baixo, toque em Mais (o último botão).','Lá estão Painel do gestor, Cadastros e Empresas.'],ir:'eu'},
 {c:'cad',q:'Como desligo a tela Hoje e volto a barra de antes?',m:'hoje',g:1,k:'desligar tela hoje voltar barra antiga como era antes partes do app',r:['Cadastros › Ajustes › Partes do app.','Desligue "Tela Hoje". A barra volta a ser Fábrica, Pedidos, Novo, Gestor e Cadastros.'],ir:'cad:ajustes#Partes do app'},
+{c:'comeco',q:'O botão voltar do celular fecha o app?',k:'voltar botão voltar celular android seta fechar sair do app sem querer',r:['Não. O voltar do celular fecha o que está aberto por cima: a confirmação, a janelinha ou a folha.','Numa aba que não é a primeira, ele volta para a primeira tela.','Só sai do app quando você já está na primeira tela sem nada aberto.']},
+{c:'comeco',q:'Errei: cancelei, pausei ou mandei para conserto sem querer. Como desfaço?',k:'desfazer errei sem querer cancelei pausei dividi conserto hora extra enviei arte voltar atrás',r:['Logo depois de fazer, aparece o aviso no alto com o botão Desfazer.','Em Pedidos, o botão Desfazer fica sempre no alto e volta até as 5 últimas ações dos últimos 15 minutos.','Passou disso? Corrija pelo próprio pedido ou chame quem é da gestão.']},
 {c:'comeco',q:'Por que não aparece o botão de cancelar ou de corrigir?',k:'não aparece sumiu botão cancelar corrigir horário voltar processo cadastro painel bloqueado permissão gestão',r:['Algumas ações são de quem é da gestão: Cadastros, Painel do gestor e, se a fábrica escolheu assim, cancelar pedido e corrigir o que a produção já fez.','Para essas, o botão não aparece para quem é do Escritório.','Precisa fazer? Chame quem é da gestão. Ela pode liberar em Ajustes › Acessos.']},
 {c:'cad',q:'Como dou acesso ao app para alguém?',k:'dar acesso novo usuário login vendedora email',r:['Cadastros › Ajustes › Acessos ao sistema.','Escreva nome e e-mail, escolha o perfil e toque em Dar acesso.','A pessoa entra como primeiro acesso e cria a senha.'],ir:'cad:ajustes#Acessos ao sistema',g:1},
 {c:'cad',q:'Quem recebe o aviso de pedido novo?',k:'aviso quem recebe sininho notificação configurar',r:['Cadastros › Ajustes › Aviso de pedido novo.','Toque nos nomes de quem deve receber.'],ir:'cad:ajustes#Aviso de pedido novo',g:1},
@@ -4259,7 +4272,7 @@ function vGestor(){const aba=(ui.gt==='ciclo'&&!modOn('ciclo')?'agora':ui.gt)||'
 const sheetId=s=>s.t+':'+(s.id||s.p||s.m||'');
 /* Link do QR code da etiqueta: #ficha=<peça> abre a ficha de produção dessa peça */
 let LINK_FICHA=(()=>{try{const m=location.hash.match(/ficha=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
-function render(){renderTela();permEsconde();ajBlocos();aplicaVocab();evUsoTela()}
+function render(){renderTela();permEsconde();ajBlocos();aplicaVocab();evUsoTela();histSync()}
 /* Some da tela o botão que o perfil não pode usar (a ação também recusa, e o banco também). */
 function permEsconde(){if(!usuarioAtual()||ehGestao())return;document.querySelectorAll('#app [data-a],#sheet [data-a],#pop [data-a]').forEach(b=>{if(!podeAcao(b.dataset.a,b.dataset))b.remove()})}
 /* Cor da marca do cliente (Ajustes › Sua empresa): vira a cor principal do app. Escurece sozinha se ficar clara demais para texto branco. */
@@ -4493,7 +4506,7 @@ const A={
   arqVer:d=>abreZoom('A:'+d.id),
   arqBaixar:d=>{const a=arqById(d.id);if(a)baixarArqs([a])},
   arqsPed:d=>{const ped=pedById(d.id);baixarArqs(arqsDoPedido(ped),nomeArq(`Arquivos pedido ${ped.id} - ${ped.cliente}.zip`))},
-  arqRm:d=>{const a=arqById(d.id);if(!a)return;const u=usoArq(a);if(u.length&&!ui.arqRmOk?.[a.id]){ui.arqRmOk={[a.id]:1};toast(`Está em ${u.length} ${u.length===1?'pedido':'pedidos'}. Toque em Tirar de novo para confirmar.`,false);return}
+  arqRm:d=>{const a=arqById(d.id);if(!a)return;const u=usoArq(a);if(u.length&&!d.ok&&!ui.arqRmOk?.[a.id]){ui.arqRmOk={[a.id]:1};toast(`Está em ${u.length} ${u.length===1?'pedido':'pedidos'}. Toque em Tirar de novo para confirmar.`,false);return}
     snap();state.arquivos=state.arquivos.filter(x=>x.id!==a.id);state.lotes.forEach(l=>{if(l.mockArq===a.id)l.mockArq=undefined;(l.pers||[]).forEach(x=>{if(x.arte===a.id)x.arte=undefined;if(x.bord===a.id)x.bord=undefined})});ui.arqRmOk=null;commit();toast('Arquivo tirado')},
   ir:d=>{const [k,v]=d.to.split(':');ui.sheet=null;
     if(k==='ped'){ui.tela='pedidos';render();openSheet({t:'pedido',id:v})}
@@ -4569,7 +4582,7 @@ const A={
   segLista:async()=>{openSheet({t:'seg',bk:null,lx:null});if(NV.modo!=='nuvem'){ui.sheet.bk=[];ui.sheet.lx=[];return render()}
     try{const [B,X]=await Promise.all([NV.db.collection('backup').get(),NV.db.collection('lixeira').get()]);if(ui.sheet?.t!=='seg')return;
       ui.sheet.bk=B.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);ui.sheet.lx=X.docs.map(d=>({doc:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts).slice(0,80);render()}catch(e){ui.sheet.bk=[];ui.sheet.lx=[];render()}},
-  segRest:async d=>{if(!ui.segOk||ui.segOk!==d.v){ui.segOk=d.v;toast('Toque em Restaurar de novo para confirmar. O estado atual vira uma cópia antes.',false);return}ui.segOk=null;toast('Restaurando…',false);
+  segRest:async d=>{if(!d.ok&&(!ui.segOk||ui.segOk!==d.v)){ui.segOk=d.v;toast('Toque em Restaurar de novo para confirmar. O estado atual vira uma cópia antes.',false);return}ui.segOk=null;toast('Restaurando…',false);
     try{const o=await lerBackup(d.v);await restaurar(o);ui.sheet=null;render();toast('Cópia restaurada',false)}catch(e){toast('Não consegui restaurar essa cópia',false)}},
   lixRest:async d=>{try{const x=(await NV.db.doc(`lixeira/${d.v}`).get()).data();if(!x||!COLS.includes(x.col))return;const {_o,...ent}=x.data;snap();
       if(!state[x.col].some(e=>(x.col==='consertos'?e.r:e.id)===(x.col==='consertos'?ent.r:ent.id)))state[x.col].push(ent);await NV.db.doc(`lixeira/${d.v}`).delete();commit();toast('Restaurado');A.segLista()}catch(e){toast('Não consegui restaurar',false)}},
@@ -4596,8 +4609,8 @@ const A={
   heAte:d=>{ui.sheet.ate=+d.v;render()},
   heOk:()=>{const e=ui.sheet,P=plano();if(!e.sel.length)return;snap();const t0=now();
     e.sel.forEach(m=>{const t=P.uso[m];if(!t)return;const x=t.x;x.he=x.he||[];const a=heAtiva(x);if(a)a.f=e.ate;else x.he.push({i:t0,f:e.ate});if(t.l&&t.s)evEtapa('hora_extra.autorizada',t.l,t.s,x,{dados:{ate:isoOu(e.ate)}})});
-    ui.sheet=null;commit();toast(`Hora extra até ${tsHm(e.ate)} para ${e.sel.length} ${e.sel.length>1?'pessoas':'pessoa'}`)},
-  hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();evEtapa('hora_extra.encerrada',t.l,t.s,t.x,{dur:(a.f-a.i)/1000});commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`)},
+    ui.sheet=null;commit();toast(`Hora extra até ${tsHm(e.ate)} para ${e.sel.length} ${e.sel.length>1?'pessoas':'pessoa'}`,true)},
+  hePara:d=>{const t=tarefaNa(d.m);if(!t)return;const a=heAtiva(t.x);if(!a)return;snap();a.f=now();evEtapa('hora_extra.encerrada',t.l,t.s,t.x,{dur:(a.f-a.i)/1000});commit();toast(`Hora extra de ${pNome(t.x.op)} encerrada`,true)},
   ajPulo:d=>{ui.blk=ui.blk||{};ui.blk['aj:'+d.v]=true;render();setTimeout(()=>{const x=[...document.querySelectorAll('#app details.blk>summary h2')].find(h=>h.textContent.trim()===d.v);if(x){const c=x.closest('details');c.scrollIntoView({behavior:'smooth',block:'start'});c.classList.add('aj-luz');setTimeout(()=>c.classList.remove('aj-luz'),2500)}},40)},
   mvQuem:d=>{ui.mvP=d.v;try{localStorage.setItem('martins-mv',d.v)}catch(e){}render();window.scrollTo(0,0)},
   mvTroca:()=>{ui.mvP=null;try{localStorage.removeItem('martins-mv')}catch(e){}render()},
@@ -4626,7 +4639,7 @@ const A={
     snap();const T=now(),x=t.x;{const a=heAtiva(x,T-1);if(a)a.f=T}const util=Math.round(tempoUtil({...x,fim:T})/MIN);
     if(!t.pai){paraPartes(x,n);const pt=x.partes[0];pt.st='ok';pt.fim=T;pt.util=util}else{x.st='ok';x.fim=T;x.util=util;x.n=n}
     acertaPai(t.l,t.s.id);evEtapa('etapa.pausada',t.l,t.s,t.pai?x:(x.partes&&x.partes[0])||x,{pessoa:x.op||t.pai?.op,q:n,dur:util*60,dados:{restante:restante(t.l,t.s.id)}});registrar({tipo:'pausa',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:x.op||t.pai?.op,ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n});
-    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} pausado: ${n} prontas, ${restante(t.l,t.s.id)} voltam para a fila`)},
+    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} pausado: ${n} prontas, ${restante(t.l,t.s.id)} voltam para a fila`,true)},
   dividir:d=>{const t=tarefaNa(d.m);if(!t)return;const tot=qtdDe(t);if(tot<2)return toast('Com uma peça só não dá para dividir',false);openSheet({t:'div',m:d.m,n:Math.floor(tot/2),m2:null,p2:null,err:''})},
   dvN:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('dvN')?.value,10);e.n=Math.max(1,(isNaN(v)?e.n:v)+(+d.d));e.err='';render()},
   dvM:d=>{const e=ui.sheet;const v=parseInt(document.getElementById('dvN')?.value,10);if(!isNaN(v))e.n=v;e.m2=d.v;e.p2=null;render()},
@@ -4637,16 +4650,16 @@ const A={
     let txt=`${n2} peças ficam na fila para outra pessoa`;
     if(e.m2&&e.m2!=='depois'&&e.p2){const pt={id:proxParte(pai),n:n2,st:'and',ini:now(),op:e.p2,maq:e.m2};if(situacao().k!=='trab'){const a=heAtiva(t.x);if(a)pt.he=[{i:now(),f:a.f}]}pai.partes.push(pt);txt=`${pNome(e.p2)} começou ${n2} peças na ${unidade(e.m2)?.nome||''}`}
     acertaPai(t.l,t.s.id);evEtapa('etapa.dividida',t.l,t.s,t.x,{q:n2,dados:{pessoa2:e.p2||undefined,maq2:e.m2&&e.m2!=='depois'?e.m2:undefined}});registrar({tipo:'divisao',maq:e.m,maqTipo:unidade(e.m)?.tipo,op:e.p2||'',ped:t.l.ped,cli:pedById(t.l.ped).cliente,prod:prod(t.l.prod).nome,step:t.s.nome,n:n2});
-    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} dividido: ${txt}`)},
+    ui.sheet={t:'maq',m:e.m};commit();toast(`${t.s.nome} dividido: ${txt}`,true)},
   pMot:d=>{const s=ui.sheet,t=tarefaNa(s.m),pr=state.probs[+d.k];s.mot=pr.k;const opts=topo(t.p).filter(x=>(x.id===t.s.id||anc(t.p,t.s.id).has(x.id))&&faseT(x.posto)!=='corte').map(x=>x.id);s.orig=(pr.alvo||[]).find(a=>opts.includes(a))||t.s.id;s.step=2;render()},
   pN:d=>{const s=ui.sheet,t=tarefaNa(s.m);s.n=Math.min(qtdEf(t.l),Math.max(1,s.n+(+d.d)));render()},
   pNext:()=>{ui.sheet.step=3;render()},
   pOrig:d=>{ui.sheet.orig=d.s;render()},
   pOk:()=>{const s=ui.sheet,t=tarefaNa(s.m);if(!s.orig)return;snap();const opOrig=t.l.steps[s.orig]?.op;makeRework(t.l,t.s.id,s.orig,s.n,s.mot,now(),t.x.op);const nome=sMap(t.p)[s.orig].nome;
-    ev('conserto.aberto',{ped:t.l.ped,lote:t.l.id,ref:s.orig,q:s.n,pessoa:t.x.op,dados:{motivo:s.mot,proc_origem:nome,proc_detect:t.s.nome,etapa_detect:t.s.id,pessoa_origem:opOrig||undefined}});ui.sheet={t:'maq',m:s.m};commit();toast(`${s.n} ${s.n>1?'peças foram':'peça foi'} para conserto em ${nome}`)},
+    ev('conserto.aberto',{ped:t.l.ped,lote:t.l.id,ref:s.orig,q:s.n,pessoa:t.x.op,dados:{motivo:s.mot,proc_origem:nome,proc_detect:t.s.nome,etapa_detect:t.s.id,pessoa_origem:opOrig||undefined}});ui.sheet={t:'maq',m:s.m};commit();toast(`${s.n} ${s.n>1?'peças foram':'peça foi'} para conserto em ${nome}`,true)},
   vias:d=>{const p=pedById(d.id);snap();p.vias=!p.vias;ev(p.vias?'vias.separadas':'vias.desmarcadas',{ped:p.id});commit();if(p.vias)toast('Vias separadas')},
   arte:d=>{const p=pedById(d.id);if(!p.artePrep&&!p.arte){toast('Prepare a arte antes',false);return}snap();p.arte=!p.arte;ev(p.arte?'arte.aprovada':'arte.aprovacao_desmarcada',{ped:p.id});commit();if(p.arte)toast('Arte aprovada')},
-  arteEnv:d=>{const p=pedById(d.id),l=lote(d.l);if(!p.arte)return;snap();p.artes=p.artes||{};p.artes[l.id+':'+d.s]=now();ev('arte.enviada',{ped:p.id,lote:l.id,ref:d.s});commit();toast('Arte enviada')},
+  arteEnv:d=>{const p=pedById(d.id),l=lote(d.l);if(!p.arte)return;snap();p.artes=p.artes||{};p.artes[l.id+':'+d.s]=now();ev('arte.enviada',{ped:p.id,lote:l.id,ref:d.s});commit();toast('Arte enviada',true)},
   artePrep:d=>{const p=pedById(d.id);snap();const tinha=p.arte;p.artePrep=!p.artePrep;if(!p.artePrep)p.arte=false;ev(p.artePrep?'arte.preparada':'arte.preparo_desmarcado',{ped:p.id});if(tinha&&!p.arte)ev('arte.aprovacao_desmarcada',{ped:p.id});commit();if(p.artePrep)toast('Arte preparada')},
   disp:d=>{const p=pessoa(d.id);snap();p.disp=p.disp===false;ev(p.disp?'pessoa.disponivel':'pessoa.ausente',{pessoa:p.id});commit();toast(p.disp?`${p.nome} disponível`:`${p.nome} fora agora: tarefas foram redistribuídas`)},
   troca:d=>openSheet({t:'troca',key:d.key,f:d.f}),
@@ -4743,7 +4756,7 @@ const A={
   addProb:()=>{const n=(document.getElementById('probN')?.value||'').trim();if(!n)return;snap();state.probs.push({k:n,i:'i-duvida',alvo:[]});commit()},
   addPapel:()=>{const n=(document.getElementById('papN')?.value||'').trim();if(!n)return;snap();state.papeis[uid('c')]=n;commit()},
   ff:d=>{ui.ff=d.v;render()},
-  fz:d=>{ui.fz=d.v;render();scrollTo(0,0)},
+  fz:d=>{ui.fz=d.v;try{localStorage.setItem('fab-zona',d.v)}catch(e){}render();scrollTo(0,0)},
   escVer:d=>{ui.escVer=d.v;try{localStorage.setItem('esc-ver',d.v)}catch(e){}render()},
   fornMover:d=>{const l=lote(d.l),x=l&&(l.pers||[]).find(q=>q.id===d.s),f=fornById(d.f);if(!x||!f)return;const st=l.steps[d.s],de=fornById(st?.forn)||fornEtapa(l,sMap(rp(l))[d.s]);if(de&&de.id===f.id)return;
     const vai=()=>{A.persOnde({l:d.l,s:d.s,v:'f:'+f.id});toast(`${pedById(l.ped)?.cliente||''}: ${sMap(rp(l))[d.s]?.nome||'personalização'} agora com ${f.nome}`,true)};
@@ -4843,7 +4856,7 @@ const A={
   pedCancelar:d=>{ui.cancPed=d.id;render()},
   pedCancN:()=>{ui.cancPed=null;render()},
   pedCancOk:d=>{const p=pedById(d.id);if(!p||p.concluido)return;const mot=(document.getElementById('cancMot')?.value||'').trim().slice(0,200);snap();const T=now();
-    pararPed(p,T);p.cancelado={ts:T,por:quemNome()||usuarioAtual()?.nome||'',motivo:mot};p.concluido=T;ev('pedido.cancelado',{ped:p.id,q:pecasPed(p),dados:{motivo:mot||undefined}});registrar({tipo:'cancelado',ped:p.id,cli:p.cliente,n:0});ui.cancPed=null;commit();toast(`Pedido de ${p.cliente} cancelado`)},
+    pararPed(p,T);p.cancelado={ts:T,por:quemNome()||usuarioAtual()?.nome||'',motivo:mot};p.concluido=T;ev('pedido.cancelado',{ped:p.id,q:pecasPed(p),dados:{motivo:mot||undefined}});registrar({tipo:'cancelado',ped:p.id,cli:p.cliente,n:0});ui.cancPed=null;commit();toast(`Pedido de ${p.cliente} cancelado`,true)},
   pedReativar:d=>{const p=pedById(d.id);if(!p||!p.cancelado)return;snap();p.concluido=null;p.cancelado=null;ev('pedido.reativado',{ped:p.id});registrar({tipo:'reativado',ped:p.id,cli:p.cliente,n:0});commit();toast(`Pedido de ${p.cliente} voltou para a produção`)},
   pedEditar:d=>{const p=pedById(d.id);if(!p)return;openSheet({t:'novo',w:wDoPedido(p)})},
   wSalvarEd:()=>salvarEdicao(),
@@ -4856,6 +4869,9 @@ const A={
 };
 /* Confirmação na tela, com o verbo, para o que não tem volta. Cada regra devolve [pergunta, botão] ou nada (não precisa confirmar). */
 const CONF={
+  /* Q12: um padrão só de confirmação (antes, estes dois pediam "toque de novo") */
+  arqRm:d=>{const a=arqById(d.id),u=a?usoArq(a):[];return u.length?[`Este arquivo está em ${u.length} ${u.length===1?'pedido':'pedidos'}. Tirar mesmo assim?`,'Sim, tirar']:null},
+  segRest:()=>['Restaurar esta cópia? O que está agora no app vira uma cópia antes, para não perder nada.','Sim, restaurar'],
   desEntregar:d=>{const p=pedById(d.id);return p&&[`Desfazer a entrega do pedido ${p.id} (${p.cliente})? Ele volta para a produção.`,'Sim, desfazer']},
   entregar:d=>{const p=pedById(d.id);return p&&[`Entregar o pedido ${p.id} (${p.cliente}) ao cliente? Ele sai da produção.`,'Sim, entregar']},
   sair:()=>['Sair do app neste aparelho?','Sim, sair'],euSair:()=>['Sair do app neste aparelho?','Sim, sair'],sbSair:()=>['Sair do app neste aparelho?','Sim, sair'],
@@ -4879,7 +4895,7 @@ const CONF={
   cliApRm:()=>['Tirar este outro nome da empresa?','Sim, tirar'],apRm:()=>['Esquecer este nome aprendido?','Sim, esquecer']};
 function pedeConfirma(txt,sim,fn){ui.conf={txt,sim,fn};desenhaConf()}
 function desenhaConf(){let el=document.getElementById('confirma');if(!el){el=document.createElement('div');el.id='confirma';document.body.appendChild(el)}
-  const c=ui.conf;el.innerHTML=c?`<div class="conf-fundo" data-a="confNao"></div><div class="conf" role="alertdialog" aria-label="Confirmar"><p>${esc(c.txt)}</p><div class="acoes"><button class="big go" data-a="confSim">${ic('i-check')}${esc(c.sim)}</button><button class="big neutro" data-a="confNao">Cancelar</button></div></div>`:''}
+  const c=ui.conf;el.innerHTML=c?`<div class="conf-fundo" data-a="confNao"></div><div class="conf" role="alertdialog" aria-label="Confirmar"><p>${esc(c.txt)}</p><div class="acoes"><button class="big go" data-a="confSim">${ic('i-check')}${esc(c.sim)}</button><button class="big neutro" data-a="confNao">Cancelar</button></div></div>`:'';if(typeof histSync==='function')histSync()}
 document.addEventListener('click',e=>{const z=e.target.closest('svg.mock[data-z]');if(z){e.preventDefault();e.stopPropagation();abreZoom(z.dataset.z);return}const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const nome=b.dataset.a,f=A[nome];if(!f)return;e.preventDefault();
   if(!podeAcao(nome,b.dataset)){toast(`Isso é feito por quem é da gestão (${gestoresTxt()}).`,false);return}
   if(CONF[nome]&&!b.dataset.ok){let q=null;try{q=CONF[nome](b.dataset)}catch(err){}if(q){const d={...b.dataset,ok:'1'};return pedeConfirma(q[0],q[1],()=>{EV.acao=evUuid();A[nome](d)})}}
