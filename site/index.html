@@ -1,7 +1,7 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#16202C"><link rel="manifest" href="manifest.webmanifest">
 <title>Martins Pro</title>
-<script>window.MARTINS_SB={"url":"https://cmerriurbtrkxiemjeto.supabase.co","key":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZXJyaXVyYnRya3hpZW1qZXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NTUyMDIsImV4cCI6MjEwOTAzMTIwMn0.v3WhHteqijvEQwJYxPcut64roZc3WobO6LJda596GUQ"};window.CLIENTE={"id":"martins","nome":"Martins Pro","curto":"Martins","admins":[],"suporte":"o Nico"};window.MARTINS_V="de8b9540";</script></head><body>
+<script>window.MARTINS_SB={"url":"https://cmerriurbtrkxiemjeto.supabase.co","key":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZXJyaXVyYnRya3hpZW1qZXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NTUyMDIsImV4cCI6MjEwOTAzMTIwMn0.v3WhHteqijvEQwJYxPcut64roZc3WobO6LJda596GUQ"};window.CLIENTE={"id":"martins","nome":"Martins Pro","curto":"Martins","admins":[],"suporte":"o Nico"};window.MARTINS_V="64d4b138";</script></head><body>
 <title>Chão de Fábrica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -406,6 +406,9 @@ h2{font-size:24px;margin:0 0 10px;text-wrap:balance}
 .g-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:0 16px}
 .grow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 44px;gap:10px;align-items:center;padding:7px 0;font-size:17px;border-top:1px solid var(--grey-soft)}
 .grow b{text-align:right;font-variant-numeric:tabular-nums}
+.fat-r{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 0;font-size:17px;border-top:1px solid var(--grey-soft)}
+.fat-c{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;font-size:17px;border-top:1px solid var(--grey-soft)}
+.fat-r b,.fat-c b{text-align:right;font-variant-numeric:tabular-nums}.fat-c span small{display:block;font-size:16px;color:var(--ink2)}
 .gtrack{height:12px;background:var(--grey-soft);border-radius:3px;overflow:hidden}.gtrack i{display:block;height:100%;border-radius:0 4px 4px 0}
 .gt{width:100%;border-collapse:collapse;font-size:16px}.gt th{text-align:left;font-size:14px;color:var(--muted);padding:6px 8px;border-bottom:2px solid var(--line)}.gt td{padding:8px;border-bottom:1px solid var(--grey-soft);vertical-align:top}.gt small{color:var(--muted)}
 .tw{overflow-x:auto}
@@ -2854,6 +2857,7 @@ const FAQ=[
 {c:'gestor',q:'Onde vejo o que precisa de atenção agora?',k:'atenção problemas agora alerta gestor painel',r:['Toque em Gestor, aba Agora.','Cada problema tem um link que leva onde resolver.'],ir:'gest:agora',g:1},
 {c:'gestor',q:'Quem produziu mais?',k:'ranking produtividade quem produziu mais pontos equipe desempenho',r:['Gestor › Equipe.','Escolha o período (Hoje, 7 dias, 30 dias).','Os pontos juntam volume e tempo de cada processo. Toque em "Como os pontos são calculados".'],ir:'gest:equipe',g:1},
 {c:'gestor',q:'Quanto tempo cada pessoa levou em cada processo?',k:'tempo pessoa processo relatório performance desempenho quanto tempo levou demorou por peça',r:['Gestor › Equipe, escolha o período (Hoje, 7 dias, 30 dias).','No quadro "Tempo de cada pessoa em cada processo", toque na pessoa.','Cada processo mostra o tempo total, as peças, o tempo por peça e se foi mais rápido ou mais devagar que o previsto.'],ir:'gest:equipe',g:1},
+{c:'gestor',q:'Quanto a fábrica faturou no mês? Está acima ou abaixo da média?',k:'faturamento faturou faturado vendas vendeu venda valor dinheiro mês média conta azul quanto vendemos cliente clientes que mais compraram',r:['Toque em Gestor, aba Resultados, e desça até o bloco Faturamento.','Escolha Este mês ou Mês passado. Aparece o total, quantas vendas e se ficou acima ou abaixo da média dos 12 meses anteriores.','Embaixo: os últimos 13 meses e quem mais comprou no mês.','Os números vêm do Conta Azul (vendas aprovadas e faturadas) e são atualizados toda madrugada. Só a gestão vê.']},
 {c:'gestor',q:'Quais pedidos vão atrasar?',k:'atrasos atrasar prazo pedidos atrasados entrega',r:['Gestor › Atrasos: os pedidos do mais apertado para o menos.'],ir:'gest:atrasos',g:1},
 {c:'gestor',q:'A equipe está seguindo o sistema?',k:'organização seguem sistema manual ajustes',r:['Gestor › Organização: mostra quanto foi decidido à mão e o que ajustar no cadastro.'],ir:'gest:org',g:1},
 /* cadastros */
@@ -4079,6 +4083,30 @@ function gResultados(per){const de=isoDia(now()-(per-1)*DIA),ate=isoDia(now());
    +'<div class="card"><h2>Compras</h2><div class="kpis">'+k(C.itens_em_falta??0,'itens em falta')+k(C.horas_medio_ate_comprar==null?'—':nf(C.horas_medio_ate_comprar,1)+' h','da falta até comprar')+'</div></div>'
    +(desf?'<div class="card"><h2>Onde a equipe mais desfaz</h2><p class="dica" style="margin:-4px 0 8px">Ajuda a achar o que confunde na tela.</p>'+desf+'</div>':'')
    +(uso?'<div class="card"><h2>Telas mais usadas</h2>'+uso+'</div>':'')}
+/* Faturamento: vendas aprovadas e faturadas no Conta Azul (migração 010), comparadas com a média mensal dos 12 meses anteriores. */
+const MES_C=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],MES_L=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const milTxt=v=>v>=1000?'R$ '+nf(v/1000,v>=100000?0:1)+' mil':brl(v);
+function gFaturamento(){if(!(typeof SB_CFG!=='undefined'&&SB_CFG&&NV.db&&NV.db.ev&&NV.db.ev.faturamento))return '';
+  const passado=ui.fatMes==='passado',h=new Date(now()),ini=new Date(h.getFullYear(),h.getMonth()-(passado?1:0),1),fim=passado?new Date(h.getFullYear(),h.getMonth(),0):h;
+  const de=isoDia(ini.getTime()),ate=isoDia(fim.getTime()),F0=ui.fat,mesmo=F0&&F0.de===de&&F0.ate===ate;
+  if(!mesmo||(!F0.busy&&now()-F0.ts>120000)){ui.fat={de,ate,ts:now(),busy:true,d:mesmo?F0.d:null};
+    NV.db.ev.faturamento(de,ate).then(d=>{ui.fat={de,ate,ts:now(),d,nada:!d||d.vazio}}).catch(e=>{ui.fat={de,ate,ts:now(),err:e&&e.code==='sem-fat'?'sem':'rede'}}).finally(()=>{if(ui.tela==='gestor'&&ui.gt==='res'&&!ui.sheet)render()})}
+  const F=ui.fat,d=F&&F.d;if(F&&(F.nada||F.err==='sem'))return '';
+  const nomeMes=MES_L[ini.getMonth()],chips='<div class="linha-dep" style="margin:0 0 12px"><button class="depc" data-a="fatMes" data-v="atual" aria-pressed="'+!passado+'">Este mês</button><button class="depc" data-a="fatMes" data-v="passado" aria-pressed="'+passado+'">Mês passado</button></div>';
+  const card=x=>'<div class="card" id="Faturamento"><h2>Faturamento</h2>'+chips+x+'</div>';
+  if(!d)return card('<p class="dica" style="margin:0">'+(F&&F.err?'Não consegui buscar o faturamento agora. Confira a internet e tente de novo.':'Buscando o faturamento…')+'</p>');
+  const tot=+d.total||0,med=+d.media_mensal||0,n=d.vendas||0,pct=med?Math.round((tot/med-1)*100):null;
+  const frase=!med?'Ainda não há 12 meses de vendas para comparar.':passado?(pct>=0?'<b class="ok">'+pct+'% acima</b>':'<b class="ruim">'+(-pct)+'% abaixo</b>')+' da média dos 12 meses anteriores ('+brl(med)+' por mês).'
+    :'Até hoje, dia '+h.getDate()+', já é <b>'+Math.round(tot/med*100)+'%</b> da média de um mês inteiro ('+brl(med)+').';
+  const M=d.meses||[],mx=Math.max(1,...M.map(m=>+m.total||0));
+  const meses=M.map(m=>{const [a,mm]=m.mes.split('-'),v=+m.total||0;return '<div class="fat-r"><span>'+MES_C[+mm-1]+'/'+a.slice(2)+'</span>'+barra(v,mx,!passado&&m.mes===de.slice(0,7)?'var(--blue)':med&&v<med?'var(--atn)':'var(--go)')+'<b>'+milTxt(v)+'</b></div>'}).join('');
+  const cli=(d.clientes||[]).map(c=>'<div class="fat-c"><span>'+esc(c.nome||'Sem nome')+'<small>'+c.vendas+' '+(c.vendas===1?'venda':'vendas')+'</small></span><b>'+brl(c.total)+'</b></div>').join('');
+  const at=d.atualizado?new Date(d.atualizado).getTime():null;
+  return card('<div class="kpis">'+'<div class="kpi"><b>'+brl(tot)+'</b><span>faturado em '+nomeMes+(passado?'':' até hoje')+'</span></div><div class="kpi"><b>'+n+'</b><span>'+(n===1?'venda':'vendas')+'</span></div></div>'
+    +'<p style="margin:0 0 12px;font-size:17px">'+frase+'</p>'
+    +'<div class="rotulo">Últimos 13 meses</div>'+meses+'<p class="dica" style="margin:6px 0 12px">Em amarelo: mês abaixo da média.'+(passado?'':' Em azul: este mês, ainda em andamento.')+'</p>'
+    +(cli?'<div class="rotulo">Quem mais comprou em '+nomeMes+'</div>'+cli:'<p class="dica">Nenhuma venda em '+nomeMes+' ainda.</p>')
+    +'<p class="dica" style="margin:10px 0 0">Vendas aprovadas e faturadas no Conta Azul, pela data da venda. Orçamentos e cancelados não entram.'+(at?' Atualizado em '+fD(at)+' (toda madrugada).':'')+'</p>')}
 function gAtrasos(desde){const at=state.pedidos.filter(p=>!p.concluido).map(p=>({p,f:info(p)})).sort((a,b)=>a.f.folga-b.f.folga);
   const ent=state.pedidos.filter(p=>p.concluido&&!p.cancelado&&p.concluido>=desde),late=ent.filter(p=>p.concluido>p.entrega+12*H);const esc_=tarefasEsc().filter(t=>t.late);
   return `<div class="kpis">${[[ent.length,'pedidos entregues'],[pctTxt(ent.length?(ent.length-late.length)/ent.length:null),'entregues no prazo'],[at.filter(x=>x.f.u==='crit').length,'vão atrasar'],[at.filter(x=>x.f.u==='warn').length,'prazo apertado'],[esc_.length,'terceirizados atrasados']].map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('')}</div>
@@ -4116,7 +4144,7 @@ function vGestor(){const aba=(ui.gt==='ciclo'&&!modOn('ciclo')?'agora':ui.gt)||'
   return `<div class="topo"><h1>Painel do gestor</h1>${sino()}</div>
   <div class="zonas g-abas">${abas.map(([k,n,i])=>`<button class="zona" data-a="gt" data-v="${k}" aria-pressed="${aba===k}">${ic(i)}<span>${n}</span></button>`).join('')}</div>
   ${aba==='agora'||aba==='ciclo'?'':`<div class="linha-dep" style="margin:0 0 14px">${PERIODOS.map(([d,n])=>`<button class="depc" data-a="gp" data-v="${d}" aria-pressed="${per===d}">${n}</button>`).join('')}</div>`}
-  ${aba==='agora'?gAgora():aba==='res'?gResultados(per):aba==='ciclo'?gCiclo():aba==='equipe'?gEquipe(desde):aba==='atrasos'?gAtrasos(desde):gOrg(desde)}
+  ${aba==='agora'?gAgora():aba==='res'?gResultados(per)+gFaturamento():aba==='ciclo'?gCiclo():aba==='equipe'?gEquipe(desde):aba==='atrasos'?gAtrasos(desde):gOrg(desde)}
   <p class="dica">Os números juntam o que foi registrado em todos os aparelhos.</p>`}
 
 /* ================= render ================= */
@@ -4207,6 +4235,7 @@ const A={
   gt:d=>{ui.gt=d.v;render();scrollTo(0,0)},
   gc:d=>{ui.gc=d.v==='tudo'?'tudo':+d.v;render()},
   gp:d=>{ui.gp=+d.v;render()},
+  fatMes:d=>{ui.fatMes=d.v;render()},
   mJunto:d=>{const e=ui.sheet;e.junto=e.junto||[];const i=e.junto.indexOf(d.v);i<0?e.junto.push(d.v):e.junto.splice(i,1);render()},
   mSel:d=>{ui.sheet.sel=d.v;ui.sheet.p=null;ui.sheet.junto=[];render();document.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'})},
   mRes:d=>{snap();{const l=lote(d.l);registrar({tipo:'reserva',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:sMap(rp(l))[d.s].nome})}state.reservas=state.reservas||{};Object.keys(state.reservas).forEach(k=>{const r=state.reservas[k];if(r.l===d.l&&r.s===d.s)delete state.reservas[k]});state.reservas[d.m]={l:d.l,s:d.s,p:d.p||''};ui.sheet.sel=null;commit();toast(`Reservado para ${unidade(d.m)?.nome}`)},
@@ -4940,6 +4969,8 @@ function sbDB(c){const T='docs';
   const ev={envia:async rows=>{const {error}=await c.from('eventos').upsert(rows,{onConflict:'id',ignoreDuplicates:true});if(error)throw semEv(error)||error},
     uso:async itens=>{const {error}=await c.rpc('uso_conta',{itens});if(error)throw semEv(error)||error},
     metricas:async(de,ate)=>{const {data,error}=await c.rpc('metricas',{de,ate});if(error)throw semEv(error)||error;return data},
+    /* Faturamento (migração 010): vendas do Conta Azul, só gestão. Sem a função no banco, o bloco não aparece. */
+    faturamento:async(de,ate)=>{const {data,error}=await c.rpc('faturamento',{de,ate});if(error)throw (/42883|PGRST202/.test(String(error.code))?{code:'sem-fat'}:error);return data},
     doPedido:async ped=>{const {data,error}=await c.from('eventos').select('*').eq('ped',ped).order('ts');if(error)throw semEv(error)||error;return data||[]}};
   const lixIdx=async()=>{const out=[];for(let de=0;;de+=1000){const {data,error}=await c.from(T).select('path,ts:data->ts').eq('col','lixeira').order('path').range(de,de+999);if(error)falha(error);out.push(...data);if(data.length<1000)break}return out.map(x=>({id:x.path.slice(x.path.indexOf('/')+1),ts:+x.ts||0}))};
   return {doc,collection,ev,lixIdx,sinal:{sinais,ultimo,porPaths,todos,ouvir:ouvirSinal},arq:{sobe,apaga,url:n=>SB_CFG.url+'/storage/v1/object/public/'+BK+'/'+n.split('/').map(encodeURIComponent).join('/')}}}

@@ -662,3 +662,16 @@ O tempo de cada parte conta para quem fez, no Painel.
 - Desfaz as mesmas ações de antes: Começar, Terminou, Comprei, Chegou, Levei e Feito. Entregar, cancelar e tirar continuam com a pergunta de confirmação e com o caminho próprio de voltar (ex.: "Desfazer a entrega").
 - Se outra pessoa mexeu no mesmo pedido depois, o app não desfaz e avisa.
 - Nas outras telas, o botão ↶ Desfazer continua no canto de baixo.
+---
+
+## Faturamento do Conta Azul no Painel › Resultados (só gestão)
+
+**O que mudou:**
+- No **Painel › Resultados**, no fim da tela, apareceu o bloco **Faturamento**.
+- Escolha **Este mês** ou **Mês passado**. Aparece quanto foi faturado, quantas vendas e se o mês ficou **acima ou abaixo da média** dos 12 meses anteriores.
+- Embaixo: os **últimos 13 meses** (em amarelo, os abaixo da média) e **quem mais comprou** no mês.
+- Os números vêm do **Conta Azul**: vendas aprovadas e faturadas, pela data da venda. Orçamentos e cancelados não entram. Atualiza toda madrugada.
+
+**O que NÃO mudou:**
+- Nada mudou de lugar. Os outros quadros de Resultados continuam iguais e na mesma ordem.
+- Só quem é da gestão vê.
