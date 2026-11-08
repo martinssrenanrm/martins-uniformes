@@ -748,3 +748,17 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 - Aparece só para quem pode corrigir a produção (normalmente a gestão).
 
 **O que NÃO mudou:** os botões **Corrigir** de cada etapa continuam no mesmo lugar.
+
+## Faturamento por tipo de cliente
+
+**Para quem:** gestão (Gestor › Resultados).
+
+**O que mudou:** no quadro **Faturamento**, logo abaixo da comparação com a média, aparece **Por tipo de cliente**: quanto cada tipo comprou no mês, em reais, em % do total e em vendas.
+- Na Martins os tipos são **Escola** e **Empresa**.
+- **Sem tipo** são os clientes que ainda não foram marcados. A soma das linhas é sempre o total do mês.
+- Para marcar, toque em **Marcar o tipo de… clientes** e, em cada cliente, toque no tipo dele. Marca uma vez e vale para as vendas antigas e as próximas.
+- A lista de tipos fica em **Cadastros › Ajustes › Tipos de cliente**.
+
+**O que NÃO mudou:** o total, a média, os 13 meses e quem mais comprou continuam iguais e no mesmo lugar. Nenhum botão mudou de lugar.
+
+**Risco de estranhamento:** baixo. Só acrescenta um bloco num quadro que só a gestão vê.

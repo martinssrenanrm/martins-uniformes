@@ -124,3 +124,11 @@ Varredura em 360×640 (Hoje, Máquinas, Fora, Escritório, Pedidos, Pedido, folh
 |---|---|---|---|---|---|---|
 | Hoje (gestão) | ✅ "8 coisas para resolver" | ✅ 1º item com botão azul, sem rolar (teste) | ✅ 48px, 360px sem corte (teste) | ✅ | ✅ | ✅ |
 | Hoje (Escritório) | ✅ tarefas dela primeiro | ✅ botão da própria tarefa | ✅ | ✅ (mesmo aviso do Escritório) | ✅ Desfazer | 🔜 Onda 3 de vocabulário ("vias") |
+
+### Faturamento por tipo de cliente (função nova, 08/11/2026)
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Resultados › Faturamento › Por tipo de cliente | ✅ "Por tipo de cliente em outubro" | ✅ botão azul "Marcar o tipo de N clientes" logo abaixo | ✅ 52px, 360px sem corte (teste) | ✅ a linha "Sem tipo" diminui | n/a (só leitura) | ✅ "Sem tipo" explicado embaixo |
+| Folha "Tipo de cliente" | ✅ título + "Marque uma vez" | ✅ um botão por tipo em cada cliente | ✅ 56px, 8px entre botões; a lista não pula ao marcar (teste) | ✅ botão fica azul com ✓ e aviso no alto | ✅ Desfazer no aviso; trocar é tocar no outro tipo | ✅ |
+| Ajustes › Tipos de cliente | ✅ frase diz para que serve | ✅ Adicionar | ✅ mesmo padrão de Motivos de conserto | ✅ "Tipo … adicionado" | ✅ Tirar pede confirmação e diz quem fica sem tipo | ✅ |
+Prints: `docs/ux/prints/tipo-cliente/`. Antes: o quadro Faturamento sem o bloco (prints da publicação de 06/11).
