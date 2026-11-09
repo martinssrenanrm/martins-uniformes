@@ -343,6 +343,16 @@ h2{font-size:24px;margin:0 0 10px;text-wrap:balance}
 .fitem b{display:block;font-size:18px}
 .fitem span{font-size:16px;color:var(--ink2)}
 .fitem .late{color:var(--red);font-weight:700}
+.terc-at{border-left:6px solid var(--red);margin-bottom:14px}
+.terc-at h2{display:flex;align-items:center;gap:8px;color:var(--red)}
+.ta-item{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;border-top:2px solid var(--grey-soft);padding:12px 0}
+.ta-item .mbtn{justify-self:start;min-width:160px}
+@media(min-width:600px){.ta-item{grid-template-columns:minmax(0,1fr) auto;align-items:center}.ta-item .mbtn{justify-self:end}}
+.ta-item b{display:block;font-size:19px}
+.ta-item span{display:block;font-size:16px;color:var(--ink2)}
+.ta-item .late{color:var(--red);font-weight:700;font-size:17px}
+.ta-item .mbtn{min-height:48px}
+.alrt .late{display:block;color:var(--red);font-weight:700}
 .esc{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px}
 .escp{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px}
 .escp-h{display:flex;align-items:center;gap:12px;margin-bottom:6px}
@@ -1474,7 +1484,7 @@ const GOLA={'polo-ams':'Gola polo','polo-vie':'Gola polo','cam-mc':'Gola ribana'
 const ajustaGola=p=>{if(GOLA[p.id]&&!p.golaItem){p.golaItem=GOLA[p.id];p.aviam=p.aviam.filter(a=>!/^(Gola ribana|Ribana)$/.test(a[0]));if(p.id==='blusa')p.aviam.push(['Ribana punho e barra','un',1])}};
 PRODUTOS0.forEach(ajustaGola);
 const ESTOQUE={'Gola polo Marinho':260,'Gola polo Branca':120,'Gola polo Cinza':150,'Gola ribana Branca':300,'Gola ribana Preta':150,'Piquet Marinho':140,'Piquet Branca':60,'Piquet Verde':10,'Piquet Cinza':80,'Malha dry Branca':150,'Malha dry Cinza':70,'Helanca Preta':240,'Helanca Marinho':20,'Helanca Cinza':150,'Botão':2200,'Gola ribana':900,'Etiqueta':3000,'Elástico':420,'Cordão':500,'Gabardine Branca':200,'Brim Marinho':220,'Zíper':300,'Entretela':60,'Ribana':500,'Malha PV Branca':300,'Moletom Cinza':90,'Suplex Preta':60};
-const PAR={pecasCone:30,pecasFio:30,parado:20,margem:5,jornada:480,efic:0.85,fila:0.25,leadCompra:5};
+const PAR={pecasCone:30,pecasFio:30,parado:20,margem:5,jornada:480,efic:0.85,fila:0.25,leadCompra:5,tercUteis:1};
 const PROBS=[{k:'Gola torta',i:'i-gola',alvo:['gola','prepgola','cobregola']},{k:'Etiqueta errada',i:'i-etiqueta',alvo:['etiqueta']},{k:'Estampa ou bordado com defeito',i:'i-mancha',alvo:['silk','subl','transfer','bordado','bordmanga']},{k:'Costura torta',i:'i-costura',alvo:[]},{k:'Tamanho trocado',i:'i-regua',alvo:[]},{k:'Defeito no tecido',i:'i-furo',alvo:[]},{k:'Outro problema',i:'i-duvida',alvo:[]}];
 
 /* ================= estado ================= */
@@ -1514,6 +1524,13 @@ const FAMILIA_PERS=[['estampa','estamparia']];
 const tiposIrmaos=tid=>{const t0=tipo(tid);if(!t0)return [];const fam=(FAMILIA_PERS.find(f=>f.includes(tid))||[]);return state.tipos.filter(t=>faseG(t.grupo)==='pers'&&(t.id===tid||fam.includes(t.id)||semAc(t.nome)===semAc(t0.nome)))};
 const isExt=s=>!!(s&&(s.terc||tipo(s.posto).externo));
 const prazoExt=s=>(s&&s.terc&&fornById(s.terc)?.prazo)||fornDe(s.posto)[0]?.prazo||3;
+/* Prazo do terceirizado: conta a partir do dia em que saiu. Padrão em dias úteis (expediente e feriados da fábrica); params.tercUteis=0 conta dias corridos. Uma regra só para Hoje, Escritório, Fora e Gestor. */
+const tercUteis=()=>(state.params?.tercUteis??PAR.tercUteis)!==0;
+const prazoTercTxt=n=>`${n} ${tercUteis()?(n>1?'dias úteis':'dia útil'):(n>1?'dias':'dia')}`;
+const atrasoTerc=(saiu,prazo)=>{const n=prazo||3;if(!saiu)return 0;if(!tercUteis())return Math.max(0,diasDesde(saiu)-n);const v=addWD(saiu,n);return now()>v?Math.max(1,-wdUntil(v)):0};
+function tercAtrasados(){const L=[];state.lotes.forEach(l=>{const ped=pedById(l.ped);if(!ped||ped.concluido||ped.cancelado)return;const p=rp(l),M=sMap(p);
+  Object.entries(l.steps).forEach(([sid,x])=>{if(x.st!=='fora')return;const s=M[sid]||{id:sid,nome:'Personalização (tirada do pedido)'},f=fornById(x.forn)||(M[sid]?fornEtapa(l,M[sid]):null),d=atrasoTerc(x.saiu,f?.prazo);if(d>0)L.push({l,ped,s,x,f,d})})});
+  return L.sort((a,b)=>b.d-a.d||a.x.saiu-b.x.saiu)}
 function unidades(){return state.tipos.filter(t=>!t.externo).flatMap(t=>Array.from({length:t.qtd||0},(_,k)=>({id:`${t.id}-${k+1}`,tipo:t.id,nome:t.qtd>1?`${t.nome} ${k+1}`:t.nome})))}
 const unidade=id=>unidades().find(u=>u.id===id);
 const sMap=p=>Object.fromEntries(p.steps.map(s=>[s.id,s]));
@@ -1657,7 +1674,7 @@ function tarefasEsc(){const out=[];
     lotesDe(ped.id).filter(l=>!l.rework).forEach(l=>rp(l).steps.filter(z=>z.pers&&!done(l,z.id)&&!arteOk(ped,l,z)).forEach(z=>{if(!arteAprovada(ped))return;const fo=isExt(z)?fornEtapa(l,z):null;
       T({f:'arte_env',i:'i-arte',t:`${tN('arte_env','Enviar arte')}: ${z.nome}`,sub:`${prod(l.prod).nome} ${modeloTxt(l)} → ${fo?fo.nome:tipo(z.posto).nome}`,a:'arteEnv',l:l.id,s:z.id})}));
     lotesDe(ped.id).forEach(l=>{const p=rp(l);p.steps.filter(isExt).forEach(z=>{const x=stOf(l,z.id),fo=fornById(x.forn)||fornEtapa(l,z);
-      if(x.st==='fora'){const d=diasDesde(x.saiu);T({f:'levar',forn:fo,i:'i-caminhao',t:`Buscar no ${fo?.nome||tNome(z.posto)}`,sub:`${z.nome} · ${qtdEf(l)} peças · lá ${haQuanto(x.saiu)}`,late:d>(fo?.prazo||3),a:'buscou',l:l.id,s:z.id})}
+      if(x.st==='fora'){const d=atrasoTerc(x.saiu,fo?.prazo);T({f:'levar',forn:fo,i:'i-caminhao',t:`Buscar no ${fo?.nome||tNome(z.posto)}`,sub:`${z.nome} · ${qtdEf(l)} peças · lá ${haQuanto(x.saiu)}`,late:d>0,atraso:d,a:'buscou',l:l.id,s:z.id})}
       else if(ready(l,z,ped))T({f:'levar',forn:fo,i:'i-caminhao',t:`Levar para ${fo?.nome||tNome(z.posto)}`,sub:`${z.nome} · ${qtdEf(l)} peças`,a:'levei',l:l.id,s:z.id})})});
     lotesDe(ped.id).forEach(l=>rp(l).steps.filter(isEsc).forEach(z=>{if(ready(l,z,ped))T({f:z.fEsc||'comprar',i:'i-lista',t:z.nome,sub:`${nomePeca(l)} ${modeloTxt(l)} · ${qtdEf(l)} peças${z.obs?' · '+z.obs:''}`,a:'etEscFeito',l:l.id,s:z.id})}));
     if(!inf.ab.length)T({f:'entregar',i:'i-caminhao',t:tN('entregar','Entregar ao cliente'),sub:`${sum(lotesDe(ped.id).filter(l=>!l.rework).map(l=>l.qtd))} peças prontas`,a:'entregar'});
@@ -1965,7 +1982,7 @@ function vFabrica(){const P=plano(),esc_=tarefasEsc();
     return `<section class="grupo" id="g-${g.id}"><h2 class="grupo-h">${ic(g.i)}${g.nome}</h2>
       ${on.length?`<div class="grid">${on.map(u=>{const esp=vistos.has(u.tipo)?0:(P.espera[u.tipo]||[]).length;vistos.add(u.tipo);return maqTile(u,P,esp)}).join('')}</div>`:''}
       ${off.length?`<div class="paradas"><span class="t">Paradas, sem trabalho:</span>${off.map(u=>`<button class="pm" data-a="maq" data-m="${u.id}">${ic(tipo(u.tipo).i)}${esc(u.nome)}</button>`).join('')}</div>`:''}</section>`}).join('')}`:''}
-  ${z==='fora'?`<section class="grupo" id="g-fora"><p class="sub-l">Só a parte que saiu fica esperando. O resto continua.</p>
+  ${z==='fora'?`<section class="grupo" id="g-fora">${cardTercAtrasados()}<p class="sub-l">Só a parte que saiu fica esperando. O resto continua.</p>
     <div class="forns">${state.forn.map(f=>fornCard(f,esc_)).join('')}</div></section>`:''}
   ${z==='esc'?vEscritorio(esc_):''}<div class="fim-ajuda"><button class="x azul" data-a="ajuda" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px">${ic('i-duvida')}Como usar o app</button></div>`}
 /* ================= HOJE (Onda UX 2, 11/2026) =================
@@ -2022,7 +2039,8 @@ function filaHoje(P,esc_,pid,g){const F=[],vistos=new Set(),add=x=>{F.push(x)};
   /* vence esta semana e está abaixo da metade (sugestão da Onda 3), se ainda não apareceu */
   {const fim=fimSemana();ativos.filter(x=>!vistos.has(x.p.id)&&x.p.entrega<=fim&&x.i.ab.length&&(x.i.prog||0)<.5).forEach(x=>pedRow(x,'warn',`${x.p.cliente} vence esta semana`,78))}
   /* prestador atrasado */
-  esc_.filter(t=>t.a==='buscou'&&t.late).forEach(t=>add({k:'late:'+t.key,sev:'warn',peso:76,i:'i-caminhao',txt:`${tarTxt(t)}: passou do prazo`,sub:t.ped.cliente,a:'hojeIr',d:{v:'fora'},bt:'Ver'}));
+  esc_.filter(t=>t.a==='buscou'&&t.late).forEach(t=>{const txt=`${tarTxt(t)}: passou do prazo`,sub=`${t.ped.cliente} · ${atrasoTxt(t.atraso||1)}`,ja=F.find(x=>x.k==='tar:'+t.key);
+    if(ja)Object.assign(ja,{sev:ja.sev==='crit'?'crit':'warn',txt,sub});else add({k:'late:'+t.key,sev:'warn',peso:76,i:'i-caminhao',txt,sub,a:'buscou',d:{id:t.ped.id,l:t.l,s:t.s},bt:'Chegou'})});
   /* tarefa do escritório que trava o corte de pedido em risco (gestão; o Escritório já vê as dele) */
   if(g){const trava=esc_.filter(t=>['vias','arte_prep','arte_aprov','conferir'].includes(t.f)&&['crit','warn'].includes(t.inf.u)).sort((a,b)=>a.inf.score-b.inf.score);
     if(trava.length){const t=trava[0];add({k:'trava',sev:'warn',peso:74,i:'i-vias',txt:`${tarTxt(t)}: o corte espera`,sub:`${t.ped.cliente}${t.resp?' · com '+pNome(t.resp):''}${trava.length>1?` · e mais ${trava.length-1}`:''}`,a:'pedido',d:{id:t.ped.id},bt:'Abrir'})}}
@@ -2124,12 +2142,16 @@ function tarRow(t){const lab={etEscFeito:'Feito',pedEditar:'Completar',insumos:'
   return `<div class="tar2"><button class="tar-t" data-a="pedido" data-id="${t.ped.id}" title="Abrir o pedido"><b>${esc(tarTxt(t))}</b><span>${esc(t.ped.cliente)}${t.sub?' · '+esc(t.sub):''}</span>${t.late?'<span style="display:block;color:var(--red);font-weight:700">Passou do prazo do fornecedor</span>':''}<span class="ver-p">Ver pedido ›</span></button>
   <div class="tar-pe"><button class="resp2${t.como==='reserva'?' reserva':''}" data-a="troca" data-key="${esc(t.key)}" data-f="${t.f}" title="${quem?'Quem faz: '+esc(quem):'Escolher quem faz'}" aria-label="${quem?'Quem faz: '+esc(quem)+'. Toque para trocar':'Escolher quem faz'}">${t.resp?av(t.resp,'s'):ic('i-pessoas')}</button>${t.como==='reserva'?'<small class="tar-res">ninguém tem esta função</small>':''}
   ${['comprei','chegou'].includes(t.a)?insBts(t.ped.id,t.k,t.ped.materiais[t.k]):`<button class="mbtn ${['buscou','chegou','entregar'].includes(t.a)?'go':''}" data-a="${t.a}" data-id="${t.ped.id}" data-k="${t.k??''}" data-l="${t.l||''}" data-s="${t.s||''}">${lab}</button>`}</div></div>`}
+/* Lista para cobrar o terceirizado: o que passou do prazo de volta, do mais atrasado. */
+const atrasoTxt=d=>`${d} ${tercUteis()?(d>1?'dias úteis':'dia útil'):(d>1?'dias':'dia')} de atraso`;
+function cardTercAtrasados(tit='Passaram do prazo'){const L=tercAtrasados();if(!L.length)return '';
+  return `<div class="card terc-at" id="TercAtras"><h2>${ic('i-alerta')}${tit} (${L.length})</h2>${L.map(o=>`<div class="ta-item"><button class="tar-t" data-a="pedido" data-id="${esc(o.ped.id)}" title="Abrir o pedido"><b>${esc(o.f?.nome||tNome(o.s.posto)||'Terceirizado')}</b><span>Pedido ${esc(o.ped.id)} · ${esc(o.ped.cliente)}</span><span>${esc(o.s.nome)} · ${qtdEf(o.l)} peças</span><span>Está lá desde ${fD(o.x.saiu)}</span><span class="late">${atrasoTxt(o.d)}</span><span class="ver-p">Ver pedido ›</span></button><button class="mbtn go" data-a="buscou" data-l="${esc(o.l.id)}" data-s="${esc(o.s.id)}">Chegou</button></div>`).join('')}</div>`}
 function fornCard(f,esc_){const fora=[];state.lotes.forEach(l=>{const ped=pedById(l.ped);if(!ped||ped.concluido||ped.cancelado)return;const p=rp(l);Object.entries(l.steps).forEach(([sid,x])=>{if(x.st==='fora'&&x.forn===f.id)fora.push({l,p,s:sMap(p)[sid]||{id:sid,nome:'Personalização (tirada do pedido)'},x,ped})})});
   const lev=esc_.filter(t=>t.a==='levei'&&(fornById(stOf(lote(t.l),t.s).forn)||fornEtapa(lote(t.l),sMap(rp(lote(t.l)))[t.s]))?.id===f.id);
   const outros=state.forn.filter(x=>x.id!==f.id&&x.servico===f.servico);
   const mover=(l,sid)=>outros.length&&(l.pers||[]).some(q=>q.id===sid)?`<span class="f-drag" data-drag="${esc(l.id+'|'+sid)}" data-serv="${esc(f.servico)}" aria-hidden="true" title="Arraste para outro fornecedor">⠿</span>${selOp('fornMoverSel',`data-l="${esc(l.id)}" data-s="${esc(sid)}"`,null,outros.map(x=>[x.id,x.nome]),'Mudar para…')}`:'';
-  return `<div class="forn" data-forn="${esc(f.id)}" data-serv="${esc(f.servico)}"><div class="forn-h"><span class="m-ic">${ic(tipo(f.servico).i)}</span><div><b>${esc(f.nome)}</b><span>${esc(tNome(f.servico))} · prazo ${f.prazo} ${f.prazo>1?'dias':'dia'}</span></div></div>
-    ${fora.map(o=>{const d=diasDesde(o.x.saiu);return `<div class="fitem">${loteSvg(o.l)}<button class="tar-t" data-a="pedido" data-id="${o.ped.id}" title="Abrir o pedido"><b>${esc(o.s.nome)} · ${qtdEf(o.l)} peças</b><span>${esc(o.ped.cliente)} · lá ${haQuanto(o.x.saiu)}</span>${d>f.prazo?'<span class="late" style="display:block">Passou do prazo</span>':''}<span class="ver-p">Ver pedido ›</span></button><button class="mbtn go" data-a="buscou" data-l="${o.l.id}" data-s="${o.s.id}">Chegou</button><div class="f-mov">${mover(o.l,o.s.id)}</div></div>`}).join('')||'<div class="vazio-s">Nada lá agora</div>'}
+  return `<div class="forn" data-forn="${esc(f.id)}" data-serv="${esc(f.servico)}"><div class="forn-h"><span class="m-ic">${ic(tipo(f.servico).i)}</span><div><b>${esc(f.nome)}</b><span>${esc(tNome(f.servico))} · prazo ${prazoTercTxt(f.prazo)}</span></div></div>
+    ${fora.map(o=>{const d=atrasoTerc(o.x.saiu,f.prazo);return `<div class="fitem">${loteSvg(o.l)}<button class="tar-t" data-a="pedido" data-id="${o.ped.id}" title="Abrir o pedido"><b>${esc(o.s.nome)} · ${qtdEf(o.l)} peças</b><span>${esc(o.ped.cliente)} · lá ${haQuanto(o.x.saiu)}</span>${d>0?'<span class="late" style="display:block">Passou do prazo</span>':''}<span class="ver-p">Ver pedido ›</span></button><button class="mbtn go" data-a="buscou" data-l="${o.l.id}" data-s="${o.s.id}">Chegou</button><div class="f-mov">${mover(o.l,o.s.id)}</div></div>`}).join('')||'<div class="vazio-s">Nada lá agora</div>'}
     ${lev.length?`<div class="f-lev"><div class="vazio-s" style="color:var(--atn-ink);font-weight:700">${lev.length} ${lev.length>1?'pacotes prontos':'pacote pronto'} para levar</div>${lev.map(t=>{const l=lote(t.l);return `<div class="fitem lev">${loteSvg(l)}<button class="tar-t" data-a="pedido" data-id="${t.ped.id}"><b>${esc(t.sub||'')}</b><span>${esc(t.ped.cliente)} · para levar</span></button><div class="f-bts"><button class="mbtn" data-a="levei" data-id="${t.ped.id}" data-l="${t.l}" data-s="${t.s}">Levei</button><button class="mbtn go" data-a="levouVoltou" data-l="${t.l}" data-s="${t.s}" title="Já foi e voltou do fornecedor">Chegou</button></div><div class="f-mov">${mover(l,t.s)}</div></div>`}).join('')}</div>`:''}</div>`}
 const ehSemp=(u,P)=>!P.uso[u.id]&&!P.plan[u.id]&&!!(P.semPessoa[u.tipo]||[])[P.us.filter(x=>x.tipo===u.tipo&&!P.uso[x.id]&&!P.plan[x.id]).findIndex(x=>x.id===u.id)];
 function tileTempo(t,u){const x=t.x,sit=situacao(),a=heAtiva(x),tm=`<span data-tl="${t.l.id}" data-ts="${t.s.id}"${t.pai?` data-tp="${x.id}"`:''}>${fDur(tempoUtil(x))}</span>`;
@@ -2340,7 +2362,7 @@ function fluxo(p,key,l,ped){const{pos,w,h}=layout(p),m=sMap(p);const sel=ui.fx&&
     else if(isExt(s)){cls='f-ext';st=`${ic('i-caminhao')}Terceirizado`}
     else{const f=fase(p,s);cls='f-'+f;st=f==='antes'?`${ic('i-adiantar')}Pode adiantar`:f==='pers'?`${ic('i-estampa')}Personalização`:s.fecha?`${ic('i-cadeado')}Fecha a peça`:'Depois da personalização'}
     return `<button class="nd ${cls} ${sel===s.id?'sel':''} ${rel&&!rel.has(s.id)?'dim':''}" style="left:${q.x}px;top:${q.y}px;width:${NW}px;height:${NH}px" data-a="fxSel" data-k="${key}" data-s="${s.id}">
-      <span class="nd-h">${ic(s.icon||PICON[s.posto])}<span>${esc(s.nome)}</span></span><span class="nd-m">${s.virt?`Escritório · ≈ ${minTxt(state.tEsc[s.f]||0)}`:esc(tNome(s.posto))+(l?` · ≈ ${durEt(s,qtdEf(l))}`:isExt(s)?` · ${fornDe(s.posto)[0]?.prazo||3} dias`:` · ${tMin(s.min)} por peça`)}</span><span class="nd-s">${st}</span></button>`}).join('');
+      <span class="nd-h">${ic(s.icon||PICON[s.posto])}<span>${esc(s.nome)}</span></span><span class="nd-m">${s.virt?`Escritório · ≈ ${minTxt(state.tEsc[s.f]||0)}`:esc(tNome(s.posto))+(l?` · ≈ ${durEt(s,qtdEf(l))}`:isExt(s)?` · ${prazoTercTxt(fornDe(s.posto)[0]?.prazo||3)}`:` · ${tMin(s.min)} por peça`)}</span><span class="nd-s">${st}</span></button>`}).join('');
   return `<div class="fx-wrap" data-k="${key}"><div class="fx" style="width:${w}px;height:${h}px"><svg class="fx-lines" width="${w}" height="${h}" aria-hidden="true"><defs>${mark(mk,'#A9B3BF')}${mark(mk+'g','#17864A')}${mark(mk+'h','#1E5BB8')}</defs>${edges.join('')}</svg>${nodes}</div></div>
     ${w>700?`<div class="arraste">${ic('i-seta')}Arraste para o lado para ver todas as ${p.steps.length} etapas</div>`:''}
     ${sel?(m[sel].virt?vInfo(p,m[sel],key,l,ped):fxInfo(p,m[sel],key,l)):`<div class="arraste">${ic('i-mao')}Toque numa etapa para ver o que ela precisa</div>`}`}
@@ -2417,7 +2439,7 @@ function sTipoEd(){const e=ui.sheet;const usoP=e.id?state.produtos.filter(p=>p.s
   <div class="linha-dep" style="margin-top:14px"><button class="depc" data-a="tExt" aria-pressed="${!!e.externo}">${ic('i-caminhao')}Feito fora (terceirizado)</button>${faseG(e.grupo)==='pers'?`<button class="depc" data-a="tFech" aria-pressed="${!!e.fechada}">${ic('i-camisa')}Aplica com a peça pronta (costurada)</button>`:''}</div>${faseG(e.grupo)==='pers'?'<p class="dica" style="margin:6px 0 0">Ligado: a costura não espera esta personalização; ela entra antes do acabamento. Dá para trocar em cada pedido.</p>':''}
   ${faseG(e.grupo)==='pers'?`<div class="rotulo">Tempo por peça na personalização</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tMin" data-d="-1" aria-label="Menos 5 segundos">−</button><output>${tMin(e.min)}</output><button class="stp" data-a="tMin" data-d="1" aria-label="Mais 5 segundos">+</button></div>`:''}
   ${e.externo&&!e.id?`<div class="rotulo">Quem faz esse serviço? (fornecedor)</div><input class="campo" id="xForn" value="${esc(e.forn||'')}" placeholder="Ex.: Junior Bordados" autocomplete="off">
-    <div class="rotulo">Prazo do fornecedor (dias)</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tPrazo" data-d="-1" aria-label="Menos um dia">−</button><output>${e.prazo||3}</output><button class="stp" data-a="tPrazo" data-d="1" aria-label="Mais um dia">+</button></div>`:''}
+    <div class="rotulo">Prazo do fornecedor (${tercUteis()?'dias úteis':'dias'})</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tPrazo" data-d="-1" aria-label="Menos um dia">−</button><output>${e.prazo||3}</output><button class="stp" data-a="tPrazo" data-d="1" aria-label="Mais um dia">+</button></div>`:''}
   ${e.externo?'':`<div class="rotulo">Quantas existem?</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="tQ" data-d="-1" aria-label="Menos uma">−</button><output>${e.qtd}</output><button class="stp" data-a="tQ" data-d="1" aria-label="Mais uma">+</button></div>`}
   ${usoP.length?`<p style="color:var(--ink2)">Usada nos produtos: ${esc(usoP.join(', '))}</p>`:''}
   ${e.err?`<div class="aviso">${ic('i-alerta')}${esc(e.err)}</div>`:''}
@@ -2432,7 +2454,7 @@ function cForn(){const ext=state.tipos.filter(t=>t.externo);
   return `<p class="sub-l" style="margin-top:-6px">Cada serviço feito fora (bordado, DTF…) e quem faz para vocês.</p>
   ${ext.map(t=>{const fs=fornDe(t.id);return `<section class="eq-g"><div class="srv-h"><span class="m-ic" style="background:#F3ECFB;color:#6B2F8C">${ic(t.i)}</span><h2>${esc(t.nome)}</h2><button class="x azul" data-a="tipoEd" data-t="${t.id}">Editar serviço</button></div>
     ${fs.length?'':`<div class="aviso" style="margin-bottom:10px">${ic('i-alerta')}Ninguém cadastrado para fazer ${esc(t.nome)}.</div>`}
-    <div class="eq-l">${fs.map(f=>`<button class="eq" data-a="fornEd" data-id="${f.id}"><span class="m-ic" style="background:#F3ECFB;color:#6B2F8C">${ic('i-predio')}</span><span class="eq-t"><b>${esc(f.nome)}</b><span>Prazo ${f.prazo} ${f.prazo>1?'dias':'dia'} · leva: ${esc(pNome(f.leva)||'ninguém')}</span></span><span class="eq-go">›</span></button>`).join('')}
+    <div class="eq-l">${fs.map(f=>`<button class="eq" data-a="fornEd" data-id="${f.id}"><span class="m-ic" style="background:#F3ECFB;color:#6B2F8C">${ic('i-predio')}</span><span class="eq-t"><b>${esc(f.nome)}</b><span>Prazo ${prazoTercTxt(f.prazo)} · leva: ${esc(pNome(f.leva)||'ninguém')}</span></span><span class="eq-go">›</span></button>`).join('')}
       <button class="eq add-f" data-a="fornEd" data-id="" data-serv="${t.id}">${ic('i-mais')}<span class="eq-t"><b>Adicionar fornecedor de ${esc(t.nome)}</b></span></button></div></section>`}).join('')}
   <button class="prodc add" data-a="tipoEd" data-t="" data-ext="1" style="width:100%">${ic('i-mais')}<b>Novo tipo de serviço feito fora</b><span style="font-size:16px;color:var(--muted)">Ex.: silk, sublimação terceirizada</span></button>`}
 function listaEst(){const q=(ui.eq||'').toLowerCase();const it=Object.entries(state.estoque).filter(([k])=>k.toLowerCase().includes(q)).sort((a,b)=>a[0].localeCompare(b[0]));
@@ -2528,7 +2550,7 @@ function sFornEd(){const e=ui.sheet,ext=state.tipos.filter(t=>t.externo);
   return `${voltar('Cancelar')}<h1>${e.id?esc(e.nome):'Novo fornecedor'}</h1>
   <div class="rotulo">Nome do fornecedor</div><input class="campo" id="xNome" value="${esc(e.nome)}" autocomplete="off">
   <div class="rotulo">Serviço</div><div class="escolhe">${ext.map(t=>`<button class="opc" data-a="fServ" data-v="${t.id}" aria-pressed="${e.servico===t.id}">${ic(t.i)}${esc(t.nome)}</button>`).join('')}</div>
-  <div class="rotulo">Prazo (dias)</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="fPrazo" data-d="-1" aria-label="Menos um dia">−</button><output>${e.prazo}</output><button class="stp" data-a="fPrazo" data-d="1" aria-label="Mais um dia">+</button></div>
+  <div class="rotulo">Prazo (${tercUteis()?'dias úteis':'dias'})</div><div class="contador" style="justify-content:flex-start"><button class="stp" data-a="fPrazo" data-d="-1" aria-label="Menos um dia">−</button><output>${e.prazo}</output><button class="stp" data-a="fPrazo" data-d="1" aria-label="Mais um dia">+</button></div>
   <div class="rotulo">Preferência para levar e buscar</div><div class="linha-dep">${state.pessoas.map(p=>`<button class="pchip" data-a="fLeva" data-v="${p.id}" aria-pressed="${e.leva===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div>
   ${e.err?`<div class="aviso">${ic('i-alerta')}${esc(e.err)}</div>`:''}
   <div class="acoes"><button class="big go" data-a="fOk">${ic('i-check')}Salvar</button></div>`}
@@ -2630,7 +2652,7 @@ function sTerc(){const e=ui.sheet,l=lote(e.l),z=l&&sMap(rp(l))[e.s];if(!z)return
   const L=[...state.forn].sort((a,b)=>(faseT(b.servico)===fz)-(faseT(a.servico)===fz)||a.nome.localeCompare(b.nome));
   return `${voltar('Cancelar')}<h1>Mandar para um terceirizado</h1><div class="card" style="margin:0 0 12px"><b>${esc(z.nome)}</b> · ${qtdEf(l)} peças<br><span class="lido">${esc(ped.cliente)} · ${esc(nomePeca(l))} ${esc(l.cor||'')}</span></div>
     <p class="sub-l">Segue o caminho de sempre dos terceirizados: aparece em <b>Fora › para levar</b> e na Logística do Escritório. Depois é <b>Levei</b> e <b>Chegou</b>.${x.st==='and'?' O trabalho que está na máquina para e a máquina fica livre.':''}</p>
-    ${L.length?L.map(f=>`<button class="outra" data-a="tercOk" data-f="${f.id}"><span class="m-ic">${ic(tipo(f.servico).i)}</span><div><b>${esc(f.nome)}</b><span>${esc(tNome(f.servico))} · prazo ${f.prazo} ${f.prazo>1?'dias':'dia'}</span></div><span class="ir">Escolher${ic('i-seta')}</span></button>`).join(''):`<div class="vazio-box">${ic('i-caminhao')}<b>Nenhum terceirizado cadastrado</b><button class="mbtn" data-a="irForn">Cadastrar em Terceirizados</button></div>`}`}
+    ${L.length?L.map(f=>`<button class="outra" data-a="tercOk" data-f="${f.id}"><span class="m-ic">${ic(tipo(f.servico).i)}</span><div><b>${esc(f.nome)}</b><span>${esc(tNome(f.servico))} · prazo ${prazoTercTxt(f.prazo)}</span></div><span class="ir">Escolher${ic('i-seta')}</span></button>`).join(''):`<div class="vazio-box">${ic('i-caminhao')}<b>Nenhum terceirizado cadastrado</b><button class="mbtn" data-a="irForn">Cadastrar em Terceirizados</button></div>`}`}
 function sEtEd(){const e=ui.sheet,l=lote(e.l),z=l&&sMap(rp(l))[e.s];if(!z)return voltar();const ped=pedById(l.ped),x=stOf(l,z.id),sit=etSit(l,z),depois=etDepois(l,z.id);
   const bt=(a,txt,cls='mbtn neutro2',extra='')=>`<button class="${cls}" data-a="${a}" data-l="${l.id}" data-s="${z.id}" ${extra}>${txt}</button>`;
   const ops=[];
@@ -2898,10 +2920,11 @@ const FAQ=[
 {c:'conserto',q:'Como adiciono um motivo de conserto novo?',k:'motivo conserto novo defeito lista',r:['Cadastros › Ajustes › Motivos de conserto.','Escreva em Novo motivo e toque em Adicionar.'],ir:'cad:ajustes#Motivos de conserto',g:1},
 /* rua */
 {c:'rua',q:'Onde vejo o que está no prestador de serviço (na rua)?',k:'na rua fora terceirizado prestador bordado dtf fornecedor peças fora',r:['Na Fábrica, toque na aba Fora.','Cada prestador mostra o que está lá, há quanto tempo, e avisa se passou do prazo.'],ir:'fab:fora'},
+{c:'rua',q:'Que terceirizado está atrasado? Quem eu cobro?',k:'atrasado atrasou atraso cobrar cobrança prazo passou terceirizado prestador fornecedor bordadeira demora não voltou',r:['Na Fábrica, toque na aba Fora.','No alto aparece Passaram do prazo: quem está com as peças, de qual pedido, desde quando e quantos dias úteis de atraso. O mais atrasado vem primeiro.','Se as peças já voltaram, toque em Chegou. Sem nada atrasado, essa lista não aparece.','O atraso também aparece no Hoje e em Mais › Gestor › Atrasos, com o mesmo botão Chegou.'],ir:'fab:fora'},
 {c:'rua',q:'Levei peças para o prestador. Como registro?',k:'levei levar entregar no fornecedor terceirizado saiu',r:['Na Fábrica, aba Escritório, setor Logística: tarefa "Levar para …".','Toque em Levei.','As peças passam a aparecer na aba Fora.'],ir:'fab:esc'},
 {c:'rua',q:'As peças voltaram do prestador. Como registro?',k:'voltou chegou buscar buscou retorno fornecedor',r:['Na Fábrica, aba Fora (ou Escritório › Logística), ache o item.','Toque em Chegou. As peças voltam para a produção.'],ir:'fab:fora'},
-{c:'rua',q:'Como cadastro um prestador de serviço novo?',k:'cadastrar fornecedor prestador terceirizado novo bordadeira',r:['Cadastros › Terceirizados.','Toque em Adicionar fornecedor de … (no serviço certo).','Escreva o nome, o prazo em dias e quem costuma levar e buscar. Toque em Salvar.'],ir:'cad:forn',g:1},
-{c:'rua',q:'Como mudo o prazo de um prestador?',k:'prazo fornecedor dias atraso',r:['Cadastros › Terceirizados.','Toque no fornecedor, ajuste o Prazo (dias) e toque em Salvar.'],ir:'cad:forn',g:1},
+{c:'rua',q:'Como cadastro um prestador de serviço novo?',k:'cadastrar fornecedor prestador terceirizado novo bordadeira',r:['Cadastros › Terceirizados.','Toque em Adicionar fornecedor de … (no serviço certo).','Escreva o nome, o prazo em dias úteis e quem costuma levar e buscar. Toque em Salvar.'],ir:'cad:forn',g:1},
+{c:'rua',q:'Como mudo o prazo de um prestador?',k:'prazo fornecedor dias atraso',r:['Cadastros › Terceirizados.','Toque no fornecedor, ajuste o Prazo (dias úteis) e toque em Salvar.','O prazo conta a partir do dia em que as peças saíram, sem sábado, domingo e feriado.'],ir:'cad:forn',g:1},
 /* escritório */
 {c:'esc',q:'Onde vejo as tarefas do escritório?',k:'tarefas escritório pendências fazer lista afazeres',r:['Na Fábrica, toque na aba Escritório.','As tarefas ficam por setor: Pedidos, Artes, Lista de compras e Logística.','Cada tarefa mostra o pedido, quem faz e o botão para marcar.'],ir:'fab:esc'},
 {c:'esc',q:'Como passo uma tarefa para outra pessoa?',k:'trocar pessoa responsável atribuir passar tarefa quem faz',r:['Na aba Escritório, toque na foto de quem faz, embaixo da tarefa.','Toque em quem vai fazer.','Para voltar ao automático: Deixar o sistema escolher.'],ir:'fab:esc'},
@@ -4293,7 +4316,7 @@ function gAtrasos(desde){const at=state.pedidos.filter(p=>!p.concluido).map(p=>(
   return `<div class="kpis">${[[ent.length,'pedidos entregues'],[pctTxt(ent.length?(ent.length-late.length)/ent.length:null),'entregues no prazo'],[at.filter(x=>x.f.u==='crit').length,'vão atrasar'],[at.filter(x=>x.f.u==='warn').length,'prazo apertado'],[esc_.length,'terceirizados atrasados']].map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('')}</div>
   <div class="card"><h2>Pedidos em aberto, do mais apertado</h2>${at.map(({p,f})=>`<button class="rk" data-a="pedido" data-id="${p.id}" style="width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0"><span class="pill u-${f.u}"><span class="dot"></span>${ULAB[f.u]}</span><div class="rk-t"><b>${esc(p.cliente)}</b><span>Entrega ${fD(p.entrega)} · ${f.du} dias úteis · falta ~${nf(f.need,0)} de trabalho · folga ${nf(f.folga,0)}</span>${barra(f.prog,1,f.u==='crit'?'var(--red)':f.u==='warn'?'var(--atn)':'var(--go)')}</div><div class="rk-p"><b>${Math.round(f.prog*100)}%</b><small>feito</small></div></button>`).join('')||'<p class="dica">Nenhum pedido em aberto.</p>'}</div>
   ${late.length?`<div class="card"><h2>Entregues com atraso no período</h2>${late.map(p=>`<div class="grow"><span>${esc(p.cliente)}</span><span>prazo ${fD(p.entrega)}, entregue ${fD(p.concluido)}</span><b>+${Math.max(1,-wdUntil(p.concluido)+wdUntil(p.entrega))}d</b></div>`).join('')}</div>`:''}
-  ${esc_.length?`<div class="card"><h2>Terceirizados atrasados</h2>${esc_.map(t=>`<button class="alrt a-crit" data-a="ir" data-to="fab:fora">${ic('i-caminhao')}<div><b>${esc(t.t)}</b><span>${esc(t.ped.cliente)} · ${esc(t.sub||'')}</span></div><span class="alrt-go">Ver terceirizados ›</span></button>`).join('')}</div>`:''}`}
+  ${cardTercAtrasados('Terceirizados atrasados')}`}
 /* Registro confiável: etapas terminadas em que Começar e Terminei foram tocados na hora (duração entre 1 min e 12 h). */
 function registroConfiavel(dias=CAL_DIAS){const desde=now()-dias*DIA;let tot=0,bom=0;state.lotes.forEach(l=>{if(l.rework)return;Object.values(l.steps||{}).forEach(x=>{(x.partes||[x]).forEach(q=>{if(q.st!=='ok'||!q.fim||q.fim<desde||q.herdado)return;tot++;const d=q.fim-(q.ini||q.fim);if(d>=MIN&&d<=12*H)bom++})})});return {tot,bom,pct:tot?bom/tot:null}}
 /* Tempos padrão (fase 2): o app mede quanto cada etapa leva de verdade e a gestão decide.

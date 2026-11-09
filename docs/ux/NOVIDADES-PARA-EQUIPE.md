@@ -762,3 +762,19 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 **O que NÃO mudou:** o total, a média, os 13 meses e quem mais comprou continuam iguais e no mesmo lugar. Nenhum botão mudou de lugar.
 
 **Risco de estranhamento:** baixo. Só acrescenta um bloco num quadro que só a gestão vê.
+
+## Terceirizado atrasou? Lista para cobrar
+
+**Para quem:** quem cobra o terceirizado (na Martins, a Helena).
+
+**O que mudou:** na **Fábrica › Fora**, no alto, aparece **Passaram do prazo** quando alguma peça passou do prazo de volta.
+- Cada linha diz **quem está com as peças**, **de qual pedido**, **desde quando** e **quantos dias úteis de atraso**. O mais atrasado vem primeiro.
+- Tocando no pedido, o app abre o pedido. Se as peças já voltaram, toque em **Chegou**.
+- Sem nada atrasado, a lista não aparece.
+- **O prazo agora conta em dias úteis** (sem sábado, domingo e feriado), em todos os lugares: Hoje, Escritório, Fora e Gestor. O cadastro do terceirizado passa a dizer "Prazo (dias úteis)". Por isso, algumas peças que apareciam como atrasadas podem deixar de aparecer.
+- Em **Hoje**, o aviso do terceirizado atrasado diz quantos dias de atraso e tem o botão **Chegou** (antes era Ver). Assim dá para soltar as peças para o próximo passo sem sair do Hoje.
+- Em **Gestor › Atrasos**, os terceirizados atrasados aparecem na mesma lista da aba Fora, com **Ver pedido** e **Chegou**.
+
+**O que NÃO mudou:** os cartões de cada terceirizado na aba Fora continuam iguais, com o **Chegou** no mesmo lugar. Nenhum botão mudou de lugar.
+
+**Risco de estranhamento:** baixo. Acrescenta um quadro no alto da aba Fora; no Hoje, o botão da linha do atraso muda de Ver para Chegou (mesmo lugar).

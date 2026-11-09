@@ -21,8 +21,8 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   r=await A.evaluate(()=>{const M=hojeMaquinas(plano());const x=__fila(true).find(y=>y.k==='maq:'+(M[0]&&M[0].m));return {M:M.length,txt:x&&x.txt,a:x&&x.a}});
   ok(r.M?(r.txt&&r.a==='maq'):!r.txt,'máquina livre com o próximo trabalho vira linha ("'+r.txt+'")');
   r=await A.evaluate(()=>{const l=state.lotes.find(l=>{const p=pedById(l.ped);return p&&!p.concluido&&rp(l).steps.some(isExt)});if(!l)return {sem:1};const z=rp(l).steps.find(isExt);const f=fornEtapa(l,z)||state.forn[0];
-    l.steps[z.id]={st:'fora',forn:f.id,op:f.leva,saiu:now()-30*DIA};const x=__fila(true).find(y=>y.k.startsWith('late:'));delete l.steps[z.id];RC={};return {txt:x&&x.txt,v:x&&x.d&&x.d.v}});
-  ok(r.sem||/prazo/.test(r.txt||'')&&r.v==='fora','pacote que passou do prazo no prestador vira linha ("'+r.txt+'")');
+    l.steps[z.id]={st:'fora',forn:f.id,op:f.leva,saiu:now()-30*DIA};const x=__fila(true).find(y=>y.k.startsWith('late:'));delete l.steps[z.id];RC={};return {txt:x&&x.txt,a:x&&x.a,bt:x&&x.bt}});
+  ok(r.sem||/prazo/.test(r.txt||'')&&r.a==='buscou'&&r.bt==='Chegou','pacote que passou do prazo no prestador vira linha com Chegou ("'+r.txt+'")');
   r=await A.evaluate(()=>{const p=state.pedidos.find(x=>!x.concluido&&!x.cancelado&&lotesDe(x.id).length);const salvo=JSON.stringify(lotesDe(p.id).map(l=>l.steps));
     lotesDe(p.id).forEach(l=>rp(l).steps.forEach(z=>{l.steps[z.id]={st:'ok',ini:now()-7200e3,fim:now()-3600e3,op:state.pessoas[0].id}}));const x=__fila(true).find(y=>y.k==='pronto:'+p.id);
     const back=JSON.parse(salvo);lotesDe(p.id).forEach((l,i)=>l.steps=back[i]);RC={};return {txt:x&&x.txt,cli:p.cliente}});
