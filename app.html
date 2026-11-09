@@ -5078,7 +5078,9 @@ function paraDocs(st){const m={},cfg={};
   Object.keys(st).forEach(k=>{if(COLS.includes(k))(st[k]||[]).forEach((it,i)=>{m[k+'/'+idDoc(k,it)]={...it,_o:i}});else if(k!=='log')cfg[k]=st[k]});
   m['config/main']=cfg;const b={};(st.log||[]).forEach(e=>{const key=semana(e.ts)+'_'+(e.dv||'x');(b[key]=b[key]||[]).push(e)});
   Object.entries(b).forEach(([k,v])=>m['log/'+k]={items:v});const out={};Object.entries(m).forEach(([p,v])=>out[p]=limpo(v));return out}
-function deDocs(m){const cfg=m['config/main']||{};const st=m['config/main']?{...cfg}:{v:8,estoque:{},cores:{...CORES},...CFG0()};if(st.seq==null){const nums=Object.keys(m).filter(k=>k.startsWith('pedidos/')).map(k=>parseInt(k.split('/')[1],10)).filter(n=>!isNaN(n));st.seq=nums.length?Math.max(...nums)+1:1}COLS.forEach(k=>st[k]=[]);st.log=[];
+/* deDocs devolve uma cópia: a tela nunca divide objetos com quem chamou (ex.: NV.acked, a cópia "já enviada").
+   Antes, mudar uma etapa mudava também NV.acked, o app achava que não havia nada novo e o toque não era gravado (05-06/11/2026). */
+function deDocs(m){m=limpo(m);const cfg=m['config/main']||{};const st=m['config/main']?{...cfg}:{v:8,estoque:{},cores:{...CORES},...CFG0()};if(st.seq==null){const nums=Object.keys(m).filter(k=>k.startsWith('pedidos/')).map(k=>parseInt(k.split('/')[1],10)).filter(n=>!isNaN(n));st.seq=nums.length?Math.max(...nums)+1:1}COLS.forEach(k=>st[k]=[]);st.log=[];
   Object.entries(m).forEach(([p,v])=>{const [c]=p.split('/');if(COLS.includes(c))st[c].push(v);else if(c==='log')st.log.push(...(v.items||[]))});
   COLS.forEach(k=>{st[k].sort((a,b)=>(a._o??0)-(b._o??0));st[k]=st[k].map(({_o,...r})=>r)});st.log.sort((a,b)=>a.ts-b.ts);return st}
 function difPatch(a,b){const p={};for(const k of Object.keys(a))if(!(k in b))return null;

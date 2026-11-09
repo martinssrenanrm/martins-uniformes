@@ -91,7 +91,10 @@ NODE_PATH=$(npm root -g) node tests/celular.test.js
 NODE_PATH=$(npm root -g) node tests/feito-hoje.test.js
 NODE_PATH=$(npm root -g) node tests/tipo-cliente.test.js   # PGLITE=<pasta> testa também a migração 012
 NODE_PATH=$(npm root -g) node tests/terc-atrasado.test.js
+NODE_PATH=$(npm root -g) node tests/toque-perdido.test.js   # sincronia: o 1º toque depois de abrir chega ao banco
 ```
+
+Conferência histórico × peças em produção (só lê): `tools/conferir-toques.sql`. Tem que dar zero linhas nos toques novos.
 
 ## Supabase (endereço próprio)
 

@@ -197,6 +197,11 @@ Cada item é publicado fora do expediente, com nota em `NOVIDADES-PARA-EQUIPE.md
 - Arquivar pedidos fechados.
 - **Número de pedido sem colisão:** hoje, dois aparelhos criando pedido ao mesmo tempo podem pegar o mesmo número, e um some. A saída é criar com "inserir" (falha se existir) e renumerar, ou pedir o número ao banco.
 
+### Toques que sumiam (corrigido em 09/11/2026)
+- No Supabase, o primeiro toque em cada peça depois de abrir o app não era gravado: a tela e a cópia "já enviada" (`NV.acked`) dividiam os mesmos objetos, e o app achava que não havia nada novo. 28 toques de 05 e 06/11 ficaram só no histórico.
+- Correção: `deDocs()` sempre devolve uma cópia. Teste: `tests/toque-perdido.test.js`. Conferência em produção: `tools/conferir-toques.sql`.
+- Regra: o estado da tela nunca pode dividir objetos com `NV.acked`, `NV.last` ou cópias de desfazer.
+
 ### Riscos ainda abertos (conhecidos)
 - Número de pedido duplicado entre aparelhos (fase 5): raro, mas perde um pedido.
 - Estoque: dois aparelhos mexendo no mesmo item ao mesmo tempo, vale o último.
