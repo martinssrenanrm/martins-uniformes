@@ -63,6 +63,7 @@ Base: auditoria do código em 01/11/2026 (telas e jornadas, ações e registros,
 | **Conserto** | `consertos/<lote>-C<k>` | peça de origem, etapa onde achou, etapa a refazer, motivo, quantas | o evento guarda também quem fez a etapa de origem |
 | **Empresa (cliente)** | `clientes/<id>` | nome, CNPJ, contato | mesmo nome com CNPJ diferente = empresas diferentes |
 | **Tipo do cliente do Conta Azul** | `catcli/<id do cliente no Conta Azul>` | `nome`, `tipo` (um da lista `config/main › tiposCli`) | a lista é da fábrica (padrão: `tiposCliente` do `clientes/<id>.json`, ou vazia); tipo fora da lista = sem tipo. `faturamento()` (012) soma por ele |
+| **Venda do Conta Azul fora da produção** | `cavenda/<nº da venda>` | `fora` (quando e quem), `cliente`, `total` | a venda com pedido é a que tem o número em `pedido.ficha`; `fora:null` = voltou para a lista. Lista: `vendas_para_pedido()` (013) |
 | **Arquivo** | `arquivos/<id>` + Storage | tipo (mockup/arte/bordado), `bin` (onde está), `prev` (miniatura) | só mockup é comprimido; arte e programa vão no tamanho original |
 | **Produto e roteiro** | `produtos/<id>` | etapas (`posto`, `deps`, `min` por peça), tecidos, aviamentos | produto usado em pedido não pode ser apagado |
 | **Máquina/serviço** | `tipos/<id>` | nome, quantas máquinas, setor, se é feito fora | |
@@ -103,7 +104,7 @@ Base: auditoria do código em 01/11/2026 (telas e jornadas, ações e registros,
 
 | Etapa da jornada | Eventos |
 |---|---|
-| Pedido | `pedido.criado`, `pedido.editado`, `pedido.prazo_alterado`, `pedido.aprovado` / `pedido.aprovacao_desfeita`, `pedido.entregue` / `pedido.entrega_desfeita`, `pedido.cancelado` / `pedido.reativado` |
+| Pedido | `venda.ligada`, `venda.dispensada` / `venda.dispensa_desfeita`, `pedido.criado`, `pedido.editado`, `pedido.prazo_alterado`, `pedido.aprovado` / `pedido.aprovacao_desfeita`, `pedido.entregue` / `pedido.entrega_desfeita`, `pedido.cancelado` / `pedido.reativado` |
 | Escritório | `vias.separadas` / `vias.desmarcadas`, `arte.preparada` / `arte.preparo_desmarcado`, `arte.aprovada` / `arte.aprovacao_desmarcada`, `arte.enviada`, `tarefa.atribuida` |
 | Compras | `material.do_estoque`, `material.comprado`, `material.em_falta`, `compras.lista_enviada` |
 | Produção | `etapa.iniciada`, `etapa.concluida`, `etapa.pessoa_trocada`, `etapa.pausada`, `etapa.dividida`, `etapa.inicio_cancelado`, `etapa.revertida`, `etapa.horario_corrigido`, `hora_extra.autorizada` / `hora_extra.encerrada` |

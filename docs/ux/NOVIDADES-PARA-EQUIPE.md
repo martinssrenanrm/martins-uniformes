@@ -778,3 +778,18 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 **O que NÃO mudou:** os cartões de cada terceirizado na aba Fora continuam iguais, com o **Chegou** no mesmo lugar. Nenhum botão mudou de lugar.
 
 **Risco de estranhamento:** baixo. Acrescenta um quadro no alto da aba Fora; no Hoje, o botão da linha do atraso muda de Ver para Chegou (mesmo lugar).
+
+## Venda do Conta Azul vira pedido, sem digitar de novo
+
+**Para quem:** escritório e vendas (e a gestão).
+
+**O que mudou:** na **Fábrica › Escritório**, logo abaixo da **Lista de compras**, aparece **Vendas do Conta Azul sem pedido** quando alguma venda aprovada ou faturada ainda não tem pedido no app.
+- Cada venda mostra o **cliente**, o **valor**, **quem vendeu** e as **peças**. As suas vendas vêm primeiro.
+- **Criar pedido:** abre a conferência do Conta Azul já preenchida (cliente, CNPJ, peças, tamanhos, valores). Complete o prazo e o produto e siga. O pedido entra como **pré-pedido**, e a tarefa **Completar o pedido do Conta Azul** lembra o que falta antes do corte.
+- **Já tem pedido no app:** escolha o pedido certo. O app só põe o número da venda no pedido; nada mais muda.
+- **Não vai para a produção:** tira a venda da lista (dá para voltar).
+- As vendas chegam do Conta Azul toda madrugada.
+
+**O que NÃO mudou:** o **+ Novo pedido** e a importação de PDF continuam iguais. A Lista de compras continua no mesmo lugar. Nenhum pedido é criado sozinho: sempre alguém confere e confirma.
+
+**Risco de estranhamento:** baixo. Acrescenta um botão no Escritório, embaixo da Lista de compras, só quando há venda sem pedido.

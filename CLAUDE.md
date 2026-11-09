@@ -92,6 +92,8 @@ NODE_PATH=$(npm root -g) node tests/feito-hoje.test.js
 NODE_PATH=$(npm root -g) node tests/tipo-cliente.test.js   # PGLITE=<pasta> testa também a migração 012
 NODE_PATH=$(npm root -g) node tests/terc-atrasado.test.js
 NODE_PATH=$(npm root -g) node tests/toque-perdido.test.js   # sincronia: o 1º toque depois de abrir chega ao banco
+NODE_PATH=$(npm root -g) node tests/venda-vira-pedido.test.js   # PGLITE=<pasta> testa também as migrações 013 e 014
+node tests/conta-azul-funcao.test.js   # função conta-azul do Supabase: token, trava, busca
 ```
 
 Conferência histórico × peças em produção (só lê): `tools/conferir-toques.sql`. Tem que dar zero linhas nos toques novos.
