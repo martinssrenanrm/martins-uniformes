@@ -15,7 +15,7 @@ const VENDAS=(vend,cli2,cli3)=>{const it=(nome,descricao,quantidade,valor)=>({id
 (async()=>{const b=await chromium.launch();const er=[];
   const app=fs.readFileSync(path.join(R,'app.html'),'utf8');
   const html=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>window.MARTINS_SB={url:'https://teste.supabase.co',key:'anon'}</script></head><body>${app}</body></html>`;
-  const ctx=await b.newContext({viewport:{width:360,height:640}});
+  const ctx=await b.newContext({viewport:{width:360,height:640},timezoneId:'America/Sao_Paulo'});
   await ctx.route('https://app.martins.test/**',r=>r.fulfill({contentType:'text/html',body:html}));
   await ctx.route('https://cdn.jsdelivr.net/**',r=>r.fulfill({contentType:'application/javascript',body:'window.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:null}}),onAuthStateChange(){}}})}'}));
   const p=await ctx.newPage();p.on('pageerror',e=>er.push(e.message));
