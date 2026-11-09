@@ -1,5 +1,5 @@
 -- 011: permissões por responsabilidade, também no banco (repete a regra da tela; Onda UX 1, 11/2026).
--- NÃO APLICADA. Aplicar só com aprovação, fora do expediente. Pode rodar de novo sem quebrar nada.
+-- Aplicada em produção em 06/11/2026. Pode rodar de novo sem quebrar nada.
 --
 -- Regra (igual à do app, `PERMS` em app.html):
 --   * Gestão pode tudo.

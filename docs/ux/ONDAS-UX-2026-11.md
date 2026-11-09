@@ -1,7 +1,7 @@
 # Ondas de usabilidade de 11/2026: perfis, tela Hoje, sugestões e celular
 
 Feito em 05/11/2026, numa branch separada (`claude/ux-perfis-celular-f4ded2`), em 5 commits locais, um por onda.
-**Nada foi publicado, nada foi enviado ao GitHub e nada foi aplicado no banco.**
+**Publicado em 06/11/2026, à noite**, junto com o Faturamento (migração 010). A migração 011 foi aplicada no Supabase de produção em 06/11/2026 às 19:04 (horário de Brasília), depois do site novo. Conferido em 09/11/2026: o Escritório é recusado ao cancelar pedido, a gestão consegue, e entregar pelo Escritório continua funcionando (teste numa transação desfeita, nenhum pedido mudou).
 
 ## O pedido e como ele foi lido
 
@@ -33,7 +33,7 @@ Vale para tudo: o chão de fábrica não usa o app (decisão de 05/11); quem reg
   | Corrigir o que a produção já fez (voltar processo, mudar horário, cancelar um começo) | só a gestão |
 
 - Sem permissão, o botão some e a tela diz "chame quem é da gestão (nomes)". Se um botão escapasse, o toque é recusado com aviso.
-- **No banco:** `supabase/migrations/011_permissoes_responsabilidade.sql` repete a regra (gatilho na tabela `docs`). Os 15 minutos do Desfazer continuam livres, e o que é do prestador também. **Não aplicada.** Testada num Postgres de bolso (PGlite): 10 verificações, inclusive rodar duas vezes.
+- **No banco:** `supabase/migrations/011_permissoes_responsabilidade.sql` repete a regra (gatilho na tabela `docs`). Os 15 minutos do Desfazer continuam livres, e o que é do prestador também. **Aplicada em produção em 06/11/2026.** Testada num Postgres de bolso (PGlite): 10 verificações, inclusive rodar duas vezes.
 - Achado no caminho: no gatilho "antes de gravar", a coluna `col` ainda vem vazia; a 011 usa o `path`. As migrações anteriores (003) não têm esse problema, porque usam `col` nas regras de acesso, onde ela já está calculada.
 - Prints: `prints/ondas-2026-11/antes/escritorio-pedido.png`, `escritorio-corrigir-etapa.png` e `gestao-acessos.png` → os mesmos nomes em `onda-1-depois/`.
 - Teste: `tests/permissoes.test.js`.
@@ -112,7 +112,10 @@ Sete regras sobre o que já está no app, cada uma com o porquê e um botão:
 - `site/` **não** foi gerado, porque isso é passo de publicação.
 - A FAQ ganhou 9 perguntas, e `tests/ajuda.test.js` foi atualizado.
 
-## O que precisa do Renan
+## O que precisava do Renan (tudo feito em 06/11/2026)
+
+Aprovado: barra da gestão Hoje · Fábrica · Pedidos · Novo · Mais; cancelar e corrigir o que a produção fez só com a gestão. Publicado e 011 aplicada.
+
 
 1. **Aprovar a Onda 2 (risco alto):** a tela Hoje como primeira tela e Gestor/Cadastros dentro de "Mais". Se preferir só a Hoje sem mexer na barra, dá para manter "Hoje" e deixar Gestor/Cadastros na barra, mas são 6 botões, acima do limite de 5 do guia. É uma decisão sua.
 2. **Aprovar o padrão das permissões:** "cancelar pedido" e "corrigir o que a produção já fez" passam a ser **só da gestão** na Martins. Se hoje alguma vendedora cancela pedido, ligue a escolha em Ajustes › Acessos antes de publicar.
