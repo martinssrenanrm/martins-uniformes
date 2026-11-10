@@ -1,7 +1,7 @@
 # Onde ficam os dados do Sistema Martins (e regras para não perder nada)
 
 **Casa dos dados:** banco da nuvem do artifact (capability `db`).
-- Cada cadastro é um documento: `pedidos/`, `lotes/`, `pessoas/`, `produtos/`, `clientes/`, `arquivos/`, `usuarios/`, `catcli/` (tipo de cada cliente do Conta Azul), `cavenda/` (venda do Conta Azul que não vai para a produção), etc.
+- Cada cadastro é um documento: `pedidos/`, `lotes/`, `pessoas/`, `produtos/`, `clientes/`, `arquivos/`, `usuarios/`, `catcli/` (tipo de cada cliente do Conta Azul), `cavenda/` (venda do Conta Azul que não vai para a produção), `custos/` (custo por peça de cada produto: só a gestão lê e grava, migração 016; não entra nas cópias de segurança nem na lixeira, e a história fica nos eventos `custo.informado`), etc.
 - As configurações ficam em `config/main`.
 - O histórico fica em `log/` (um documento por semana e por aparelho).
 - Imagens e arquivos grandes (mockups, artes, bordados) ficam em partes: `mock/<id>` (resumo) + `mockp/<id>~N` (conteúdo).

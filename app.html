@@ -155,6 +155,8 @@ h2{font-size:24px;margin:0 0 10px;text-wrap:balance}
 .prods{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:16px}
 .prodc{display:grid;justify-items:center;gap:6px;text-align:center;border:2px solid var(--line);background:var(--card);border-radius:18px;padding:18px}
 .prodc:hover{border-color:var(--ink2)}
+.cu-l{font-size:16px;font-weight:600;color:var(--ink2)}.cu-l.sem{font-weight:400}
+.cu-info{font-size:18px;margin:0 0 8px;line-height:1.4}.cu-sep{margin-top:12px}.cu-sep>summary{list-style:none;min-height:48px}.cu-sep>summary::-webkit-details-marker{display:none}
 .prodc svg.prod{width:130px;height:130px}
 .prodc b{font-size:22px}
 .prodc span{color:var(--ink2);font-size:17px}
@@ -1174,7 +1176,7 @@ const EV_TIPOS={
   'etapa.terceirizada':'Etapa mandada para prestador','etapa.terceirizacao_desfeita':'Etapa volta para a fábrica','remessa.enviada':'Peças levadas ao prestador','remessa.retornada':'Peças voltaram do prestador',
   'remessa.cancelada':'Peças não foram levadas','fornecedor.trocado':'Prestador trocado','conserto.aberto':'Peças mandadas para conserto',
   'pessoa.ausente':'Pessoa fora agora','pessoa.disponivel':'Pessoa disponível','tempo_padrao.alterado':'Tempo padrão mudou','acesso.alterado':'Acesso ao app mudou',
-  'cliente.tipo_marcado':'Tipo do cliente marcado','venda.ligada':'Venda do Conta Azul ligada a um pedido','venda.dispensada':'Venda do Conta Azul não vai para a produção','venda.dispensa_desfeita':'Venda do Conta Azul voltou para a lista','app.aberto':'App aberto','acao.desfeita':'Ação desfeita','acao.refeita':'Ação refeita'};
+  'cliente.tipo_marcado':'Tipo do cliente marcado','custo.informado':'Custo do produto informado','venda.ligada':'Venda do Conta Azul ligada a um pedido','venda.dispensada':'Venda do Conta Azul não vai para a produção','venda.dispensa_desfeita':'Venda do Conta Azul voltou para a lista','app.aberto':'App aberto','acao.desfeita':'Ação desfeita','acao.refeita':'Ação refeita'};
 const isoOu=t=>t&&t>0?new Date(t).toISOString():null;
 /* Fotografia da etapa no momento do evento: o roteiro e os tempos padrão podem mudar depois, as métricas não. padrao = segundos por peça. */
 function evEtapa(tipo,l,s,x,o){o=o||{};let p=null,u=null;try{p=prod(l.prod);u=x&&x.maq?unidade(x.maq):null}catch(e){}
@@ -1842,7 +1844,7 @@ const SCHEMA=MIGRACOES[MIGRACOES.length-1].v;
 function migrar(s){const v0=s.schema||0;MIGRACOES.forEach(m=>{if(m.v>v0)m.fn(s)});s.schema=SCHEMA}
 function normalizar(s){s.usuarios=s.usuarios||[];migrar(s);(s.lotes||[]).forEach(l=>religaPers(l,s.forn));if(!s.feriados)s.feriados=FER0();if(!s.usuarios.length)s.usuarios=adminsIniciais(s);s.usersV=2;
 
-s.clientes=s.clientes||[];s.catcli=s.catcli||[];s.cavenda=s.cavenda||[];s.arquivos=s.arquivos||[];if(s.mockups&&s.mockups.length){s.mockups.forEach(m=>{if(m&&m.id&&m.img&&!MOCKG[m.id])guardaMockG(m.id,m.img)})}delete s.mockups;s.apelidos=s.apelidos||{};['tecido','cor','prod','local','serv'].forEach(k=>{if(!s.apelidos[k])s.apelidos[k]={}});
+s.clientes=s.clientes||[];s.catcli=s.catcli||[];s.custos=s.custos||[];s.cavenda=s.cavenda||[];s.arquivos=s.arquivos||[];if(s.mockups&&s.mockups.length){s.mockups.forEach(m=>{if(m&&m.id&&m.img&&!MOCKG[m.id])guardaMockG(m.id,m.img)})}delete s.mockups;s.apelidos=s.apelidos||{};['tecido','cor','prod','local','serv'].forEach(k=>{if(!s.apelidos[k])s.apelidos[k]={}});
   (s.pedidos||[]).forEach(p=>{if(p.cli&&s.clientes.some(c=>c.id===p.cli))return;const c=acharCliente(s,p.cliente,p.cnpj);if(c){p.cli=c.id;if(!c.cnpj&&p.cnpj)c.cnpj=p.cnpj;if(!c.contato&&p.contato)c.contato=p.contato}else{const n={id:'c-'+(nCli(p.cliente).replace(/\s+/g,'-').slice(0,60)||'sem-nome'),nome:(p.cliente||'').trim(),cnpj:p.cnpj||'',contato:p.contato||'',apelidos:[]};s.clientes.push(n);p.cli=n.id}});s.log=s.log||[];s.pessoas=s.pessoas||[];s.consertos=s.consertos||[];s.pedidos.forEach(p=>{p.contato=p.contato||'';p.cnpj=p.cnpj||''});s.pessoas.forEach(p=>{if(!p.papeis)p.papeis=p.papel?[p.papel]:[];delete p.papel});const mg=x=>{if(x.parte==='Mangas'&&!x.lado)x.lado='esq'};s.produtos.forEach(p=>{(p.persPadrao||[]).forEach(mg)});s.lotes.forEach(l=>(l.pers||[]).forEach(mg));cfgDefaults(s);juntaClientes(s);mockNaBib(s);return s}
 const nCli=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 function acharCliente(st,nome,cnpj){const n=nCli(nome),d=String(cnpj||'').replace(/\D/g,'');return (st.clientes||[]).find(c=>(n&&(nCli(c.nome)===n||(c.apelidos||[]).includes(n)))||(d.length>=14&&String(c.cnpj||'').replace(/\D/g,'')===d))||null}
@@ -2534,7 +2536,7 @@ function cardTecidos(){const ed=ui.tecEd;const usos=x=>(state.lotes||[]).filter(
     <div class="linha-dep">${tecidosAll().map(x=>ed===x?`<span class="depc tec-ed"><input class="campo" id="tecRen" value="${esc(x)}" autocomplete="off"><button class="mbtn go" data-a="tecRenOk" data-v="${esc(x)}">Salvar</button><button class="x" data-a="tecRen" data-v="">Cancelar</button></span>`:`<span class="depc">${ic('i-rolo')}${esc(x)}<button class="x" data-a="tecRen" data-v="${esc(x)}" aria-label="Mudar o nome de ${esc(x)}" style="padding:0 8px;margin-left:4px">✎</button><button class="x" data-a="tecRm" data-v="${esc(x)}" aria-label="Tirar ${esc(x)}" style="padding:0 8px">×</button></span>`).join('')}</div>
     ${ui.tecRmQ?`<div class="aviso">${ic('i-alerta')}<span>Tirar <b>${esc(ui.tecRmQ)}</b> da lista?${usos(ui.tecRmQ)?` ${usos(ui.tecRmQ)} ${usos(ui.tecRmQ)===1?'peça de pedido aberto usa':'peças de pedidos abertos usam'} este tecido; elas continuam com o nome antigo.`:''}</span><button class="mbtn" data-a="tecRmOk" data-v="${esc(ui.tecRmQ)}">Sim, tirar</button><button class="x" data-a="tecRm" data-v="">Não</button></div>`:''}
     <div class="novo-in"><input class="campo" id="tecG" placeholder="Ex.: Moletom PA" autocomplete="off"><button class="mbtn" data-a="addTecG">Adicionar</button></div></div>`}
-function cProdutos(){return `${cardTecidos()}<div class="prods">${state.produtos.map(p=>`<button class="prodc" data-a="produto" data-p="${p.id}">${prodSvg(p.id,'')}<b>${esc(p.nome)}</b><span>${p.steps.length} etapas · ${tMin(sum(p.steps.filter(s=>!isExt(s)).map(s=>s.min)))} por peça</span></button>`).join('')}
+function cProdutos(){return `${cardTecidos()}<div class="prods">${state.produtos.map(p=>`<button class="prodc" data-a="produto" data-p="${p.id}">${prodSvg(p.id,'')}<b>${esc(p.nome)}</b><span>${p.steps.length} etapas · ${tMin(sum(p.steps.filter(s=>!isExt(s)).map(s=>s.min)))} por peça</span>${custoPode()?(c=>`<span class="cu-l${c?'':' sem'}">${c?`Custo: ${brl(c.total)} por peça`:'Sem custo'}</span>`)(custoDe(p.id)):''}</button>`).join('')}
   <button class="prodc add" data-a="nprod">${ic('i-mais')}<b>Cadastrar produto</b></button></div>`}
 function sPesEd(){const e=ui.sheet,internos=state.tipos.filter(t=>!t.externo);
   const nomesEtapas=[...new Set(state.produtos.flatMap(p=>p.steps.filter(s=>e.sabe.includes(s.posto)).map(s=>s.nome)))];
@@ -2573,6 +2575,7 @@ function sProduto(pid){const p=prod(pid);if(!p)return voltar();const key='P'+p.i
     <div class="rotulo">Gola comprada pronta <span class="dica">(deixe vazio se a peça não tem)</span></div><input class="campo" id="prGola" value="${esc(p.golaItem||'')}" placeholder="Ex.: Gola polo" autocomplete="off">
     <div class="acoes"><button class="big go" data-a="prSalvar" data-p="${p.id}">${ic('i-check')}Salvar dados</button></div>
     <div class="rotulo">Desenho</div><div class="linha-dep">${FORMAS.map(([f,n])=>`<button class="depc" data-a="prForma" data-p="${p.id}" data-v="${f}" aria-pressed="${p.forma===f}">${n}</button>`).join('')}</div></div>
+  ${custoPode()?cardCusto(p):''}
   <div class="card"><h2>Variações</h2><p class="dica" style="margin:0 0 10px">Ex.: Manga curta, Manga longa. No pedido, cada peça escolhe uma.</p>
     <div class="linha-dep">${(p.variacoes||[]).map((x,j)=>`<span class="depc">${esc(x)}<button class="x" data-a="rmVar" data-p="${p.id}" data-j="${j}" aria-label="Tirar ${esc(x)}" style="padding:0 8px;margin-left:4px">×</button></span>`).join('')||'<span class="dica">Nenhuma</span>'}</div>
     <div class="novo-in"><input class="campo" id="novaVar" placeholder="Ex.: Manga longa" autocomplete="off"><button class="mbtn" data-a="addVar" data-p="${p.id}">${ic('i-mais')}Adicionar</button></div></div>
@@ -2598,6 +2601,38 @@ function sProduto(pid){const p=prod(pid);if(!p)return voltar();const key='P'+p.i
     <div class="novo-in"><input class="campo" id="novaParte" placeholder="Nova parte (ex.: Bolso)" autocomplete="off"><button class="mbtn" data-a="addParte" data-p="${p.id}">Adicionar</button></div></div>
   <div class="card"><h2>Etapas por máquina</h2>${porMaq.map(x=>`<div class="mat">${ic(x.t.i)}<div><b>${esc(x.t.nome)}</b><span>${x.ss.map(s=>esc(s.nome)).join(' · ')}</span></div><span class="tagp">${x.t.externo?'fora':tMin(sum(x.ss.map(s=>s.min)))}</span></div>`).join('')}</div>
   <div class="acoes"><button class="big neutro" data-a="rmProd" data-p="${p.id}">Excluir este produto</button></div>`}
+/* Custo por peça do produto (base da margem e do "fazer ou mandar para prestador"). Mora em custos/<id do produto>, separado do produto:
+   o produto é lido por todos, o custo só pela gestão (tela e banco, migração 016). Nível: produto (não variação). Total obrigatório; partes opcionais. */
+const custoPode=()=>{const u=usuarioAtual();return !u||u.perfil==='gestao'};
+const custoDe=pid=>(state.custos||[]).find(c=>c.id===pid)||null;
+const CUSTO_PARTES=[['mat','Tecido e aviamentos'],['mao','Mão de obra (costura e acabamento)'],['fora','Prestador de serviço (estampa, bordado fora)']];
+const numBR=v=>{v=String(v??'').replace(/R\$|\s/g,'');if(!v)return null;if(v.includes(','))v=v.replace(/\./g,'').replace(',','.');const n=Number(v);return isFinite(n)?n:NaN};
+const r2=n=>Math.round(n*100)/100;
+const valCampo=v=>v==null?'':Number(v).toFixed(2).replace('.',',');
+/* lê e confere o que foi digitado: {v:{total,mat,mao,fora}} ou {err,campo} */
+function custoConfere(raw){const v={};for(const k of ['total',...CUSTO_PARTES.map(x=>x[0])]){const n=numBR(raw[k]);if(Number.isNaN(n)||(n!=null&&n<0))return {campo:k,err:'Escreva só o valor em reais, por exemplo 32,50.'};v[k]=n==null?null:r2(n)}
+  const soma=r2(CUSTO_PARTES.reduce((a,[k])=>a+(v[k]||0),0));
+  if(v.total==null&&soma>0)v.total=soma;
+  if(!(v.total>0))return {campo:'total',err:'Escreva o custo por peça, por exemplo 32,50.'};
+  if(soma>0&&Math.abs(soma-v.total)>0.005)return {campo:'total',err:`As partes somam ${brl(soma)}, mas o total está ${brl(v.total)}. Acerte um dos dois ou apague o total.`};
+  return {v}}
+/* função de domínio: muda o custo e registra o evento com a fotografia */
+function defineCusto(pid,v){const p=prod(pid);if(!p||!(v.total>0))return null;state.custos=state.custos||[];const i=state.custos.findIndex(c=>c.id===pid),de=i>=0?state.custos[i].total:null;
+  const c={id:pid,total:v.total,ts:now(),por:quemNome()||''};CUSTO_PARTES.forEach(([k])=>{if(v[k]!=null)c[k]=v[k]});
+  if(i>=0)state.custos[i]=c;else state.custos.push(c);
+  ev('custo.informado',{ref:pid,de,para:v.total,dados:{produto:p.nome,total:v.total,mat:v.mat,mao:v.mao,fora:v.fora}});return c}
+function cardCusto(p){const c=custoDe(p.id),E=ui.cuP===p.id?ui.cuErr:null,R=ui.cuP===p.id&&ui.cuVal?ui.cuVal:null;
+  const val=k=>esc(R?R[k]??'':valCampo(c?.[k]));const temParte=CUSTO_PARTES.some(([k])=>R?R[k]:c?.[k]!=null);
+  const erro=k=>E&&E.campo===k?`<div class="aviso" id="cuErr">${ic('i-alerta')}${esc(E.err)}</div>`:'';
+  const campo=(k,rot,ex)=>`<label class="rotulo" for="cu_${k}">${rot}</label><input class="campo cu-in" id="cu_${k}" inputmode="decimal" value="${val(k)}" placeholder="${ex}" autocomplete="off"${E&&E.campo===k?' aria-invalid="true" aria-describedby="cuErr"':''}>${erro(k)}`;
+  return `<div class="card" id="CustoProd"><h2>Custo por peça</h2>
+    <p class="cu-info">${c?`Hoje: <b>${brl(c.total)}</b> por peça.<br>Informado em ${dataCurta(c.ts)}${c.por?` por ${esc(c.por)}`:''}.`:'Ainda sem custo.'}</p>
+    <p class="dica" style="margin:0 0 6px">Quanto custa fazer uma peça, em reais. Só a gestão vê.</p>
+    ${campo('total','Custo por peça (R$)','Ex.: 32,50')}
+    <details class="cu-sep"${temParte||(E&&E.campo!=='total')?' open':''}><summary class="mbtn neutro2">${ic('i-lista')}Separar o custo (se souber)</summary>
+      ${CUSTO_PARTES.map(([k,n])=>campo(k,n+' (R$)','Ex.: 10,00')).join('')}
+      <p class="dica" style="margin:8px 0 0">Se deixar o custo por peça vazio, ele vira a soma das partes.</p></details>
+    <div class="acoes"><button class="big go" data-a="cuSalvar" data-p="${p.id}">${ic('i-check')}Salvar custo</button></div></div>`}
 /* Etapas do produto em lista (pedido da Martins, 10/2026): mudar a ordem, inserir, editar e excluir sem mexer em setas.
    A ordem da lista é a ordem de p.steps (sempre válida: cada etapa vem depois das que espera). */
 function ordemEt(p){const ok=p.steps.every((z,i)=>z.deps.every(d=>p.steps.slice(0,i).some(y=>y.id===d)));return ok?p.steps:topo(p)}
@@ -2965,6 +3000,7 @@ const FAQ=[
 {c:'ped',q:'Como separo peça masculina e feminina?',k:'feminina feminino masculina masculino modelagem baby look babylook separar mulher homem',r:['No novo pedido, cada peça pergunta: Masculina ou feminina?','Se o pedido tem as duas, adicione a peça duas vezes: uma masculina e outra feminina, cada uma com seus tamanhos.','A ficha de produção mostra MASCULINA ou FEMININA em destaque, para a costura não confundir.','Na importação da ficha, o sistema já marca sozinho quando está escrito feminina ou masculina.'],ir:'ped'},
 {c:'cad',q:'Onde marco cobre gola e segunda barra da polo?',m:'polo',k:'cobre gola segunda barra peitilho polo detalhe cor secundária punho manga gola',r:['Na polo, a cor do detalhe vai no peitilho, no cobre gola e na segunda barra da manga.','No novo pedido, em Outras cores na peça, escolha a cor e toque nessas partes.','Na importação, quando a ficha da polo diz “gola” ou “manga” no detalhe, o sistema já entende como cobre gola e segunda barra.'],ir:'ped'},
 {c:'cad',q:'Como cadastro variações como manga longa e manga curta?',k:'variação variações manga longa manga curta modelo versão produto camisa social',r:['Vá em Cadastros › Produtos e abra o produto.','No quadro Variações, escreva a variação (ex.: Manga longa) e toque em Adicionar.','No novo pedido, cada peça desse produto escolhe a variação. Ela aparece no pedido e na ficha de produção.'],ir:'cad:produtos'},
+{c:'cad',q:'Onde coloco o custo de um produto?',k:'custo custa quanto custa preço de custo margem lucro valor por peça produto mão de obra prestador tecido',r:['Vá em Cadastros › Produtos e abra o produto.','No quadro Custo por peça, escreva quanto custa fazer uma peça (ex.: 32,50) e toque em Salvar custo.','Se souber, toque em Separar o custo e escreva tecido e aviamentos, mão de obra e prestador de serviço.','Só a gestão vê o custo. A lista de produtos mostra quais ainda estão sem custo.'],ir:'cad:produtos',g:1},
 {c:'cad',q:'Posso fazer qualquer peça em qualquer tecido?',k:'qualquer tecido tecidos lista geral tecido novo cadastrar tecido malha piquet',r:['Sim. No pedido, o tecido sai de uma lista geral, com todos os tecidos cadastrados.','Para cadastrar um tecido novo: no pedido, escolha Novo tecido na lista. Ou vá em Cadastros › Ajustes › Tecidos.','O mesmo tecido não entra duas vezes, mesmo escrito com letras diferentes.'],ir:'cad:ajustes#Tecidos'},
 {c:'ped',q:'Como imprimo as etiquetas do corte?',m:'etq',k:'etiqueta etiquetas térmica impressora corte cortador paninho escrever pacote personalização qr code adesivo tamanho folha 10x15 duas por folha filtro só camiseta blusa calça bermuda',r:['Abra o pedido e toque em Etiquetas, ao lado de PDF de produção.','Saem dois tipos, em 10 × 7,5 cm: uma de pacote para cada tamanho de cada peça (ex.: 10 P, 20 M e 15 G dão 3 etiquetas, cada uma com o tamanho e a quantidade) e uma de personalização para cada parte que sai para bordar, estampar ou aplicar DTF.','Vão duas etiquetas em cada folha de 10 × 15 cm, uma embaixo da outra. Se o número for ímpar, a última folha sai com a metade de baixo em branco.','Quer só algumas peças? Em "Quais peças?", toque em Camiseta, Calça… (pode marcar mais de uma). Imprimir e Baixar PDF saem só com as marcadas. "Todas as peças" volta a mostrar tudo.','Toque em Imprimir (impressora térmica, papel 10 × 15 cm, escala 100%) ou em Baixar PDF.','O QR code de cada etiqueta abre a ficha de produção daquela peça em qualquer celular, sem precisar entrar no app. Só mostra aquela ficha: o resto do sistema continua fechado.'],ir:'ped'},
 {c:'esc',q:'Dá para cortar pedidos juntos?',m:'junto',k:'cortar junto corte junto mesmo tecido mesma cor enfesto aproveitar outras fichas pretas juntar corte',r:['Sim. Na tarefa de Corte aparece o quadro Dá para cortar junto.','Ele mostra as peças de outros pedidos com o mesmo tecido e a mesma cor que ainda não foram cortadas, mesmo que o modelo seja outro (ex.: dois modelos de polo) e mesmo que a entrega seja mais para frente.','Cada uma diz se já está liberada para cortar. Toque nela para abrir o pedido. Quem decide se corta junto é a equipe.'],ir:'ped'},
@@ -4155,7 +4191,8 @@ function permCard(){return `<div class="perm-c" id="Permissoes"><h3>O que o Escr
 /* ================= cópias de segurança ================= */
 const ehExemplo=p=>!!(p&&p.exemplo);
 const hojeISO=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
-const snapshot=()=>JSON.stringify({...state,_app:'martins',_ts:now()});
+/* O custo dos produtos é só da gestão (migração 016). As cópias são lidas por todos: não levam custos/*, e restaurar mantém os custos atuais. */
+const snapshot=()=>{const {custos,...st}=state;return JSON.stringify({...st,_app:'martins',_ts:now()})};
 async function backupNuvem(nome){if(NV.modo!=='nuvem'||!NV.db)return false;const data=snapshot();const n=Math.ceil(data.length/PARTE);
   try{for(let k=0;k<n;k++)await NV.db.doc(`backupp/${nome}~${k}`).set({d:data.slice(k*PARTE,(k+1)*PARTE)});await NV.db.doc(`backup/${nome}`).set({n,tam:data.length,ts:now(),por:quemNome()||'',pedidos:state.pedidos.length});return true}catch(e){return false}}
 async function backupDiario(){if(NV.modo!=='nuvem'||!NV.db)return;try{const hoje=hojeISO();const b=await NV.db.doc(`backup/${hoje}`).get();if(!b.exists)await backupNuvem(hoje);
@@ -4163,7 +4200,7 @@ async function backupDiario(){if(NV.modo!=='nuvem'||!NV.db)return;try{const hoje
   const lx=Date.now()-60*DIA;const X=NV.db.lixIdx?await NV.db.lixIdx():(await NV.db.collection('lixeira').get()).docs.map(d=>({id:d.id,ts:d.data()?.ts||0}));for(const d of X){if((d.ts||0)<lx)await NV.db.doc(`lixeira/${d.id}`).delete()}}catch(e){}}
 async function lerBackup(nome){const m=await NV.db.doc(`backup/${nome}`).get();if(!m.exists)return null;const n=m.data().n;const ps=await Promise.all(Array.from({length:n},(_,k)=>NV.db.doc(`backupp/${nome}~${k}`).get()));if(ps.some(x=>!x.exists))return null;return JSON.parse(ps.map(x=>x.data().d).join(''))}
 async function restaurar(obj){if(!obj||!Array.isArray(obj.pedidos)||!Array.isArray(obj.produtos))throw new Error('arquivo inválido');await backupNuvem(`${hojeISO()}-antes-de-restaurar-${Date.now().toString(36)}`);
-  const {_app,_ts,...st}=obj;snap();state=normalizar(st);RC={};save();render();tick()}
+  const {_app,_ts,custos,...st}=obj;const cus=state.custos||[];snap();state=normalizar(st);state.custos=cus;RC={};save();render();tick()}
 async function sSeg(){}
 /* Modelo de fábrica: a configuração sem os dados do dia a dia. Serve para começar outra confecção a partir desta. */
 const MODELO_CFG=['temposHist','vocab','modOff','setores','escOff','liberaCom','escNomes','cargoFun','vendFaz','cats','fatorEsp','cores','pesos','posicoes','tamPadrao','partesExtra','probs','papeis','tecidos','termos','expediente','params','tEsc'];
@@ -4892,9 +4929,12 @@ const A={
   fOk:()=>{eRead();const e=ui.sheet;if(!e.nome.trim()){e.err='Escreva o nome do fornecedor';return render()}snap();
     const obj={id:e.id||uid('f'),nome:e.nome.trim(),servico:e.servico,prazo:e.prazo,leva:e.leva};const i=state.forn.findIndex(f=>f.id===e.id);i<0?state.forn.push(obj):state.forn[i]=obj;ui.sheet=null;commit();toast(`${obj.nome} salvo`)},
   fxSel:d=>{ui.fx=ui.fx&&ui.fx.k===d.k&&ui.fx.s===d.s?null:{k:d.k,s:d.s};render()},
-  produto:d=>{ui.fx=null;openSheet({t:'produto',p:d.p})},
+  produto:d=>{ui.fx=null;ui.cuErr=null;ui.cuVal=null;openSheet({t:'produto',p:d.p})},
   addEtapa:d=>{const p=prod(d.p),L=p?ordemEt(p):[],ap=d.s||L.filter(z=>faseT(z.posto)!=='acab').slice(-1)[0]?.id;openSheet({t:'etapa',p:d.p,ins:d.s||null,nome:'',posto:null,deps:ap?[ap]:[],partes:[...(sMap(p)[ap]?.partes||[])],min:0.5,pers:false,fecha:false,obs:'',err:''})},
   ePt:d=>{eRead();togl(ui.sheet.partes,d.v);render()},
+  cuSalvar:d=>{const p=prod(d.p);if(!p||!custoPode())return;const raw={};['total',...CUSTO_PARTES.map(x=>x[0])].forEach(k=>raw[k]=document.getElementById('cu_'+k)?.value||'');
+    const r=custoConfere(raw);ui.cuP=p.id;if(r.err){ui.cuErr=r;ui.cuVal=raw;render();setTimeout(()=>document.getElementById('cu_'+r.campo)?.focus(),0);return}
+    ui.cuErr=null;ui.cuVal=null;snap();defineCusto(p.id,r.v);commit();toast(`Pronto! Custo de ${p.nome}: ${brl(r.v.total)} por peça`,true)},
   prSalvar:d=>{const p=prod(d.p),n=(document.getElementById('prNome')?.value||'').trim(),c=parseFloat((document.getElementById('prCons')?.value||'').replace(',','.')),g=(document.getElementById('prGola')?.value||'').trim();if(!n){toast('Escreva o nome',false);return}snap();p.nome=n;if(!isNaN(c)&&c>=0)p.consumo=c;p.golaItem=g||undefined;commit();toast('Dados salvos')},
   prForma:d=>{snap();prod(d.p).forma=d.v;commit()},
   rmTec:d=>{const p=prod(d.p);if(p.tecidos.length<=1){toast('O produto precisa de pelo menos um tecido',false);return}snap();p.tecidos=p.tecidos.filter(x=>x!==d.v);commit();toast(`${d.v} tirado`)},
@@ -5148,7 +5188,7 @@ function sQuem(){return `${voltar('Voltar')}<h1>Quem está usando este aparelho?
   <div class="eq-l">${state.pessoas.map(p=>`<button class="eq" data-a="quemSel" data-v="${p.id}" aria-pressed="${QUEM===p.id}">${av(p.id)}<span class="eq-t"><b>${esc(p.nome)}</b><span>${esc(papeisTxt(p))}</span></span>${QUEM===p.id?ic('i-check'):''}</button>`).join('')}</div>`}
 
 /* ================= nuvem (banco de dados compartilhado) ================= */
-const COLS=['tipos','pessoas','forn','produtos','pedidos','lotes','consertos','clientes','arquivos','usuarios','catcli','cavenda'];
+const COLS=['tipos','pessoas','forn','produtos','pedidos','lotes','consertos','clientes','arquivos','usuarios','catcli','cavenda','custos'];
 const NV={db:null,modo:'local',st:'',Q:new Set(),acked:{},last:{},busy:false,subs:[],pendR:false,timer:null,pronto:false,erro:'',soLer:false,avisoT:0};
 const stab=v=>JSON.stringify(v,(k,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.keys(x).sort().reduce((o,k2)=>(o[k2]=x[k2],o),{}):x);
 const limpo=v=>JSON.parse(JSON.stringify(v));
@@ -5173,7 +5213,7 @@ function nuvemSalvar(){if(NV.modo!=='nuvem')return;const cur=paraDocs(state);con
   Object.keys(NV.last).forEach(p=>{if(!(p in cur))NV.Q.add(p)});NV.last=nl;nuvemEnviar()}
 async function nuvemEnviar(){if(NV.busy||!NV.db||!NV.Q.size)return;NV.busy=true;syncSt('salvando');let falhou=false;
   try{while(NV.Q.size){const p=NV.Q.values().next().value;const cur=paraDocs(state)[p];const ref=NV.db.doc(p);
-      try{if(!cur){const [col,idd]=p.split('/');if(col!=='log'&&NV.acked[p]){await NV.db.doc(`lixeira/${col}~${idd}~${Date.now().toString(36)}`).set({col,id:idd,data:NV.acked[p],ts:now(),por:quemNome()||''})}await ref.delete();delete NV.acked[p];sinGuarda()}
+      try{if(!cur){const [col,idd]=p.split('/');if(col!=='log'&&col!=='custos'&&NV.acked[p]){await NV.db.doc(`lixeira/${col}~${idd}~${Date.now().toString(36)}`).set({col,id:idd,data:NV.acked[p],ts:now(),por:quemNome()||''})}await ref.delete();delete NV.acked[p];sinGuarda()}
         else{const old=NV.acked[p];const pt=old?difPatch(old,cur):null;
           if(!old||pt===null)await ref.set(cur);else if(Object.keys(pt).length)await ref.update(pt);NV.acked[p]=cur;sinGuarda()}
         NV.Q.delete(p)}

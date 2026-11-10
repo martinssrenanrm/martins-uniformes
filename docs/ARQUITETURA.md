@@ -64,6 +64,7 @@ Base: auditoria do código em 01/11/2026 (telas e jornadas, ações e registros,
 | **Empresa (cliente)** | `clientes/<id>` | nome, CNPJ, contato | mesmo nome com CNPJ diferente = empresas diferentes |
 | **Tipo do cliente do Conta Azul** | `catcli/<id do cliente no Conta Azul>` | `nome`, `tipo` (um da lista `config/main › tiposCli`) | a lista é da fábrica (padrão: `tiposCliente` do `clientes/<id>.json`, ou vazia); tipo fora da lista = sem tipo. `faturamento()` (012) soma por ele |
 | **Venda do Conta Azul fora da produção** | `cavenda/<nº da venda>` | `fora` (quando e quem), `cliente`, `total` | a venda com pedido é a que tem o número em `pedido.ficha`; `fora:null` = voltou para a lista. Lista: `vendas_para_pedido()` (013) |
+| **Custo do produto** | `custos/<id do produto>` | `total` (R$ por peça), `mat`, `mao`, `fora` (opcionais), `ts`, `por` | só a gestão lê e grava (016); fora do produto porque o produto é lido por todos; não vai para `backup/` nem `lixeira/`; restaurar cópia mantém os custos atuais |
 | **Arquivo** | `arquivos/<id>` + Storage | tipo (mockup/arte/bordado), `bin` (onde está), `prev` (miniatura) | só mockup é comprimido; arte e programa vão no tamanho original |
 | **Produto e roteiro** | `produtos/<id>` | etapas (`posto`, `deps`, `min` por peça), tecidos, aviamentos | produto usado em pedido não pode ser apagado |
 | **Máquina/serviço** | `tipos/<id>` | nome, quantas máquinas, setor, se é feito fora | |
@@ -110,7 +111,7 @@ Base: auditoria do código em 01/11/2026 (telas e jornadas, ações e registros,
 | Produção | `etapa.iniciada`, `etapa.concluida`, `etapa.pessoa_trocada`, `etapa.pausada`, `etapa.dividida`, `etapa.inicio_cancelado`, `etapa.revertida`, `etapa.horario_corrigido`, `hora_extra.autorizada` / `hora_extra.encerrada` |
 | Prestador | `etapa.terceirizada` / `etapa.terceirizacao_desfeita`, `remessa.enviada`, `remessa.retornada`, `remessa.cancelada`, `fornecedor.trocado` |
 | Qualidade | `conserto.aberto` (com quem fez a etapa de origem) |
-| Pessoas e cadastros | `pessoa.ausente` / `pessoa.disponivel`, `tempo_padrao.alterado`, `acesso.alterado`, `cliente.tipo_marcado` |
+| Pessoas e cadastros | `pessoa.ausente` / `pessoa.disponivel`, `tempo_padrao.alterado`, `acesso.alterado`, `cliente.tipo_marcado`, `custo.informado` (de/para = total; fotografia com produto e partes) |
 | Sistema | `app.aberto`, `acao.desfeita`; a contagem de telas fica na tabela `uso` (por dia, sem registrar o que a pessoa viu) |
 
 **Como acrescentar um evento:**

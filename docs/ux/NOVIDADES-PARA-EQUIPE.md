@@ -793,3 +793,18 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 **O que NÃO mudou:** o **+ Novo pedido** e a importação de PDF continuam iguais. A Lista de compras continua no mesmo lugar. Nenhum pedido é criado sozinho: sempre alguém confere e confirma.
 
 **Risco de estranhamento:** baixo. Acrescenta um botão no Escritório, embaixo da Lista de compras, só quando há venda sem pedido.
+
+---
+
+## Custo por peça de cada produto
+
+**Para quem:** gestão (só a gestão vê).
+
+**O que mudou:** em **Cadastros › Produtos**, cada produto mostra **"Custo: R$ … por peça"** ou **"Sem custo"**. Abrindo o produto, logo abaixo de **Dados do produto**, tem o quadro **Custo por peça**:
+- Escreva quanto custa fazer uma peça (ex.: 32,50) e toque em **Salvar custo**.
+- Se souber, toque em **Separar o custo** e escreva tecido e aviamentos, mão de obra e prestador de serviço. Deixando o custo por peça vazio, ele vira a soma.
+- O app guarda o dia e quem informou. Mudar de novo não apaga o valor antigo: fica na história, para comparar depois.
+
+**O que NÃO mudou:** nenhum botão mudou de lugar. Escritório e produção não veem o custo.
+
+**Risco de estranhamento:** baixo. Acrescenta um quadro na ficha do produto e uma linha em cada produto da lista, só para a gestão.
