@@ -107,10 +107,10 @@ Os arquivos antigos são levados sozinhos por um computador da gestão (não rod
 ## Venda nova na hora (função conta-azul, migrações 014 e 015)
 - **Onde mora:** a busca no Conta Azul é a função `conta-azul` do Supabase (`supabase/functions/conta-azul`). O agendador do banco (pg_cron) chama a cada 3 min, seg–sáb, 7h–19h, e às 02:30. O botão "Buscar vendas agora" (gestão e escritório) chama a mesma função.
 - **Token:** só a função usa o token do Conta Azul (`integracoes`, só o servidor lê). Trava `ca_trava` = uma busca por vez; o acesso de 1 hora é reaproveitado.
-- **Segredos:** `CA_CLIENT_ID` e `CA_CLIENT_SECRET` só nos segredos da função (painel). O segredo do agendador e o endereço da função ficam no Vault. Nada disso vai para o navegador nem para repositório.
+- **Segredos:** `CA_CLIENT_ID` e `CA_CLIENT_SECRET` só nos segredos da função (painel). Os códigos também podem vir de `integracoes` › `conta-azul-app` (gravados pela rotina "Vendas do Conta Azul" do repositório privado a partir dos segredos de lá). O segredo do agendador fica no Vault; o endereço da função, em `ca_config`. Nada disso vai para o navegador nem para repositório.
 - **Aviso ao app:** a função grava `docs_sinal` `cavsinal/vendas`; o app recarrega só a lista de vendas.
 - **014** prepara (trava, `ca_estado`, `ca_pode_buscar`, `ca_cron_confere`), **015** liga o agendador. Desligar: `select cron.unschedule('conta-azul-rapida'); select cron.unschedule('conta-azul-noite');`.
-- **Troca (uma vez):** segredos colados → publicar a função (verify_jwt desligado) → tirar o horário de `conta-azul-vendas.yml` em martins-uniformes-copias → `conta_azul_url` no Vault → 015 → tocar em "Buscar vendas agora" e conferir.
+- **Troca (uma vez):** segredos colados → publicar a função (verify_jwt desligado) → tirar o horário de `conta-azul-vendas.yml` em martins-uniformes-copias → endereço em `ca_config` → 015 → tocar em "Buscar vendas agora" e conferir.
 
 ## Página pública do QR (migração 008)
 A etiqueta vai para o prestador: a ficha pública **não leva o preço unitário nem o registro das etapas** (quem fez e quando). O mockup que já está no Storage volta como `st:<nome>` e o app baixa direto.

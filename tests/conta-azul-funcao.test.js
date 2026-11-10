@@ -8,7 +8,7 @@ function falsos({vendas=[],acesso=null,acessoAte=null,ultima='2026-11-09T13:50:0
   const st={integ:{nome:'conta-azul',segredo:'rt-0',info:{ultima_sincronizacao:ultima,acesso,acesso_ate:acessoAte}},vendas:new Map(),sinais:[],ordem:[],tokens:new Set(['rt-0']),n:0,buscas:[],trava:{dono:null,ate:0},detalhes:[],limite};
   const json=(s,o,h={})=>new Response(JSON.stringify(o),{status:s,headers:{'content-type':'application/json',...h}});
   const f=async(url,o={})=>{const u=new URL(url);const m=(o.method||'GET').toUpperCase();const b=o.body?String(o.body):'';
-    if(u.pathname==='/oauth/token'){st.ordem.push('token');const p=new URLSearchParams(b);if(revogado)return json(400,{error:'invalid_grant',error_subtype:'access_revoked'});
+    if(u.pathname==='/oauth/token'){st.ordem.push('token');st.basic=o.headers.Authorization;const p=new URLSearchParams(b);if(revogado)return json(400,{error:'invalid_grant',error_subtype:'access_revoked'});
       if(!st.tokens.has(p.get('refresh_token')))return json(400,{error:'invalid_grant',error_subtype:'invalid_refresh_token'});st.tokens.clear();const novo='rt-'+(++st.n);st.tokens.add(novo);return json(200,{access_token:'at-'+st.n,refresh_token:novo,expires_in:3600})}
     if(u.pathname==='/v1/venda/busca'){st.ordem.push('busca');st.buscas.push(u.search);if(!/^Bearer at-/.test(o.headers.Authorization))return json(401,{});
       if(st.limite>0){st.limite--;return json(429,{error:'too_many'},{'retry-after':'1'})}
@@ -18,7 +18,7 @@ function falsos({vendas=[],acesso=null,acessoAte=null,ultima='2026-11-09T13:50:0
       return json(200,{itens:[{id_item:'p1',nome:'Camisa polo',descricao:'M/10',quantidade:10,valor:v.total/10,custo:1}]})}
     if(u.pathname==='/rest/v1/rpc/ca_trava_pega'){const a=JSON.parse(b);const t=Date.now();if(st.trava.ate<t||st.trava.dono===a.dono){st.trava={dono:a.dono,ate:t+a.segundos*1000};return json(200,true)}return json(200,false)}
     if(u.pathname==='/rest/v1/rpc/ca_trava_solta'){const a=JSON.parse(b);if(st.trava.dono===a.dono)st.trava.ate=0;return json(200,null)}
-    if(u.pathname==='/rest/v1/integracoes'){if(m==='GET')return json(200,[st.integ]);if(m==='PATCH'){const x=JSON.parse(b);if(x.segredo)st.ordem.push('guarda-token');Object.assign(st.integ,x);return new Response(null,{status:204})}}
+    if(u.pathname==='/rest/v1/integracoes'){if(m==='GET'&&u.searchParams.get('nome')==='eq.conta-azul-app')return json(200,st.app?[{segredo:JSON.stringify(st.app)}]:[]);if(m==='GET')return json(200,[st.integ]);if(m==='PATCH'){const x=JSON.parse(b);if(x.segredo)st.ordem.push('guarda-token');Object.assign(st.integ,x);return new Response(null,{status:204})}}
     if(u.pathname==='/rest/v1/ca_vendas'){if(m==='POST'){JSON.parse(b).forEach(l=>st.vendas.set(l.id,{...(st.vendas.get(l.id)||{}),...l}));return new Response(null,{status:201})}
       if(m==='PATCH'){const id=u.searchParams.get('id').slice(3);Object.assign(st.vendas.get(id),JSON.parse(b));return new Response(null,{status:204})}
       if(m==='GET'){const min=(u.searchParams.get('data')||'').replace('gte.','');return json(200,[...st.vendas.values()].filter(l=>l.itens==null&&/^(APROVADO|FATURADO)$/.test(l.situacao)&&String(l.data)>=min).map(l=>({id:l.id})))}}
@@ -70,5 +70,8 @@ const V=(n,sit,data='2026-11-09',total=100)=>({id:'v'+n,numero:n,data,total,situ
   console.log('5) Conta Azul com problema');
   F=falsos({vendas:[V(1,'APROVADO')],limite:2});x=await roda(F);ok(!x.e&&x.r.vendas===1,'limite de chamadas (429): espera e tenta de novo',x);
   F=falsos({revogado:true});x=await roda(F);ok(x.e&&/access_revoked/.test(x.e)&&/conectar o Conta Azul de novo/.test(x.e)&&F.st.integ.segredo==='rt-0','autorização cancelada: diz para conectar de novo e não mexe no token',x);
-  x=await sincronizar({env:{...ENV,CA_CLIENT_SECRET:''},f:falsos().f}).then(()=>({}),e=>({e:e.message}));ok(/CA_CLIENT_SECRET/.test(x.e||''),'sem o segredo na função: diz qual falta',x);
+  const SEM={...ENV,CA_CLIENT_ID:'',CA_CLIENT_SECRET:''};
+  F=falsos({vendas:[V(1,'APROVADO')]});F.st.app={client_id:'cid2',client_secret:'csec2'};x=await sincronizar({env:SEM,f:F.f,agora:()=>AGORA});
+  ok(x.vendas===1&&F.st.basic==='Basic '+Buffer.from('cid2:csec2').toString('base64'),'sem os segredos na função: usa os códigos guardados no banco (conta-azul-app)',F.st.basic);
+  x=await sincronizar({env:SEM,f:falsos().f,agora:()=>AGORA}).then(()=>({}),e=>({e:e.message}));ok(/CA_CLIENT_ID e CA_CLIENT_SECRET/.test(x.e||''),'sem códigos em lugar nenhum: diz o que falta',x);
   console.log(falhas?`\n${falhas} FALHA(S)`:'\nTudo certo.');process.exit(falhas?1:0)})();

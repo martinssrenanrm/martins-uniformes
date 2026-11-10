@@ -10,7 +10,7 @@ const resp = (status: number, o: unknown) => new Response(JSON.stringify(o), { s
 const env = Deno.env.toObject();
 
 async function rpc(nome: string, args: unknown, token: string, chave: string) {
-  const r = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/${nome}`, { method: 'POST', headers: { apikey: chave, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(args) });
+  const r = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/${nome}`, { method: 'POST', headers: { apikey: chave, ...(token.startsWith('eyJ') ? { Authorization: `Bearer ${token}` } : {}), 'Content-Type': 'application/json' }, body: JSON.stringify(args) });
   return r.ok ? r.json() : null;
 }
 

@@ -16,10 +16,10 @@ export async function sincronizar({ modo = 'rapida', desde = null, env, f = fetc
   const CA = String(env.CA_API || 'https://api-v2.contaazul.com').replace(/\/+$/, '');
   const SB = String(env.SUPABASE_URL || '').replace(/\/+$/, '');
   const SBK = env.SUPABASE_SERVICE_ROLE_KEY || '';
-  const faltam = ['CA_CLIENT_ID', 'CA_CLIENT_SECRET', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'].filter((k) => !env[k]);
+  const faltam = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'].filter((k) => !env[k]);
   if (faltam.length) falha(`faltam os segredos ${faltam.join(', ')} na função.`);
   const DIAS = Number(env.CA_DETALHE_DIAS || 90), MAX = Number(env.CA_DETALHE_MAX || (modo === 'rapida' ? 40 : 400));
-  const sbCab = { apikey: SBK, Authorization: `Bearer ${SBK}`, 'Content-Type': 'application/json' };
+  const sbCab = { apikey: SBK, ...(SBK.startsWith('eyJ') ? { Authorization: `Bearer ${SBK}` } : {}), 'Content-Type': 'application/json' };
   const sb = async (caminho, o = {}) => {
     const r = await f(SB + caminho, { ...o, headers: { ...sbCab, ...(o.headers || {}) } });
     if (!r.ok) falha(`Supabase ${o.method || 'GET'} ${caminho.split('?')[0]} respondeu ${r.status}: ${(await r.text()).slice(0, 300)}`);
@@ -27,6 +27,14 @@ export async function sincronizar({ modo = 'rapida', desde = null, env, f = fetc
   };
   const rpc = async (nome, args) => (await sb(`/rest/v1/rpc/${nome}`, { method: 'POST', body: JSON.stringify(args) })).json();
 
+  // Códigos da aplicação do Conta Azul: segredos da função ou, se não houver, integracoes 'conta-azul-app'
+  // (gravado pela rotina do GitHub a partir dos segredos de lá; só a chave de serviço lê).
+  let cid = env.CA_CLIENT_ID, csec = env.CA_CLIENT_SECRET;
+  if (!cid || !csec) {
+    const [app] = await (await sb('/rest/v1/integracoes?nome=eq.conta-azul-app&select=segredo')).json();
+    try { const j = JSON.parse(app?.segredo || '{}'); cid = cid || j.client_id; csec = csec || j.client_secret; } catch { /* inválido */ }
+    if (!cid || !csec) falha('faltam os códigos da aplicação do Conta Azul (CA_CLIENT_ID e CA_CLIENT_SECRET).');
+  }
   const dono = `${modo}-${agora()}-${Math.random().toString(36).slice(2, 8)}`;
   if (!(await rpc('ca_trava_pega', { dono, segundos: 140 }))) return { ocupado: true };
   try {
@@ -38,7 +46,7 @@ export async function sincronizar({ modo = 'rapida', desde = null, env, f = fetc
     // acesso: reaproveita enquanto vale (com 2 min de folga); senão renova e grava o token novo na hora
     let acesso = info.acesso && Date.parse(info.acesso_ate || 0) > agora() + 120e3 ? info.acesso : null;
     if (!acesso) {
-      const r = await f(`${CA}/oauth/token`, { method: 'POST', headers: { Authorization: 'Basic ' + btoa(`${env.CA_CLIENT_ID}:${env.CA_CLIENT_SECRET}`), 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: integ.segredo }) });
+      const r = await f(`${CA}/oauth/token`, { method: 'POST', headers: { Authorization: 'Basic ' + btoa(`${cid}:${csec}`), 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: integ.segredo }) });
       const txt = await r.text(); let j = {}; try { j = JSON.parse(txt); } catch { /* não-JSON */ }
       if (!r.ok || !j.access_token || !j.refresh_token) {
         const revogado = ['access_revoked', 'invalid_refresh_token'].includes(j.error_subtype);
