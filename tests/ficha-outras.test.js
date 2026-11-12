@@ -20,5 +20,10 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   ok(r.tot,'mostra o total do pedido e quantas fichas tem');
   ok(r.so,'pedido de uma peça só não tem o quadro');
   ok(r.pb,'a versão preto e branco também traz o quadro');
+  // fichaVias (clientes/<id>.json): quantas vias vêm marcadas ao abrir o PDF de produção
+  const v=await A.evaluate(async()=>{const ped=state.pedidos.find(p=>lotesDe(p.id).some(l=>!l.rework));delete CLIENTE.fichaVias;await abreDoc('prod',ped.id);const pad=[ui.sheet.vias,ui.sheet.mocks];
+    CLIENTE.fichaVias=1;await abreDoc('prod',ped.id);const um=[ui.sheet.vias,ui.sheet.mocks];const t=document.getElementById('sheet').innerText;delete CLIENTE.fichaVias;ui.sheet=null;return {pad,um,pg:/Baixar PDF/.test(t)}});
+  ok(v.pad[0]===2&&v.pad[1]===true,'sem configuração: abre com 1ª e 2ª via e mockups');
+  ok(v.um[0]===1&&v.um[1]===true&&v.pg,'fábrica com fichaVias 1: abre com Só 1ª via e Incluir mockups');
   ok(!erros.length,'sem erros na página'+(erros.length?': '+erros.join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} FALHA(S)`:'\nTudo certo.');process.exit(falhas?1:0)})();
