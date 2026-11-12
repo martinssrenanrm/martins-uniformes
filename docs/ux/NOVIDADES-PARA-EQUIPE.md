@@ -837,3 +837,10 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 - **NÃO ATRASAR** continua nos pedidos de evento.
 
 **O que NÃO mudou:** o botão continua em Pedidos, no mesmo lugar, com Baixar PDF e Imprimir.
+
+## PDF de produção: já abre com Só 1ª via
+
+**O que mudou:** ao tocar em **PDF de produção**, já vem marcado **Só 1ª via** e **Incluir mockups**.
+- Precisa da 2ª via? Toque em **1ª e 2ª via** antes de baixar ou imprimir.
+
+**O que NÃO mudou:** os botões continuam no mesmo lugar.
