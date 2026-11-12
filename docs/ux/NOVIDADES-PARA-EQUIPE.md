@@ -826,3 +826,14 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 - As etapas continuam sendo marcadas no app, como sempre.
 
 **O que NÃO mudou:** produto, cor, personalização, tamanhos e observações continuam no mesmo lugar da folha.
+
+## Planilha de entregas: novo jeito (mais fácil de ler)
+
+**O que mudou:** o PDF da **Planilha de entregas por semana** foi refeito.
+- As semanas agora vão de **segunda a domingo** (ex.: 09 a 15/11/2026).
+- Colunas: **Prazo**, **Cliente / pedido**, **Itens** (um por linha) e **Fichas de produção**.
+- A cor fica **só no prazo**: vermelho = atrasado, laranja = hoje, amarelo = nos próximos 5 dias úteis, branco = mais para frente. Embaixo da data vem escrito **ATRASADO**, **HOJE**, **EM BREVE** ou **PROGRAMADO**, então dá para ler também em preto e branco.
+- Nada sai cortado: o pedido grande continua na página seguinte e o rodapé não fica mais em cima dos pedidos.
+- **NÃO ATRASAR** continua nos pedidos de evento.
+
+**O que NÃO mudou:** o botão continua em Pedidos, no mesmo lugar, com Baixar PDF e Imprimir.
