@@ -808,3 +808,21 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 **O que NÃO mudou:** nenhum botão mudou de lugar. Escritório e produção não veem o custo.
 
 **Risco de estranhamento:** baixo. Acrescenta um quadro na ficha do produto e uma linha em cada produto da lista, só para a gestão.
+
+## Planilha de entregas por semana
+
+**O que mudou:** em **Pedidos**, apareceu o botão **Planilha de entregas por semana**, logo abaixo da busca.
+- Mostra os pedidos em aberto separados pela semana da entrega (segunda a sexta), no mesmo jeito da planilha impressa: Nº pedido, cliente, quantas fichas, os itens e a data de entrega.
+- Toque em **Baixar PDF** ou **Imprimir**.
+- Data com fundo vermelho é pedido atrasando. **NÃO ATRASAR** aparece nos pedidos de evento.
+
+**O que NÃO mudou:** a busca, o Filtrar, o Ordenar e a lista de pedidos continuam no mesmo lugar.
+
+## Ficha de produção: outras fichas do mesmo pedido
+
+**O que mudou:** na ficha de produção, o quadro **Etapas** saiu. No lugar dele aparece **Outras fichas do mesmo pedido**: a foto, o nome, a cor e a quantidade de cada outra peça do pedido, e o total do pedido.
+- Quem pega uma ficha já sabe o que mais vai junto no pedido.
+- Pedido com uma peça só não tem esse quadro.
+- As etapas continuam sendo marcadas no app, como sempre.
+
+**O que NÃO mudou:** produto, cor, personalização, tamanhos e observações continuam no mesmo lugar da folha.
