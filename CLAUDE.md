@@ -89,6 +89,8 @@ NODE_PATH=$(npm root -g) node tests/hoje.test.js
 NODE_PATH=$(npm root -g) node tests/sugestoes.test.js
 NODE_PATH=$(npm root -g) node tests/celular.test.js
 NODE_PATH=$(npm root -g) node tests/feito-hoje.test.js
+NODE_PATH=$(npm root -g) node tests/entregas-semana.test.js
+NODE_PATH=$(npm root -g) node tests/ficha-outras.test.js
 NODE_PATH=$(npm root -g) node tests/tipo-cliente.test.js   # PGLITE=<pasta> testa também a migração 012
 NODE_PATH=$(npm root -g) node tests/terc-atrasado.test.js
 NODE_PATH=$(npm root -g) node tests/toque-perdido.test.js   # sincronia: o 1º toque depois de abrir chega ao banco
