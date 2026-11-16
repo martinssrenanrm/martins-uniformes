@@ -7,5 +7,31 @@
   "tiposCliente": [
     "Escola",
     "Empresa"
-  ]
+  ],
+  "quadro": {
+    "cols": [
+      {"nome": "Início de Produção", "tipo": "inicio"},
+      {"nome": "Compra", "tipo": "compra"},
+      {"nome": "Corte", "tipo": "prod", "fases": ["corte"]},
+      {"nome": "Personalização", "tipo": "prod", "fases": ["pers"]},
+      {"nome": "Costura", "tipo": "prod", "fases": ["costura"]},
+      {"nome": "Casear / Botão / Silk", "tipo": "prod", "maqs": ["Caseadeira", "Botoneira", "Silk", "Serigrafia"]},
+      {"nome": "Embalagem / Separação", "tipo": "prod", "fases": ["acab"]},
+      {"nome": "Finalizados", "tipo": "fim"}
+    ],
+    "etiquetas": [
+      {"nome": "NÃO ATRASAR", "cor": "amarelo"},
+      {"nome": "Urgente", "cor": "vermelho"},
+      {"nome": "Ficha não está nem no corte nem em compras", "cor": "amarelo"}
+    ],
+    "checklist": [
+      {"nome": "Início de Produção", "itens": ["Tem Mockup?", "Fez ficha de Produção?", "Enviou programa de bordado?", "Enviou amostra?", "Imprimiu ficha de produção?"]},
+      {"nome": "Compra de Insumos", "itens": ["Tecido", "Recorte/punho/filete/galão", "Zíper / Botão / Elástico / Linha", "Tem fotolito?", "Fez tela?"]},
+      {"nome": "Corte", "itens": ["Separou pro Silk/bordado?", "Cortou?"]},
+      {"nome": "Personalização", "itens": []},
+      {"nome": "Costura", "itens": ["Montar Pacote", "Separar elástico, etiqueta, zíper, filete", "Foi pra oficina?"]},
+      {"nome": "Embalagem", "itens": ["Combinar retirada da Amostra"]},
+      {"nome": "Checklist", "itens": []}
+    ]
+  }
 }
