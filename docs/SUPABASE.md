@@ -114,3 +114,6 @@ Os arquivos antigos são levados sozinhos por um computador da gestão (não rod
 
 ## Página pública do QR (migração 008)
 A etiqueta vai para o prestador: a ficha pública **não leva o preço unitário nem o registro das etapas** (quem fez e quando). O mockup que já está no Storage volta como `st:<nome>` e o app baixa direto.
+
+## Migração 017: cartão do pedido no QR code (16/11/2026)
+Rodar `supabase/migrations/017_qr_cartao.sql` no SQL Editor do Supabase (pode rodar de novo). Sem ela, o QR continua abrindo a ficha, mas sem o cartão do pedido.
