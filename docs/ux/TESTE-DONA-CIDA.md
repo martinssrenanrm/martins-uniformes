@@ -132,3 +132,32 @@ Varredura em 360×640 (Hoje, Máquinas, Fora, Escritório, Pedidos, Pedido, folh
 | Folha "Tipo de cliente" | ✅ título + "Marque uma vez" | ✅ um botão por tipo em cada cliente | ✅ 56px, 8px entre botões; a lista não pula ao marcar (teste) | ✅ botão fica azul com ✓ e aviso no alto | ✅ Desfazer no aviso; trocar é tocar no outro tipo | ✅ |
 | Ajustes › Tipos de cliente | ✅ frase diz para que serve | ✅ Adicionar | ✅ mesmo padrão de Motivos de conserto | ✅ "Tipo … adicionado" | ✅ Tirar pede confirmação e diz quem fica sem tipo | ✅ |
 Prints: `docs/ux/prints/tipo-cliente/`. Antes: o quadro Faturamento sem o bloco (prints da publicação de 06/11).
+
+### Quadro de pedidos, estilo Trello (função nova, 16/11/2026)
+Risco de estranhamento: **baixo**. A lista de Pedidos abre igual; o Quadro é uma chave nova ao lado de Pedidos e Empresas, e o bloco novo do pedido abre fechado (só abre sozinho quando se chega pelo Quadro).
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Pedidos › Quadro | ✅ colunas com nome e número; frase "muda de coluna sozinho" | ✅ o cartão é o toque; "Adicionar pedido" em Início | ✅ 48px, letra ≥ 16px, 360px sem corte fora do quadro (teste); no celular a próxima coluna aparece pela metade + "Arraste para o lado" | n/a (só leitura) | ✅ Voltar | ✅ sem "status"/"Kanban" |
+| Pedido › Quadro: etiquetas e checklist | ✅ "No quadro: Costura. Muda sozinho" | ✅ toque no item marca | ✅ itens com 52px, 360px sem corte (teste) | ✅ item fica verde com "Marcado por … em …" | ✅ tocar de novo desmarca; Tirar item ou grupo pede confirmação; Desfazer | ✅ palavras do Trello da equipe |
+| Pedido › Histórico | ✅ | n/a | ✅ | n/a | n/a (não muda nem apaga) | ✅ |
+| Ajustes › Quadro de pedidos (gestão) | ✅ frase diz para que serve | ✅ Salvar / Pôr | ✅ mesmo padrão de Setores | ✅ aviso no alto | ✅ Tirar pede confirmação | ✅ |
+Prints: `docs/ux/prints/quadro/` (antes: a lista de Pedidos não mudou).
+
+### Arquivos do pedido e comentários (fase 2 do quadro, 16/11/2026)
+Risco de estranhamento: **baixo**. O bloco Anexos fica no mesmo lugar, com os mesmos botões; cada arquivo ganhou mais informação e o botão Mudar. Comentários é um bloco novo, fechado.
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Pedido › Anexos | ✅ frase diz o que vai ali | ✅ Anexar ao pedido; no computador, quadro "Arraste os arquivos para cá" | ✅ 48px, letra ≥ 16px, 360px sem corte (teste) | ✅ aviso "Arquivo guardado"; selo "editado" | ✅ Tirar pede confirmação e o arquivo fica em "Arquivos tirados" com Pôr de volta; versão anterior guardada | ✅ "Trocar por uma versão nova", "Tirar do pedido" |
+| Pedido › Comentários | ✅ | ✅ Enviar comentário (verde) | ✅ (teste) | ✅ aviso diz quem vai ver | ✅ Mudar o próprio comentário; texto anterior guardado | ✅ "Avisar quem precisa ver" |
+Prints: `docs/ux/prints/quadro/anexos-*.png`, `versoes-*.png`, `comentarios-*.png`.
+
+### Quadro, fase 3 (16/11/2026)
+Risco de estranhamento: **baixo**. Telas novas (Calendário, Caixa de entrada) e um bloco novo na ficha do QR; nada mudou de lugar.
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| QR code › Cartão do pedido | ✅ "Cartão do pedido · Agora em: Costura" | n/a (só leitura) | ✅ | n/a | ✅ diz que para marcar precisa entrar no app | ✅ |
+| Sininho › Para você | ✅ frase diz o que aconteceu | ✅ toque abre o pedido | ✅ | ✅ o aviso deixa de ser novo | ✅ Fechar | ✅ |
+| Pedidos › Calendário | ✅ mês e número de entregas | ✅ toque no pedido abre | ✅ 48px; no celular vira lista por dia (teste) | n/a | ✅ Hoje volta ao mês atual | ✅ |
+| Quadro › Caixa de entrada | ✅ | ✅ Guardar anotação / Virar pedido | ✅ (teste) | ✅ aviso | ✅ Tirar pede confirmação e não apaga | ✅ |
+| Ajustes › Importar do Trello | ✅ explica onde exportar | ✅ Importar (verde) | ✅ | ✅ aviso com o que entrou | ✅ mostra antes; "Não importar"; importar de novo não repete | ✅ |
+Prints: `docs/ux/prints/quadro/qr-cartao-*.png`, `para-voce-*.png`, `calendario-*.png`, `caixa-*.png`.

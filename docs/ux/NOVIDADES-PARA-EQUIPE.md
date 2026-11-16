@@ -844,3 +844,56 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 - Precisa da 2ª via? Toque em **1ª e 2ª via** antes de baixar ou imprimir.
 
 **O que NÃO mudou:** os botões continuam no mesmo lugar.
+
+## Quadro de pedidos (como o Trello)
+
+**O que mudou:** em **Pedidos** apareceu a chave **Quadro**, entre Pedidos e Empresas.
+- Os pedidos ficam em **colunas**: Início de Produção, Compra, Corte, Personalização, Costura, Casear / Botão / Silk, Embalagem / Separação e Finalizados.
+- **O pedido muda de coluna sozinho**, conforme a produção anda na Fábrica. **Não precisa arrastar.** Se uma peça do pedido está mais atrasada, o cartão fica na coluna dela.
+- Cada cartão mostra o número, o cliente e as peças (ex.: *6262 CLIENTE X - polos e camisetas*), as etiquetas, as datas e quantos itens do checklist já foram feitos.
+- A data fica **vermelha** quando passou do dia, **amarela** quando faltam 2 dias úteis ou menos e **verde** quando o pedido foi entregue.
+- Toque no cartão para abrir o pedido. Lá tem o bloco novo **Quadro: etiquetas e checklist**:
+  - **Etiquetas:** EVENTO, NÃO ATRASAR, Urgente e "Ficha não está nem no corte nem em compras". Toque para pôr ou tirar.
+  - **Responsáveis:** toque no nome de quem cuida do pedido.
+  - **Checklist:** o mesmo do Trello (Início de Produção, Compra de Insumos, Corte, Costura, Embalagem…). Toque no item para marcar. Aparece **quem marcou e quando**. Para pôr ou tirar itens, toque em **Mudar itens**.
+  - **Histórico:** tudo o que foi feito no pedido, com quem e quando. Ninguém consegue apagar.
+- A gestão muda as colunas, as etiquetas e o checklist padrão em **Cadastros › Ajustes › Quadro de pedidos**.
+
+**O que NÃO mudou:** a lista de Pedidos continua igual e abre do mesmo jeito. Nenhum botão mudou de lugar. O pedido é o mesmo: não precisa lançar nada duas vezes.
+
+## Arquivos do pedido com versões, e comentários
+
+**O que mudou no bloco Anexos do pedido:**
+- Cada arquivo mostra **o tipo, o tamanho e "Enviado por … em …"**.
+- Toque em **Mudar** no arquivo para:
+  - mudar o **nome**;
+  - marcar o **tipo**: Ficha de produção, Mockup, Bordado, Fotolito/Tela, Foto ou Outros;
+  - **trocar por uma versão nova**: a versão anterior fica guardada em **Versões** e dá para baixar;
+  - **tirar do pedido**.
+- Arquivo mudado ganha o selo **editado**, com "Editado por … em …".
+- Arquivo tirado **não some**: fica em **Arquivos tirados do pedido**, com "Excluído por … em …", e dá para pôr de volta.
+- **Anexar link** (ex.: pasta do Drive).
+- No computador, dá para **arrastar vários arquivos** de uma vez para o quadro tracejado.
+
+**Comentários (bloco novo no pedido):**
+- Escreva e toque em **Enviar comentário**. Aparece quem escreveu e a hora.
+- Para avisar alguém, toque no nome da pessoa antes de enviar (ou escreva @ e o nome).
+- Quem escreveu pode mudar o comentário; aparece "editado em".
+
+**Observações do pedido:** quando alguém muda, aparece "Editado por … em …".
+
+**O que NÃO mudou:** os botões Anexar ao pedido, Anexar arquivos e Baixar todos continuam no mesmo lugar. O QR code da etiqueta continua baixando os arquivos do pedido (sempre a versão de agora).
+
+## QR code abre o cartão; avisos para você; calendário; caixa de entrada; trazer do Trello
+
+**QR code da etiqueta do corte:** além da ficha de produção, agora mostra o **cartão do pedido**: em que coluna ele está, as etiquetas, as datas, os responsáveis e o checklist (com quem marcou). **Não precisa de acesso ao app.** É só para ver; para marcar, é preciso entrar no app. Comentários e histórico não aparecem no QR code.
+
+**Sininho › Para você:** avisa quando põem você como responsável, quando alguém avisa você num comentário e quando um pedido seu está perto do prazo ou atrasado. No pedido dá para escolher quantos dias antes avisar.
+
+**Pedidos › Calendário:** cada pedido no dia da entrega, com Anterior, Próximo e Hoje. No alto: atrasados, entregas da semana e pedidos por coluna.
+
+**Quadro › Caixa de entrada:** a primeira coluna. Anote rápido (cliente, peças, prazo) e, na hora de lançar, toque em **Virar pedido**.
+
+**Trazer do Trello (gestão):** Cadastros › Ajustes › Quadro de pedidos › Importar do Trello. O cartão com o número de um pedido leva para ele as etiquetas, o checklist, os comentários e os anexos (como link). Os outros vão para a Caixa de entrada. O app mostra antes o que vai entrar e importar de novo não repete nada.
+
+**O que NÃO mudou:** a lista de Pedidos, o Quadro e o pedido continuam no mesmo lugar.
