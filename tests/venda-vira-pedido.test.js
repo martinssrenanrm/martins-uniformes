@@ -81,8 +81,8 @@ const VENDAS=(vend,cli2,cli3)=>{const it=(nome,descricao,quantidade,valor)=>({id
   ok(prim===await p.evaluate(()=>window.P1),'o primeiro sugerido é o pedido do mesmo cliente');
   if(process.env.PRINTS){await p.evaluate(()=>{document.getElementById('toast').innerHTML='';document.getElementById('cav-9203').scrollIntoView()});await p.screenshot({path:path.join(process.env.PRINTS,'vendas-ligar.png')})}
   await p.click(`#cav-9203 [data-a=cavLigaOk][data-id="${prim}"]`);await p.waitForTimeout(200);
-  r=await p.evaluate(()=>{const x=pedById(window.P1),o=window.P1orig;const dif=Object.keys({...x,...o}).filter(k=>k!=='ficha'&&k!=='marcos'&&JSON.stringify(x[k])!==JSON.stringify(o[k]));const e=EV.fila.filter(e=>e.tipo==='venda.ligada').pop();return {f:x.ficha,dif,e:e&&[e.ped,e.ref,e.para]}});
-  ok(r.f==='9203'&&!r.dif.length,'só o "Nº do pedido no Conta Azul" muda (nada mais do pedido; marcos de fase são do app)'+(r.dif.length?': '+r.dif.join(','):''));
+  r=await p.evaluate(()=>{const x=pedById(window.P1),o=window.P1orig;const dif=Object.keys({...x,...o}).filter(k=>k!=='ficha'&&k!=='marcos'&&k!=='qdc'&&JSON.stringify(x[k])!==JSON.stringify(o[k]));const e=EV.fila.filter(e=>e.tipo==='venda.ligada').pop();return {f:x.ficha,dif,e:e&&[e.ped,e.ref,e.para]}});
+  ok(r.f==='9203'&&!r.dif.length,'só o "Nº do pedido no Conta Azul" muda (nada mais do pedido; marcos de fase e a cópia do cartão para o QR são do app)'+(r.dif.length?': '+r.dif.join(','):''));
   ok(JSON.stringify(r.e)===JSON.stringify([await p.evaluate(()=>window.P1),'9203','9203']),'evento venda.ligada');
   ok((await cards()).join(',')==='9204,9205','a venda ligada sai da lista');
   await p.evaluate(()=>A.desfazer());await p.waitForTimeout(200);

@@ -18,7 +18,7 @@ const DST=path.join(os.tmpdir(),'logo-peito.dst');fs.writeFileSync(DST,Buffer.fr
   ok(r.lArqs===2,'os anexos vão para o pedido criado');
   console.log('2) Bloco Anexos no pedido');
   await A.evaluate(id=>{ui.sheet={t:'pedido',id};ui.blk={['anx'+id]:true};render();A.anxPedAdd({id})},r.pid);await A.setInputFiles('#fArq',[path.join(FX,'mockup-royal.png')]);await A.waitForTimeout(900);
-  r={...r,...await A.evaluate(id=>{const ped=pedById(id);render();const bl=document.querySelector(`[data-blk="anx${id}"]`);const txt=bl?bl.innerText:'';return {pedAnx:(ped.anexos||[]).length,linhas:bl?bl.querySelectorAll('.anx').length:0,todos:/Baixar todos \(3\)/.test(txt),qr:/QR code/.test(txt)}},r.pid)};
+  r={...r,...await A.evaluate(id=>{const ped=pedById(id);render();const bl=document.querySelector(`[data-blk="anx${id}"]`);const txt=bl?bl.innerText:'';return {pedAnx:(ped.anexos||[]).length,linhas:bl?bl.querySelectorAll('.anx-l > .ax').length:0,todos:/Baixar todos \(3\)/.test(txt),qr:/QR code/.test(txt)}},r.pid)};
   ok(r.pedAnx===1&&r.linhas===3&&r.todos,'o pedido mostra todos os anexos num lugar só (do pedido e de cada personalização) e Baixar todos');
   ok(r.qr,'avisa que quem lê o QR code também baixa');
   r={...r,...await A.evaluate(id=>{const ped=pedById(id),l=lotesDe(id)[0];const a=l.pers[0].arqs[0];A.anxRm({l:l.id,x:l.pers[0].id,id:a});const n=(l.pers[0].arqs||[]).length;A.anxAdd&&0;
