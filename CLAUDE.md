@@ -96,6 +96,9 @@ NODE_PATH=$(npm root -g) node tests/terc-atrasado.test.js
 NODE_PATH=$(npm root -g) node tests/toque-perdido.test.js   # sincronia: o 1º toque depois de abrir chega ao banco
 NODE_PATH=$(npm root -g) node tests/venda-vira-pedido.test.js   # PGLITE=<pasta> testa também as migrações 013 e 014
 NODE_PATH=$(npm root -g) node tests/custo-produto.test.js   # custo por peça, só gestão; PGLITE=<pasta> testa também a migração 016
+NODE_PATH=$(npm root -g) node tests/quadro.test.js   # Pedidos › Quadro: coluna calculada pela produção, etiquetas, checklist, histórico, 360×640
+NODE_PATH=$(npm root -g) node tests/arquivos-pedido.test.js   # arquivos com quem enviou, versões, link, tirados com registro, arrastar; comentários com aviso
+NODE_PATH=$(npm root -g) node tests/quadro-fase3.test.js   # cartão no QR sem login, avisos "Para você", calendário, Caixa de entrada, importar do Trello
 node tests/conta-azul-funcao.test.js   # função conta-azul do Supabase: token, trava, busca
 ```
 

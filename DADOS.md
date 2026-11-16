@@ -1,8 +1,10 @@
 # Onde ficam os dados do Sistema Martins (e regras para não perder nada)
 
 **Casa dos dados:** banco da nuvem do artifact (capability `db`).
-- Cada cadastro é um documento: `pedidos/`, `lotes/`, `pessoas/`, `produtos/`, `clientes/`, `arquivos/`, `usuarios/`, `catcli/` (tipo de cada cliente do Conta Azul), `cavenda/` (venda do Conta Azul que não vai para a produção), `custos/` (custo por peça de cada produto: só a gestão lê e grava, migração 016; não entra nas cópias de segurança nem na lixeira, e a história fica nos eventos `custo.informado`), etc.
+- Cada cadastro é um documento: `notas/` (Caixa de entrada do Quadro; anotação tirada ou que virou pedido fica marcada com `feito`, nunca é apagada), `pedidos/`, `lotes/`, `pessoas/`, `produtos/`, `clientes/`, `arquivos/`, `usuarios/`, `catcli/` (tipo de cada cliente do Conta Azul), `cavenda/` (venda do Conta Azul que não vai para a produção), `custos/` (custo por peça de cada produto: só a gestão lê e grava, migração 016; não entra nas cópias de segurança nem na lixeira, e a história fica nos eventos `custo.informado`), etc.
 - As configurações ficam em `config/main`.
+- O **Quadro de pedidos** guarda dentro de cada pedido as etiquetas (`etq`), os responsáveis (`resp`), a capa e o checklist (`ck`, com quem marcou e quando). A coluna não é guardada: é calculada pela produção. Colunas, etiquetas e checklist padrão ficam em `config/main › quadro`.
+- **Arquivos do pedido:** trocar por versão nova guarda a anterior dentro do próprio arquivo (`ver`), sem apagar o binário. Tirar do pedido não apaga: fica em `ped.arqRm` com quem tirou e quando. Comentários ficam no pedido (`coment`), com o texto anterior quando alguém muda.
 - O histórico fica em `log/` (um documento por semana e por aparelho).
 - Imagens e arquivos grandes (mockups, artes, bordados) ficam em partes: `mock/<id>` (resumo) + `mockp/<id>~N` (conteúdo).
 - O aparelho guarda uma cópia local para funcionar sem internet.

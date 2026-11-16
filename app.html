@@ -1059,6 +1059,78 @@ body.com-undo #app{padding-bottom:80px}#undoF{position:fixed;left:max(12px,env(s
 .anx-l{display:flex;flex-direction:column;gap:6px;margin-top:6px}.anx{display:flex;align-items:center;gap:10px;min-height:48px}.anx .aq-th{width:44px;height:44px;flex:none}.anx-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;display:flex;flex-direction:column;font-size:16px}.anx-n b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.anx-n small{color:var(--muted)}.anx-g{border-top:1px solid var(--line);padding:10px 0}.anx-g>small{color:var(--muted)}.anx-l>.x{align-self:flex-start}.pub-anx{margin:0 0 14px}
 .lc-mv{font-size:15px;padding:2px 10px;min-height:32px;color:var(--blue,#2563eb);display:block;margin-top:4px}
 .fin-l{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:17px}.fin-l b{white-space:nowrap}.fin-t{border-bottom:0;font-size:19px}
+/* ================= Quadro de pedidos (estilo Trello) ================= */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.qd-dica{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:16px;color:var(--ink2)}.qd-dica svg.ic{width:22px;height:22px;flex:none}
+.qd-cols{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px 6px;scrollbar-width:thin}
+.qd-ir{flex:0 0 auto;min-height:48px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line-btn);background:var(--card);font:inherit;font-size:16px;font-weight:700;color:var(--ink);display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.qd-ir small,.qd-col h2 small{font-size:16px;font-weight:800;color:var(--ink2);background:var(--grey-soft);border-radius:999px;padding:1px 10px}
+.qd{display:flex;gap:14px;overflow-x:auto;align-items:flex-start;padding:0 2px 16px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.qd-col{flex:0 0 300px;scroll-snap-align:start;background:#E3E8EF;border-radius:var(--r-lg);padding:10px}
+.qd-col h2{font-size:18px;margin:4px 4px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px}.qd-col h2 small{background:#fff}
+.qd-card{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-1);padding:0;margin:0 0 10px;font:inherit;color:var(--ink);cursor:pointer;overflow:hidden}
+.qd-card:hover{box-shadow:var(--sh-2);border-color:var(--line-strong)}.qd-card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.qd-capa{display:block;width:100%;height:140px;object-fit:contain;background:#F6F8FB;border-bottom:1px solid var(--line)}
+.qd-in{display:block;padding:10px 12px 12px}
+.qd-etqs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.qd-etq{display:inline-block;font-size:16px;font-weight:800;line-height:1.25;padding:3px 9px;border-radius:8px}
+.qd-t{display:block;font-size:17px;font-weight:750;line-height:1.3;margin-bottom:8px;overflow-wrap:anywhere}
+.qd-per{display:inline-flex;align-items:center;gap:6px;font-size:16px;font-weight:700;padding:3px 9px;border-radius:8px;background:var(--grey-soft);color:var(--ink2)}.qd-per svg.ic{width:18px;height:18px}
+.qd-per.crit{background:var(--red);color:#fff}.qd-per.warn{background:#FFE08A;color:#4A3500}.qd-per.ok{background:var(--go);color:#fff}
+.qd-rod{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:8px;font-size:16px;font-weight:700;color:var(--ink2)}
+.qd-rod>span{display:inline-flex;align-items:center;gap:4px}.qd-rod svg.ic{width:18px;height:18px}
+.qd-rod>span.ok{color:#fff;background:var(--go);border-radius:6px;padding:0 6px}
+.qd-avs{margin-left:auto;display:flex!important;padding-left:6px}
+.av.qd-av{width:34px;height:34px;font-size:16px;font-weight:800;letter-spacing:-.02em}.qd-avs .av.qd-av{margin-left:-6px;border:2px solid #fff}
+.qd-tg .av.qd-av{width:32px;height:32px}
+.qd-vazio{font-size:16px;color:var(--muted);padding:4px 4px 8px;margin:0}
+.qd-add{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;padding:0 12px;border:1.5px dashed var(--line-btn);border-radius:var(--r-md);background:transparent;font:inherit;font-size:16px;font-weight:700;color:var(--ink2);cursor:pointer;margin-bottom:6px}
+.qd-onde{display:flex;gap:8px;align-items:flex-start;font-size:17px;color:var(--ink2)}.qd-onde svg.ic{flex:none;width:22px;height:22px;margin-top:2px}
+.qd-pecas{margin:8px 0 0 30px;padding:0;font-size:16px;color:var(--ink2)}
+.qd-tg{min-height:48px}
+.qd-capas{display:flex;flex-wrap:wrap;gap:10px}.qd-capa-b{width:84px;height:84px;padding:4px;border:2px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}.qd-capa-b img{width:100%;height:100%;object-fit:contain}.qd-capa-b[aria-pressed="true"]{border:3px solid var(--blue)}
+.qd-ck-h{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}.qd-ck-h .rotulo{margin-bottom:6px}
+.qd-n{font-size:16px;font-weight:800;color:var(--ink2)}
+.qd-bar{height:10px;border-radius:99px;background:var(--grey-soft);overflow:hidden;margin:6px 0 4px}.qd-bar i{display:block;height:100%;background:var(--go);border-radius:99px}.qd-bar.fino{height:6px;margin:2px 0 6px}
+.qd-g{margin-top:14px}.qd-g-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.qd-g-h h3{margin:0;font-size:18px}.qd-g-h .campo{flex:1 1 200px;font-weight:700}
+.qd-it{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;text-align:left;padding:8px 12px;margin-top:6px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);font:inherit;font-size:17px;font-weight:600;color:var(--ink);cursor:pointer}
+.qd-it .box{flex:none;width:30px;height:30px;border-radius:8px;border:3px solid var(--muted);display:grid;place-items:center}.qd-it .box svg.ic{width:20px;height:20px;stroke-width:4.5;visibility:hidden}
+.qd-it[aria-pressed="true"]{border-color:var(--go);background:var(--go-soft)}.qd-it[aria-pressed="true"] .box{background:var(--go);border-color:var(--go);color:#fff}.qd-it[aria-pressed="true"] .box svg.ic{visibility:visible}
+.qd-it-t{display:block;min-width:0}.qd-it-t small{display:block;font-size:16px;font-weight:500;color:var(--ink2)}
+.qd-it-ed,.qd-add-l{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}.qd-it-ed .campo,.qd-add-l .campo{flex:1 1 200px;min-width:0}
+.qd-hist{list-style:none;margin:0;padding:0}.qd-hist li{padding:10px 0;border-bottom:1px solid var(--line);font-size:17px}.qd-h-q{display:block;font-size:16px;color:var(--ink2);font-weight:700}
+.qd-txt{font-size:16px;color:var(--ink2);margin:0 0 8px}.qd-cfg-c.off b{color:var(--muted);text-decoration:line-through}
+@media (max-width:640px){.qd-dica .so-cel{display:inline}.qd,.qd-cols{margin-inline:-16px;padding-inline:16px;scroll-padding-inline:16px}.qd-col{flex-basis:calc(100vw - 76px)}.qd{gap:10px}}
+/* Arquivos do pedido e comentários (fase 2) */
+.ax{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}.ax:last-of-type{border-bottom:0}
+.ax .aq-th{width:56px;height:56px}.ax .aq-ext b{font-size:16px;letter-spacing:-.03em}.ax .aq-v{padding:0;border:0;background:none;cursor:zoom-in}
+.ax-t{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:16px;color:var(--ink2)}.ax-t>b{font-size:17px;color:var(--ink);overflow-wrap:anywhere}
+.ax-selo{display:inline-block;width:max-content;font-size:16px;font-weight:800;color:#6B4C00;background:#FFEDB3;border-radius:6px;padding:0 7px}
+.ax-b{grid-column:2;display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}.ax-b .x{min-height:48px}
+.ax-p{grid-column:1/-1;background:var(--grey-soft);border-radius:14px;padding:12px;margin-top:8px}
+.ax-vers{list-style:none;margin:0 0 10px;padding:0}.ax-vers li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:16px}.ax-vers small{font-size:16px;color:var(--ink2)}.ax-vers .x{min-height:48px}
+.ax-drop{display:flex;align-items:center;gap:10px;border:2px dashed var(--line-btn);border-radius:14px;padding:14px;margin:0 0 12px;font-size:16px;color:var(--ink2)}
+@media (max-width:640px){.ax-drop{display:none}}
+.ax-drop-on{border-color:var(--blue)!important;background:var(--blue-soft)!important;outline:2px dashed var(--blue)}
+.ax-rm{margin-top:12px}.ax-rm summary{min-height:48px;display:flex;align-items:center;font-size:17px;font-weight:700;color:var(--ink2);cursor:pointer}
+.ax-ed{font-size:16px;font-weight:500;color:var(--ink2)}
+.cm{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.cm-h{font-size:16px;color:var(--ink2)}.cm-h b{color:var(--ink);font-size:17px}.cm-t{margin:4px 0;font-size:17px;white-space:normal;overflow-wrap:anywhere}.cm-m{color:var(--blue)}.cm .x{min-height:48px}
+/* Fase 3: cartão no QR, resumo, calendário, caixa de entrada */
+.pub-qd h2{margin:6px 0 8px;font-size:22px}.pub-qd-h{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}.pub-qd .qd-it{cursor:default}
+.qd-res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.qd-kpi{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;min-height:48px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--card);box-shadow:var(--sh-1);font:inherit;color:var(--ink)}
+button.qd-kpi{cursor:pointer}.qd-kpi b{font-size:28px;line-height:1}.qd-kpi span{font-size:16px;color:var(--ink2)}.qd-kpi.crit b{color:var(--red)}
+.qd-eb{display:grid;grid-template-columns:minmax(0,1fr) 2fr auto;gap:10px;align-items:center;padding:6px 0;font-size:16px}.qd-eb-b{height:12px;background:var(--grey-soft);border-radius:99px;overflow:hidden}.qd-eb-b i{display:block;height:100%;background:var(--blue)}
+.cal-nav{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 10px}.cal-nav h2{margin:0 auto 0 0;font-size:22px;order:-1;flex:1 1 100%}.cal-nav h2 small{font-size:16px;color:var(--ink2);font-weight:600;text-transform:none}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.cal-h{font-size:16px;font-weight:800;color:var(--ink2);padding:0 4px}
+.cal-d{min-height:110px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0}.cal-d.vazio{background:transparent;border:0}.cal-d.hoje{border:2px solid var(--blue)}
+.cal-n{font-size:16px;font-weight:800;color:var(--ink2)}
+.cal-p{display:block;width:100%;text-align:left;font:inherit;font-size:16px;font-weight:700;line-height:1.25;padding:6px 8px;min-height:48px;border-radius:8px;border:0;background:var(--grey-soft);color:var(--ink);cursor:pointer;overflow-wrap:anywhere}
+.cal-p.crit{background:var(--red);color:#fff}.cal-p.warn{background:#FFE08A;color:#4A3500}.cal-p.ok{background:var(--go);color:#fff}
+.cal-l{display:none;flex-direction:column;gap:12px}.cal-dl h3{margin:0 0 6px;font-size:18px}.cal-dl .cal-p{margin-bottom:6px}.cal-dl.hoje h3{color:var(--blue)}
+@media (max-width:640px){.cal-l.so-cel{display:flex}.qd-res{grid-template-columns:1fr 1fr}.qd-res .qd-kpi:last-child{grid-column:1/-1}}
+.qd-caixa{background:#F7EFD9}.qd-caixa .campo{width:100%;font-size:17px}.qd-nota{cursor:default}.qd-nota .mbtn,.qd-nota .x{min-height:48px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1177,7 +1249,10 @@ const EV_TIPOS={
   'etapa.terceirizada':'Etapa mandada para prestador','etapa.terceirizacao_desfeita':'Etapa volta para a fábrica','remessa.enviada':'Peças levadas ao prestador','remessa.retornada':'Peças voltaram do prestador',
   'remessa.cancelada':'Peças não foram levadas','fornecedor.trocado':'Prestador trocado','conserto.aberto':'Peças mandadas para conserto',
   'pessoa.ausente':'Pessoa fora agora','pessoa.disponivel':'Pessoa disponível','tempo_padrao.alterado':'Tempo padrão mudou','acesso.alterado':'Acesso ao app mudou',
-  'cliente.tipo_marcado':'Tipo do cliente marcado','custo.informado':'Custo do produto informado','venda.ligada':'Venda do Conta Azul ligada a um pedido','venda.dispensada':'Venda do Conta Azul não vai para a produção','venda.dispensa_desfeita':'Venda do Conta Azul voltou para a lista','app.aberto':'App aberto','acao.desfeita':'Ação desfeita','acao.refeita':'Ação refeita'};
+  'cliente.tipo_marcado':'Tipo do cliente marcado','custo.informado':'Custo do produto informado','venda.ligada':'Venda do Conta Azul ligada a um pedido','venda.dispensada':'Venda do Conta Azul não vai para a produção','venda.dispensa_desfeita':'Venda do Conta Azul voltou para a lista','pedido.etiqueta_alterada':'Etiqueta do pedido mudou','pedido.responsavel_alterado':'Responsável pelo pedido mudou','pedido.capa_alterada':'Capa do cartão mudou',
+  'checklist.marcado':'Item do checklist marcado','checklist.desmarcado':'Item do checklist desmarcado','checklist.item_criado':'Item do checklist criado','checklist.item_removido':'Item do checklist removido','checklist.item_editado':'Item do checklist mudou de nome','quadro.configurado':'Colunas, etiquetas ou checklist do quadro mudaram',
+  'arquivo.enviado':'Arquivo posto no pedido','arquivo.editado':'Arquivo mudou de nome ou de tipo','arquivo.nova_versao':'Arquivo trocado por versão nova','arquivo.tirado':'Arquivo tirado do pedido','comentario.criado':'Comentário no pedido','comentario.editado':'Comentário mudado','pedido.lembrete_alterado':'Aviso antes da entrega mudou','nota.criada':'Anotação na Caixa de entrada','nota.virou_pedido':'Anotação virou pedido','nota.tirada':'Anotação tirada da Caixa de entrada','quadro.trello_importado':'Dados importados do Trello',
+  'app.aberto':'App aberto','acao.desfeita':'Ação desfeita','acao.refeita':'Ação refeita'};
 const isoOu=t=>t&&t>0?new Date(t).toISOString():null;
 /* Fotografia da etapa no momento do evento: o roteiro e os tempos padrão podem mudar depois, as métricas não. padrao = segundos por peça. */
 function evEtapa(tipo,l,s,x,o){o=o||{};let p=null,u=null;try{p=prod(l.prod);u=x&&x.maq?unidade(x.maq):null}catch(e){}
@@ -1248,7 +1323,7 @@ const GRUPOS=[{id:'corte',nome:'Corte',i:'i-corte'},{id:'pers',nome:'Personaliza
    corte = abre o lote · pers = personalização · costura = montagem · acab = acabamento/fecha a peça. */
 /* Módulos: partes do app que cada fábrica liga ou desliga (state.modOff). Desligado só esconde da tela e da ajuda; os dados ficam. */
 const MODULOS=[['pers','Personalização (estampa, bordado, artes)','i-estampa'],['etq','Etiquetas do corte com QR','i-etiqueta'],['junto','Juntar pedidos (cortar e costurar de uma vez)','i-corte'],
-  ['hora','Hora extra','i-relogio'],['imp','Importar fichas (PDF/Word)','i-lista'],['ciclo','Painel do ciclo (tempo por fase)','i-grafico'],['hoje','Tela Hoje (o que importa primeiro para cada pessoa)','i-hoje'],['cav','Vendas do Conta Azul viram pedido','i-lista']];
+  ['hora','Hora extra','i-relogio'],['imp','Importar fichas (PDF/Word)','i-lista'],['ciclo','Painel do ciclo (tempo por fase)','i-grafico'],['hoje','Tela Hoje (o que importa primeiro para cada pessoa)','i-hoje'],['cav','Vendas do Conta Azul viram pedido','i-lista'],['quadro','Quadro de pedidos (colunas, etiquetas e checklist)','i-lista']];
 const modOn=k=>!((typeof state!=='undefined'&&state&&state.modOff)||[]).includes(k);
 const faqOn=f=>!f.m||(f.m==='polo'?((typeof state!=='undefined'&&state&&state.produtos)||[]).some(p=>(p.partes||[]).includes('Peitilho')):modOn(f.m));
 const FASES_SETOR=[['corte','Abre o lote (corte)'],['pers','Personalização'],['costura','Montagem / costura'],['acab','Acabamento (fecha a peça)']];
@@ -1796,7 +1871,7 @@ function marcosAgora(p){const ls=lotesDe(p.id).filter(l=>!l.rework);const grp=s=
   return {desp:{lib:p.chegada||null,fim:real},ins:{lib:real,ini:conf,fim:tv(p.insOk)},corte:{lib:tv(p.insOk),ini:C.ini,fim:C.fim},pers:pers?{lib:C.fim,ini:PZ.ini,fim:PZ.fim}:{na:true},
     cost:{lib:pers?(C.fim&&PZ.fim?Math.max(C.fim,PZ.fim):null):C.fim,ini:CO.ini,fim:CO.fim},emb:{lib:CO.fim,ini:EM.ini,fim:EM.fim||(p.concluido&&!p.cancelado?p.concluido:null)}}}
 function gravaMarcos(p){const A=marcosAgora(p);const R=p.marcos=p.marcos||{};FASES.forEach(([k])=>{const a=A[k];if(a.na){R[k]={na:true};return}const r=R[k]=R[k]&&!R[k].na?R[k]:{};['lib','ini','fim'].forEach(q=>{if(a[q]&&!r[q])r[q]=a[q]})})}
-function save(){RC={};if(NV.soLer&&NV.modo==='nuvem'){soLeituraVolta();return}carimbaNovos();carimbaInsumos();try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}nuvemSalvar()}
+function save(){RC={};if(NV.soLer&&NV.modo==='nuvem'){soLeituraVolta();return}carimbaNovos();carimbaInsumos();try{qdCarimba()}catch(e){}try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}nuvemSalvar()}
 /* Acesso só de leitura: nada muda neste aparelho sem ir para a nuvem. Volta ao que está na nuvem e avisa. */
 /* Pedido novo: guarda quando e quem cadastrou. Quem cadastrou já conta como visto. */
 function carimbaNovos(){if(!state||!state.avisosV)return;const u=usuarioAtual();(state.pedidos||[]).forEach(p=>{if(p.criado)return;p.criado={ts:now(),por:quemNome()||u?.nome||'',u:u?.id||''};p.vistoPor=p.vistoPor||{};if(u)p.vistoPor[u.id]=now()})}
@@ -2108,7 +2183,7 @@ function sSetor(){const z=SETORES_ESC.find(x=>x.id===ui.sheet.v);if(!z)return vo
   ${z.fs.filter(escOn).map(f=>{const c0=capazes(f),ps=[...c0,...state.pessoas.filter(p=>!c0.includes(p)&&(state.usuarios||[]).some(u=>u.pessoa===p.id))];
     return `<div class="card"><h2 style="font-size:19px">${esc(fNome(f))}</h2><div class="linha-dep"><button class="pchip" data-a="donoSel" data-f="${f}" data-v="" aria-pressed="${!D[f]}">Automático</button>${ps.map(p=>`<button class="pchip" data-a="donoSel" data-f="${f}" data-v="${p.id}" aria-pressed="${D[f]===p.id}">${av(p.id,'s')}${esc(p.nome)}</button>`).join('')}</div></div>`}).join('')}`}
 /* Sininho de avisos: sempre no canto de cima, à direita. Abre uma janelinha com os avisos. */
-function sino(){const u=usuarioAtual();if(!u)return '';const n=avisos().length;return `${euBtn(u)}<button class="sino" data-a="sinoAbre" aria-expanded="${!!ui.sino}" aria-label="${n?n+(n>1?' avisos novos':' aviso novo'):'Avisos'}" title="Avisos">${ic('i-sino')}${n?`<em>${n>9?'9+':n}</em>`:''}</button>`}
+function sino(){const u=usuarioAtual();if(!u)return '';const n=avisos().length+notifsNovas(u).length;return `${euBtn(u)}<button class="sino" data-a="sinoAbre" aria-expanded="${!!ui.sino}" aria-label="${n?n+(n>1?' avisos novos':' aviso novo'):'Avisos'}" title="Avisos">${ic('i-sino')}${n?`<em>${n>9?'9+':n}</em>`:''}</button>`}
 function euBtn(u){const pid=u.pessoa&&pessoa(u.pessoa)?u.pessoa:null;return `<button class="eu" data-a="euAbre" aria-expanded="${!!ui.eu}" aria-label="Você: ${esc(quemNome()||u.nome)}. Como usar e Sair" title="${esc(quemNome()||u.nome)}">${pid?av(pid,'s'):`<span class="eu-i">${esc((u.nome||'?')[0].toUpperCase())}</span>`}</button>`}
 /* ================= Minha vez (perfil Chão de fábrica) =================
    Uma tela só: quem é você → o que fazer agora → meta do dia. Gestão pode abrir para ver ou deixar num tablet. */
@@ -2141,6 +2216,7 @@ function popAvisos(){const u=usuarioAtual(),rec=(state.avisarNovos||[]).includes
   const item=(p,novo)=>{const q=sum(lotesDe(p.id).filter(l=>!l.rework).map(l=>l.qtd));return `<button class="av-item${novo?' novo':''}" data-a="avAbrir" data-id="${p.id}">${ic('i-lista')}<span><b>${novo?'Pedido novo: ':''}${esc(p.cliente)}</b><span>${q?q+' peças · ':''}entrega ${fD(p.entrega)}${p.criado.por?` · por ${esc(p.criado.por)}`:''} · ${haQuanto(p.criado.ts)}</span></span>${ic('i-seta')}</button>`};
   return `<div class="pop-fundo" data-a="sinoFecha"></div><div class="pop" role="dialog" aria-label="Avisos"><div class="pop-h"><b>Avisos</b><button class="x" data-a="sinoFecha" aria-label="Fechar avisos">× Fechar</button></div>
   ${!rec?`<p class="dica">Você não recebe avisos de pedido novo. Quem escolhe é a gestão, em Cadastros › Ajustes.</p>`:av_.length?`<div class="avisos">${av_.map(p=>item(p,true)).join('')}</div><button class="mbtn neutro2" data-a="avVistoPop" style="width:100%;margin-top:10px">${ic('i-check')}Marcar todos como vistos</button>`:`<p class="dica" style="margin:6px 0">Nenhum aviso novo.</p>`}
+  ${popNotifs()}
   ${vistos.length?`<div class="rotulo">Vistos nos últimos 7 dias</div><div class="avisos">${vistos.map(p=>item(p,false)).join('')}</div>`:''}</div>`}
 function faixasTopo(){let h='';const av_=avisos();
   const g=soAqui();if(g)h+=`<div class="faixa" style="border-color:var(--red)">${ic('i-alerta')}<span><b>${g.pedidos.length} ${g.pedidos.length>1?'pedidos ficaram':'pedido ficou'} só neste aparelho</b> (${esc(g.pedidos.map(p=>p.cliente).slice(0,3).join(', '))}). Envie para a nuvem para todos verem.</span><span class="linha-dep" style="margin:0"><button class="mbtn go" data-a="soAquiEnviar">Enviar</button>${ui.soAquiConf?`<button class="mbtn" style="background:var(--red)" data-a="soAquiDescartar" data-ok="1">Apagar mesmo</button>`:`<button class="mbtn neutro2" data-a="soAquiDescartar">Descartar</button>`}</span></div>`;
@@ -2233,19 +2309,327 @@ function listaPedidos(){const f=ui.pf||{},ls=pedFiltrados();
       ${falta.length&&!p.concluido?`<div class="falta">${ic('i-cadeado')}Falta: ${falta.join(', ')}</div>`:''}
       ${fora&&!p.concluido?`<div class="falta" style="background:#F3ECFB;color:#6B2F8C">${ic('i-caminhao')}Parte da peça no fornecedor</div>`:''}
     </button>`}).join('')}</div>`}
-function vPedidos(){if(!ui.pf){let st='todos';try{const v=JSON.parse(localStorage.getItem('pf-st')||'null');if(Array.isArray(v))st=v}catch(e){}ui.pf={st,ord:'urg',q:'',inv:false}}const f=ui.pf,sts=pfSts(f),ehProd=sts.length===3&&PF_PROD.every(x=>sts.includes(x));const emp=ui.pv==='emp';
+function vPedidos(){if(ui.pv==null){try{if(localStorage.getItem('pd-pv')==='qd')ui.pv='qd'}catch(e){}}if(ui.pv==='qd'&&!modOn('quadro'))ui.pv='ped';if(!ui.pf){let st='todos';try{const v=JSON.parse(localStorage.getItem('pf-st')||'null');if(Array.isArray(v))st=v}catch(e){}ui.pf={st,ord:'urg',q:'',inv:false}}const f=ui.pf,sts=pfSts(f),ehProd=sts.length===3&&PF_PROD.every(x=>sts.includes(x));if(ui.pv==='cal'&&!modOn('quadro'))ui.pv='ped';const emp=ui.pv==='emp',qd=ui.pv==='qd',cal=ui.pv==='cal';
   const cnt=u=>u==='todos'?state.pedidos.length:state.pedidos.filter(p=>info(p).u===u).length;
   const stN=!sts.length?'Filtrar':ehProd?'Em produção':sts.length===1?(PF_ST.find(x=>x[0]===sts[0])||PF_ST[0])[1]:`${sts.length} filtros`,ordN=(PF_ORD.find(x=>x[0]===f.ord)||PF_ORD[0])[1];
   const seta=k=>f.ord===k&&k!=='urg'?(k==='entrega'?(f.inv?' ↓ mais longe':' ↑ mais perto'):(f.inv?' ↑ mais antigo':' ↓ mais recente')):'';
-  const vista=`<div class="vista" role="group" aria-label="Ver"><button class="vista-b" data-a="pv" data-v="ped" aria-pressed="${!emp}" aria-label="Ver pedidos" title="Pedidos">${ic('i-lista')}<span>Pedidos</span></button><button class="vista-b" data-a="pv" data-v="emp" aria-pressed="${emp}" aria-label="Ver empresas" title="Empresas">${ic('i-predio')}<span>Empresas</span></button></div>`;
+  const vista=`<div class="vista" role="group" aria-label="Ver"><button class="vista-b" data-a="pv" data-v="ped" aria-pressed="${!emp&&!qd&&!cal}" aria-label="Ver pedidos em lista" title="Pedidos">${ic('i-lista')}<span>Pedidos</span></button>${modOn('quadro')?`<button class="vista-b" data-a="pv" data-v="qd" aria-pressed="${qd}" aria-label="Ver pedidos no quadro" title="Quadro">${ic('i-vias')}<span>Quadro</span></button><button class="vista-b" data-a="pv" data-v="cal" aria-pressed="${cal}" aria-label="Ver as entregas no calendário" title="Calendário">${ic('i-hoje')}<span>Calendário</span></button>`:''}<button class="vista-b" data-a="pv" data-v="emp" aria-pressed="${emp}" aria-label="Ver empresas" title="Empresas">${ic('i-predio')}<span>Empresas</span></button></div>`;
   return `<div class="topo"><h1>${emp?'Empresas':'Pedidos'}</h1><span class="so-pc">${vista}</span><span class="desf-topo">${desfBt('desfP')}</span>${sino()}</div>${ultAcao()}
-  ${emp?`<div class="so-cel" style="margin-bottom:10px">${vista}</div>`+vEmpresas():`<div class="busca-l"><label class="busca-c">${ic('i-lupa')}<input class="campo busca" id="pedBusca" value="${esc(f.q)}" placeholder="Buscar pedido" autocomplete="off" aria-label="Buscar pedido"></label>
+  ${emp||qd||cal?`<div class="so-cel" style="margin-bottom:10px">${vista}</div>`+(emp?vEmpresas():qd?vQuadro():vCalendario()):`<div class="busca-l"><label class="busca-c">${ic('i-lupa')}<input class="campo busca" id="pedBusca" value="${esc(f.q)}" placeholder="Buscar pedido" autocomplete="off" aria-label="Buscar pedido"></label>
     <div class="busca-bts"><span class="so-cel">${vista}</span><button class="mbtn neutro2 fo-b${sts.length?' ativo':''}" data-a="pfAbre" data-v="f" aria-expanded="${ui.pfAb==='f'}">${ic('i-filtro')}<span>${esc(stN)}</span></button>
     <button class="mbtn neutro2 fo-b" data-a="pfAbre" data-v="o" aria-expanded="${ui.pfAb==='o'}">${ic('i-ordenar')}<span class="so-pc">${esc(ordN)}</span><span class="so-cel">Ordenar</span></button></div></div>
     ${ui.pfAb==='f'?`<div class="fo-p"><div class="rotulo" style="margin-top:0">Mostrar <span style="font-weight:400">(pode marcar vários)</span></div><div class="linha-dep">${PF_ST.map(([k,n])=>`<button class="depc st-${k}" data-a="pfSt" data-v="${k}" aria-pressed="${k==='todos'?!sts.length:sts.includes(k)}">${k!=='todos'?`<span class="dot u-${k}" style="width:12px;height:12px;background:currentColor"></span>`:''}${n} <small style="font-weight:400">${cnt(k)}</small></button>${k==='todos'?`<button class="depc" data-a="pfSt" data-v="prod" aria-pressed="${ehProd}">Em produção <small style="font-weight:400">${PF_PROD.reduce((t,u)=>t+cnt(u),0)}</small></button>`:''}`).join('')}</div><button class="mbtn go" data-a="pfAbre" data-v="f" style="margin-top:10px">${ic('i-check')}Ver ${listaPedidosN()} ${listaPedidosN()===1?'pedido':'pedidos'}</button></div>`:''}
     ${ui.pfAb==='o'?`<div class="fo-p"><div class="rotulo" style="margin-top:0">Ordenar por <span style="font-weight:400">(toque de novo para inverter)</span></div><div class="linha-dep">${PF_ORD.map(([k,n])=>`<button class="depc" data-a="pfOrd" data-v="${k}" aria-pressed="${f.ord===k}">${n}${seta(k)}</button>`).join('')}</div></div>`:''}
   <div class="imp-bar" style="margin:0 0 12px"><button class="mbtn neutro2" data-a="entregas">${ic('i-caminhao')}Planilha de entregas por semana</button></div>
   <div id="pedLista">${listaPedidos()}</div>`}`}
+/* ================= Quadro de pedidos (estilo Trello) =================
+   Cada cartão é o próprio pedido (nada é lançado duas vezes). A coluna é calculada pela produção, não se arrasta:
+   Início (falta pré-pedido, ficha ou arte) → Compra (falta material para cortar) → uma coluna por grupo de máquinas → Finalizados.
+   O pedido fica na coluna da peça mais atrasada. Colunas, etiquetas e o modelo de checklist são da fábrica (state.quadro);
+   enquanto a fábrica não mexe, valem os de clientes/<id>.json (CLIENTE.quadro) ou o padrão neutro QD0. */
+const QD_CORES=[['vermelho','Vermelho','#B3261E','#FDE3E0'],['amarelo','Amarelo','#6B4C00','#FFEDB3'],['verde','Verde','#0C6B39','#DDF3E6'],['azul','Azul','#1A3DA8','#E3EAFF'],
+  ['rosa','Rosa','#A3195B','#FCE1EE'],['roxo','Roxo','#6B2F8C','#F1E6FA'],['laranja','Laranja','#9A4300','#FFE6D1'],['cinza','Cinza','#3B4552','#E8ECF1']];
+const qdCor=c=>QD_CORES.find(x=>x[0]===c)||QD_CORES[7];
+const QD_EVT={id:'evento',nome:'EVENTO',cor:'rosa',fixa:true};   // etiqueta ligada ao "pedido para evento" que o app já tem (p.evento)
+const qdSlug=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,30)||'c';
+const QD0=()=>({cols:[{id:'inicio',nome:'Início de produção',tipo:'inicio'},{id:'compra',nome:'Compra',tipo:'compra'},
+    ...SETORES().map(g=>({id:'s-'+g.id,nome:g.nome,tipo:'prod',setores:[g.id]})),{id:'fim',nome:'Finalizados',tipo:'fim'}],
+  etq:[{id:'urgente',nome:'Urgente',cor:'vermelho'},{id:'nao-atrasar',nome:'Não atrasar',cor:'amarelo'}],
+  ck:[{nome:'Início de produção',itens:['Tem mockup?','Fez ficha de produção?']},{nome:'Compra',itens:['Tecido','Aviamentos']},{nome:'Corte',itens:['Cortou?']},{nome:'Costura',itens:['Montou o pacote?']},{nome:'Embalagem',itens:['Embalou?']}]});
+/* Ponto de partida do cliente (clientes/<id>.json › quadro): só o que ele traz substitui o padrão. */
+const qdDoCliente=()=>{const q0=QD0(),c=CLIENTE.quadro||{};const ids=new Set();const uq=b=>{let i=b,n=2;while(ids.has(i))i=b+'-'+(n++);ids.add(i);return i};
+  return {cols:Array.isArray(c.cols)&&c.cols.length?c.cols.map(x=>({...x,id:uq(x.id||qdSlug(x.nome))})):q0.cols,
+    etq:Array.isArray(c.etiquetas)?c.etiquetas.map(x=>({id:x.id||qdSlug(x.nome),nome:x.nome,cor:x.cor||'cinza'})):q0.etq,
+    ck:Array.isArray(c.checklist)?c.checklist.map(g=>({nome:g.nome,itens:[...(g.itens||[])]})):q0.ck}};
+const QD=()=>{if(RC.qd)return RC.qd;const s=typeof state!=='undefined'&&state&&state.quadro;const b=qdDoCliente();
+  const q=s&&typeof s==='object'?{cols:Array.isArray(s.cols)&&s.cols.length?s.cols:b.cols,etq:Array.isArray(s.etq)?s.etq:b.etq,ck:Array.isArray(s.ck)?s.ck:b.ck}:b;return RC.qd=q};
+/* A fábrica mexeu: grava a configuração inteira (a partir daí não depende mais do padrão). */
+const qdGrava=fn=>{const q=JSON.parse(JSON.stringify(QD()));fn(q);state.quadro=q;RC={}};
+const qdEtqs=()=>[QD_EVT,...QD().etq];
+const qdEtqDe=p=>[...(p.evento?['evento']:[]),...(p.etq||[]).filter(id=>QD().etq.some(e=>e.id===id))];
+const nkQ=s=>qdSlug(s);
+/* Em que coluna está cada etapa do roteiro: máquina citada na coluna > setor > função do setor. */
+function qdIdxEtapa(s,Q){const t=tipo(s.posto)||{},C=Q.cols;
+  let k=C.findIndex(c=>c.tipo==='prod'&&(c.maqs||[]).some(x=>x===t.id||nkQ(x)===nkQ(t.nome)||(t.curto&&nkQ(x)===nkQ(t.curto))));
+  if(k<0)k=C.findIndex(c=>c.tipo==='prod'&&(c.setores||[]).includes(t.grupo));
+  if(k<0){const f=faseT(s.posto);k=C.findIndex(c=>c.tipo==='prod'&&(c.fases||[]).includes(f))}
+  if(k<0)k=C.findIndex(c=>c.tipo==='prod');
+  return k<0?C.findIndex(c=>c.tipo==='fim'):k}
+const qdIdxT=(Q,t)=>Q.cols.findIndex(c=>c.tipo===t);
+/* Coluna de uma peça (índice em Q.cols, antes de pular as escondidas). */
+function qdIdxLote(p,l,Q){if(loteDone(l))return qdIdxT(Q,'fim');const R=rp(l),comecou=R.steps.some(s=>stOf(l,s.id).st!=='pend');
+  if(!comecou&&!liberado(p,l)){const c=qdIdxT(Q,'compra');if(c>=0)return c}
+  const fr=R.steps.filter(s=>!done(l,s.id)&&s.deps.every(d=>done(l,d)));
+  return fr.length?Math.min(...fr.map(s=>qdIdxEtapa(s,Q))):qdIdxT(Q,'fim')}
+/* Escondida pela fábrica: o cartão vai para a próxima coluna visível (ou a última). */
+const qdVis=(Q,k)=>{const C=Q.cols;if(k<0)k=0;for(let j=k;j<C.length;j++)if(!C[j].off)return C[j];for(let j=C.length-1;j>=0;j--)if(!C[j].off)return C[j];return null};
+function qdIdxPed(p,Q){Q=Q||QD();const i=info(p);
+  if(p.concluido||(i.ls.length&&!i.ab.length))return qdIdxT(Q,'fim');
+  if(!i.ls.length||(p.pre&&p.pre.length)||!viasOk(p)||!arteAprovada(p)){const k=qdIdxT(Q,'inicio');return k<0?0:k}
+  return Math.min(...i.ab.map(l=>qdIdxLote(p,l,Q)))}
+const qdColDe=p=>{if(p.cancelado)return null;const k=RC['qc:'+p.id];if(k!==undefined)return k;const Q=QD();return RC['qc:'+p.id]=qdVis(Q,qdIdxPed(p,Q))};
+/* ---- partes do cartão ---- */
+const qdPlural=(w,n)=>n<2||/s$/i.test(w)?w:/m$/i.test(w)?w.slice(0,-1)+'ns':/(a|e|o|u)l$/i.test(w)?w.slice(0,-1)+'is':/[rz]$/i.test(w)?w+'es':w+'s';
+function qdProdutos(p){const M=new Map();lotesDe(p.id).filter(l=>!l.rework).forEach(l=>{const w=String((prod(l.prod)||{}).nome||'peça').trim().split(/\s+/)[0].toLowerCase();M.set(w,(M.get(w)||0)+(l.qtd||0))});
+  const L=[...M].map(([w,n])=>qdPlural(w,n));return L.length>1?L.slice(0,-1).join(', ')+' e '+L[L.length-1]:L[0]||''}
+const qdTitulo=p=>{const n=numCA(p)||p.id,pr=qdProdutos(p);return `${n?n+' ':''}${p.cliente||'Pedido'}${pr?' - '+pr:''}`};
+const qdDm=ts=>{if(!ts)return '';const d=new Date(ts);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}`};
+/* Prazo: verde = entregue; vermelho = passou do dia; amarelo = faltam 2 dias úteis ou menos. */
+const qdPrazo=p=>p.concluido&&!p.cancelado?'ok':!p.entrega?'':p.entrega<now()?'crit':wdUntil(p.entrega)<=2?'warn':'';
+const QD_PRAZO_T={ok:'entregue',crit:'atrasado',warn:'perto de vencer'};
+function qdCkDe(p){if(p.ck)return p.ck;return QD().ck.map((g,gi)=>({id:'g'+gi,nome:g.nome,itens:g.itens.map((t,ii)=>({id:'g'+gi+'i'+ii,t,ok:false}))}))}
+const qdCkGarante=p=>{if(!p.ck)p.ck=JSON.parse(JSON.stringify(qdCkDe(p)));return p.ck};
+const qdCkConta=p=>{const I=qdCkDe(p).flatMap(g=>g.itens);return [I.filter(x=>x.ok).length,I.length]};
+const qdCapa=p=>{const ls=lotesDe(p.id).filter(l=>!l.rework&&l.mock);return (p.capa&&ls.find(l=>l.id===p.capa))||ls[0]||null};
+const uIni=n=>{const w=String(n||'?').trim().split(/\s+/).filter(Boolean);return ((w[0]||'?')[0]+(w.length>1?w[w.length-1][0]:'')).toUpperCase()};
+const uNomeQ=u=>u?((u.pessoa&&pessoa(u.pessoa)?pNome(u.pessoa):'')||u.nome||String(u.email||'').split('@')[0]||'?'):'?';
+const uById=id=>(state.usuarios||[]).find(u=>u.id===id);
+const uAv=(u,cls='')=>{const n=uNomeQ(u),k=Math.max(0,(state.usuarios||[]).indexOf(u));return `<span class="av qd-av ${cls}" style="background:${AVC[k%AVC.length]}" title="${esc(n)}" aria-label="${esc(n)}">${esc(uIni(n))}</span>`};
+const qdEtqH=(e,cls='')=>{const c=qdCor(e.cor);return `<span class="qd-etq ${cls}" style="color:${c[2]};background:${c[3]}">${esc(e.nome)}</span>`};
+function qdCard(p){const E=qdEtqDe(p).map(id=>qdEtqs().find(e=>e.id===id)).filter(Boolean),pz=qdPrazo(p),cp=qdCapa(p),[f,t]=qdCkConta(p),nA=arqsDoPedido(p).length,R=(p.resp||[]).map(uById).filter(Boolean);
+  return `<button class="qd-card" data-a="qdAbre" data-id="${esc(p.id)}">${cp?`<img class="qd-capa" src="${esc(cp.mock)}" alt="Mockup da peça" loading="lazy">`:''}<span class="qd-in">
+    ${E.length?`<span class="qd-etqs">${E.map(e=>qdEtqH(e)).join('')}</span>`:''}
+    <span class="qd-t">${esc(qdTitulo(p))}</span>
+    ${p.chegada||p.entrega?`<span class="qd-per ${pz}">${ic('i-relogio')}${qdDm(p.chegada)}${p.chegada&&p.entrega?' – ':''}${qdDm(p.entrega)}${pz?`<span class="sr">, ${QD_PRAZO_T[pz]}</span>`:''}</span>`:''}
+    <span class="qd-rod">${p.obs?`<span title="Tem observações">${ic('i-lista')}<span class="sr">Tem observações</span></span>`:''}${nA?`<span title="Arquivos">${ic('i-arte')}${nA}</span>`:''}${t?`<span class="${f===t?'ok':''}" title="Checklist">${ic('i-check')}${f}/${t}</span>`:''}
+      ${R.length?`<span class="qd-avs">${R.slice(0,4).map(u=>uAv(u)).join('')}${R.length>4?`<span class="av qd-av" style="background:var(--muted)">+${R.length-4}</span>`:''}</span>`:''}</span></span></button>`}
+/* ---- filtros ---- */
+const QD_ORD=[['entrega','Data de entrega'],['criacao','Data de criação'],['nome','Nome']];
+const QD_PZ=[['atrasado','Atrasados'],['semana','Vencem esta semana'],['sem','Sem data']];
+const qdF=()=>{if(!ui.qf){let o='entrega';try{o=localStorage.getItem('qd-ord')||o}catch(e){}ui.qf={q:'',etq:[],resp:[],pz:[],ord:o}}return ui.qf};
+const qdFimSem=s=>{const d=new Date(sod(now()));d.setDate(d.getDate()+(7-d.getDay())%7);return d.getTime()+DIA-1};
+function qdPassa(p,f){if(f.q){const q=nCli(f.q),qd=f.q.replace(/\D/g,'');if(!(nCli(qdTitulo(p)).includes(q)||(qd&&(String(p.id).includes(qd)||numCA(p).includes(qd)))))return false}
+  if(f.etq.length&&!f.etq.some(e=>qdEtqDe(p).includes(e)))return false;
+  if(f.resp.length&&!f.resp.some(u=>(p.resp||[]).includes(u)))return false;
+  if(f.pz.length){const ok={atrasado:!p.concluido&&p.entrega&&p.entrega<now(),semana:!p.concluido&&p.entrega&&p.entrega>=sod(now())&&p.entrega<=qdFimSem(),sem:!p.entrega};if(!f.pz.some(k=>ok[k]))return false}
+  return true}
+const QD_FIM_DIAS=30;   // entregues há mais tempo saem do quadro (continuam na lista, em Entregues)
+function qdGrupos(){const Q=QD(),f=qdF(),G=new Map(Q.cols.filter(c=>!c.off).map(c=>[c.id,[]]));const lim=now()-QD_FIM_DIAS*DIA;
+  state.pedidos.forEach(p=>{if(p.cancelado||(p.concluido&&p.concluido<lim)||!qdPassa(p,f))return;const c=qdColDe(p);if(c&&G.has(c.id))G.get(c.id).push(p)});
+  const cmp=f.ord==='nome'?(a,b)=>String(a.cliente).localeCompare(String(b.cliente),'pt-BR'):f.ord==='criacao'?(a,b)=>(b.chegada||0)-(a.chegada||0):(a,b)=>(a.entrega||9e15)-(b.entrega||9e15);
+  G.forEach(L=>L.sort(cmp));return G}
+const qdFiltrosN=f=>f.etq.length+f.resp.length+f.pz.length;
+function qdBoard(){const Q=QD(),G=qdGrupos(),C=Q.cols.filter(c=>!c.off);
+  const nN=notasAbertas().length;return `<div class="qd-cols" role="group" aria-label="Ir para a coluna"><button class="qd-ir" data-a="qdIr" data-c="caixa">Caixa de entrada <small>${nN}</small></button>${C.map(c=>`<button class="qd-ir" data-a="qdIr" data-c="${esc(c.id)}">${esc(c.nome)} <small>${G.get(c.id).length}</small></button>`).join('')}</div>
+  <div class="qd" id="qdCols">${qdCaixa()}${C.map(c=>{const L=G.get(c.id);return `<section class="qd-col" id="qdc-${esc(c.id)}" aria-label="${esc(c.nome)}"><h2>${esc(c.nome)}<small>${L.length}</small></h2>
+    ${L.length?L.map(qdCard).join(''):`<p class="qd-vazio">Nenhum pedido aqui${qdFiltrosN(qdF())||qdF().q?' com esse filtro':''}.</p>`}
+    ${c.tipo==='inicio'?`<button class="qd-add" data-a="novo">${ic('i-mais')}Adicionar pedido</button>`:''}
+    ${c.tipo==='fim'?`<p class="qd-vazio">Entregues há mais de ${QD_FIM_DIAS} dias ficam só na lista (Filtrar › Entregues).</p>`:''}</section>`}).join('')}</div>`}
+function vQuadro(){const f=qdF(),n=qdFiltrosN(f),U=state.usuarios||[];
+  const chip=(a,v,on,t)=>`<button class="depc" data-a="${a}" data-v="${esc(v)}" aria-pressed="${!!on}">${t}</button>`;
+  return `<div class="busca-l"><label class="busca-c">${ic('i-lupa')}<input class="campo busca" id="qdBusca" value="${esc(f.q)}" placeholder="Buscar nome ou número" autocomplete="off" aria-label="Buscar pedido no quadro"></label>
+    <div class="busca-bts"><button class="mbtn neutro2 fo-b${n?' ativo':''}" data-a="qdFAbre" data-v="f" aria-expanded="${ui.qfAb==='f'}">${ic('i-filtro')}<span>${n?n+(n>1?' filtros':' filtro'):'Filtrar'}</span></button>
+    <button class="mbtn neutro2 fo-b" data-a="qdFAbre" data-v="o" aria-expanded="${ui.qfAb==='o'}">${ic('i-ordenar')}<span class="so-pc">${esc((QD_ORD.find(x=>x[0]===f.ord)||QD_ORD[0])[1])}</span><span class="so-cel">Ordenar</span></button></div></div>
+  ${ui.qfAb==='f'?`<div class="fo-p"><div class="rotulo" style="margin-top:0">Prazo</div><div class="linha-dep">${QD_PZ.map(([k,t])=>chip('qdFPz',k,f.pz.includes(k),t)).join('')}</div>
+    <div class="rotulo">Etiqueta</div><div class="linha-dep">${qdEtqs().map(e=>chip('qdFEtq',e.id,f.etq.includes(e.id),qdEtqH(e))).join('')}</div>
+    ${U.length?`<div class="rotulo">Responsável</div><div class="linha-dep">${U.map(u=>chip('qdFResp',u.id,f.resp.includes(u.id),uAv(u,'s')+esc(uNomeQ(u)))).join('')}</div>`:''}
+    <div class="acoes" style="margin-top:12px">${n?`<button class="mbtn neutro2" data-a="qdFLimpa">Limpar filtros</button>`:''}<button class="mbtn go" data-a="qdFAbre" data-v="f">${ic('i-check')}Ver o quadro</button></div></div>`:''}
+  ${ui.qfAb==='o'?`<div class="fo-p"><div class="rotulo" style="margin-top:0">Ordenar cada coluna por</div><div class="linha-dep">${QD_ORD.map(([k,t])=>chip('qdOrd',k,f.ord===k,t)).join('')}</div></div>`:''}
+  <p class="qd-dica">${ic('i-fabrica')}<span>O pedido muda de coluna sozinho, conforme a produção anda na Fábrica.<span class="so-cel"> Arraste para o lado para ver as outras colunas →</span></span></p>
+  <div id="qdBoard">${qdBoard()}</div>`}
+/* ---- no pedido: coluna, etiquetas, responsáveis, capa e checklist ---- */
+const qdQuando=ts=>{const d=new Date(ts);return `${pad(d.getDate())}/${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+function qdBloco(p){const id=p.id,Q=QD(),col=qdColDe(p),ck=qdCkDe(p),[f,t]=qdCkConta(p),ed=ui.qdEd===id,U=state.usuarios||[],abre=ui.qdDe===id;
+  const ls=info(p).ab.filter(l=>!l.rework),mk=lotesDe(id).filter(l=>!l.rework&&l.mock),cp=qdCapa(p);
+  const porPeca=!p.concluido&&ls.length>1&&col&&col.tipo!=='inicio'?ls.map(l=>{const c=qdVis(Q,qdIdxLote(p,l,Q));return `<li>${esc(nomePeca(l))}${l.cor?' '+esc(l.cor):''}: <b>${esc(c?c.nome:'—')}</b></li>`}).join(''):'';
+  return `${blkA('qd'+id,'Quadro: etiquetas e checklist',abre,`<span class="pill">${esc(col?col.nome:'Cancelado')}${t?` · ${f}/${t}`:''}</span>`)}
+    <div class="qd-onde">${ic('i-fabrica')}<span>No quadro: <b>${esc(col?col.nome:'fora do quadro (cancelado)')}</b>. Muda sozinho, conforme a produção anda.</span></div>
+    ${porPeca?`<ul class="qd-pecas">${porPeca}</ul>`:''}
+    <div class="rotulo">Etiquetas</div><div class="linha-dep">${qdEtqs().map(e=>`<button class="depc qd-tg" data-a="qdEtq" data-id="${esc(id)}" data-e="${esc(e.id)}" aria-pressed="${qdEtqDe(p).includes(e.id)}">${qdEtqH(e)}</button>`).join('')}</div>
+    ${U.length?`<div class="rotulo">Responsáveis</div><div class="linha-dep">${U.map(u=>`<button class="depc qd-tg" data-a="qdResp" data-id="${esc(id)}" data-u="${esc(u.id)}" aria-pressed="${(p.resp||[]).includes(u.id)}">${uAv(u,'s')}${esc(uNomeQ(u))}</button>`).join('')}</div>`:''}
+    ${(p.resp||[]).length&&!p.concluido?`<div class="rotulo">Avisar ${(p.resp||[]).length>1?'os responsáveis':'o responsável'} antes da entrega</div><div class="linha-dep">${QD_LEMB.map(([v,t])=>`<button class="depc" data-a="qdLemb" data-id="${esc(id)}" data-v="${v}" aria-pressed="${qdLemb(p)===v}">${t}</button>`).join('')}</div>`:''}
+    ${mk.length>1?`<div class="rotulo">Capa do cartão</div><div class="qd-capas">${mk.map(l=>`<button class="qd-capa-b" data-a="qdCapa" data-id="${esc(id)}" data-l="${esc(l.id)}" aria-pressed="${cp&&cp.id===l.id}" aria-label="Usar ${esc(nomePeca(l))} como capa"><img src="${esc(l.mock)}" alt=""></button>`).join('')}</div>`:''}
+    <div class="qd-ck-h"><div class="rotulo">Checklist${t?` <span class="qd-n">${f}/${t}</span>`:''}</div><button class="mbtn neutro2" data-a="qdCkEd" data-id="${esc(id)}">${ed?ic('i-check')+'Pronto':'✎ Mudar itens'}</button></div>
+    ${t?`<div class="qd-bar" role="img" aria-label="${f} de ${t} feitos"><i style="width:${f/t*100}%"></i></div>`:''}
+    ${ck.map((g,gi)=>{const fe=g.itens.filter(x=>x.ok).length;return `<div class="qd-g"><div class="qd-g-h">${ed?`<input class="campo" data-qdren="${esc(id)}|${esc(g.id)}|" value="${esc(g.nome)}" aria-label="Nome do grupo">
+        <span class="linha-dep" style="margin:0">${gi?`<button class="x azul" data-a="qdGMov" data-id="${esc(id)}" data-g="${esc(g.id)}" data-d="-1" aria-label="Subir o grupo ${esc(g.nome)}">↑</button>`:''}${gi<ck.length-1?`<button class="x azul" data-a="qdGMov" data-id="${esc(id)}" data-g="${esc(g.id)}" data-d="1" aria-label="Descer o grupo ${esc(g.nome)}">↓</button>`:''}<button class="x" data-a="qdGRm" data-id="${esc(id)}" data-g="${esc(g.id)}" aria-label="Tirar o grupo ${esc(g.nome)}">× Tirar</button></span>`
+        :`<h3>${esc(g.nome)}</h3>${g.itens.length?`<span class="qd-n">${fe}/${g.itens.length}</span>`:''}`}</div>
+      ${g.itens.length&&!ed?`<div class="qd-bar fino"><i style="width:${fe/g.itens.length*100}%"></i></div>`:''}
+      ${g.itens.map((x,ii)=>ed?`<div class="qd-it-ed"><input class="campo" data-qdren="${esc(id)}|${esc(g.id)}|${esc(x.id)}" value="${esc(x.t)}" aria-label="Item"><span class="linha-dep" style="margin:0">${ii?`<button class="x azul" data-a="qdIMov" data-id="${esc(id)}" data-g="${esc(g.id)}" data-i="${esc(x.id)}" data-d="-1" aria-label="Subir ${esc(x.t)}">↑</button>`:''}${ii<g.itens.length-1?`<button class="x azul" data-a="qdIMov" data-id="${esc(id)}" data-g="${esc(g.id)}" data-i="${esc(x.id)}" data-d="1" aria-label="Descer ${esc(x.t)}">↓</button>`:''}<button class="x" data-a="qdIRm" data-id="${esc(id)}" data-g="${esc(g.id)}" data-i="${esc(x.id)}" aria-label="Tirar ${esc(x.t)}">× Tirar</button></span></div>`
+        :`<button class="qd-it" data-a="qdCk" data-id="${esc(id)}" data-g="${esc(g.id)}" data-i="${esc(x.id)}" aria-pressed="${!!x.ok}"><span class="box">${ic('i-check')}</span><span class="qd-it-t">${esc(x.t)}${x.em?`<small>${x.ok?'Marcado':'Desmarcado'} por ${esc(x.por||'?')} em ${qdQuando(x.em)}</small>`:''}</span></button>`).join('')}
+      ${ed?`<div class="qd-add-l"><input class="campo" id="qdNovo-${esc(g.id)}" placeholder="Novo item em ${esc(g.nome)}" aria-label="Novo item em ${esc(g.nome)}"><button class="mbtn" data-a="qdIAdd" data-id="${esc(id)}" data-g="${esc(g.id)}">${ic('i-mais')}Pôr</button></div>`:''}</div>`}).join('')}
+    ${ed?`<div class="qd-add-l"><input class="campo" id="qdNovoG" placeholder="Nome do grupo novo" aria-label="Nome do grupo novo"><button class="mbtn" data-a="qdGAdd" data-id="${esc(id)}">${ic('i-mais')}Pôr grupo</button></div>`:''}
+  </details>${cmBloco(p)}${qdHist(p)}`}
+/* Histórico do pedido: o que já é registrado no app (state.log, sincroniza) mais criação, correções e entrega. Só leitura. */
+const QD_LOG_T={inicio:'Começou',pausa:'Pausou',divisao:'Dividiu',troca:'Passou para outra pessoa',retro:'Registrou depois',reserva:'Reservou a máquina para',terc:'Mandou para prestador',cancelado:'Cancelou o pedido',reativado:'Voltou o pedido para a produção',edicao:'Corrigiu o pedido'};
+function qdHistLista(p){const L=(state.log||[]).filter(e=>e.ped===p.id).map(e=>{const o=e.op&&pessoa(e.op)?pNome(e.op):'';
+    const t=e.tipo==='quadro'?e.step:e.tipo==='edicao'?`Corrigiu o pedido: ${e.step||''}`:e.tipo==='troca'&&e.f?`Passou "${e.step||''}" para ${pNome(e.para)||'outra pessoa'}`:
+      `${QD_LOG_T[e.tipo]||e.tipo}${e.step?' '+e.step:''}${e.prod?' ('+e.prod+')':''}${o&&e.tipo!=='cancelado'?' com '+o:''}`;return {ts:e.ts,por:e.por,t}});
+  if(p.criado&&p.criado.ts&&!p.criado.antigo)L.push({ts:p.criado.ts,por:p.criado.por||'',t:'Criou o pedido'});
+  if(p.concluido&&!p.cancelado)L.push({ts:p.concluido,por:'',t:'Pedido entregue'});
+  return L.sort((a,b)=>b.ts-a.ts)}
+function qdHist(p){const L=qdHistLista(p),tudo=ui.qdHt===p.id,V=tudo?L:L.slice(0,15);
+  return `${blkA('qh'+p.id,'Histórico',false,`<span class="pill">${L.length}</span>`)}${L.length?`<ol class="qd-hist">${V.map(e=>`<li><span class="qd-h-q">${qdQuando(e.ts)}${e.por?' · '+esc(e.por):''}</span>${esc(e.t)}</li>`).join('')}</ol>
+    ${L.length>V.length?`<button class="mbtn neutro2" data-a="qdHTudo" data-id="${esc(p.id)}">Ver tudo (${L.length})</button>`:''}`:'<p class="qd-vazio">Nada registrado ainda.</p>'}<p class="qd-vazio">O histórico não pode ser mudado nem apagado.</p></details>`}
+/* Registro de uma mudança do quadro: no histórico do pedido (state.log) e no evento (métricas). */
+function qdReg(p,txt,tipoEv,o){registrar({tipo:'quadro',ped:p.id,cli:p.cliente,step:String(txt).slice(0,300)});ev(tipoEv,{ped:p.id,...(o||{})})}
+/* ---- configuração do quadro (Cadastros › Ajustes) ---- */
+function cardQuadro(){if(!modOn('quadro'))return '';const Q=QD(),e=ui.qdCfgEd;
+  const maqs=state.tipos.map(t=>[t.id,t.nome]);
+  return `<div class="card" id="Quadro"><h2>Quadro de pedidos</h2><p class="qd-txt">As colunas da vista Quadro, em Pedidos. O pedido muda de coluna sozinho: Início (falta ficha ou arte), Compra (falta material para cortar), a coluna da máquina onde a peça está, Finalizados.</p>
+    <div class="rotulo">Colunas</div>${Q.cols.map((c,k)=>`<div class="set-row qd-cfg-c${c.off?' off':''}"><span class="set-t">${e==='c:'+c.id?`<input class="campo" id="qdCfgNome" value="${esc(c.nome)}" aria-label="Nome da coluna"><button class="x azul" data-a="qdColRenOk" data-c="${esc(c.id)}">Salvar</button>`:`<b>${esc(c.nome)}</b>`}</span>
+      <span class="qd-txt">${c.tipo==='inicio'?'Falta pré-pedido, ficha ou arte':c.tipo==='compra'?'Falta material para cortar':c.tipo==='fim'?'Pronto ou entregue':
+        `Máquinas: ${esc(state.tipos.filter(t=>qdIdxEtapa({posto:t.id},Q)===k).map(t=>t.nome).join(', ')||'nenhuma')}`}</span>
+      <span class="linha-dep" style="margin:0">${k?`<button class="x azul" data-a="qdColMov" data-c="${esc(c.id)}" data-d="-1" aria-label="Subir ${esc(c.nome)}">↑</button>`:''}${k<Q.cols.length-1?`<button class="x azul" data-a="qdColMov" data-c="${esc(c.id)}" data-d="1" aria-label="Descer ${esc(c.nome)}">↓</button>`:''}
+        ${e==='c:'+c.id?'':`<button class="x azul" data-a="qdColRen" data-c="${esc(c.id)}" aria-label="Mudar o nome de ${esc(c.nome)}">✎</button>`}
+        <button class="depc" data-a="qdColOff" data-c="${esc(c.id)}" aria-pressed="${!c.off}">${c.off?'Escondida':'Aparece'}</button>
+        ${c.tipo==='prod'?`<button class="x" data-a="qdColRm" data-c="${esc(c.id)}" aria-label="Tirar a coluna ${esc(c.nome)}">× Tirar</button>`:''}</span></div>`).join('')}
+    <div class="rotulo">Mudar a coluna de uma máquina</div><div class="qd-add-l">${selOp('qdMaqSel','',ui.qdMaq||'',maqs,'Escolha a máquina')}${ui.qdMaq?selOp('qdMaqCol',`data-m="${esc(ui.qdMaq)}"`,(Q.cols[qdIdxEtapa({posto:ui.qdMaq},Q)]||{}).id||'',Q.cols.filter(c=>c.tipo==='prod').map(c=>[c.id,c.nome]),'Vai para a coluna'):''}</div>
+    <div class="qd-add-l"><input class="campo" id="qdColNova" placeholder="Nome de uma coluna nova (ex.: Bordado)" aria-label="Nome da coluna nova"><button class="mbtn" data-a="qdColAdd">${ic('i-mais')}Pôr coluna</button></div>
+    <div class="rotulo">Etiquetas</div>${qdEtqs().map(x=>`<div class="set-row">${x.fixa?`<span class="set-t">${qdEtqH(x)}</span><span class="qd-txt">Liga com "pedido para evento"</span>`:e==='e:'+x.id?`<span class="set-t"><input class="campo" id="qdCfgNome" value="${esc(x.nome)}" aria-label="Nome da etiqueta"></span>${selOp('qdEtqCor',`data-e="${esc(x.id)}"`,x.cor,QD_CORES.map(c=>[c[0],c[1]]),'Cor')}<button class="x azul" data-a="qdEtqRenOk" data-e="${esc(x.id)}">Salvar</button>`
+      :`<span class="set-t">${qdEtqH(x)}</span><span class="linha-dep" style="margin:0"><button class="x azul" data-a="qdEtqRen" data-e="${esc(x.id)}" aria-label="Mudar a etiqueta ${esc(x.nome)}">✎</button><button class="x" data-a="qdEtqRm" data-e="${esc(x.id)}" aria-label="Tirar a etiqueta ${esc(x.nome)}">× Tirar</button></span>`}</div>`).join('')}
+    <div class="qd-add-l"><input class="campo" id="qdEtqNova" placeholder="Nome da etiqueta nova" aria-label="Nome da etiqueta nova">${selOp('qdEtqNovaCor','',ui.qdEtqCor||'amarelo',QD_CORES.map(c=>[c[0],c[1]]),'Cor')}<button class="mbtn" data-a="qdEtqAdd">${ic('i-mais')}Pôr etiqueta</button></div>
+    <div class="rotulo">Trazer do Trello</div><p class="qd-txt">No Trello: Menu › Imprimir, exportar e compartilhar › Exportar como JSON. Depois escolha o arquivo aqui. Antes de importar, o app mostra o que vai entrar.</p>
+    <button class="mbtn neutro2" data-a="trImp">${ic('i-mais')}Importar do Trello (arquivo .json)</button>
+    <div class="rotulo">Checklist que todo pedido novo recebe</div><p class="qd-txt">Um grupo por linha, os itens depois de dois-pontos, separados por ponto e vírgula. Ex.: <i>Corte: Separou para o bordado?; Cortou?</i>. Pedidos que já mexeram no checklist não mudam.</p>
+    <textarea class="campo" id="qdCkTxt" rows="8" aria-label="Checklist padrão">${esc(Q.ck.map(g=>`${g.nome}: ${g.itens.join('; ')}`).join('\n'))}</textarea>
+    <div class="acoes"><button class="mbtn" data-a="qdCkSalva">${ic('i-check')}Salvar o checklist</button></div></div>`}
+const qdTog=(L,v)=>{const k=L.indexOf(v);if(k<0)L.push(v);else L.splice(k,1)};
+/* Nome de grupo ou item do checklist mudado na hora (ao sair do campo): fica no histórico. */
+function qdRen(pid,g,i,val){const p=pedById(pid),t=String(val||'').trim();if(!p||!t)return;const G=qdCkGarante(p).find(x=>x.id===g);if(!G)return;
+  if(i){const x=G.itens.find(y=>y.id===i);if(!x||x.t===t)return;const era=x.t;x.t=t;qdReg(p,`Mudou o item "${era}" para "${t}" (${G.nome})`,'checklist.item_editado',{ref:x.id,de:era,para:t})}
+  else{if(G.nome===t)return;const era=G.nome;G.nome=t;qdReg(p,`Mudou o grupo "${era}" para "${t}"`,'checklist.item_editado',{de:era,para:t})}save()}
+/* ================= Arquivos do pedido: quem enviou, versões, categoria, link e exclusão registrada (fase 2 do quadro, 16/11) =================
+   O arquivo continua sendo da empresa (arquivos/<id>); o pedido aponta para ele (ped.anexos, pers.arqs).
+   Trocar por versão nova guarda a versão anterior em a.ver (com o binário, quem enviou e quando) e o arquivo segue com o mesmo id.
+   Tirar do pedido não apaga nada: fica em ped.arqRm (quem tirou e quando) e no histórico. */
+const AX_CAT=[['ficha','Ficha de produção'],['mockup','Mockup'],['bordado','Bordado'],['fotolito','Fotolito/Tela'],['foto','Foto'],['outros','Outros']];
+const axCatDe=(nome,mime,tipo)=>{const e=extDe(nome);if(tipo==='mockup')return 'mockup';if(tipo==='bordado'||/^(dst|dsb|emb|pes|exp|jef|vp3|xxx|pxf|hus|vip|sew|ofm|dsz|tbf)$/.test(e))return 'bordado';
+  if(/^(doc|docx|odt)$/.test(e))return 'ficha';if(/^image\//.test(mime||'')||/^(png|jpg|jpeg|jfif|webp|gif|heic)$/.test(e))return 'foto';return 'outros'};
+const axCatN=c=>(AX_CAT.find(x=>x[0]===c)||[0,''])[1];
+const axQuem=()=>({por:quemNome()||usuarioAtual()?.nome||'',u:usuarioAtual()?.id||''});
+const axTipoTxt=a=>a.link?'Link':(extDe(a.nome)||'arquivo').toUpperCase();
+/* Uma linha de arquivo do pedido. ctx = onde está (pedido ou personalização) e como tirar. */
+function axLinha(a,ped,ctx){const k=a.id+'|'+ctx.k,ab=ui.axEd===k,V=a.ver||[];
+  const meta=[axTipoTxt(a),a.tam?tamArq(a.tam):'',axCatN(a.cat||axCatDe(a.nome,a.mime,a.tipo))].filter(Boolean).join(' · ');
+  return `<div class="ax${ab?' ab':''}">${a.link?`<span class="aq-th aq-ext p">${ic('i-seta')}<b>link</b></span>`:ehImg(a)||a.vis?`<button class="aq-v" data-a="arqVer" data-id="${a.id}" aria-label="Ver ${esc(a.nome)}">${arqThumb(a,'p')}</button>`:arqThumb(a,'p')}
+    <div class="ax-t"><b title="${esc(a.nome)}">${esc(a.nome)}</b>${a.ed?' <span class="ax-selo">editado</span>':''}
+      <span>${esc(meta)}</span>
+      <span>${a.por?`Enviado por <b>${esc(a.por)}</b> em ${qdQuando(a.ts)}`:`Enviado em ${qdQuando(a.ts)}`}</span>
+      ${a.ed?`<span>Editado por <b>${esc(a.ed.por||'?')}</b> em ${qdQuando(a.ed.ts)}${a.ed.o?` (${esc(a.ed.o)})`:''}</span>`:''}
+      ${V.length?`<span>${V.length+1} versões</span>`:''}</div>
+    <div class="ax-b">${a.link?`<button class="x azul" data-a="axAbrir" data-id="${a.id}">Abrir</button>`:`<button class="x azul" data-a="arqBaixar" data-id="${a.id}">Baixar</button>`}
+      <button class="x azul" data-a="axEd" data-k="${esc(k)}" aria-expanded="${ab}">${ab?'Fechar':'Mudar'}</button></div>
+    ${ab?`<div class="ax-p">
+      <label class="rotulo" for="axN-${esc(a.id)}">Nome</label><div class="qd-add-l" style="margin-top:0"><input class="campo" id="axN-${esc(a.id)}" value="${esc(a.nome)}"><button class="mbtn" data-a="axNome" data-id="${a.id}" data-ped="${esc(ped.id)}">${ic('i-check')}Salvar nome</button></div>
+      <div class="rotulo">Tipo do arquivo</div><div class="linha-dep">${AX_CAT.map(([c,n])=>`<button class="depc" data-a="axCat" data-id="${a.id}" data-ped="${esc(ped.id)}" data-v="${c}" aria-pressed="${(a.cat||axCatDe(a.nome,a.mime,a.tipo))===c}">${n}</button>`).join('')}</div>
+      ${a.link?'':`<div class="rotulo">Versões</div><ol class="ax-vers">${V.map((v,i)=>`<li><span>Versão ${i+1}: ${esc(v.nome)}<br><small>Enviada por ${esc(v.por||'?')} em ${qdQuando(v.ts)}</small></span><button class="x azul" data-a="axVerBaixar" data-id="${a.id}" data-i="${i}">Baixar</button></li>`).join('')}
+        <li><span><b>Versão ${V.length+1} (a de agora)</b><br><small>Enviada por ${esc((a.vpor||a.por)||'?')} em ${qdQuando(a.vts||a.ts)}</small></span></li></ol>
+        <button class="mbtn neutro2" data-a="axTroca" data-id="${a.id}" data-ped="${esc(ped.id)}">${ic('i-mais')}Trocar por uma versão nova</button>
+        <p class="qd-txt" style="margin-top:6px">A versão de agora fica guardada aqui e dá para baixar depois.</p>`}
+      <div class="acoes" style="margin-top:10px"><button class="mbtn neutro2" style="color:var(--red)" ${ctx.rm}>× Tirar do pedido</button></div></div>`:''}</div>`}
+/* Arquivos tirados do pedido: o registro fica. */
+function axTirados(ped){const no=new Set(arqsDoPedido(ped).map(a=>a.id)),R=(ped.arqRm||[]).filter(r=>!no.has(r.id));if(!R.length)return '';
+  return `<details class="ax-rm"><summary>Arquivos tirados do pedido (${R.length})</summary>${R.slice().reverse().map(r=>{const a=arqById(r.id);return `<div class="ax"><div class="ax-t"><b>${esc(r.nome||a?.nome||'arquivo')}</b><span>Excluído por <b>${esc(r.por||'?')}</b> em ${qdQuando(r.ts)}${r.onde?' · '+esc(r.onde):''}</span></div>
+    ${a?`<div class="ax-b">${a.link?`<button class="x azul" data-a="axAbrir" data-id="${a.id}">Abrir</button>`:`<button class="x azul" data-a="arqBaixar" data-id="${a.id}">Baixar</button>`}<button class="x azul" data-a="axVolta" data-id="${a.id}" data-ped="${esc(ped.id)}">Pôr de volta</button></div>`:''}</div>`}).join('')}</details>`}
+function axRegRm(ped,a,onde){(ped.arqRm=ped.arqRm||[]).push({id:a.id,nome:a.nome,ts:now(),onde,...axQuem()});if(ped.arqRm.length>200)ped.arqRm.splice(0,ped.arqRm.length-200);
+  qdReg(ped,`Excluiu o arquivo "${a.nome}"${onde?' ('+onde+')':''}`,'arquivo.tirado',{ref:a.id,dados:{nome:a.nome,onde}})}
+/* Envio de arquivos (botão, arrastar e soltar): mesmo caminho para o pedido, a personalização e a troca de versão. */
+async function arqEnviar(fs,al){if(!al||!fs.length)return;toast('Guardando…',false);let ult=null;const salvos=[];
+  for(const fl of fs){try{const a=await arqSalvar(fl,al.cli,al.tipo==='auto'?tipoArqDe(fl):al.tipo);if(a){ult=a;salvos.push(a)}}catch(er){toast(`Não consegui abrir ${fl.name}`,false)}}
+  document.getElementById('toast').innerHTML='';if(!ult)return;snap();
+  if(al.troca){const a=arqById(al.troca),n=ult,q=axQuem();state.arquivos=state.arquivos.filter(x=>x!==n);if(!a)return commit();
+    (a.ver=a.ver||[]).push({bin:a.bin,nome:a.nome,tam:a.tam,mime:a.mime,prev:a.prev,vis:a.vis,ts:a.vts||a.ts,por:a.vpor||a.por||''});
+    Object.assign(a,{bin:n.bin,nome:n.nome,tam:n.tam,mime:n.mime,vts:now(),vpor:q.por,ed:{ts:now(),...q,o:'versão nova'}});if(n.prev)a.prev=n.prev;else delete a.prev;if(n.vis)a.vis=n.vis;else delete a.vis;
+    const p=al.ped&&pedById(al.ped);if(p)qdReg(p,`Trocou "${a.ver[a.ver.length-1].nome}" pela versão ${a.ver.length+1} ("${a.nome}")`,'arquivo.nova_versao',{ref:a.id,de:a.ver[a.ver.length-1].nome,para:a.nome,q:a.ver.length+1});
+    commit();toast('Versão nova guardada. A anterior continua em Mudar › Versões.');return}
+  if(al.alvo){if(al.multi)salvos.forEach(a=>usaArq(a,al.alvo));else usaArq(ult,al.alvo);if(ui.sheet&&ui.sheet.t==='arqPick')ui.sheet=ui.sheet.volta||null;
+    const pid=al.alvo.k==='pedAnx'?al.alvo.ped:al.alvo.k==='anx'?(lote(al.alvo.l)||{}).ped:null,p=pid&&pedById(pid);
+    if(p)(al.multi?salvos:[ult]).forEach(a=>qdReg(p,`Enviou o arquivo "${a.nome}"`,'arquivo.enviado',{ref:a.id,dados:{nome:a.nome,tam:a.tam,cat:a.cat}}))}
+  commit();toast(fs.length>1?`${fs.length} arquivos guardados`:'Arquivo guardado')}
+/* Comentários do pedido: autor, data e hora, "editado em"; marcar quem precisa ver (menção). */
+const cmDe=p=>(p.coment||[]).filter(c=>!c.rm);
+const cmTexto=(c)=>{let t=esc(c.t);(c.m||[]).map(uById).filter(Boolean).forEach(u=>{const n=esc(uNomeQ(u));t=t.split('@'+n).join(`<b class="cm-m">@${n}</b>`)});const fora=(c.m||[]).map(uById).filter(u=>u&&!c.t.includes('@'+uNomeQ(u)));
+  return t.replace(/\n/g,'<br>')+(fora.length?`<br><span class="cm-para">Avisou: ${fora.map(u=>`<b class="cm-m">@${esc(uNomeQ(u))}</b>`).join(', ')}</span>`:'')};
+function cmBloco(p){const C=cmDe(p),eu=usuarioAtual(),U=state.usuarios||[],f=ui.cmF&&ui.cmF.p===p.id?ui.cmF:{m:[]};
+  return `${blkA('cm'+p.id,'Comentários',ui.qdDe===p.id&&C.length>0,`<span class="pill">${C.length}</span>`)}
+    ${C.map(c=>{const u=uById(c.u),ed=ui.cmEd===c.id;return `<div class="cm">${u?uAv(u):`<span class="av qd-av" style="background:var(--muted)">${esc(uIni(c.por))}</span>`}<div class="cm-c"><div class="cm-h"><b>${esc(c.por||'?')}</b> <span>${qdQuando(c.ts)}${c.ed?` · editado em ${qdQuando(c.ed)}`:''}</span></div>
+      ${ed?`<textarea class="campo" id="cmEdT" rows="3" aria-label="Mudar o comentário">${esc(c.t)}</textarea><div class="acoes"><button class="mbtn" data-a="cmEdOk" data-id="${esc(p.id)}" data-c="${c.id}">${ic('i-check')}Salvar</button><button class="mbtn neutro2" data-a="cmEd" data-c="">Não mudar</button></div>`
+        :`<p class="cm-t">${cmTexto(c)}</p>${eu&&c.u===eu.id?`<button class="x azul" data-a="cmEd" data-c="${c.id}">✎ Mudar</button>`:''}`}</div></div>`}).join('')||'<p class="qd-vazio">Nenhum comentário ainda.</p>'}
+    <label class="rotulo" for="cmNovo">Escrever um comentário</label><textarea class="campo" id="cmNovo" rows="3" placeholder="Ex.: cliente pediu para trocar a cor do bordado">${esc(f.t||'')}</textarea>
+    ${U.length>1?`<div class="rotulo">Avisar quem precisa ver <span style="font-weight:400">(se quiser)</span></div><div class="linha-dep">${U.filter(u=>!eu||u.id!==eu.id).map(u=>`<button class="depc qd-tg" data-a="cmMarca" data-id="${esc(p.id)}" data-u="${u.id}" aria-pressed="${f.m.includes(u.id)}">${uAv(u,'s')}${esc(uNomeQ(u))}</button>`).join('')}</div>`:''}
+    <div class="acoes"><button class="mbtn go" data-a="cmEnvia" data-id="${esc(p.id)}">${ic('i-check')}Enviar comentário</button></div></details>`}
+/* ================= Fase 3 do quadro (16/11): cartão no QR, avisos para você, calendário, caixa de entrada, importar do Trello ================= */
+/* Cópia da coluna, do título e dos responsáveis no pedido (p.qdc), só para a ficha pública do QR, que não recebe as etapas nem os acessos.
+   Calculada a cada save; só muda o documento quando a coluna muda. */
+function qdCarimba(){if(!modOn('quadro'))return;(state.pedidos||[]).forEach(p=>{let v=null;if(!p.cancelado){const c=qdColDe(p);if(c)v={c:c.id,n:c.nome,t:qdTitulo(p),r:(p.resp||[]).map(uById).filter(Boolean).map(uNomeQ)}}
+  if(JSON.stringify(v)!==JSON.stringify(p.qdc||null)){if(v)p.qdc=v;else delete p.qdc}})}
+/* Cartão na ficha do QR (sem login): só leitura. Não mostra comentários nem histórico (a etiqueta vai para o prestador). */
+function pubCartao(p){if(!modOn('quadro'))return '';const q=p.qdc||{},E=qdEtqDe(p).map(id=>qdEtqs().find(e=>e.id===id)).filter(Boolean),pz=qdPrazo(p),ck=qdCkDe(p),[f,t]=qdCkConta(p);
+  return `<div class="card pub-qd"><div class="rotulo" style="margin:0">Cartão do pedido</div>${q.n?`<div class="qd-onde" style="margin-top:6px">${ic('i-fabrica')}<span>Agora em: <b>${esc(q.n)}</b></span></div>`:''}
+    <h2>${esc(q.t||qdTitulo(p))}</h2>${E.length?`<div class="qd-etqs">${E.map(e=>qdEtqH(e)).join('')}</div>`:''}
+    ${p.chegada||p.entrega?`<span class="qd-per ${pz}">${ic('i-relogio')}${qdDm(p.chegada)}${p.chegada&&p.entrega?' – ':''}${qdDm(p.entrega)}${pz?` · ${QD_PRAZO_T[pz]}`:''}</span>`:''}
+    ${(q.r||[]).length?`<p class="qd-txt" style="margin-top:8px">Responsáveis: <b>${esc(q.r.join(', '))}</b></p>`:''}
+    ${t?`<div class="qd-ck-h"><div class="rotulo">Checklist <span class="qd-n">${f}/${t}</span></div></div><div class="qd-bar" role="img" aria-label="${f} de ${t} feitos"><i style="width:${f/t*100}%"></i></div>
+      ${ck.filter(g=>g.itens.length).map(g=>`<div class="qd-g"><div class="qd-g-h"><h3>${esc(g.nome)}</h3><span class="qd-n">${g.itens.filter(x=>x.ok).length}/${g.itens.length}</span></div>${g.itens.map(x=>`<div class="qd-it" aria-pressed="${!!x.ok}" role="img" aria-label="${esc(x.t)}: ${x.ok?'feito':'falta'}"><span class="box">${ic('i-check')}</span><span class="qd-it-t">${esc(x.t)}${x.ok&&x.em?`<small>Marcado por ${esc(x.por||'?')} em ${qdQuando(x.em)}</small>`:''}</span></div>`).join('')}</div>`).join('')}`:''}
+    <p class="qd-txt" style="margin-top:10px">Para marcar o checklist, entre no app com o seu acesso.</p></div>`}
+/* ---- Avisos para você: quem foi posto como responsável, quem foi avisado num comentário e prazo dos pedidos de que é responsável ---- */
+const QD_LEMB=[[0,'Não avisar'],[1,'1 dia antes'],[2,'2 dias antes'],[5,'5 dias antes']];
+const qdLemb=p=>p.lemb==null?2:+p.lemb;
+function notifsDe(u){if(!u||!modOn('quadro'))return [];const out=[],hoje=sod(now()).getTime();
+  state.pedidos.forEach(p=>{if(p.cancelado)return;const visto=(p.ntVisto||{})[u.id]||0,R=(p.resp||[]).includes(u.id);
+    const re=(p.respEm||{})[u.id];if(R&&re&&re.por!==uNomeQ(u))out.push({p,k:'resp',ts:re.ts,txt:`${re.por||'Alguém'} pôs você como responsável`});
+    cmDe(p).forEach(c=>{if((c.m||[]).includes(u.id)&&c.u!==u.id)out.push({p,k:'menc',ts:c.ts,txt:`${c.por||'Alguém'} avisou você num comentário: "${c.t.length>60?c.t.slice(0,60)+'…':c.t}"`})});
+    if(R&&!p.concluido&&p.entrega){const L=qdLemb(p);if(p.entrega<now())out.push({p,k:'atraso',ts:hoje,txt:'Pedido seu está atrasado'});else if(L&&wdUntil(p.entrega)<=L)out.push({p,k:'prazo',ts:hoje,txt:`Pedido seu vence ${wdUntil(p.entrega)===0?'hoje':wdUntil(p.entrega)===1?'amanhã':'em '+wdUntil(p.entrega)+' dias úteis'}`})}
+    out.forEach(n=>{if(n.p===p&&n.novo==null)n.novo=n.ts>visto})});
+  return out.sort((a,b)=>(b.novo-a.novo)||(b.ts-a.ts))}
+const notifsNovas=u=>notifsDe(u).filter(n=>n.novo);
+function popNotifs(){const u=usuarioAtual(),N=notifsDe(u).slice(0,12);if(!modOn('quadro'))return '';
+  return `<div class="pop-h" style="margin-top:12px"><b>Para você</b></div>${N.length?`<div class="avisos">${N.map(n=>`<button class="av-item${n.novo?' novo':''}" data-a="ntAbrir" data-id="${esc(n.p.id)}">${ic(n.k==='menc'?'i-lista':n.k==='resp'?'i-pessoas':'i-relogio')}<span><b>${esc(n.txt)}</b><span>${esc(qdTitulo(n.p))}${n.k==='resp'||n.k==='menc'?' · '+haQuanto(n.ts):''}</span></span>${ic('i-seta')}</button>`).join('')}</div>`:'<p class="qd-vazio">Nada para você agora.</p>'}`}
+function ntVisto(p){const u=usuarioAtual();if(!u||!p)return;if(!notifsDe(u).some(n=>n.p===p&&n.novo))return;p.ntVisto={...(p.ntVisto||{}),[u.id]:now()};save()}
+/* ---- Calendário (entregas) e resumo ---- */
+const MESES_QD=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function qdResumo(){const G=qdGrupos(),C=QD().cols.filter(c=>!c.off),vivos=state.pedidos.filter(p=>!p.cancelado&&!p.concluido),fimS=qdFimSem();
+  const at=vivos.filter(p=>p.entrega&&p.entrega<now()).length,sem=vivos.filter(p=>p.entrega&&p.entrega>=sod(now()).getTime()&&p.entrega<=fimS).length,mx=Math.max(1,...C.map(c=>G.get(c.id).length));
+  return `<div class="qd-res"><button class="qd-kpi crit" data-a="qdResIr" data-v="atrasado"><b>${at}</b><span>${at===1?'atrasado':'atrasados'}</span></button><button class="qd-kpi" data-a="qdResIr" data-v="semana"><b>${sem}</b><span>${sem===1?'entrega':'entregas'} esta semana</span></button><div class="qd-kpi"><b>${vivos.length}</b><span>em andamento</span></div></div>
+    <details class="card blk qd-etapas"${ui.qdResAb?' open':''} data-blk="qdres"><summary><h2>Pedidos por coluna</h2><span class="blk-r"><span class="blk-i">${ic('i-seta')}</span></span></summary>${C.map(c=>{const n=G.get(c.id).length;return `<div class="qd-eb"><span>${esc(c.nome)}</span><span class="qd-eb-b"><i style="width:${n/mx*100}%"></i></span><b>${n}</b></div>`}).join('')}</details>`}
+function vCalendario(){const hoje=new Date(sod(now())),m=ui.calM||{a:hoje.getFullYear(),m:hoje.getMonth()};ui.calM=m;const ini=new Date(m.a,m.m,1),dias=new Date(m.a,m.m+1,0).getDate();
+  const P=state.pedidos.filter(p=>!p.cancelado&&p.entrega),porDia={};P.forEach(p=>{const d=new Date(p.entrega);if(d.getFullYear()===m.a&&d.getMonth()===m.m)(porDia[d.getDate()]=porDia[d.getDate()]||[]).push(p)});
+  Object.values(porDia).forEach(L=>L.sort((a,b)=>a.entrega-b.entrega));const chip=p=>`<button class="cal-p ${qdPrazo(p)}" data-a="qdAbre" data-id="${esc(p.id)}">${esc(qdTitulo(p))}</button>`;
+  const ehHoje=d=>m.a===hoje.getFullYear()&&m.m===hoje.getMonth()&&d===hoje.getDate(),vazio=(ini.getDay()+6)%7;const nM=Object.values(porDia).reduce((t,L)=>t+L.length,0);
+  return `${qdResumo()}<div class="cal-nav"><button class="mbtn neutro2" data-a="calMes" data-d="-1" aria-label="Mês anterior">‹ Anterior</button><h2>${MESES_QD[m.m][0].toUpperCase()+MESES_QD[m.m].slice(1)} de ${m.a} <small>${nM} ${nM===1?'entrega':'entregas'}</small></h2><button class="mbtn neutro2" data-a="calMes" data-d="1" aria-label="Próximo mês">Próximo ›</button><button class="mbtn neutro2" data-a="calMes" data-d="0">Hoje</button></div>
+  <div class="cal so-pc">${['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(d=>`<div class="cal-h">${d}</div>`).join('')}${'<div class="cal-d vazio"></div>'.repeat(vazio)}${Array.from({length:dias},(_,i)=>i+1).map(d=>`<div class="cal-d${ehHoje(d)?' hoje':''}"><span class="cal-n">${d}</span>${(porDia[d]||[]).map(chip).join('')}</div>`).join('')}</div>
+  <div class="cal-l so-cel">${Object.keys(porDia).map(Number).sort((a,b)=>a-b).map(d=>{const dt=new Date(m.a,m.m,d);return `<div class="cal-dl${ehHoje(d)?' hoje':''}"><h3>${DOWc[dt.getDay()]} ${pad(d)}/${pad(m.m+1)}${ehHoje(d)?' · hoje':''}</h3>${porDia[d].map(chip).join('')}</div>`}).join('')||'<p class="qd-vazio">Nenhuma entrega neste mês.</p>'}</div>
+  <p class="qd-txt" style="margin-top:10px">Vermelho: atrasado · amarelo: perto de vencer · verde: entregue. Toque no pedido para abrir.</p>`}
+/* ---- Caixa de entrada: anotação rápida que vira pedido depois (coleção notas/, um documento por anotação; nada se apaga) ---- */
+const notasAbertas=()=>(state.notas||[]).filter(n=>!n.feito).sort((a,b)=>b.ts-a.ts);
+function qdCaixa(){const N=notasAbertas();return `<section class="qd-col qd-caixa" id="qdc-caixa" aria-label="Caixa de entrada"><h2>Caixa de entrada<small>${N.length}</small></h2>
+  <label class="sr" for="ntNova">Anotação nova</label><textarea class="campo" id="ntNova" rows="2" placeholder="Anote rápido: cliente, peças, prazo…"></textarea><button class="qd-add" data-a="ntAdd" style="margin-top:6px">${ic('i-mais')}Guardar anotação</button>
+  ${N.map(n=>`<div class="qd-card qd-nota"><span class="qd-in"><span class="qd-t" style="font-weight:600;white-space:pre-line">${esc(n.t)}</span><span class="qd-txt" style="display:block">${esc(n.por||'')}${n.por?' · ':''}${qdQuando(n.ts)}${n.tr?' · do Trello':''}</span>
+    <span class="linha-dep" style="margin:6px 0 0"><button class="mbtn" data-a="ntVira" data-id="${n.id}">${ic('i-mais')}Virar pedido</button><button class="x" data-a="ntRm" data-id="${n.id}">× Tirar</button></span></span></div>`).join('')}</section>`}
+function notaVirou(id,ped){const n=(state.notas||[]).find(x=>x.id===id);if(!n)return;n.feito={ts:now(),ped,...axQuem()};const p=pedById(ped);if(p)qdReg(p,`Pedido criado a partir da anotação "${n.t.slice(0,80)}"`,'nota.virou_pedido',{ref:n.id})}
+/* ---- Importar do Trello (arquivo JSON exportado do quadro) ---- */
+const TR_COR=c=>{c=String(c||'').replace(/_(dark|light)$/,'');return {green:'verde',lime:'verde',yellow:'amarelo',orange:'laranja',red:'vermelho',purple:'roxo',blue:'azul',sky:'azul',pink:'rosa',black:'cinza'}[c]||'cinza'};
+function trelloPlano(J){const L=new Map((J.lists||[]).map(l=>[l.id,l])),LB=new Map((J.labels||[]).map(l=>[l.id,l])),CK=J.checklists||[],AC=J.actions||[],num=s=>(String(s||'').match(/^\s*(\d{3,6})\b/)||[])[1]||'';
+  const marc={};AC.filter(a=>a.type==='updateCheckItemStateOnCard'&&a.data&&a.data.checkItem).forEach(a=>{const k=a.data.checkItem.id;if(!marc[k]||marc[k].ts<+new Date(a.date))marc[k]={ts:+new Date(a.date),por:(a.memberCreator&&a.memberCreator.fullName)||''}});
+  const cards=(J.cards||[]).filter(c=>!c.closed&&!(L.get(c.idList)||{}).closed);const out={lig:[],caixa:[],etqNovas:[],nC:0,nCk:0,nA:0};const etqNomes=new Set(qdEtqs().map(e=>nkQ(e.nome)));
+  cards.forEach(c=>{const n=num(c.name),p=n&&state.pedidos.find(x=>numCA(x)===n||x.id===n||String(+x.id)===n);
+    const etq=(c.idLabels||[]).map(i=>LB.get(i)).filter(l=>l&&l.name).map(l=>({nome:l.name,cor:TR_COR(l.color)}));etq.forEach(e=>{if(!etqNomes.has(nkQ(e.nome))&&!out.etqNovas.some(x=>nkQ(x.nome)===nkQ(e.nome)))out.etqNovas.push(e)});
+    const ck=CK.filter(k=>k.idCard===c.id).sort((a,b)=>(a.pos||0)-(b.pos||0)).map(k=>({nome:k.name,itens:(k.checkItems||[]).slice().sort((a,b)=>(a.pos||0)-(b.pos||0)).map(i=>({id:'tr'+i.id,t:i.name,ok:i.state==='complete',...(i.state==='complete'&&marc[i.id]?{por:marc[i.id].por+' (Trello)',em:marc[i.id].ts}:{})}))}));
+    const cm=AC.filter(a=>a.type==='commentCard'&&a.data&&a.data.card&&a.data.card.id===c.id).map(a=>({id:'tr'+a.id,t:(a.data.text||'').trim(),ts:+new Date(a.date),por:((a.memberCreator&&a.memberCreator.fullName)||'?')+' (Trello)',m:[],trello:1})).filter(x=>x.t);
+    const ax=(c.attachments||[]).filter(a=>a.url).map(a=>({tr:a.id,nome:a.name||a.url,link:a.url,ts:a.date?+new Date(a.date):now(),tam:a.bytes||undefined}));
+    const it={c,lista:(L.get(c.idList)||{}).name||'',etq,ck,cm,ax,desc:(c.desc||'').trim(),due:c.due?+new Date(c.due):null};
+    if(p){it.p=p;out.lig.push(it);out.nC+=cm.length;out.nCk+=ck.reduce((t,g)=>t+g.itens.length,0);out.nA+=ax.length}else out.caixa.push(it)});
+  return out}
+function trelloAplica(P){const q=axQuem();let nP=0,nN=0;snap();
+  if(P.etqNovas.length)qdGrava(Q=>{P.etqNovas.forEach(e=>{if(nkQ(e.nome)==='evento')return;let id=qdSlug(e.nome),k=2;while(id==='evento'||Q.etq.some(x=>x.id===id))id=qdSlug(e.nome)+'-'+(k++);Q.etq.push({id,nome:e.nome,cor:e.cor})})});
+  P.lig.forEach(it=>{const p=it.p,feito=[];
+    it.etq.forEach(e=>{if(nkQ(e.nome)==='evento'){p.evento=true;return}const x=QD().etq.find(y=>nkQ(y.nome)===nkQ(e.nome));if(x){p.etq=p.etq||[];if(!p.etq.includes(x.id))p.etq.push(x.id)}});
+    if(it.ck.length&&!p.ck){p.ck=it.ck.map((g,gi)=>({id:'trg'+gi,nome:g.nome,itens:g.itens}));feito.push('checklist')}
+    const C=(p.coment=p.coment||[]);let nc=0;if(it.desc&&!C.some(c=>c.id==='trd'+it.c.id)){C.push({id:'trd'+it.c.id,t:'Descrição no Trello:\n'+it.desc,ts:it.c.dateLastActivity?+new Date(it.c.dateLastActivity):now(),por:'Trello',m:[],trello:1});nc++}
+    it.cm.forEach(c=>{if(!C.some(x=>x.id===c.id)){C.push(c);nc++}});C.sort((a,b)=>a.ts-b.ts);if(!C.length)delete p.coment;if(nc)feito.push(`${nc} ${nc===1?'comentário':'comentários'}`);
+    let na=0;it.ax.forEach(a=>{if((state.arquivos||[]).some(x=>x.tr===a.tr))return;const ar={id:uid('a'),cli:p.cli||null,tipo:'link',link:a.link,nome:a.nome,ts:a.ts,tam:a.tam,cat:axCatDe(a.nome,'','link'),por:'Trello',tr:a.tr};(state.arquivos=state.arquivos||[]).push(ar);(p.anexos=p.anexos||[]).push(ar.id);na++});
+    if(na)feito.push(`${na} ${na===1?'anexo':'anexos'} (como link)`);if(feito.length){nP++;qdReg(p,`Importou do Trello: ${feito.join(', ')}`,'quadro.trello_importado',{dados:{card:it.c.id}})}});
+  P.caixa.forEach(it=>{state.notas=state.notas||[];if(state.notas.some(n=>n.tr===it.c.id))return;const t=[it.c.name,it.desc,it.due?`Entrega no Trello: ${qdDm(it.due)}`:'',it.lista?`Lista: ${it.lista}`:''].filter(Boolean).join('\n');
+    state.notas.push({id:uid('n'),t:t.slice(0,2000),ts:it.c.dateLastActivity?+new Date(it.c.dateLastActivity):now(),por:'Trello',tr:it.c.id});nN++});
+  ev('quadro.trello_importado',{q:nP,dados:{pedidos:nP,caixa:nN,etiquetas:P.etqNovas.length}});commit();return {nP,nN}}
+function sTrello(){const P=ui.sheet.plano;return `${voltar()}<h1>Importar do Trello</h1><p class="sub-l">Confira antes de importar. Nada é apagado; dá para importar de novo sem repetir.</p>
+  <div class="card"><h2>${P.lig.length} ${P.lig.length===1?'cartão vai':'cartões vão'} para pedidos que já existem</h2><p class="qd-txt">O número no começo do nome do cartão é o número do pedido (ex.: <i>6262 CLIENTE - polos</i>). Entram: etiquetas, checklist (se o pedido ainda não tem), ${P.nC} ${P.nC===1?'comentário':'comentários'} e ${P.nA} ${P.nA===1?'anexo':'anexos'} como link. A coluna continua automática.</p>
+    ${P.lig.slice(0,30).map(it=>`<div class="aj-row"><span><b>${esc(it.c.name)}</b><br><small class="qd-txt">→ pedido ${esc(it.p.id)} · ${esc(it.p.cliente)}</small></span></div>`).join('')}${P.lig.length>30?`<p class="qd-txt">e mais ${P.lig.length-30}</p>`:''}</div>
+  <div class="card"><h2>${P.caixa.length} ${P.caixa.length===1?'cartão vai':'cartões vão'} para a Caixa de entrada</h2><p class="qd-txt">Não achei pedido com o número deles. Ficam como anotação no Quadro, para virar pedido depois.</p>
+    ${P.caixa.slice(0,30).map(it=>`<div class="aj-row"><span><b>${esc(it.c.name)}</b>${it.lista?`<br><small class="qd-txt">Lista: ${esc(it.lista)}</small>`:''}</span></div>`).join('')}${P.caixa.length>30?`<p class="qd-txt">e mais ${P.caixa.length-30}</p>`:''}</div>
+  ${P.etqNovas.length?`<div class="card"><h2>Etiquetas novas</h2><div class="linha-dep">${P.etqNovas.map(e=>qdEtqH(e)).join('')}</div></div>`:''}
+  <div class="acoes"><button class="big go" data-a="trOk">${ic('i-check')}Importar</button><button class="big neutro" data-a="fechar">Não importar</button></div>`}
 function vEmpresas(){const q=ui.eqc||'';return `${ehGestao()?`<div class="imp-bar" style="margin:0 0 12px"><button class="mbtn neutro2 mod-imp" data-a="impCliCA">${ic('i-predio')}Importar clientes do Conta Azul</button></div>`:''}<label class="busca-c" style="margin-bottom:14px">${ic('i-lupa')}<input class="campo busca" id="empBusca" value="${esc(q)}" placeholder="Buscar empresa" autocomplete="off" aria-label="Buscar empresa"></label><div id="empLista">${listaEmpresas()}</div>`}
 function listaEmpresas(){const q=nCli(ui.eqc||''),qd=(ui.eqc||'').replace(/\D/g,'');
   const L=state.clientes.filter(c=>!q||nCli(c.nome).includes(q)||(c.apelidos||[]).some(a=>a.includes(q))||(qd.length>=2&&String(c.cnpj||'').replace(/\D/g,'').includes(qd))).map(c=>{const ps=pedsDoCli(c.id),ab=ps.filter(p=>!p.concluido),inf=ab.map(info);
@@ -2274,7 +2658,7 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     ${ped.contato||ped.cnpj?`<div class="ped-ent">${ic('i-predio')}<span>${ped.contato?`Cliente: <b>${esc(ped.contato)}</b>`:''}${ped.contato&&ped.cnpj?' · ':''}${ped.cnpj?`<span class="nw">CNPJ ${esc(ped.cnpj)}</span>`:''}</span></div>`:''}
     ${!ped.concluido&&i.ab.length?`<div class="ped-ent">${ic('i-relogio')}<span>Trabalho restante ≈ ${nf(i.need)} dias úteis</span></div>`:''}
     <div class="ped-ent">${v?av(v,'s'):''}<span>Vendedora: <b>${esc(pNome(v)||'—')}</b> · feito em ${fD(ped.chegada)}</span></div>
-    ${ped.obs?`<div class="ped-ent">${ic('i-lista')}<span>Observações: <b>${esc(ped.obs)}</b></span></div>`:''}
+    ${ped.obs?`<div class="ped-ent">${ic('i-lista')}<span>Observações: <b>${esc(ped.obs)}</b>${ped.obsEd?`<br><small class="ax-ed">Editado por ${esc(ped.obsEd.por||'?')} em ${qdQuando(ped.obsEd.ts)}</small>`:''}</span></div>`:''}
     ${(ped.edicoes||[]).length?`<div class="ped-ent" style="font-size:16px">${ic('i-engr')}<span>Corrigido por ${esc(ped.edicoes[ped.edicoes.length-1].por||'?')} ${haQuanto(ped.edicoes[ped.edicoes.length-1].ts)}${ped.edicoes.length>1?` · ${ped.edicoes.length} correções`:''}</span></div>`:''}
     ${ped.concluido&&!ped.cancelado?`<div class="lib u-ok">${ic('i-check')}Entregue em ${fD(ped.concluido)}</div><div class="acoes"><button class="mbtn neutro2" data-a="desEntregar" data-id="${id}">${ic('i-voltar')}Desfazer a entrega: volta para a produção</button></div>`:''}
     ${ped.cancelado?`<div class="aviso">${ic('i-alerta')}<span>Pedido cancelado ${fD(ped.cancelado.ts)}${ped.cancelado.por?` por ${esc(ped.cancelado.por)}`:''}.${ped.cancelado.motivo?` Motivo: ${esc(ped.cancelado.motivo)}.`:''} Ele não aparece na produção nem nas tarefas.</span></div><div class="acoes"><button class="mbtn" data-a="pedReativar" data-id="${id}">Voltar o pedido para a produção</button></div>`:''}
@@ -2282,6 +2666,7 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
     <div class="doc-bts">${ped.cancelado?'':`<button class="mbtn neutro2" data-a="pedEditar" data-id="${id}">✎ Corrigir pedido</button>`}<button class="mbtn" data-a="docPed" data-id="${id}">${ic('i-predio')}Pedido</button><button class="mbtn neutro2" data-a="docProd" data-id="${id}">${ic('i-lista')}PDF de produção</button><button class="mbtn neutro2 mod-etq" data-a="docEtq" data-id="${id}">${ic('i-lista')}Etiquetas</button>${ped.aprov?`<span class="imp-ok">${ic('i-check')}Cliente aprovou em ${dataCurta(ped.aprov.ts)}</span>`:'<span class="imp-q">Cliente ainda não aprovou</span>'}</div>
     ${tEnt?`<div class="acoes"><button class="big go" data-a="entregar" data-id="${id}">${ic('i-caminhao')}${esc(tarTxt(tEnt))}${tEnt.resp?' · '+esc(pNome(tEnt.resp)):''}</button></div>`:''}</div>
   ${ped.fin?finCard(ped.fin):''}
+  ${modOn('quadro')?qdBloco(ped):''}
   ${ped.concluido||!permOn('cancelar')?'':`<div class="card">${ui.cancPed===id?`<h2>Cancelar este pedido?</h2><div class="aviso">${ic('i-alerta')}<span>O pedido de <b>${esc(ped.cliente)}</b> sai da produção, das máquinas e das tarefas do escritório. Ele fica guardado em Pedidos › Filtrar › Cancelados e pode voltar depois.</span></div>
     <div class="rotulo">Motivo (se quiser)</div><input class="campo" id="cancMot" placeholder="Ex.: cliente desistiu" autocomplete="off">
     <div class="acoes"><button class="big" style="background:var(--red);color:#fff" data-a="pedCancOk" data-id="${id}">Sim, cancelar pedido</button><button class="big neutro" data-a="pedCancN">Não</button></div>`
@@ -2296,10 +2681,15 @@ function sPedido(id){const ped=pedById(id),i=info(ped),mats=ped.materiais.filter
   ${envs.length?`${blkA('arte'+id,'Arte para quem aplica',arteAprovada(ped)&&envs.some(e=>!e.ok),envs.every(e=>e.ok)?'<span class="pill u-ok">Todas enviadas</span>':arteAprovada(ped)?`<span class="pill u-warn">${envs.filter(e=>!e.ok).length} a enviar</span>`:'<span class="pill">Espera a aprovação</span>')}<p style="margin:0 0 6px;color:var(--ink2)">Cada personalização só começa quando a arte chegou em quem aplica.</p>${(()=>{const L=arqsDoPedido(ped);return L.length?`<button class="mbtn neutro2" data-a="arqsPed" data-id="${id}" style="margin:4px 0 8px">${ic('i-lista')}Baixar todos os arquivos (${L.length})</button>`:''})()}
     ${envs.map(e=>{const fo=isExt(e.z)?fornEtapa(e.l,e.z):null;const r=resp('arteEnv',{l:e.l.id,s:e.z.id});return `<div class="mat">${ic(tipo(e.z.posto).i)}<div><b>${esc(e.z.nome)} · ${esc(prod(e.l.prod).nome)} ${esc(e.l.cor)}</b><span>Para ${esc(fo?fo.nome:tipo(e.z.posto).nome)}${!e.ok&&r?' · '+esc(r):''}${(e.l.pers||[]).find(x=>x.id===e.z.id)?.desc?`<br>Arte: ${esc((e.l.pers||[]).find(x=>x.id===e.z.id).desc)}`:''}${(()=>{const x=(e.l.pers||[]).find(x=>x.id===e.z.id);if(!x)return '';const tm=tamTxt(x);return `<label class="tam-in">Posição: <select class="campo" data-pos="${e.l.id}|${x.id}"><option value="">${esc(x.parte==='Mangas'?(LADOS[x.lado]||'Mangas'):x.parte)} (sem detalhe)</option>${[...new Set([...posDe(x.parte),...(x.pos?[x.pos]:[])])].map(v=>`<option ${x.pos===v?'selected':''}>${esc(v)}</option>`).join('')}</select></label><label class="tam-in">Tamanho: <input class="campo" data-tam="${e.l.id}|${x.id}" value="${esc(x.tam||'')}" placeholder="${esc(tm?tm.t:'ex.: 8 × 8 cm')}"></label>${pzArquivos(e.l,x)}`})()}</span></div>
       ${e.ok?`<span class="pill u-ok">${ic('i-check')}Enviada</span>`:`<button class="mbtn" data-a="arteEnv" data-id="${id}" data-l="${e.l.id}" data-s="${e.z.id}" ${arteAprovada(ped)?'':'disabled style="opacity:.4"'}>Enviei</button>`}</div>`}).join('')}</details>`:''}`}
-  ${(()=>{const L=arqsDoPedido(ped),ls=i.ls.filter(l=>!l.rework);return `${blkA('anx'+id,'Anexos',false,`<span class="pill">${L.length} ${L.length===1?'arquivo':'arquivos'}</span>`)}<p class="dica" style="margin:0 0 8px">Arte, imagem e programa do bordado, logo da empresa. Quem lê o QR code da etiqueta também baixa estes arquivos.</p>
-    ${L.length?`<button class="mbtn neutro2" data-a="arqsPed" data-id="${id}" style="margin:0 0 10px">${ic('i-lista')}Baixar todos (${L.length})</button>`:''}
-    <div class="anx-g"><b>Do pedido</b> <small>(logo da empresa e outros)</small><div class="anx-l">${anexoLinhas(anexosPed(ped),a=>`<button class="x" data-a="anxPedRm" data-id="${id}" data-a2="${a.id}">Tirar</button>`)}<button class="x azul" data-a="anxPedAdd" data-id="${id}">${ic('i-mais')}Anexar ao pedido</button></div></div>
-    ${ls.flatMap(l=>(l.pers||[]).map(x=>({l,x}))).filter(({l,x},k,A)=>A.findIndex(o=>o.l.prod===l.prod&&o.l.cor===l.cor&&o.x.id===x.id&&o.x.tipo===x.tipo&&o.x.parte===x.parte&&o.x.pos===x.pos)===k).map(({l,x})=>`<div class="anx-g"><b>${esc(nomePeca(l))} ${esc(l.cor||'')} · ${esc(tNome(x.tipo))} ${esc(localTxt(x).toLowerCase())}</b>${pzArquivos(l,x)}</div>`).join('')}</details>`})()}
+  ${(()=>{const L=arqsDoPedido(ped),ls=i.ls.filter(l=>!l.rework);return `${blkA('anx'+id,'Anexos',false,`<span class="pill">${L.length} ${L.length===1?'arquivo':'arquivos'}</span>`)}<p class="qd-txt">Ficha de produção, arte, imagem e programa do bordado, logo da empresa, fotos. Quem lê o QR code da etiqueta também baixa estes arquivos.</p>
+    <div class="ax-drop so-pc" data-drop="${esc(id)}">${ic('i-mais')}<span><b>Arraste os arquivos para cá</b> para pôr no pedido. Pode mandar vários de uma vez.</span></div>
+    ${L.length?`<button class="mbtn neutro2" data-a="arqsPed" data-id="${id}" style="margin:0 0 10px">${ic('i-lista')}Baixar todos (${L.filter(a=>!a.link).length})</button>`:''}
+    <div class="anx-g" data-drop="${esc(id)}"><b>Do pedido</b> <small>(ficha, logo da empresa e outros)</small><div class="anx-l">${anexosPed(ped).map(a=>axLinha(a,ped,{k:'p',rm:`data-a="anxPedRm" data-id="${esc(id)}" data-a2="${a.id}"`})).join('')}
+      <div class="linha-dep"><button class="x azul" data-a="anxPedAdd" data-id="${id}">${ic('i-mais')}Anexar ao pedido</button><button class="x azul" data-a="axLink" data-id="${esc(id)}" aria-expanded="${ui.axLink===id}">${ic('i-mais')}Anexar link</button></div>
+      ${ui.axLink===id?`<div class="ax-p"><label class="rotulo" for="axLU" style="margin-top:0">Endereço do link</label><input class="campo" id="axLU" inputmode="url" placeholder="https://…" autocomplete="off">
+        <label class="rotulo" for="axLN">Nome (se quiser)</label><input class="campo" id="axLN" placeholder="Ex.: Fotos da amostra no Drive" autocomplete="off"><div class="acoes"><button class="mbtn" data-a="axLinkOk" data-id="${esc(id)}">${ic('i-check')}Anexar link</button></div></div>`:''}</div></div>
+    ${ls.flatMap(l=>(l.pers||[]).map(x=>({l,x}))).filter(({l,x},k,A)=>A.findIndex(o=>o.l.prod===l.prod&&o.l.cor===l.cor&&o.x.id===x.id&&o.x.tipo===x.tipo&&o.x.parte===x.parte&&o.x.pos===x.pos)===k).map(({l,x})=>`<div class="anx-g"><b>${esc(nomePeca(l))} ${esc(l.cor||'')} · ${esc(tNome(x.tipo))} ${esc(localTxt(x).toLowerCase())}</b><div class="anx-l">${anexosPz(x).map(a=>axLinha(a,ped,{k:'z'+l.id+x.id,rm:`data-a="anxRm" data-l="${l.id}" data-x="${x.id}" data-id="${a.id}"`})).join('')}<button class="x azul" data-a="anxAdd" data-l="${l.id}" data-x="${x.id}">${ic('i-mais')}Anexar arquivos</button></div></div>`).join('')}
+    ${axTirados(ped)}</details>`})()}
   ${blkA('pecas'+id,'Peças e etapas',true,`<span class="pill">${i.ls.filter(l=>!l.rework&&loteDone(l)).length} de ${i.ls.filter(l=>!l.rework).length} prontas</span>`)}${legendaStatus()}${i.ls.filter(l=>!l.rework).map(l=>prodLine(l,ped)+i.ls.filter(r=>r.parent===l.id&&!loteDone(r)).map(r=>prodLine(r,ped)).join('')).join('')}</details>`}
 /* Barra de etapas da peça: um item por setor; setor marcado "por máquina" mostra cada máquina (ex.: Arremate e Embalagem). */
 const ETAPAS_DE=()=>SETORES().flatMap(g=>g.porMaquina?state.tipos.filter(t=>t.grupo===g.id&&!t.externo).map(t=>({nome:t.curto||t.nome,i:t.i,t:[t.id]})):[{nome:g.nome,i:g.i,g:[g.id]}]);
@@ -2477,7 +2867,7 @@ const campoN=(lab,attr,val,suf)=>`<label class="aj-row"><span>${lab}</span><span
 function cAjustes(){const pr=state.params;
   return `${state.pedidos.some(ehExemplo)?`<div class="card" style="border-color:var(--atn)"><h2>Pedidos de exemplo</h2><p style="margin:0 0 12px;color:var(--ink2)">Antes de começar com dados reais, apague os ${state.pedidos.filter(ehExemplo).length} pedidos de exemplo (e as empresas de exemplo). Pedidos reais, como os importados de fichas, continuam. Máquinas, equipe, produtos e estoque continuam.</p>
     ${ui.apagaEx?`<div class="aviso">${ic('i-alerta')}Isso apaga só os pedidos de exemplo, em todos os aparelhos. Antes, uma cópia de segurança é guardada. Tem certeza?</div><div class="acoes"><button class="big" style="background:var(--red);color:#fff" data-a="apagaEx" data-ok="1">Sim, apagar</button><button class="big neutro" data-a="apagaExN">Não</button></div>`:`<button class="mbtn" data-a="apagaEx">Apagar pedidos de exemplo</button>`}</div>`:''}
-  ${cardAcessos()}${cardAvisos()}${cardSeguranca()}${cardModulos()}${cardEscritorio()}${cardVocab()}${cardModelo()}<div class="card"><h2>Este aparelho</h2><div class="aj-row"><span>Conectado como: <b>${esc(usuarioAtual()?.nome||'')}</b><br><small class="lido">${esc(usuarioAtual()?.email||'')}</small></span><button class="mbtn" data-a="sair">Sair</button></div>
+  ${cardAcessos()}${cardAvisos()}${cardSeguranca()}${cardModulos()}${cardEscritorio()}${cardQuadro()}${cardVocab()}${cardModelo()}<div class="card"><h2>Este aparelho</h2><div class="aj-row"><span>Conectado como: <b>${esc(usuarioAtual()?.nome||'')}</b><br><small class="lido">${esc(usuarioAtual()?.email||'')}</small></span><button class="mbtn" data-a="sair">Sair</button></div>
     <div class="aj-row"><span>Dúvidas sobre o app</span><button class="mbtn" data-a="ajuda">${ic('i-duvida')}Como usar</button></div></div>
   <div class="card"><h2>Onde ficam os dados</h2><p style="margin:0;color:var(--ink2)">${NV.modo==='nuvem'?'Na nuvem: todos os aparelhos veem as mesmas informações ao mesmo tempo.':'Só neste aparelho. Abra pelo link do sistema para usar a nuvem.'}</p></div>
   <div class="card"><h2>Sua empresa nos documentos</h2><p class="dica" style="margin:-4px 0 8px">Aparece no Pedido enviado ao cliente e nas fichas.</p>
@@ -2876,7 +3266,7 @@ function mudancasPed(w){const ped=pedById(w.edit);if(!ped)return[];const m=[],d=
 function salvarEdicao(){const w=ui.sheet.w,ped=pedById(w.edit);if(!ped)return;const md=mudancasPed(w);if(!md.length)return;snap();const entregaAntes=ped.entrega;
   const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);
   Object.assign(ped,{cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim(),vendedor:w.vend,entrega:w.entrega});if(w.evento)ped.evento=true;else delete ped.evento;
-  if((w.ficha||'').trim())ped.ficha=w.ficha.trim();else delete ped.ficha;if((w.obs||'').trim())ped.obs=w.obs.trim();else delete ped.obs;
+  if((w.ficha||'').trim())ped.ficha=w.ficha.trim();else delete ped.ficha;{const oa=ped.obs||'';if((w.obs||'').trim())ped.obs=w.obs.trim();else delete ped.obs;if((ped.obs||'')!==oa)ped.obsEd={ts:now(),por:quemNome()||''}}
   const IT=expandeMF(w.itens),ids=new Set(IT.map(it=>it.lote).filter(Boolean));
   state.lotes=state.lotes.filter(l=>l.ped!==ped.id||l.rework||ids.has(l.id)||Object.keys(l.steps||{}).length);
   let n=Math.max(0,...state.lotes.filter(l=>l.ped===ped.id).map(l=>parseInt(String(l.id).split('-')[1],10)||0));
@@ -2996,6 +3386,19 @@ const FAQ=[
 {c:'ped',q:'Como corrijo o nome, CNPJ ou contato de uma empresa?',k:'corrigir empresa dados cnpj contato nome cliente',r:['Pedidos › Empresas › toque na empresa.','Mude os dados e toque em Salvar.'],ir:'emp'},
 {c:'ped',q:'Como cancelo um pedido?',k:'cancelar cancelamento desistiu desistência cliente desistiu parar pedido anular',r:['Abra o pedido e toque em Cancelar pedido (no fim do primeiro quadro).','Se quiser, escreva o motivo. Toque em Sim, cancelar pedido.','O pedido sai da produção, das máquinas e das tarefas. O que estava rodando para, e o tempo já trabalhado fica registrado.','Ele continua guardado em Pedidos › Filtrar › Cancelados.'],ir:'ped'},
 {c:'ped',q:'Cancelei sem querer. Como volto o pedido?',k:'voltar reativar desfazer cancelamento cancelado engano descancelar',r:['Pedidos › Filtrar › Cancelados, abra o pedido e toque em Voltar o pedido para a produção.','O que estava rodando volta para a fila.'],ir:'ped'},
+{c:'arte',q:'Como troco um arquivo do pedido por uma versão nova?',k:'versão nova trocar arquivo substituir atualizar ficha corrigida versão antiga anterior editado',r:['Abra o pedido, bloco Anexos, e toque em Mudar no arquivo.','Toque em Trocar por uma versão nova e escolha o arquivo.','A versão anterior fica guardada em Versões, com quem enviou e quando. Dá para baixar.','O arquivo ganha o selo "editado", com quem trocou e quando.'],ir:'ped'},
+{c:'arte',q:'Quem enviou ou tirou um arquivo do pedido?',k:'quem enviou arquivo quem tirou excluiu apagou arquivo sumiu tirado excluído registro',r:['No bloco Anexos, cada arquivo mostra "Enviado por" e, se mudou, "Editado por".','Arquivo tirado não some: fica em Arquivos tirados do pedido, com quem tirou e quando. Dá para pôr de volta.','Tudo também aparece no Histórico do pedido.'],ir:'ped'},
+{c:'arte',q:'Dá para anexar um link ou arrastar arquivos para o pedido?',k:'link drive anexar link arrastar soltar vários arquivos cdr corel emb doc pdf jfif',r:['Sim. No bloco Anexos, toque em Anexar link e cole o endereço.','No computador, arraste os arquivos para o quadro tracejado. Pode mandar vários de uma vez.','Vale qualquer arquivo: ficha (Word, PDF), fotos, mockup, programa de bordado (.emb), CorelDRAW (.cdr).'],ir:'ped'},
+{c:'ped',m:'quadro',q:'Como comento no pedido e aviso alguém?',k:'comentário comentar recado avisar mencionar marcar pessoa arroba @ conversa',r:['Abra o pedido, bloco Comentários.','Escreva e toque em Enviar comentário.','Para avisar alguém, toque no nome da pessoa antes de enviar (ou escreva @ e o nome).','Quem escreveu pode mudar o comentário; aparece "editado em".'],ir:'ped'},
+{c:'ped',m:'quadro',q:'Onde vejo as entregas no calendário?',k:'calendário agenda entregas mês semana planejador data de entrega resumo atrasados',r:['Em Pedidos, toque em Calendário (ao lado de Quadro).','Cada pedido aparece no dia da entrega. Use Anterior e Próximo para mudar o mês.','No alto: quantos estão atrasados, quantas entregas tem nesta semana e os pedidos por coluna. Toque em atrasados para ver no Quadro.'],ir:'ped'},
+{c:'ped',m:'quadro',q:'Como anoto um pedido rápido para lançar depois?',k:'caixa de entrada anotação anotar rápido lembrar depois rascunho virar pedido',r:['No Quadro, a primeira coluna é a Caixa de entrada.','Escreva e toque em Guardar anotação.','Quando for lançar, toque em Virar pedido: a anotação vai para as Observações do pedido novo.'],ir:'ped'},
+{c:'cad',m:'quadro',q:'Como trago os dados do Trello?',k:'trello importar json exportar trazer cartões checklist comentários anexos',r:['No Trello: Menu › Imprimir, exportar e compartilhar › Exportar como JSON.','No app: Cadastros › Ajustes › Quadro de pedidos › Importar do Trello. Escolha o arquivo.','O app mostra antes o que vai entrar. O cartão com o número de um pedido leva etiquetas, checklist, comentários e anexos (como link) para ele. Os outros vão para a Caixa de entrada.'],ir:'cad:ajustes#Quadro'},
+{c:'ped',m:'quadro',q:'O sininho avisa o quê sobre os meus pedidos?',k:'aviso notificação sininho responsável mencionado avisado prazo vencendo atrasado lembrete',r:['Em Para você, no sininho: quando põem você como responsável, quando avisam você num comentário e quando um pedido seu está perto do prazo ou atrasado.','No pedido dá para escolher quantos dias antes avisar (bloco Quadro: etiquetas e checklist).','Toque no aviso para abrir o pedido.'],ir:'sino'},
+{c:'ped',m:'quadro',q:'Quem lê o QR code da etiqueta vê o quê?',k:'qr code etiqueta corte ler sem acesso sem login cartão prestador oficina costureira',r:['Abre a ficha de produção da peça e o cartão do pedido: onde ele está agora, etiquetas, datas e checklist.','Não precisa de acesso ao app. É só para ver: para marcar o checklist, é preciso entrar no app.','Comentários e histórico não aparecem no QR code.'],ir:'ped'},
+{c:'ped',m:'quadro',q:'Como vejo os pedidos em colunas, como no Trello?',k:'quadro trello colunas kanban cartão cartões etapa coluna mover arrastar onde está o pedido',r:['Em Pedidos, toque em Quadro (no alto, ao lado de Pedidos e Empresas).','Cada coluna é um passo da produção: Início de produção, Compra, as máquinas da fábrica e Finalizados.','O pedido muda de coluna sozinho, conforme a produção anda na Fábrica. Não precisa arrastar.','Ele fica na coluna da peça mais atrasada do pedido. Toque no cartão para abrir o pedido.'],ir:'ped'},
+{c:'ped',m:'quadro',q:'Como uso o checklist do pedido?',k:'checklist lista itens marcar ticar mockup ficha amostra fotolito tela quem marcou',r:['Abra o pedido e o bloco Quadro: etiquetas e checklist.','Toque no item para marcar. Aparece quem marcou e quando.','Para pôr, mudar o nome ou tirar itens, toque em Mudar itens.','O checklist que todo pedido novo recebe fica em Cadastros › Ajustes › Quadro de pedidos.'],ir:'ped'},
+{c:'ped',m:'quadro',q:'Como ponho etiqueta ou responsável no pedido?',k:'etiqueta etiquetas urgente evento não atrasar responsável responsáveis cor marcar pessoa do pedido',r:['Abra o pedido e o bloco Quadro: etiquetas e checklist.','Toque na etiqueta ou no nome da pessoa. Toque de novo para tirar.','A etiqueta EVENTO é a mesma marca de "pedido para evento".','A gestão cria e muda etiquetas em Cadastros › Ajustes › Quadro de pedidos.'],ir:'ped'},
+{c:'cad',m:'quadro',q:'Como mudo as colunas do quadro de pedidos?',k:'colunas quadro renomear esconder nova coluna máquina etiqueta nova cor checklist padrão modelo',r:['Cadastros › Ajustes › Quadro de pedidos (só a gestão).','Dá para mudar o nome e a ordem, esconder ou criar colunas.','Em "Mudar a coluna de uma máquina", escolha a máquina e a coluna onde ela fica.','Ali também ficam as etiquetas e o checklist padrão.'],ir:'cad:ajustes#Quadro'},
 {c:'ped',q:'Dá para apagar um pedido?',k:'apagar excluir deletar pedido remover',r:['Um pedido real não se apaga. Se o cliente desistiu, use Cancelar pedido: ele sai da produção e fica guardado em Cancelados.','Se foi lançado errado, use Corrigir pedido.','Só os pedidos de exemplo podem ser apagados (Cadastros › Ajustes › Pedidos de exemplo).']},
 /* novo e corrigir */
 {c:'novo',q:'Como lanço um pedido novo?',k:'novo pedido lançar cadastrar criar pedido venda',r:['Toque no + Novo, na barra de baixo.','Passo 1: empresa, contato, CNPJ e quem vendeu.','Passo 2: em Adicionar peça, escolha a peça na lista. Depois escolha tecido e cor nas listas, a personalização e as quantidades por tamanho.','Passo 3: a data de entrega. Passo 4: confira e toque em Criar pedido.'],ir:'novo'},
@@ -4231,7 +4634,7 @@ const usoArq=a=>[...new Set([...state.lotes.filter(l=>!l.rework&&(l.mockArq===a.
 async function thumbDe(src,ehPdf,N){const im=new Image();if(ehPdf){const pdf=await pdfLib();const d=await pdf.getDocument({data:Uint8Array.from(atob(src.split(',')[1]),c=>c.charCodeAt(0)),isEvalSupported:false}).promise;const pg=await d.getPage(1);const v1=pg.getViewport({scale:1}),vp=pg.getViewport({scale:N/Math.max(v1.width,v1.height)});const c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:g,viewport:vp}).promise;return c.toDataURL('image/jpeg',.85)}
   im.src=src;await im.decode();const k=Math.min(1,N/Math.max(im.naturalWidth||N,im.naturalHeight||N));const c=document.createElement('canvas');c.width=Math.max(1,Math.round((im.naturalWidth||N)*k));c.height=Math.max(1,Math.round((im.naturalHeight||N)*k));const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85)}
 async function arqSalvar(file,cli,tipo){if(file.size>15*1048576){toast(`${file.name} passa de 15 MB. Envie uma versão menor.`,false);return null}
-  const id=uid('a'),e=extDe(file.name),mime=file.type||'';const a={id,cli,tipo,nome:file.name,mime,tam:file.size,ts:now(),bin:'A-'+id};
+  const id=uid('a'),e=extDe(file.name),mime=file.type||'';const a={id,cli,tipo,nome:file.name,mime,tam:file.size,ts:now(),bin:'A-'+id,cat:axCatDe(file.name,mime,tipo),...axQuem()};
   if(tipo==='mockup'){const m=await mockDeArquivo(file);a.prev=m.p;a.bin='A-'+id;guardaMockG(a.bin,m.g)}
   else{const data=await lerURL(file);SEM_COMPRIMIR.add(a.bin);guardaMockG(a.bin,data);
     try{if(/^image\//.test(mime)||['png','jpg','jpeg','webp','gif','svg'].includes(e)){a.prev=await thumbDe(data,false,240);a.vis=a.bin}
@@ -4250,7 +4653,7 @@ const OK_EXT=new Set('gif png jpg jpeg webp mp4 webm txt json md docx pptx epub 
 async function baixarBlob(nome,blob){let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
   if(dl){try{await dl.save({filename:nome,data:blob});return}catch(e){if(e&&e.code==='declined')return}}
   const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)}
-async function baixarArqs(lista,nomeZip){toast('Preparando os arquivos…',false);const fs=[];for(const a of lista){const d=await pegaBin(a.bin);if(d)fs.push({name:a.tipo==='mockup'&&!/\.\w{2,4}$/.test(a.nome)?a.nome+'.'+((d.match(/^data:image\/(\w+)/)||[])[1]||'jpg').replace('jpeg','jpg'):a.nome,bytes:bytesDe(d)})}
+async function baixarArqs(lista,nomeZip){toast('Preparando os arquivos…',false);const fs=[];for(const a of lista){if(a.link)continue;const d=await pegaBin(a.bin);if(d)fs.push({name:a.tipo==='mockup'&&!/\.\w{2,4}$/.test(a.nome)?a.nome+'.'+((d.match(/^data:image\/(\w+)/)||[])[1]||'jpg').replace('jpeg','jpg'):a.nome,bytes:bytesDe(d)})}
   document.getElementById('toast').innerHTML='';if(!fs.length){toast('Arquivo não encontrado neste aparelho nem na nuvem',false);return}
   if(fs.length===1&&OK_EXT.has(extDe(fs[0].name)))return baixarBlob(fs[0].name,new Blob([fs[0].bytes]));
   await baixarBlob(nomeZip||(fs.length===1?fs[0].name+'.zip':'arquivos.zip'),zipar(fs))}
@@ -4463,7 +4866,7 @@ function gEquipe(desde){const D=gDados(desde),R=D.rank,tot=k=>sum(R.map(r=>r[k])
   <div class="card"><h2>Horas extras</h2>${R.some(r=>r.he>0)?[...R].filter(r=>r.he>0).sort((a,b)=>b.he-a.he).map(r=>`<div class="grow"><span style="display:flex;align-items:center;gap:8px">${av(r.p.id,'s')}${esc(r.p.nome)}</span>${barra(r.he,Math.max(...R.map(x=>x.he)),'#7A3E9D')}<b>${fDur(r.he)}</b></div>`).join('')+`<p class="dica" style="margin:8px 0 0">Total: <b>${fDur(tot('he'))}</b> no período.</p>`:'<p class="dica" style="margin:0">Nenhuma hora extra no período.</p>'}</div>`}
 /* ===== Resultados: números calculados no banco a partir dos eventos (o que aconteceu), não do estado atual ===== */
 const isoDia=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
-const TELA_NOME={'fabrica/maq':'Fábrica › Máquinas','fabrica/esc':'Fábrica › Escritório','fabrica/fora':'Fábrica › Fora',fabrica:'Fábrica',pedidos:'Pedidos','pedidos/ped':'Pedidos','pedidos/emp':'Empresas',
+const TELA_NOME={'fabrica/maq':'Fábrica › Máquinas','fabrica/esc':'Fábrica › Escritório','fabrica/fora':'Fábrica › Fora',fabrica:'Fábrica',pedidos:'Pedidos','pedidos/ped':'Pedidos','pedidos/qd':'Pedidos › Quadro','pedidos/cal':'Pedidos › Calendário','pedidos/emp':'Empresas',
   gestor:'Painel',cadastros:'Cadastros',pedido:'Pedido',maq:'Máquina',compras:'Lista de compras',entregas:'Entregas por semana',ins:'Conferir insumos',doc:'Documentos',cli:'Empresa',etEd:'Corrigir etapa',hora:'Informar horário',
   terc:'Mandar para prestador',prob:'Deu problema',pausa:'Pausar',div:'Dividir',he:'Hora extra',troca:'Trocar quem faz',ajuda:'Como usar',imp:'Importar ficha',mock:'Importar mockups'};
 const telaNome=t=>{if(!t)return 'outra tela';if(TELA_NOME[t])return TELA_NOME[t];const m=String(t).match(/^novo#(\d)$/);if(m)return 'Novo pedido (passo '+m[1]+')';const [a,b]=String(t).split('/');return (TELA_NOME[a]||a)+(b?' › '+b:'')};
@@ -4588,6 +4991,7 @@ function vGestor(){const aba=(ui.gt==='ciclo'&&!modOn('ciclo')?'agora':ui.gt)||'
 /* ================= render ================= */
 const sheetId=s=>s.t+':'+(s.id||s.p||s.m||'');
 /* Link do QR code da etiqueta: #ficha=<peça> abre a ficha de produção dessa peça */
+let LINK_PED=(()=>{try{const m=location.hash.match(/pedido=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
 let LINK_FICHA=(()=>{try{const m=location.hash.match(/ficha=([^&]+)/);return m?decodeURIComponent(m[1]):null}catch(e){return null}})();
 function render(){renderTela();permEsconde();ajBlocos();aplicaVocab();evUsoTela();histSync()}
 /* Some da tela o botão que o perfil não pode usar (a ação também recusa, e o banco também). */
@@ -4604,7 +5008,7 @@ function ajBlocos(){if(ui.tela!=='cadastros'||ui.cad!=='ajustes'||ui.sheet)retur
     const d=document.createElement('details');d.className=c.className+' blk';if(c.id)d.id=c.id;d.dataset.blk=k;if(o==null?AJ_ABERTOS.includes(t):o)d.open=true;
     const sm=document.createElement('summary');sm.innerHTML=`<h2>${esc(t)}</h2><span class="blk-r"><span class="blk-i">${ic('i-seta')}</span></span>`;h.remove();d.appendChild(sm);while(c.firstChild)d.appendChild(c.firstChild);c.replaceWith(d)});
 }
-function renderTela(){RC={};aplicaCor();if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){const l=(state.lotes||[]).find(x=>x.id===LINK_FICHA);LINK_FICHA=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(l){setTimeout(()=>abreDoc('prod',l.ped,l.id),0)}}
+function renderTela(){RC={};aplicaCor();if(LINK_PED&&NV.pronto&&state&&usuarioAtual()){const id=LINK_PED;LINK_PED=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(pedById(id)){ui.tela='pedidos';setTimeout(()=>A.qdAbre({id}),0)}}if(LINK_FICHA&&NV.pronto&&state&&usuarioAtual()){const l=(state.lotes||[]).find(x=>x.id===LINK_FICHA);LINK_FICHA=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(l){setTimeout(()=>abreDoc('prod',l.ped,l.id),0)}}
   document.querySelectorAll('.nb[data-t]').forEach(b=>b.setAttribute('aria-current',b.dataset.t===ui.tela?'page':'false'));
   if(!NV.pronto){document.body.classList.add('sem-login');document.getElementById('app').innerHTML=vConectando();document.getElementById('sheet').innerHTML='';document.body.style.overflow='';return}
   const logado=!!usuarioAtual();document.body.classList.toggle('sem-login',!logado);document.body.classList.toggle('operacao',logado&&!ehGestao());MODULOS.forEach(([k])=>document.body.classList.toggle('sem-'+k,!modOn(k)));
@@ -4617,7 +5021,7 @@ function renderTela(){RC={};aplicaCor();if(LINK_FICHA&&NV.pronto&&state&&usuario
   const sh=document.getElementById('sheet');const s=ui.sheet;
   if(!s){sh.innerHTML='';document.body.style.overflow='';return}
   const old=sh.querySelector('.sheet'),keep=old&&old.dataset.id===sheetId(s)?{top:old.scrollTop,x:[...old.querySelectorAll('.fx-wrap')].map(e=>[e.dataset.k,e.scrollLeft])}:null;
-  const html=({tipo:sTipoEd,troca:sTroca,maq:sMaq,pedido:()=>sPedido(s.id),prob:sProblema,novo:sNovo,ajuda:sAjuda,produto:()=>sProduto(s.p),etapa:sEtapa,nprod:sNovoProd,pes:sPesEd,forn:sFornEd,quem:sQuem,he:sHE,setor:sSetor,escEt:sEscEt,pausa:sPausa,div:sDiv,menu:sMenu,imp:sImp,cav:sCav,compras:sCompras,entregas:sEntregas,terc:sTerc,etEd:sEtEd,hora:sHora,impCli:sImpCli,mock:sMock,cli:sCli,doc:sDoc,ins:sIns,arqPick:sArqPick,seg:sSegLista,tipoCli:sTipoCli}[s.t]||(()=>''))();
+  const html=({trello:sTrello,tipo:sTipoEd,troca:sTroca,maq:sMaq,pedido:()=>sPedido(s.id),prob:sProblema,novo:sNovo,ajuda:sAjuda,produto:()=>sProduto(s.p),etapa:sEtapa,nprod:sNovoProd,pes:sPesEd,forn:sFornEd,quem:sQuem,he:sHE,setor:sSetor,escEt:sEscEt,pausa:sPausa,div:sDiv,menu:sMenu,imp:sImp,cav:sCav,compras:sCompras,entregas:sEntregas,terc:sTerc,etEd:sEtEd,hora:sHora,impCli:sImpCli,mock:sMock,cli:sCli,doc:sDoc,ins:sIns,arqPick:sArqPick,seg:sSegLista,tipoCli:sTipoCli}[s.t]||(()=>''))();
   sh.innerHTML=`<div class="sheet ${['pedido','produto'].includes(s.t)?'largo':''}" data-id="${esc(sheetId(s))}" role="dialog" aria-modal="true"><div class="wrap">${html}</div></div>`;document.body.style.overflow='hidden';
   if(keep){const n=sh.querySelector('.sheet');n.scrollTop=keep.top;keep.x.forEach(([k,x])=>{const e=n.querySelector(`.fx-wrap[data-k="${k}"]`);if(e)e.scrollLeft=x})}
   document.querySelectorAll('[aria-label]:not([title])').forEach(el=>el.title=el.getAttribute('aria-label'));
@@ -4691,7 +5095,7 @@ const A={
   mSel:d=>{ui.sheet.sel=d.v;ui.sheet.p=null;ui.sheet.junto=[];render();document.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'})},
   mRes:d=>{snap();{const l=lote(d.l);registrar({tipo:'reserva',maq:d.m,maqTipo:unidade(d.m)?.tipo,op:d.p||'',ped:l.ped,cli:pedById(l.ped).cliente,prod:prod(l.prod).nome,step:sMap(rp(l))[d.s].nome})}state.reservas=state.reservas||{};Object.keys(state.reservas).forEach(k=>{const r=state.reservas[k];if(r.l===d.l&&r.s===d.s)delete state.reservas[k]});state.reservas[d.m]={l:d.l,s:d.s,p:d.p||''};ui.sheet.sel=null;commit();toast(`Reservado para ${unidade(d.m)?.nome}`)},
   mResX:d=>{snap();delete (state.reservas||{})[d.m];ui.sheet.sel=null;commit();toast('Reserva tirada: o sistema volta a escolher')},
-  pedido:d=>{ui.fx=null;openSheet({t:'pedido',id:d.id});if(avisos().some(p=>p.id===d.id))marcaVisto([d.id])},
+  pedido:d=>{ui.fx=null;openSheet({t:'pedido',id:d.id});if(avisos().some(p=>p.id===d.id))marcaVisto([d.id]);ntVisto(pedById(d.id))},
   terminou:d=>{const t=tarefaNa(d.m);if(!t)return;if(t.grupo&&t.grupo.length){snap();const T=now(),tot=tempoUtil(t.x,T),G=[t,...t.grupo],w=G.map(g=>(g.s.min||1)*qtdEf(g.l)),W=sum(w)||1;
       G.forEach((g,i)=>{g.x.st='ok';g.x.fim=T;const a=heAtiva(g.x,T-1);if(a)a.f=T;g.x.util=Math.round(tot*w[i]/W/MIN);evEtapa('etapa.concluida',g.l,g.s,g.x,{q:qtdEf(g.l),dur:tot*w[i]/W/1000,dados:{peso:Math.round(w[i]/W*1000)/1000}})});save();const n=`${pNome(t.x.op)} terminou ${G.length} ${jPal(t.s.posto)} juntos`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true);return}
     snap();t.x.st='ok';t.x.fim=now();{const a=heAtiva(t.x,t.x.fim-1);if(a)a.f=t.x.fim}const dms=tempoUtil(t.x);t.x.util=Math.round(dms/MIN);if(t.pai)acertaPai(t.l,t.s.id);evEtapa('etapa.concluida',t.l,t.s,t.x,{q:t.pai?t.x.n:qtdEf(t.l),dur:dms/1000,parte:t.pai?t.x.id:undefined,dados:{he:t.x.he&&t.x.he.length?1:undefined}});save();const n=t.pai?`${pNome(t.x.op)} terminou ${t.x.n} peças de ${t.s.nome}${t.pai.st==='ok'?'. Processo completo':`. Faltam ${qtdEf(t.l)-pecasFeitas(t.pai)}`}`:`${pNome(t.x.op)} terminou ${t.s.nome}`;openSheet({t:'maq',m:d.m,feito:n});toast(n,true)},
@@ -4765,7 +5169,89 @@ const A={
   impCriar:()=>impCriar(),
   mockAlvo:d=>{ui.sheet.itens[+d.i].alvo=d.v;render()},
   mockOk:()=>{snap();let n=0;ui.sheet.itens.forEach(m=>{const l=m.alvo&&lote(m.alvo);if(l){setMock(l,m.img,m.g);n++}});ui.sheet=null;commit();toast(`${n} ${n===1?'mockup salvo':'mockups salvos'}`)},
-  pv:d=>{ui.pv=d.v;ui.pfAb=null;render()},
+  pv:d=>{ui.pv=d.v;ui.pfAb=null;ui.qfAb=null;if(d.v!=='emp')try{localStorage.setItem('pd-pv',d.v)}catch(e){}render()},
+  axEd:d=>{ui.axEd=ui.axEd===d.k?null:d.k;render()},
+  axAbrir:d=>{const a=arqById(d.id);if(a&&a.link)window.open(a.link,'_blank','noopener')},
+  axNome:d=>{const a=arqById(d.id),p=pedById(d.ped),n=(document.getElementById('axN-'+d.id)?.value||'').trim();if(!a)return;if(!n)return toast('Escreva o nome');if(n===a.nome)return toast('O nome é o mesmo');snap();const era=a.nome;a.nome=n;a.ed={ts:now(),...axQuem(),o:'nome'};
+    if(p)qdReg(p,`Mudou o nome do arquivo "${era}" para "${n}"`,'arquivo.editado',{ref:a.id,de:era,para:n});commit();toast('Nome salvo')},
+  axCat:d=>{const a=arqById(d.id),p=pedById(d.ped);if(!a)return;const era=a.cat||axCatDe(a.nome,a.mime,a.tipo);if(era===d.v)return;snap();a.cat=d.v;if(p)qdReg(p,`Marcou "${a.nome}" como ${axCatN(d.v)}`,'arquivo.editado',{ref:a.id,de:era,para:d.v});commit()},
+  axTroca:d=>{const a=arqById(d.id);if(!a||a.link)return;ui.arqAlvo={cli:a.cli,tipo:a.tipo,troca:a.id,ped:d.ped};const i=document.getElementById('fArq');i.accept='';i.multiple=false;i.value='';i.click()},
+  axVerBaixar:d=>{const a=arqById(d.id),v=a&&(a.ver||[])[+d.i];if(v)baixarArqs([{...v,tipo:a.tipo}])},
+  axVolta:d=>{const a=arqById(d.id),p=pedById(d.ped);if(!a||!p)return;snap();p.anexos=p.anexos||[];if(!p.anexos.includes(a.id))p.anexos.push(a.id);qdReg(p,`Pôs de volta o arquivo "${a.nome}"`,'arquivo.enviado',{ref:a.id,dados:{nome:a.nome,volta:1}});commit();toast('Arquivo de volta no pedido')},
+  axLink:d=>{ui.axLink=ui.axLink===d.id?null:d.id;render();setTimeout(()=>document.getElementById('axLU')?.focus(),30)},
+  axLinkOk:d=>{const p=pedById(d.id);if(!p)return;let u=(document.getElementById('axLU')?.value||'').trim();const n=(document.getElementById('axLN')?.value||'').trim();
+    if(!/^https?:\/\/\S+\.\S+/i.test(u)){if(/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(u))u='https://'+u;else return toast('Cole o endereço do link (começa com https://)')}
+    snap();const a={id:uid('a'),cli:p.cli||null,tipo:'link',link:u,nome:n||u.replace(/^https?:\/\//,'').slice(0,60),ts:now(),cat:'outros',...axQuem()};(state.arquivos=state.arquivos||[]).push(a);(p.anexos=p.anexos||[]).push(a.id);ui.axLink=null;
+    qdReg(p,`Anexou o link "${a.nome}"`,'arquivo.enviado',{ref:a.id,dados:{nome:a.nome,link:1}});commit();toast('Link anexado')},
+  cmMarca:d=>{const t=document.getElementById('cmNovo');if(!ui.cmF||ui.cmF.p!==d.id)ui.cmF={p:d.id,m:[]};ui.cmF.t=t?t.value:'';qdTog(ui.cmF.m,d.u);render()},
+  cmEnvia:d=>{const p=pedById(d.id),t=(document.getElementById('cmNovo')?.value||'').trim();if(!p)return;if(!t)return toast('Escreva o comentário');const m=ui.cmF&&ui.cmF.p===d.id?[...ui.cmF.m]:[];
+    (state.usuarios||[]).forEach(u=>{if(t.includes('@'+uNomeQ(u))&&!m.includes(u.id))m.push(u.id)});
+    snap();const c={id:uid('cm'),t,ts:now(),...axQuem(),m};(p.coment=p.coment||[]).push(c);ui.cmF=null;
+    qdReg(p,`Comentou: "${t.length>120?t.slice(0,120)+'…':t}"`,'comentario.criado',{ref:c.id,q:m.length||null,dados:m.length?{mencionados:m}:null});commit();toast(m.length?`Comentário enviado. ${m.map(uById).filter(Boolean).map(uNomeQ).join(', ')} vai ver no pedido.`:'Comentário enviado')},
+  cmEd:d=>{ui.cmEd=d.c||null;render();setTimeout(()=>document.getElementById('cmEdT')?.focus(),30)},
+  cmEdOk:d=>{const p=pedById(d.id),c=p&&(p.coment||[]).find(x=>x.id===d.c),t=(document.getElementById('cmEdT')?.value||'').trim();if(!c)return;if(c.u!==usuarioAtual()?.id)return toast('Só quem escreveu pode mudar o comentário');if(!t)return toast('Escreva o comentário');if(t===c.t){ui.cmEd=null;return render()}
+    snap();(c.hist=c.hist||[]).push({t:c.t,ts:c.ed||c.ts});c.t=t;c.ed=now();ui.cmEd=null;qdReg(p,'Mudou um comentário','comentario.editado',{ref:c.id});commit();toast('Comentário mudado')},
+  ntAbrir:d=>{ui.sino=false;A.qdAbre(d)},
+  qdLemb:d=>{const p=pedById(d.id);if(!p)return;const v=+d.v;if(qdLemb(p)===v)return;snap();p.lemb=v;qdReg(p,v?`Avisar ${v} ${v===1?'dia':'dias'} antes da entrega`:'Sem aviso antes da entrega','pedido.lembrete_alterado',{q:v});commit()},
+  qdResIr:d=>{ui.pv='qd';const f=qdF();f.pz=[d.v];f.etq=[];f.resp=[];try{localStorage.setItem('pd-pv','qd')}catch(e){}render();window.scrollTo(0,0)},
+  calMes:d=>{const h=new Date(sod(now()));let m=ui.calM||{a:h.getFullYear(),m:h.getMonth()};if(+d.d===0)m={a:h.getFullYear(),m:h.getMonth()};else{const x=new Date(m.a,m.m+(+d.d),1);m={a:x.getFullYear(),m:x.getMonth()}}ui.calM=m;render()},
+  ntAdd:()=>{const el=document.getElementById('ntNova'),t=(el?.value||'').trim();if(!t)return toast('Escreva a anotação');snap();const n={id:uid('n'),t:t.slice(0,2000),ts:now(),...axQuem()};(state.notas=state.notas||[]).push(n);ev('nota.criada',{ref:n.id});commit();toast('Anotação guardada na Caixa de entrada');setTimeout(()=>document.getElementById('ntNova')?.focus(),30)},
+  ntRm:d=>{const n=(state.notas||[]).find(x=>x.id===d.id);if(!n)return;snap();n.feito={ts:now(),tirada:1,...axQuem()};ev('nota.tirada',{ref:n.id});commit();toast('Anotação tirada',true)},
+  ntVira:d=>{const n=(state.notas||[]).find(x=>x.id===d.id);if(!n)return;openSheet({t:'novo',w:{step:1,cliente:'',vend:null,itens:[],entrega:null,err:'',obs:n.t,nota:n.id}});toast('A anotação foi para as Observações do pedido')},
+  trImp:()=>{const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=async()=>{const f=i.files&&i.files[0];if(!f)return;let J=null;try{J=JSON.parse(await f.text())}catch(e){return toast('Esse arquivo não é o JSON do Trello',false)}
+    if(!J||!Array.isArray(J.cards))return toast('Esse arquivo não é o JSON do Trello (falta a lista de cartões)',false);openSheet({t:'trello',plano:trelloPlano(J)})};i.click()},
+  trOk:()=>{const sh=ui.sheet;if(!sh||sh.t!=='trello')return;const r=trelloAplica(sh.plano);ui.sheet=null;ui.tela='pedidos';ui.pv='qd';render();toast(`Importado: ${r.nP} ${r.nP===1?'pedido':'pedidos'} atualizados e ${r.nN} ${r.nN===1?'anotação':'anotações'} na Caixa de entrada`)},
+  /* Quadro de pedidos */
+  qdAbre:d=>{ui.qdDe=d.id;ui.qdEd=null;A.pedido(d)},
+  qdIr:d=>{const e=document.getElementById('qdc-'+d.c);if(e)e.scrollIntoView({behavior:'smooth',inline:'start',block:'nearest'})},
+  qdFAbre:d=>{ui.qfAb=ui.qfAb===d.v?null:d.v;render()},
+  qdFPz:d=>{qdTog(qdF().pz,d.v);render()},qdFEtq:d=>{qdTog(qdF().etq,d.v);render()},qdFResp:d=>{qdTog(qdF().resp,d.v);render()},
+  qdFLimpa:()=>{const f=qdF();f.pz=[];f.etq=[];f.resp=[];render()},
+  qdOrd:d=>{qdF().ord=d.v;try{localStorage.setItem('qd-ord',d.v)}catch(e){}ui.qfAb=null;render()},
+  qdEtq:d=>{const p=pedById(d.id),e=qdEtqs().find(x=>x.id===d.e);if(!p||!e)return;const tem=qdEtqDe(p).includes(e.id);snap();
+    if(e.fixa)p.evento=!tem;else{p.etq=(p.etq||[]).filter(x=>x!==e.id);if(!tem)p.etq.push(e.id)}
+    qdReg(p,`${tem?'Tirou':'Pôs'} a etiqueta ${e.nome}`,'pedido.etiqueta_alterada',{ref:e.id,de:tem?e.nome:null,para:tem?null:e.nome});commit()},
+  qdResp:d=>{const p=pedById(d.id),u=uById(d.u);if(!p||!u)return;const tem=(p.resp||[]).includes(u.id);snap();p.resp=(p.resp||[]).filter(x=>x!==u.id);if(!tem){p.resp.push(u.id);p.respEm={...(p.respEm||{}),[u.id]:{ts:now(),por:quemNome()||''}}}else if(p.respEm){delete p.respEm[u.id];if(!Object.keys(p.respEm).length)delete p.respEm}
+    qdReg(p,`${tem?'Tirou':'Pôs'} ${uNomeQ(u)} como responsável`,'pedido.responsavel_alterado',{ref:u.id,de:tem?u.id:null,para:tem?null:u.id});commit()},
+  qdCapa:d=>{const p=pedById(d.id),l=lote(d.l);if(!p||!l)return;const era=qdCapa(p);snap();p.capa=l.id;qdReg(p,`Trocou a capa para ${nomePeca(l)}${l.cor?' '+l.cor:''}`,'pedido.capa_alterada',{lote:l.id,de:era&&era.id,para:l.id});commit()},
+  qdCk:d=>{const p=pedById(d.id);if(!p)return;snap();const g=qdCkGarante(p).find(x=>x.id===d.g),x=g&&g.itens.find(y=>y.id===d.i);if(!x)return;
+    x.ok=!x.ok;x.por=quemNome()||usuarioAtual()?.nome||'';x.u=usuarioAtual()?.id||'';x.em=now();
+    qdReg(p,`${x.ok?'Marcou':'Desmarcou'} "${x.t}" (${g.nome})`,x.ok?'checklist.marcado':'checklist.desmarcado',{ref:x.id,dados:{item:x.t,grupo:g.nome}});commit()},
+  qdCkEd:d=>{if(ui.qdEd===d.id){ui.qdEd=null}else ui.qdEd=d.id;render()},
+  qdIAdd:d=>{const p=pedById(d.id),inp=document.getElementById('qdNovo-'+d.g),t=(inp?.value||'').trim();if(!p)return;if(!t)return toast('Escreva o item');snap();
+    const g=qdCkGarante(p).find(x=>x.id===d.g);if(!g)return;const x={id:uid('i'),t,ok:false};g.itens.push(x);qdReg(p,`Criou o item "${t}" (${g.nome})`,'checklist.item_criado',{ref:x.id,dados:{item:t,grupo:g.nome}});commit();
+    setTimeout(()=>document.getElementById('qdNovo-'+d.g)?.focus(),30)},
+  qdIRm:d=>{const p=pedById(d.id);if(!p)return;snap();const g=qdCkGarante(p).find(x=>x.id===d.g),k=g?g.itens.findIndex(y=>y.id===d.i):-1;if(k<0)return;const [x]=g.itens.splice(k,1);
+    qdReg(p,`Removeu o item "${x.t}" (${g.nome})`,'checklist.item_removido',{ref:x.id,dados:{item:x.t,grupo:g.nome,feito:x.ok||undefined}});commit();toast('Item tirado',true)},
+  qdIMov:d=>{const p=pedById(d.id);if(!p)return;const g=qdCkGarante(p).find(x=>x.id===d.g);if(!g)return;const i=g.itens.findIndex(y=>y.id===d.i),j=i+(+d.d);if(i<0||j<0||j>=g.itens.length)return;snap();[g.itens[i],g.itens[j]]=[g.itens[j],g.itens[i]];commit()},
+  qdGAdd:d=>{const p=pedById(d.id),t=(document.getElementById('qdNovoG')?.value||'').trim();if(!p)return;if(!t)return toast('Escreva o nome do grupo');snap();qdCkGarante(p).push({id:uid('g'),nome:t,itens:[]});
+    qdReg(p,`Criou o grupo "${t}" no checklist`,'checklist.item_criado',{dados:{grupo:t}});commit()},
+  qdGRm:d=>{const p=pedById(d.id);if(!p)return;snap();const C=qdCkGarante(p),k=C.findIndex(x=>x.id===d.g);if(k<0)return;const [g]=C.splice(k,1);
+    qdReg(p,`Removeu o grupo "${g.nome}" (${g.itens.length} ${g.itens.length===1?'item':'itens'})`,'checklist.item_removido',{dados:{grupo:g.nome,itens:g.itens.length}});commit();toast('Grupo tirado',true)},
+  qdGMov:d=>{const p=pedById(d.id);if(!p)return;const C=qdCkGarante(p),i=C.findIndex(x=>x.id===d.g),j=i+(+d.d);if(i<0||j<0||j>=C.length)return;snap();[C[i],C[j]]=[C[j],C[i]];commit()},
+  qdHTudo:d=>{ui.qdHt=d.id;render()},
+  /* configuração (gestão) */
+  qdColRen:d=>{ui.qdCfgEd='c:'+d.c;render();setTimeout(()=>document.getElementById('qdCfgNome')?.focus(),30)},
+  qdColRenOk:d=>{const n=(document.getElementById('qdCfgNome')?.value||'').trim();if(!n)return toast('Escreva o nome');snap();qdGrava(q=>{const c=q.cols.find(x=>x.id===d.c);if(c)c.nome=n});ui.qdCfgEd=null;ev('quadro.configurado',{ref:d.c,para:n});commit()},
+  qdColMov:d=>{snap();qdGrava(q=>{const i=q.cols.findIndex(x=>x.id===d.c),j=i+(+d.d);if(i<0||j<0||j>=q.cols.length)return;[q.cols[i],q.cols[j]]=[q.cols[j],q.cols[i]]});ev('quadro.configurado',{ref:d.c});commit()},
+  qdColOff:d=>{const c=QD().cols.find(x=>x.id===d.c);if(!c)return;if(!c.off&&QD().cols.filter(x=>!x.off).length<2)return toast('Pelo menos uma coluna precisa aparecer');snap();qdGrava(q=>{const x=q.cols.find(y=>y.id===d.c);x.off=!x.off});ev('quadro.configurado',{ref:d.c,para:c.off?'aparece':'escondida'});commit()},
+  qdColRm:d=>{snap();qdGrava(q=>{q.cols=q.cols.filter(x=>x.id!==d.c)});ev('quadro.configurado',{ref:d.c,para:'tirada'});commit();toast('Coluna tirada. Os pedidos dela vão para outra coluna.',true)},
+  qdColAdd:()=>{const n=(document.getElementById('qdColNova')?.value||'').trim();if(!n)return toast('Escreva o nome da coluna');snap();
+    qdGrava(q=>{let id='q-'+qdSlug(n),k=2;while(q.cols.some(x=>x.id===id))id='q-'+qdSlug(n)+'-'+(k++);const fim=q.cols.findIndex(x=>x.tipo==='fim');q.cols.splice(fim<0?q.cols.length:fim,0,{id,nome:n,tipo:'prod',maqs:[]})});
+    ev('quadro.configurado',{para:n});commit();toast('Coluna criada. Agora escolha que máquinas vão para ela.')},
+  qdMaqSel:d=>{ui.qdMaq=d.v;render()},
+  qdMaqCol:d=>{const t=tipo(d.m);if(!t||!t.id)return;snap();qdGrava(q=>{q.cols.forEach(c=>{if(c.tipo!=='prod')return;c.maqs=(c.maqs||[]).filter(x=>!(x===t.id||nkQ(x)===nkQ(t.nome)||(t.curto&&nkQ(x)===nkQ(t.curto))));if(c.id===d.v)c.maqs.push(t.id)})});
+    ev('quadro.configurado',{ref:t.id,para:d.v});ui.qdMaq=null;commit();toast(`${t.nome} agora fica na coluna ${(QD().cols.find(c=>c.id===d.v)||{}).nome||''}`)},
+  qdEtqRen:d=>{ui.qdCfgEd='e:'+d.e;render();setTimeout(()=>document.getElementById('qdCfgNome')?.focus(),30)},
+  qdEtqRenOk:d=>{const n=(document.getElementById('qdCfgNome')?.value||'').trim();if(!n)return toast('Escreva o nome');snap();qdGrava(q=>{const e=q.etq.find(x=>x.id===d.e);if(e)e.nome=n});ui.qdCfgEd=null;ev('quadro.configurado',{ref:d.e,para:n});commit()},
+  qdEtqCor:d=>{snap();qdGrava(q=>{const e=q.etq.find(x=>x.id===d.e);if(e)e.cor=d.v});commit()},
+  qdEtqNovaCor:d=>{ui.qdEtqCor=d.v},
+  qdEtqRm:d=>{snap();qdGrava(q=>{q.etq=q.etq.filter(x=>x.id!==d.e)});ev('quadro.configurado',{ref:d.e,para:'tirada'});commit();toast('Etiqueta tirada',true)},
+  qdEtqAdd:()=>{const n=(document.getElementById('qdEtqNova')?.value||'').trim();if(!n)return toast('Escreva o nome da etiqueta');snap();
+    qdGrava(q=>{let id=qdSlug(n),k=2;while(id==='evento'||q.etq.some(x=>x.id===id))id=qdSlug(n)+'-'+(k++);q.etq.push({id,nome:n,cor:ui.qdEtqCor||'amarelo'})});ev('quadro.configurado',{para:n});commit()},
+  qdCkSalva:()=>{const L=(document.getElementById('qdCkTxt')?.value||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const k=x.indexOf(':');return k<0?{nome:x,itens:[]}:{nome:x.slice(0,k).trim(),itens:x.slice(k+1).split(';').map(y=>y.trim()).filter(Boolean)}}).filter(g=>g.nome);
+    snap();qdGrava(q=>{q.ck=L});ev('quadro.configurado',{ref:'checklist',q:L.reduce((t,g)=>t+g.itens.length,0)});commit();toast('Checklist salvo')},
+
   sinoAbre:()=>{ui.sino=!ui.sino;ui.eu=false;render()},
   euAbre:()=>{ui.eu=!ui.eu;ui.sino=false;render()},
   euFecha:()=>{ui.eu=false;render()},
@@ -4842,13 +5328,13 @@ const A={
   mockBib:d=>{const l=lote(d.l),ped=pedById(l.ped);openSheet({t:'arqPick',cli:ped.cli,tipo:'mockup',alvo:{k:'mock',l:d.l},volta:{t:'pedido',id:ped.id}})},
   arqUsar:d=>{const e=ui.sheet;usaArq(arqById(d.id),e.alvo);ui.sheet=e.volta||null;commit();toast('Arquivo ligado ao pedido')},
   anxAdd:d=>{const l=lote(d.l),ped=l&&pedById(l.ped);if(!ped)return;ui.arqAlvo={cli:ped.cli,tipo:'auto',multi:true,alvo:{k:'anx',l:d.l,x:d.x}};const i=document.getElementById('fArq');i.accept='';i.multiple=true;i.value='';i.click()},
-  anxRm:d=>{const l=lote(d.l),x=l&&(l.pers||[]).find(y=>y.id===d.x);if(!x)return;snap();lotesDe(l.ped).forEach(o=>(o.pers||[]).filter(y=>y.id===x.id&&y.tipo===x.tipo&&y.parte===x.parte&&y.pos===x.pos).forEach(y=>tiraAnx(y,d.id)));commit();toast('Anexo tirado da personalização (continua guardado na empresa)',true)},
+  anxRm:d=>{const l=lote(d.l),x=l&&(l.pers||[]).find(y=>y.id===d.x);if(!x)return;snap();{const ax=arqById(d.id),pd=pedById(l.ped);if(ax&&pd)axRegRm(pd,ax,`${tNome(x.tipo)} ${localTxt(x).toLowerCase()}`)}lotesDe(l.ped).forEach(o=>(o.pers||[]).filter(y=>y.id===x.id&&y.tipo===x.tipo&&y.parte===x.parte&&y.pos===x.pos).forEach(y=>tiraAnx(y,d.id)));commit();toast('Anexo tirado da personalização (continua guardado na empresa)',true)},
   anxPedAdd:d=>{const ped=pedById(d.id);if(!ped)return;ui.arqAlvo={cli:ped.cli,tipo:'auto',multi:true,alvo:{k:'pedAnx',ped:ped.id}};const i=document.getElementById('fArq');i.accept='';i.multiple=true;i.value='';i.click()},
-  anxPedRm:d=>{const ped=pedById(d.id);if(!ped)return;snap();ped.anexos=(ped.anexos||[]).filter(x=>x!==d.a2);if(!ped.anexos.length)delete ped.anexos;commit();toast('Anexo tirado do pedido (continua guardado na empresa)',true)},
+  anxPedRm:d=>{const ped=pedById(d.id);if(!ped)return;snap();{const ax=arqById(d.a2);if(ax&&(ped.anexos||[]).includes(ax.id))axRegRm(ped,ax,'')}ped.anexos=(ped.anexos||[]).filter(x=>x!==d.a2);if(!ped.anexos.length)delete ped.anexos;commit();toast('Anexo tirado do pedido (continua guardado na empresa)',true)},
   pubAnexos:()=>{ui.pubAnx=!ui.pubAnx;fichaPubRender()},
   pubTodos:()=>{const l=lote(PUB_L);if(!l)return;const ped=pedById(l.ped);baixarArqs(anexosLote(l,ped).map(o=>o.a),nomeArq(`Anexos ${ped.id} - ${ped.cliente} - peça ${l.id}.zip`))},
   arqVer:d=>abreZoom('A:'+d.id),
-  arqBaixar:d=>{const a=arqById(d.id);if(a)baixarArqs([a])},
+  arqBaixar:d=>{const a=arqById(d.id);if(a&&a.link)return window.open(a.link,'_blank','noopener');if(a)baixarArqs([a])},
   arqsPed:d=>{const ped=pedById(d.id);baixarArqs(arqsDoPedido(ped),nomeArq(`Arquivos pedido ${ped.id} - ${ped.cliente}.zip`))},
   arqRm:d=>{const a=arqById(d.id);if(!a)return;const u=usoArq(a);if(u.length&&!d.ok&&!ui.arqRmOk?.[a.id]){ui.arqRmOk={[a.id]:1};toast(`Está em ${u.length} ${u.length===1?'pedido':'pedidos'}. Toque em Tirar de novo para confirmar.`,false);return}
     snap();state.arquivos=state.arquivos.filter(x=>x.id!==a.id);state.lotes.forEach(l=>{if(l.mockArq===a.id)l.mockArq=undefined;(l.pers||[]).forEach(x=>{if(x.arte===a.id)x.arte=undefined;if(x.bord===a.id)x.bord=undefined})});ui.arqRmOk=null;commit();toast('Arquivo tirado')},
@@ -5212,7 +5698,7 @@ const A={
     const cl=garanteCliente(w.cliente,(w.cnpj||'').trim(),(w.contato||'').trim(),w.cli);if(I&&I.ca)dadosCliente(cl,I.cliDados||{});arqsDaEmpresa(lines.flatMap(x=>x.pers),cl.id);const preI=I&&I.ca?faltaItens(lines.map(x=>({...x,g:x.g}))):[];
     state.pedidos.push({...(I?{fonte:I.fonte,...(I.venda?{daVenda:I.venda}:{}),...(I.fin?{fin:JSON.parse(JSON.stringify(I.fin))}:{}),...(preI.length?{pre:preI}:{})}:{}),id,...((w.ficha||'').trim()?{ficha:w.ficha.trim()}:{}),...(w.evento?{evento:true}:{}),cli:cl.id,cliente:cl.nome,contato:(w.contato||'').trim(),cnpj:(w.cnpj||'').trim()||cl.cnpj||'',vendedor:w.vend,chegada:(I&&I.chegada)||now(),entrega:w.entrega,vias:false,artePrep:false,arte:false,artes:{},materiais:calcMat(lines),concluido:null,obs:(w.obs||'').trim()||undefined});
     IT.forEach((it,i)=>{if(it.mockG)guardaMockG(`${id}-${i+1}`,it.mockG)});lines.forEach((x,i)=>state.lotes.push({obs:x.obs,preco:x.preco,id:`${id}-${i+1}`,ped:id,mock:IT[i].mock||undefined,prod:x.prod,gen:x.gen,variacao:x.variacao,cor:x.cor,cores2:x.cores2,tecido:x.tecido,opcoes:x.opcoes,pers:x.pers,qtd:x.qtd,grade:x.g,desm:0,steps:{},rework:false,parent:null}));
-    evPedidoCriado(pedById(id));ui.tela='pedidos';if(I&&(I.resto||[]).length){ui.sheet={t:'imp',gi:0,grupos:I.resto};commit();toast(`Pedido ${id} criado. Falta ${I.resto.length}`);return}ui.sheet={t:'pedido',id};commit();toast(preI.length?`Pré-pedido ${id} criado`:'Pedido criado')},
+    evPedidoCriado(pedById(id));if(w.nota)notaVirou(w.nota,id);ui.tela='pedidos';if(I&&(I.resto||[]).length){ui.sheet={t:'imp',gi:0,grupos:I.resto};commit();toast(`Pedido ${id} criado. Falta ${I.resto.length}`);return}ui.sheet={t:'pedido',id};commit();toast(preI.length?`Pré-pedido ${id} criado`:'Pedido criado')},
 };
 /* Confirmação na tela, com o verbo, para o que não tem volta. Cada regra devolve [pergunta, botão] ou nada (não precisa confirmar). */
 const CONF={
@@ -5233,6 +5719,10 @@ const CONF={
   rmProd:d=>{const p=prod(d.p);return p&&[`Excluir o produto ${p.nome}?`,'Sim, excluir']},
   rmEst:d=>[`Tirar "${d.v}" do estoque?`,'Sim, tirar'],
   acsRm:d=>{const u=(state.usuarios||[]).find(x=>x.id===d.id);return u&&[`Tirar o acesso de ${u.nome||u.email}?`,'Sim, tirar acesso']},
+  ntRm:d=>{const n=(state.notas||[]).find(x=>x.id===d.id);return n&&[`Tirar a anotação "${n.t.slice(0,60)}${n.t.length>60?'…':''}" da Caixa de entrada?`,'Sim, tirar']},
+  anxPedRm:d=>{const a=arqById(d.a2);return a&&[`Tirar "${a.nome}" do pedido? O registro fica em "Arquivos tirados do pedido".`,'Sim, tirar']},anxRm:d=>{const a=arqById(d.id);return a&&[`Tirar "${a.nome}" desta personalização? O registro fica em "Arquivos tirados do pedido".`,'Sim, tirar']},
+  qdIRm:d=>{const p=pedById(d.id),g=p&&qdCkDe(p).find(x=>x.id===d.g),x=g&&g.itens.find(y=>y.id===d.i);return x&&[`Tirar o item "${x.t}" do checklist?`,'Sim, tirar']},qdGRm:d=>{const p=pedById(d.id),g=p&&qdCkDe(p).find(x=>x.id===d.g);return g&&[`Tirar o grupo "${g.nome}"${g.itens.length?` e os ${g.itens.length} itens dele`:''}?`,'Sim, tirar']},
+  qdColRm:d=>{const c=QD().cols.find(x=>x.id===d.c);return c&&[`Tirar a coluna "${c.nome}" do quadro? As máquinas dela vão para outra coluna.`,'Sim, tirar']},qdEtqRm:d=>{const e=QD().etq.find(x=>x.id===d.e);return e&&[`Tirar a etiqueta "${e.nome}"? Ela sai de todos os pedidos.`,'Sim, tirar']},
   rmCat:()=>['Tirar esta grade de tamanhos?','Sim, tirar'],rmCor:d=>[`Tirar a cor ${d.v||''}?`,'Sim, tirar'],rmPx:()=>['Tirar este detalhe?','Sim, tirar'],
   rmPeso:()=>['Tirar esta parte da conta de tecido?','Sim, tirar'],rmProb:()=>['Tirar este motivo de conserto?','Sim, tirar'],rmTipoCli:d=>{const x=(state.tiposCli||[])[+d.i],n=(state.catcli||[]).filter(c=>c.tipo===x).length;return x&&[`Tirar o tipo "${x}"?${n?` ${n===1?'O cliente marcado':`Os ${n} clientes marcados`} com ele ${n===1?'fica':'ficam'} sem tipo.`:''}`,'Sim, tirar']},
   setRm:()=>['Tirar este setor?','Sim, tirar'],tempoUsarTodos:()=>{const n=Math.min(12,calibTempos().length);return n&&[`Trocar ${n} tempos cadastrados pelos tempos reais medidos? Prazos e metas passam a usar os novos tempos.`,'Sim, usar o real']},vocRm:()=>['Tirar esta troca de palavra?','Sim, tirar'],posRm:()=>['Tirar esta posição?','Sim, tirar'],
@@ -5257,13 +5747,19 @@ document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.datas
   const fim=e=>{if(!arr)return;const a=arr;arr=null;a.g.remove();document.querySelectorAll('.f-saindo,.f-alvo').forEach(x=>x.classList.remove('f-saindo','f-alvo'));const el=document.elementFromPoint(e.clientX,e.clientY);const f=el&&el.closest('.forn[data-forn]');
     if(f&&f.dataset.serv===a.serv&&f!==a.orig){const [l,s]=a.k.split('|');A.fornMover({l,s,f:f.dataset.forn})}};
   document.addEventListener('pointerup',fim);document.addEventListener('pointercancel',e=>{if(arr){arr.g.remove();document.querySelectorAll('.f-saindo,.f-alvo').forEach(x=>x.classList.remove('f-saindo','f-alvo'));arr=null}})}
+/* Arrastar e soltar arquivos no bloco Anexos do pedido (computador). */
+{const dz=e=>e.target&&e.target.closest?e.target.closest('[data-drop]'):null,temArq=e=>e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
+  document.addEventListener('dragover',e=>{const z=dz(e);if(!z||!temArq(e))return;e.preventDefault();e.dataTransfer.dropEffect='copy';z.classList.add('ax-drop-on')});
+  document.addEventListener('dragleave',e=>{const z=dz(e);if(z&&!z.contains(e.relatedTarget))z.classList.remove('ax-drop-on')});
+  document.addEventListener('drop',e=>{const z=dz(e);if(!z)return;e.preventDefault();z.classList.remove('ax-drop-on');const fs=[...((e.dataTransfer&&e.dataTransfer.files)||[])],p=pedById(z.dataset.drop);if(!fs.length||!p)return;
+    EV.acao=evUuid();arqEnviar(fs,{cli:p.cli,tipo:'auto',multi:true,alvo:{k:'pedAnx',ped:p.id}})})}
 document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)return;EV.acao=evUuid();
+  if(d.qdren){const [p,g,i]=d.qdren.split('|');qdRen(p,g,i,t.value);return}
   if(d.sel){const v=t.value;if(!v)return;if(v==='__nova'){if(d.nova)A[d.nova]({...d});return}A[d.sel]({...d,[d.key||'v']:v});return}
   if(t.id==='impNum'&&ui.sheet&&ui.sheet.t==='imp'){const g=ui.sheet.grupos[ui.sheet.gi];const ns=t.value.split(/[\/,;]|\be\b/).map(x=>x.trim()).filter(Boolean);g.num=ns[0]||'';g.nums=ns;return}
   if(t.id==='fModelo'&&t.files[0]){lerArq(t.files[0],true).then(txt=>{let m;try{m=JSON.parse(txt)}catch(e){}if(!m||m._modelo!==1)return toast('Esse arquivo não é um modelo de fábrica',false);ui.modPend=m;render()});return}
   if(t.id==='fSeg'&&t.files[0]){const arq=t.files[0];t.value='';pedeConfirma(`Restaurar a cópia "${arq.name}"? O que está no app agora vira uma cópia antes.`,'Sim, restaurar',()=>lerArq(arq,true).then(async txt=>{try{await restaurar(JSON.parse(txt));toast('Cópia restaurada')}catch(e){toast('Esse arquivo não é uma cópia do sistema')}}));return}
-  if(t.id==='fArq'&&t.files.length){const fs=[...t.files],al=ui.arqAlvo;if(!al)return;(async()=>{toast('Guardando…',false);let ult=null;const salvos=[];for(const fl of fs){try{const a=await arqSalvar(fl,al.cli,al.tipo==='auto'?tipoArqDe(fl):al.tipo);if(a){ult=a;salvos.push(a)}}catch(er){toast(`Não consegui abrir ${fl.name}`,false)}}
-      document.getElementById('toast').innerHTML='';if(!ult)return;snap();if(al.alvo){if(al.multi)salvos.forEach(a=>usaArq(a,al.alvo));else usaArq(ult,al.alvo);if(ui.sheet&&ui.sheet.t==='arqPick')ui.sheet=ui.sheet.volta||null}commit();toast(fs.length>1?`${fs.length} arquivos guardados na empresa`:'Arquivo guardado na empresa')})();return}
+  if(t.id==='fArq'&&t.files.length){arqEnviar([...t.files],ui.arqAlvo);return}
   if(t.id==='fImpF'&&t.files.length){importarFichas([...t.files]);return}if(t.id==='fImpC'&&t.files.length){importarClientesCA([...t.files]);return}
   if((t.id==='fImpM'||t.id==='fImpM1')&&t.files.length){const fs=[...t.files];(async()=>{toast('Preparando o mockup…',false);const out=[];
       for(const f of fs){try{const m=await mockDeArquivo(f);out.push({img:m.p,g:m.g,nome:f.name})}catch(er){toast(`Não consegui abrir ${f.name}`,false)}}document.getElementById('toast').innerHTML='';if(!out.length)return;
@@ -5298,7 +5794,7 @@ document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(!state)re
   else if(d.papel!=null){snap();state.papeis[d.papel]=t.value.trim()||state.papeis[d.papel];ok=true}
   if(ok){save();if(!d.est)render();toast('Salvo',true)}});
 function wLerFalta(){const i=document.getElementById('insFQ');if(i&&ui.sheet)ui.sheet.fq=i.value}
-document.addEventListener('input',e=>{if(e.target.id==='pzN'||e.target.id==='dvN'){const b=document.getElementById(e.target.id==='pzN'?'pzResta':'dvResta'),v=parseInt(e.target.value,10);if(b&&!isNaN(v))b.textContent=Math.max(0,(+b.dataset.tot)-v)+' peças';return}if(e.target.id==='insFQ'&&ui.sheet){ui.sheet.fq=e.target.value;return}if(e.target.id==='ajBusca'&&ui.sheet?.t==='ajuda'){ui.sheet.q=e.target.value;const L=document.getElementById('ajRes');if(L)L.innerHTML=ajRes();return}if(e.target.id==='wCli'&&ui.sheet?.w){ui.sheet.w.cliente=e.target.value;ui.sheet.w.cli=null;const L=document.getElementById('wCliSug');if(L)L.innerHTML=sugClientes(e.target.value,null)}if(e.target.id==='estBusca'){ui.eq=e.target.value;const L=document.getElementById('estLista');if(L)L.innerHTML=listaEst()}if(e.target.id==='empBusca'){ui.eqc=e.target.value;const L=document.getElementById('empLista');if(L)L.innerHTML=listaEmpresas()}if(e.target.id==='pedBusca'){ui.pf.q=e.target.value;const L=document.getElementById('pedLista');if(L)L.innerHTML=listaPedidos()}if(e.target.id==='wCnpj'){const v=fmtCnpj(e.target.value);if(v!==e.target.value)e.target.value=v}});
+document.addEventListener('input',e=>{if(e.target.id==='pzN'||e.target.id==='dvN'){const b=document.getElementById(e.target.id==='pzN'?'pzResta':'dvResta'),v=parseInt(e.target.value,10);if(b&&!isNaN(v))b.textContent=Math.max(0,(+b.dataset.tot)-v)+' peças';return}if(e.target.id==='insFQ'&&ui.sheet){ui.sheet.fq=e.target.value;return}if(e.target.id==='ajBusca'&&ui.sheet?.t==='ajuda'){ui.sheet.q=e.target.value;const L=document.getElementById('ajRes');if(L)L.innerHTML=ajRes();return}if(e.target.id==='wCli'&&ui.sheet?.w){ui.sheet.w.cliente=e.target.value;ui.sheet.w.cli=null;const L=document.getElementById('wCliSug');if(L)L.innerHTML=sugClientes(e.target.value,null)}if(e.target.id==='estBusca'){ui.eq=e.target.value;const L=document.getElementById('estLista');if(L)L.innerHTML=listaEst()}if(e.target.id==='empBusca'){ui.eqc=e.target.value;const L=document.getElementById('empLista');if(L)L.innerHTML=listaEmpresas()}if(e.target.id==='qdBusca'){qdF().q=e.target.value;const L=document.getElementById('qdBoard');if(L)L.innerHTML=qdBoard()}if(e.target.id==='pedBusca'){ui.pf.q=e.target.value;const L=document.getElementById('pedLista');if(L)L.innerHTML=listaPedidos()}if(e.target.id==='wCnpj'){const v=fmtCnpj(e.target.value);if(v!==e.target.value)e.target.value=v}});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&['sbE','sbS'].includes(e.target.id)&&ui.sbLogin?.passo==='entrar'){e.preventDefault();A.sbEntrar();return}if(e.key==='Enter'&&['lgE','lgS'].includes(e.target.id)){e.preventDefault();A.lgEntrar();return}if(e.key==='Enter'&&['lgS1','lgS2'].includes(e.target.id)){e.preventDefault();A.lgCriar();return}if(e.key==='Escape'&&ui.sheet)A.fechar();if(e.key==='Enter'&&(['eNome','eObs','pNome','pTec','xNome','wCont','wCnpj','pedBusca','estBusca'].includes(e.target.id)||e.target.closest?.('.card')&&e.target.tagName==='INPUT'))e.preventDefault();if(e.key==='Enter'&&e.target.id==='wCli'){e.preventDefault();A.wNext()}});
 /* Ctrl+Z desfaz e Ctrl+Y (ou Ctrl+Shift+Z) refaz, no computador (Cmd no Mac). Não age enquanto a pessoa digita num campo
    (aí o atalho desfaz o texto, como sempre), nem com uma pergunta de confirmação ou um formulário aberto (para não perder o preenchido). */
@@ -5320,7 +5816,7 @@ function sQuem(){return `${voltar('Voltar')}<h1>Quem está usando este aparelho?
   <div class="eq-l">${state.pessoas.map(p=>`<button class="eq" data-a="quemSel" data-v="${p.id}" aria-pressed="${QUEM===p.id}">${av(p.id)}<span class="eq-t"><b>${esc(p.nome)}</b><span>${esc(papeisTxt(p))}</span></span>${QUEM===p.id?ic('i-check'):''}</button>`).join('')}</div>`}
 
 /* ================= nuvem (banco de dados compartilhado) ================= */
-const COLS=['tipos','pessoas','forn','produtos','pedidos','lotes','consertos','clientes','arquivos','usuarios','catcli','cavenda','custos'];
+const COLS=['tipos','pessoas','forn','produtos','pedidos','lotes','consertos','clientes','arquivos','usuarios','catcli','cavenda','custos','notas'];
 const NV={db:null,modo:'local',st:'',Q:new Set(),acked:{},last:{},busy:false,subs:[],pendR:false,timer:null,pronto:false,erro:'',soLer:false,avisoT:0};
 const stab=v=>JSON.stringify(v,(k,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.keys(x).sort().reduce((o,k2)=>(o[k2]=x[k2],o),{}):x);
 const limpo=v=>JSON.parse(JSON.stringify(v));
@@ -5553,6 +6049,7 @@ async function fichaPublica(tok){const app=document.getElementById('app');docume
 let PUB_L=null;
 function fichaPubRender(){const app=document.getElementById('app'),l=lote(PUB_L);if(!l)return;const ped=pedById(l.ped),P=paginasDoc(ui.sheet),AX=anexosLote(l,ped);
   app.innerHTML=`<div class="pub-f"><div class="pub-h">${logoMarca()}<div><h1>Ficha de produção</h1><p class="sub-l">${esc(ped.cliente)} · pedido ${esc(ped.id)} · peça ${esc(l.id)}${ped.cancelado?' · <b>PEDIDO CANCELADO</b>':''}</p></div></div>
+    ${pubCartao(ped)}${modOn('quadro')?`<p class="qd-txt"><a href="${esc(location.pathname)}#pedido=${encodeURIComponent(ped.id)}">Tem acesso ao app? Abrir este pedido no app</a></p>`:''}
     <div class="acoes" style="margin-top:0"><button class="big go" data-a="docPdf">${ic('i-lista')}Baixar PDF</button><button class="big neutro" data-a="docPrint">Imprimir</button><button class="big neutro" data-a="pubAnexos" aria-pressed="${!!ui.pubAnx}">${ic('i-arte')}Anexos (${AX.length})</button></div>
     ${ui.pubAnx?`<div class="card pub-anx"><h2>Anexos</h2>${AX.length?`${AX.length>1?`<button class="mbtn neutro2" data-a="pubTodos" style="margin:0 0 10px">${ic('i-lista')}Baixar todos (${AX.length})</button>`:''}${AX.map(o=>`<div class="anx">${arqThumb(o.a,'p')}<span class="anx-n"><b>${esc(o.a.nome)}</b><small>${esc(o.onde)}</small></span><button class="mbtn" data-a="arqBaixar" data-id="${o.a.id}">Baixar</button></div>`).join('')}`:'<p class="dica">Nenhum arquivo anexado a esta peça.</p>'}</div>`:''}
     <div class="docs">${P.map(h=>`<div class="a4wrap">${h}</div>`).join('')}</div></div>`;ajustaA4()}
