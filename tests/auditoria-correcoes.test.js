@@ -127,7 +127,8 @@ const SZ=[[360,640],[390,844],[768,1024],[1024,768],[1280,800],[1366,768],[1800,
   ok(r==='ok','link do Trello que não é http(s) (ex.: javascript:) é ignorado na importação');
   await ctx.close();
   for(const [w,h] of [[1024,768],[1366,768],[1920,1080]]){({A,ctx}=await abre(w,h));
-    r=await A.evaluate(()=>{ui.pv='qd';render();const B=document.getElementById('qdCols').getBoundingClientRect(),n=document.querySelector('.nav'),nt=n&&getComputedStyle(n).display!=='none'?n.getBoundingClientRect().top:innerHeight;return {b:Math.round(B.bottom),nt:Math.round(nt)}});
-    ok(r.b<=r.nt+1,`${w}×${h}: o fim do quadro (e a barra de rolagem) fica acima da barra de baixo (${r.b} ≤ ${r.nt})`);await ctx.close()}
+    r=await A.evaluate(()=>{ui.pv='qd';render();const B=document.getElementById('qdCols').getBoundingClientRect(),n=document.querySelector('.nav'),nr=n&&getComputedStyle(n).display!=='none'?n.getBoundingClientRect():null,nt=nr&&nr.top>innerHeight/2?nr.top:innerHeight;   // com o menu na lateral (computador) não há barra embaixo: o limite é o fim da janela
+return {b:Math.round(B.bottom),nt:Math.round(nt)}});
+    ok(r.b<=r.nt+1,`${w}×${h}: o fim do quadro (e a barra de rolagem) fica acima da barra de baixo ou do fim da janela (${r.b} ≤ ${r.nt})`);await ctx.close()}
   ok(!erros.length,'sem erros de JavaScript'+(erros.length?': '+erros.slice(0,3).join(' | '):''));
   await b.close();console.log(falhas?`\n${falhas} FALHA(S)`:'\nTudo certo.');process.exit(falhas?1:0)})();
