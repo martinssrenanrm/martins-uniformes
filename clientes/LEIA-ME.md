@@ -11,6 +11,7 @@ Campos:
 - `nome` / `curto`: nome do app no celular (ícone e título).
 - `suporte`: quem a equipe procura quando o app não abre (ex.: "o Nico"). Aparece nas telas de erro.
 - `tiposCliente` (opcional): tipos de cliente que separam o faturamento em Resultados (ex.: `["Escola","Empresa"]`). É só o ponto de partida: depois, a lista é cuidada em Cadastros › Ajustes › Tipos de cliente. Sem o campo, a fábrica começa sem tipos e a divisão não aparece.
+- `fichaVias` (opcional): `1` faz o PDF de produção abrir com **Só 1ª via** marcado (e Incluir mockups). Sem o campo, abre com 1ª e 2ª via.
 - `quadro` (opcional): ponto de partida do **Quadro de pedidos** (Pedidos › Quadro). Depois, a gestão cuida em Cadastros › Ajustes › Quadro de pedidos.
   - `cols`: colunas em ordem. `tipo` é `inicio` (falta pré-pedido, ficha ou arte), `compra` (falta material para cortar), `prod` (máquinas) ou `fim` (pronto ou entregue). Coluna `prod` diz quais máquinas são dela por `maqs` (nome ou id da máquina), `setores` (id do setor) ou `fases` (`corte`, `pers`, `costura`, `acab`). A máquina citada pelo nome vence o setor e a fase.
   - `etiquetas`: `[{"nome":"Urgente","cor":"vermelho"}]`. Cores: vermelho, amarelo, verde, azul, rosa, roxo, laranja, cinza. A etiqueta EVENTO já existe (é o "pedido para evento").
