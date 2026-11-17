@@ -117,3 +117,16 @@ A etiqueta vai para o prestador: a ficha pública **não leva o preço unitário
 
 ## Migração 017: cartão do pedido no QR code (16/11/2026)
 Rodar `supabase/migrations/017_qr_cartao.sql` no SQL Editor do Supabase (pode rodar de novo). Sem ela, o QR continua abrindo a ficha, mas sem o cartão do pedido.
+
+## Correções da auditoria (16/11/2026): o que depende de aprovação
+Todas foram testadas num Postgres de teste (imitação do Supabase, não o banco real) com as migrações 001–019 (sem a 015, que precisa do pg_cron), antes e depois de aplicar 017–019. Nenhuma foi aplicada na produção.
+
+**Sem a 019 (banco de hoje):** o app lê, junta e grava só o que mudou (proteção parcial). Se duas pessoas salvarem o mesmo pedido no mesmo instante, uma lista pode ficar só com a versão de uma delas. Ajustes › Onde ficam os dados mostra qual proteção está valendo.
+
+| Ordem | O quê | Como aplicar | Como conferir | Como voltar atrás |
+|---|---|---|---|---|
+| 1 | Publicar o app (enviar o ramo para a main) | push; o GitHub roda os testes e publica | Actions verde; Pedidos › Quadro abre na largura toda | reverter o commit na main |
+| 2 | Migração 017 (cartão no QR, checklist sem nomes) | SQL Editor › colar `017_qr_cartao.sql` › Run | ler um QR: aparece "Cartão do pedido" com a coluna e o checklist certo | rodar de novo a `008_qr_sem_preco.sql` |
+| 3 | Migração 019 (pedido sem sobrescrever: `doc_update_se` e `doc_set_se`) | colar `019_pedido_sem_sobrescrever.sql` › Run | `select public.doc_update_se('x','{}','{}'), public.doc_set_se('x','{}','{}');` devolve `false, false` sem erro; no app, Ajustes › Onde ficam os dados diz "proteção completa" depois do primeiro pedido salvo (recarregar o app depois de rodar) | `drop function public.doc_update_se(text,jsonb,jsonb); drop function public.doc_set_se(text,jsonb,jsonb);` (o app volta sozinho à proteção parcial e avisa) |
+| 4 | Função `arquivo-qr` | Edge Functions › Deploy (`supabase/functions/arquivo-qr`), verify_jwt desligado | chamar com um token e chave válidos devolve `{url}` | apagar a função |
+| 5 | Migração 018 (arquivos só com acesso) — **só depois de 1 e 4** | colar `018_arquivos_privados.sql` › Run | no app logado, baixar um anexo funciona; no QR, o anexo abre; o link público antigo dá erro | `update storage.buckets set public = true where id = 'arquivos';` |
