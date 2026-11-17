@@ -4349,7 +4349,8 @@ async function paraCinza(src){if(!src)return '';const im=new Image();im.src=src;
   for(let i=0;i<a.length;i+=4){const v=a[i]*.3+a[i+1]*.59+a[i+2]*.11;a[i]=a[i+1]=a[i+2]=v}g.putImageData(d,0,0);return c.toDataURL('image/jpeg',.85)}
 async function abreDoc(tipoDoc,id,so){const ped=pedById(id),ls=lotesDe(id).filter(l=>!l.rework);const cinza={};toast(tipoDoc==='etq'?'Montando as etiquetas…':'Carregando as imagens…',false);
   if(tipoDoc==='etq'){if(!window.qrcode)try{await carregaScript(LIBS.qr)}catch(e){}const sem=ls.filter(l=>!l.qr);if(sem.length){snap();sem.forEach(l=>l.qr=codigoQR());commit()}}else await Promise.all(ls.map(pegaMock));document.getElementById('toast').innerHTML='';
-  openSheet({t:'doc',tipo:tipoDoc,id,cinza,vias:so?1:2,mocks:!so,pb:false,so:so||null})}
+  /* fichaVias (clientes/<id>.json): quantas vias vêm marcadas ao abrir o PDF de produção (padrão: 1ª e 2ª via) */
+  openSheet({t:'doc',tipo:tipoDoc,id,cinza,vias:so||(tipoDoc==='prod'&&+CLIENTE.fichaVias===1)?1:2,mocks:!so,pb:false,so:so||null})}
 function paginasDoc(e){const ped=pedById(e.id),ls=lotesDe(e.id).filter(l=>!l.rework&&(!e.so||l.id===e.so));
   if(e.tipo==='pedido')return docPedido(ped);if(e.tipo==='etq')return folhasEtq(etiquetasDe(ped,e.tipos));const P=[];
   const todos=gruposFicha(lotesDe(e.id).filter(l=>!l.rework)),grp=e.so?todos.filter(g=>g.some(l=>l.id===e.so)):todos;
