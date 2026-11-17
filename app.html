@@ -4796,43 +4796,64 @@ function pdfEntregas(D,op={}){const J=window.jspdf.jsPDF,doc=new J({unit:'mm',fo
         const pedaco=resto.slice(0,cabeN);resto=resto.slice(pedaco.length);const h=Math.max(base,(pedaco.length+(cont?1:0))*lh(IPT)+2*PE.pad);
         pg.blocos.push({t:'linha',y,h,L:R.L,it:pedaco,nm:c.nm,cont,itCont:cont});y+=h;cont=true;
         if(resto.length){nova();pg.blocos.push({t:'banda',y,tit:w.tit,n,cont:true});y+=banda}}})});
-  /* desenho */
+  /* desenho — identidade MartinsPro (só aparência: posições, medidas e quebras de página são as mesmas de antes) */
   const N=pags.length;
   const cinza=v=>doc.setTextColor(v,v,v);
+  const MP={pet:[16,47,47],ard:[71,95,95],sal:[92,126,127],off:[245,245,245],gra:[26,26,26],ver:[199,52,55],petSoft:[230,237,237],petLine:[184,202,202],linha:[211,220,220]};
+  const cor=c=>doc.setTextColor(...c);
+  /* logotipo oficial (versão negativa, para o fundo petróleo); sem arquivo oficial, fica o nome em texto, como antes */
+  const LG=(typeof CLIENTE!=='undefined'&&CLIENTE&&/^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(CLIENTE.logoNeg||''))?CLIENTE.logoNeg:'';
+  let lgAsp=0;if(LG){try{const pr=doc.getImageProperties(LG);lgAsp=pr.height/pr.width}catch(e){lgAsp=0}}
+  const logo=(x,y,w)=>{if(lgAsp){doc.addImage(LG,'PNG',x,y,w,w*lgAsp,'mplogo','FAST');return}F('bold',11);doc.setTextColor(255,255,255);doc.text(mk.nome,x,y,{baseline:'top'})};
+  const site=(typeof CLIENTE!=='undefined'&&CLIENTE&&CLIENTE.site)||'';
   pags.forEach((p,ix)=>{if(ix)doc.addPage();let yy=PE.M;
-    if(ix===0){F('bold',9);cinza(90);doc.text(mk.nome,PE.M,yy,{baseline:'top'});F('bold',17);cinza(20);doc.text('Entregas por semana',PE.M,yy+4.2,{baseline:'top'});
-      F('bold',10);doc.text('Situação em: '+refTxt,PE.W-PE.M,yy,{baseline:'top',align:'right'});F('normal',8.5);cinza(70);doc.text(descEnt(D),PE.W-PE.M,yy+5,{baseline:'top',align:'right'});
-      /* legenda */
-      let lx=PE.M;const ly=yy+13.2;F('normal',8.5);['venc','hoje','breve','prog'].forEach(k=>{const K=PRAZO_K[k];doc.setDrawColor(150,150,150);doc.setLineWidth(.2);if(K.cor){doc.setFillColor(...K.cor);doc.rect(lx,ly,4,4,'FD')}else doc.rect(lx,ly,4,4,'S');cinza(30);doc.text(K.leg,lx+5.4,ly+.4,{baseline:'top'});lx+=5.4+doc.getTextWidth(K.leg)+6});
-      F('italic',8);cinza(80);doc.text('Situação dos prazos calculada na emissão do relatório. Dias úteis: expediente da fábrica, sem os feriados cadastrados.',PE.M,ly+6.2,{baseline:'top'});
-      doc.setDrawColor(40,40,40);doc.setLineWidth(.5);doc.line(PE.M,topo(0)-1.6,PE.W-PE.M,topo(0)-1.6)}
-    else{F('bold',9);cinza(60);doc.text(`${mk.nome} · Entregas por semana · Situação em: ${refTxt}`,PE.M,yy,{baseline:'top'});doc.setDrawColor(40,40,40);doc.setLineWidth(.4);doc.line(PE.M,topo(ix)-2.4,PE.W-PE.M,topo(ix)-2.4)}
-    /* cabeçalho das colunas (repete em toda página) */
-    const yc=topo(ix);F('bold',8.5);cinza(70);['PRAZO','CLIENTE / PEDIDO','ITENS'].forEach((t,i)=>doc.text(t,cx[i]+PE.pad,yc+1.4,{baseline:'top'}));
+    if(ix===0){
+      /* faixa petróleo do cabeçalho */
+      doc.setFillColor(...MP.pet);doc.rect(0,0,PE.W,30,'F');
+      logo(PE.M,6.6,50);
+      F('bold',16);doc.setTextColor(255,255,255);doc.text('Entregas por semana',PE.M,19.4,{baseline:'top'});
+      F('bold',8.5);cor(MP.petLine);doc.text('Situação em: '+refTxt,PE.W-PE.M,7.2,{baseline:'top',align:'right'});
+      F('bold',13);doc.setTextColor(255,255,255);doc.text(`${D.total} ${D.total===1?'pedido em aberto':'pedidos em aberto'}`,PE.W-PE.M,13.2,{baseline:'top',align:'right'});
+      F('normal',8);cor(MP.petLine);doc.text('(sem os entregues e os cancelados)',PE.W-PE.M,20.2,{baseline:'top',align:'right'});
+      /* legenda: as cores de alerta são as mesmas das células de prazo */
+      doc.setFillColor(...MP.off);doc.rect(0,30,PE.W,9.4,'F');
+      let lx=PE.M;const ly=31.5;F('normal',8.5);['venc','hoje','breve','prog'].forEach(k=>{const K=PRAZO_K[k];doc.setDrawColor(...MP.ard);doc.setLineWidth(.2);if(K.cor){doc.setFillColor(...K.cor);doc.rect(lx,ly,3.8,3.8,'FD')}else{doc.setFillColor(255,255,255);doc.rect(lx,ly,3.8,3.8,'FD')}cor(MP.gra);doc.text(K.leg,lx+5.2,ly+.3,{baseline:'top'});lx+=5.2+doc.getTextWidth(K.leg)+6});
+      F('italic',7.5);cor(MP.ard);doc.text('Situação dos prazos calculada na emissão do relatório. Dias úteis: expediente da fábrica, sem os feriados cadastrados.',PE.M,ly+4.9,{baseline:'top'})}
+    else{
+      doc.setFillColor(...MP.pet);doc.rect(0,0,PE.W,20,'F');
+      logo(PE.M,6.4,38);
+      F('bold',9);doc.setTextColor(255,255,255);doc.text('Entregas por semana',PE.W-PE.M,6.2,{baseline:'top',align:'right'});
+      F('normal',8);cor(MP.petLine);doc.text('Situação em: '+refTxt,PE.W-PE.M,10.8,{baseline:'top',align:'right'})}
+    /* cabeçalho das colunas (repete em toda página): faixa ardósia, texto branco */
+    const yc=topo(ix);doc.setFillColor(...MP.ard);doc.rect(PE.M,yc-.8,uw,cabCol,'F');F('bold',8);doc.setTextColor(255,255,255);['PRAZO','CLIENTE / PEDIDO','ITENS'].forEach((t,i)=>doc.text(t,cx[i]+PE.pad,yc+1.4,{baseline:'top'}));
     doc.text('FICHAS DE',cx[3]+cw[3]/2,yc+.2,{baseline:'top',align:'center'});doc.text('PRODUÇÃO',cx[3]+cw[3]/2,yc+3.4,{baseline:'top',align:'center'});
-    doc.setDrawColor(60,60,60);doc.setLineWidth(.35);doc.line(PE.M,yc+cabCol-.4,PE.W-PE.M,yc+cabCol-.4);
     p.blocos.forEach(b=>{
-      if(b.t==='banda'){doc.setFillColor(232,232,232);doc.rect(PE.M,b.y+.6,uw,banda-1.2,'F');F('bold',10.5);cinza(20);doc.text(b.tit+(b.cont?' — continuação':''),PE.M+PE.pad,b.y+banda/2,{baseline:'middle'});
-        if(!b.cont){F('normal',8.5);cinza(70);doc.text(`${b.n} ${b.n===1?'pedido':'pedidos'}`,PE.W-PE.M-PE.pad,b.y+banda/2,{baseline:'middle',align:'right'})}return}
+      if(b.t==='banda'){doc.setFillColor(...MP.petSoft);doc.rect(PE.M,b.y+.6,uw,banda-1.2,'F');doc.setFillColor(...MP.pet);doc.rect(PE.M,b.y+.6,1.1,banda-1.2,'F');
+        F('bold',10.5);cor(MP.pet);doc.text(b.tit+(b.cont?' — continuação':''),PE.M+PE.pad+.8,b.y+banda/2,{baseline:'middle'});
+        if(!b.cont){F('normal',8.5);cor(MP.ard);doc.text(`${b.n} ${b.n===1?'pedido':'pedidos'}`,PE.W-PE.M-PE.pad,b.y+banda/2,{baseline:'middle',align:'right'})}return}
       const L=b.L,K=PRAZO_K[L.k],y0=b.y;
       if(K.cor){doc.setFillColor(...K.cor);doc.rect(cx[0],y0,cw[0],b.h,'F')}
       /* prazo */
-      let ty=y0+PE.pad;F('bold',11);cinza(15);doc.text(L.dia?`${DOW3[dDia(L.dia).getDay()]} ${fDia(L.dia)}`:'—',cx[0]+PE.pad,ty,{baseline:'top'});ty+=lh(11)+.6;F('bold',8);cinza(35);doc.text(K.rot,cx[0]+PE.pad,ty,{baseline:'top'});
+      let ty=y0+PE.pad;F('bold',11);cor(MP.gra);doc.text(L.dia?`${DOW3[dDia(L.dia).getDay()]} ${fDia(L.dia)}`:'—',cx[0]+PE.pad,ty,{baseline:'top'});ty+=lh(11)+.6;F('bold',8);cor(MP.ard);doc.text(K.rot,cx[0]+PE.pad,ty,{baseline:'top'});
       /* cliente / pedido */
-      ty=y0+PE.pad;F('bold',CPT);cinza(15);b.nm.forEach(t=>{doc.text(t,cx[1]+PE.pad,ty,{baseline:'top'});ty+=lh(CPT)});
-      F('normal',9);cinza(60);doc.text(L.num?`Pedido ${L.num}`:'Sem nº',cx[1]+PE.pad,ty,{baseline:'top'});ty+=lh(9);
+      ty=y0+PE.pad;F('bold',CPT);cor(MP.gra);b.nm.forEach(t=>{doc.text(t,cx[1]+PE.pad,ty,{baseline:'top'});ty+=lh(CPT)});
+      F('normal',9);cor(MP.ard);doc.text(L.num?`Pedido ${L.num}`:'Sem nº',cx[1]+PE.pad,ty,{baseline:'top'});ty+=lh(9);
       if(b.cont){F('italic',8.5);doc.text('(continuação)',cx[1]+PE.pad,ty,{baseline:'top'});ty+=lh(8.5)}
-      else if(L.evento){ty+=.9;F('bold',8);const t='NÃO ATRASAR',tw=doc.getTextWidth(t)+3;doc.setDrawColor(20,20,20);doc.setLineWidth(.35);doc.rect(cx[1]+PE.pad,ty,tw,4.2,'S');cinza(15);doc.text(t,cx[1]+PE.pad+1.5,ty+2.1,{baseline:'middle'})}
+      else if(L.evento){ty+=.9;F('bold',8);const t='NÃO ATRASAR',tw=doc.getTextWidth(t)+3;doc.setDrawColor(...MP.ver);doc.setLineWidth(.35);doc.rect(cx[1]+PE.pad,ty,tw,4.2,'S');cor(MP.ver);doc.text(t,cx[1]+PE.pad+1.5,ty+2.1,{baseline:'middle'})}
       /* itens */
-      ty=y0+PE.pad;if(b.itCont){F('italic',8.5);cinza(70);doc.text('Itens — continuação',cx[2]+PE.pad,ty,{baseline:'top'});ty+=lh(IPT)}
-      b.it.forEach(r=>{if(r.q){F('bold',IPT);cinza(15);doc.text(r.q,cx[2]+PE.pad,ty,{baseline:'top'})}F('normal',IPT);cinza(25);doc.text(r.t,cx[2]+PE.pad+r.wq,ty,{baseline:'top'});ty+=lh(IPT)});
-      if(!b.it.length&&!b.itCont){F('italic',IPT);cinza(90);doc.text('Sem peças cadastradas',cx[2]+PE.pad,ty,{baseline:'top'})}
+      ty=y0+PE.pad;if(b.itCont){F('italic',8.5);cor(MP.ard);doc.text('Itens — continuação',cx[2]+PE.pad,ty,{baseline:'top'});ty+=lh(IPT)}
+      b.it.forEach(r=>{if(r.q){F('bold',IPT);cor(MP.gra);doc.text(r.q,cx[2]+PE.pad,ty,{baseline:'top'})}F('normal',IPT);cor(MP.gra);doc.text(r.t,cx[2]+PE.pad+r.wq,ty,{baseline:'top'});ty+=lh(IPT)});
+      if(!b.it.length&&!b.itCont){F('italic',IPT);cor(MP.ard);doc.text('Sem peças cadastradas',cx[2]+PE.pad,ty,{baseline:'top'})}
       /* fichas */
-      if(!b.cont){F('bold',11);cinza(15);doc.text(String(L.fichas),cx[3]+cw[3]/2,y0+PE.pad,{baseline:'top',align:'center'})}
-      doc.setDrawColor(185,185,185);doc.setLineWidth(.2);doc.line(PE.M,y0+b.h,PE.W-PE.M,y0+b.h)});
-    /* rodapé, com espaço reservado */
-    const yr=PE.H-PE.M-PE.rod+4;doc.setDrawColor(120,120,120);doc.setLineWidth(.2);doc.line(PE.M,yr,PE.W-PE.M,yr);F('normal',8.5);cinza(70);
-    doc.text(`${mk.nome} · Entregas por semana · Situação em: ${refTxt}`,PE.M,yr+2,{baseline:'top'});doc.text(`Página ${ix+1} de ${N}`,PE.W-PE.M,yr+2,{baseline:'top',align:'right'})});
+      if(!b.cont){F('bold',11);cor(MP.pet);doc.text(String(L.fichas),cx[3]+cw[3]/2,y0+PE.pad,{baseline:'top',align:'center'})}
+      doc.setDrawColor(...MP.linha);doc.setLineWidth(.25);doc.line(PE.M,y0+b.h,PE.W-PE.M,y0+b.h)});
+    /* rodapé institucional, no mesmo espaço reservado de antes */
+    const yr=PE.H-PE.M-PE.rod+4;doc.setDrawColor(...MP.linha);doc.setLineWidth(.25);doc.line(PE.M,yr,PE.W-PE.M,yr);
+    doc.setFillColor(...MP.pet);doc.rect(PE.M,yr+2,.9,6.4,'F');
+    F('bold',8);cor(MP.pet);doc.text(`${mk.nome} · Entregas por semana`,PE.M+2.4,yr+2,{baseline:'top'});
+    F('normal',7.5);cor(MP.ard);doc.text(`Situação em: ${refTxt}`,PE.M+2.4,yr+5.6,{baseline:'top'});
+    F('bold',8);cor(MP.pet);doc.text(`Página ${ix+1} de ${N}`,PE.W-PE.M,yr+2,{baseline:'top',align:'right'});
+    if(site){F('normal',7.5);cor(MP.ard);doc.text(site,PE.W-PE.M,yr+5.6,{baseline:'top',align:'right'})}});
   if(!D.semanas.length){F('normal',12);cinza(60);doc.text('Nenhum pedido em aberto.',PE.W/2,topo(0)+20,{align:'center'})}
   return {doc,pags,fim}}
 async function libPdf(){if(!window.jspdf)await carregaScript(LIBS.pdf)}
