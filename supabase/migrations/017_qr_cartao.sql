@@ -3,7 +3,18 @@
 -- o checklist (ck) e o aviso antes da entrega (lemb); na configuração, as colunas e etiquetas do quadro (quadro) e os módulos desligados (modOff);
 -- nos anexos, o endereço dos que são link (link).
 -- Continua sem: comentários, histórico, quem fez cada etapa, preços, materiais, contatos e usuários.
+-- O checklist vai sem o nome e o acesso de quem marcou (ck_publico): só o item, se está feito e quando.
 -- Pode rodar de novo sem problema.
+create or replace function public.ck_publico(ck jsonb) returns jsonb
+language sql immutable as $f$
+  select case when ck is null or jsonb_typeof(ck) <> 'array' then null else coalesce((
+    select jsonb_agg(jsonb_build_object('id', g->>'id', 'nome', g->>'nome', 'itens', coalesce((
+      select jsonb_agg(jsonb_build_object('id', i->>'id', 't', i->>'t', 'ok', coalesce((i->>'ok')::boolean, false), 'em', i->'em') order by n)
+      from jsonb_array_elements(case when jsonb_typeof(g->'itens') = 'array' then g->'itens' else '[]'::jsonb end) with ordinality as x(i, n)), '[]'::jsonb)) order by m)
+    from jsonb_array_elements(ck) with ordinality as y(g, m)), '[]'::jsonb) end
+$f$;
+revoke execute on function public.ck_publico(jsonb) from public;
+grant execute on function public.ck_publico(jsonb) to anon, authenticated;
 create or replace function public.ficha_publica(tok text) returns jsonb
 language plpgsql stable security definer set search_path = public as $function$
 declare l jsonb; p jsonb; cfg jsonb; pr jsonb; ti jsonb; ve jsonb; k text; mk text; r jsonb; ax jsonb; st text;
@@ -33,7 +44,7 @@ begin
   r := jsonb_build_object(
     'config/main', jsonb_build_object('v', 8, 'cores', cfg->'cores', 'cats', cfg->'cats', 'marca', cfg->'marca', 'posicoes', cfg->'posicoes', 'tamPadrao', cfg->'tamPadrao', 'fatorEsp', cfg->'fatorEsp', 'partesExtra', cfg->'partesExtra', 'feriados', cfg->'feriados', 'tecidos', cfg->'tecidos', 'quadro', cfg->'quadro', 'modOff', cfg->'modOff', 'v2610', 1, 'tamEspV', 1, 'avisosV', 1, 'donosV', 1, 'usersV', 2, 'insV', 1, 'nomesV', 1, 'alexV', 1),
     'lotes/' || (l->>'id'), (l - 'preco') || jsonb_build_object('steps', '{}'::jsonb),
-    'pedidos/' || (p->>'id'), jsonb_build_object('id', p->>'id', 'cli', p->>'cli', 'cliente', p->>'cliente', 'ficha', p->>'ficha', 'vendedor', p->>'vendedor', 'chegada', p->'chegada', 'entrega', p->'entrega', 'obs', p->>'obs', 'cancelado', p->'cancelado', 'concluido', p->'concluido', 'evento', p->'evento', 'anexos', coalesce(p->'anexos','[]'::jsonb), 'qdc', p->'qdc', 'etq', p->'etq', 'ck', p->'ck', 'lemb', p->'lemb', 'materiais', '[]'::jsonb, 'artes', '{}'::jsonb)
+    'pedidos/' || (p->>'id'), jsonb_build_object('id', p->>'id', 'cli', p->>'cli', 'cliente', p->>'cliente', 'ficha', p->>'ficha', 'vendedor', p->>'vendedor', 'chegada', p->'chegada', 'entrega', p->'entrega', 'obs', p->>'obs', 'cancelado', p->'cancelado', 'concluido', p->'concluido', 'evento', p->'evento', 'anexos', coalesce(p->'anexos','[]'::jsonb), 'qdc', (p->'qdc') - 'r', 'etq', p->'etq', 'ck', public.ck_publico(p->'ck'), 'lemb', p->'lemb', 'materiais', '[]'::jsonb, 'artes', '{}'::jsonb)
   ) || ti || ax;
   if pr is not null then r := r || jsonb_build_object('produtos/' || (l->>'prod'), pr); end if;
   if ve is not null then r := r || jsonb_build_object('pessoas/' || (ve->>'id'), ve); end if;

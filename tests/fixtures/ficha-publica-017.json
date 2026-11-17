@@ -1,0 +1,174 @@
+{
+ "_origem": "saída real de public.ficha_publica (migração 017) num Postgres de teste, 16/11/2026; dados fictícios",
+ "com_cartao": {
+  "ck": [
+   {
+    "id": "g1",
+    "nome": "Grupo 1",
+    "itens": [
+     {
+      "t": "Item 1",
+      "em": 1794869038377,
+      "id": "g1i1",
+      "ok": true
+     },
+     {
+      "t": "Item 2",
+      "em": 1794869038377,
+      "id": "g1i2",
+      "ok": true
+     },
+     {
+      "t": "Item 3",
+      "em": 1794869038377,
+      "id": "g1i3",
+      "ok": true
+     },
+     {
+      "t": "Item 4",
+      "em": 1794869038377,
+      "id": "g1i4",
+      "ok": true
+     }
+    ]
+   },
+   {
+    "id": "g2",
+    "nome": "Grupo 2",
+    "itens": [
+     {
+      "t": "Item 1",
+      "em": 1794869038377,
+      "id": "g2i1",
+      "ok": true
+     },
+     {
+      "t": "Item 2",
+      "em": 1794869038377,
+      "id": "g2i2",
+      "ok": true
+     },
+     {
+      "t": "Item 3",
+      "em": 1794869038377,
+      "id": "g2i3",
+      "ok": true
+     },
+     {
+      "t": "Item 4",
+      "em": 1794869038377,
+      "id": "g2i4",
+      "ok": true
+     }
+    ]
+   },
+   {
+    "id": "g3",
+    "nome": "Grupo 3",
+    "itens": [
+     {
+      "t": "Item 1",
+      "em": 1794869038377,
+      "id": "g3i1",
+      "ok": true
+     },
+     {
+      "t": "Item 2",
+      "em": 1794869038377,
+      "id": "g3i2",
+      "ok": true
+     },
+     {
+      "t": "Item 3",
+      "em": 1794869038377,
+      "id": "g3i3",
+      "ok": true
+     },
+     {
+      "t": "Item 4",
+      "em": 1794869038377,
+      "id": "g3i4",
+      "ok": true
+     }
+    ]
+   },
+   {
+    "id": "g4",
+    "nome": "Grupo 4",
+    "itens": [
+     {
+      "t": "Item 1",
+      "em": 1794869038377,
+      "id": "g4i1",
+      "ok": true
+     },
+     {
+      "t": "Item 2",
+      "em": 1794869038377,
+      "id": "g4i2",
+      "ok": true
+     },
+     {
+      "t": "Item 3",
+      "em": 1794869038377,
+      "id": "g4i3",
+      "ok": true
+     },
+     {
+      "t": "Item 4",
+      "em": 1794869038377,
+      "id": "g4i4",
+      "ok": true
+     }
+    ]
+   }
+  ],
+  "id": "6262",
+  "cli": null,
+  "etq": [
+   "urgente"
+  ],
+  "obs": null,
+  "qdc": {
+   "c": "corte",
+   "n": "Corte",
+   "t": "6262 Cliente X - polos",
+   "ck": [
+    16,
+    16
+   ]
+  },
+  "lemb": null,
+  "artes": {},
+  "ficha": null,
+  "anexos": [],
+  "evento": null,
+  "chegada": null,
+  "cliente": "Cliente X",
+  "entrega": null,
+  "vendedor": null,
+  "cancelado": null,
+  "concluido": null,
+  "materiais": []
+ },
+ "sem_cartao": {
+  "ck": null,
+  "id": "6300",
+  "cli": null,
+  "etq": null,
+  "obs": null,
+  "qdc": null,
+  "lemb": null,
+  "artes": {},
+  "ficha": null,
+  "anexos": [],
+  "evento": null,
+  "chegada": null,
+  "cliente": "Sem checklist",
+  "entrega": null,
+  "vendedor": null,
+  "cancelado": null,
+  "concluido": null,
+  "materiais": []
+ }
+}

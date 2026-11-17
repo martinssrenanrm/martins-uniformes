@@ -99,6 +99,8 @@ NODE_PATH=$(npm root -g) node tests/custo-produto.test.js   # custo por peça, s
 NODE_PATH=$(npm root -g) node tests/quadro.test.js   # Pedidos › Quadro: coluna calculada pela produção, etiquetas, checklist, histórico, 360×640
 NODE_PATH=$(npm root -g) node tests/arquivos-pedido.test.js   # arquivos com quem enviou, versões, link, tirados com registro, arrastar; comentários com aviso
 NODE_PATH=$(npm root -g) node tests/quadro-fase3.test.js   # cartão no QR sem login, avisos "Para você", calendário, Caixa de entrada, importar do Trello
+NODE_PATH=$(npm root -g) node tests/auditoria-correcoes.test.js   # correções da auditoria: QR, quadro em 8 tamanhos de tela com ~90 pedidos, cartões, avisos, Trello, arquivos fechados
+NODE_PATH=$(npm root -g) node tests/edicao-simultanea.test.js   # duas pessoas no mesmo pedido: nada some (mescla3; migração 019)
 node tests/conta-azul-funcao.test.js   # função conta-azul do Supabase: token, trava, busca
 ```
 

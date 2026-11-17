@@ -3,6 +3,7 @@
 const { chromium } = require('playwright');const fs=require('fs'),path=require('path');
 const R=path.resolve(__dirname,'..');let falhas=0;const ok=(c,m)=>{console.log((c?'  ✔ ':'  ✘ ')+m);if(!c)falhas++};
 const docs=new Map(),users=new Map(),pages=[];const avisos=[];
+const SEM_019=!!process.env.SEM_019;const stj=x=>JSON.stringify(x,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((o,k2)=>(o[k2]=v[k2],o),{}):v);
 const merge=(a,b)=>{if(a&&b&&typeof a==='object'&&typeof b==='object'&&!Array.isArray(a)&&!Array.isArray(b)){const o={...a};for(const k of Object.keys(b))o[k]=k in a?merge(a[k],b[k]):b[k];return o}return b};
 const acesso=e=>!!e&&[...docs].some(([p,d])=>p.startsWith('usuarios/')&&String(d.email||'').toLowerCase()===String(e).toLowerCase());
 // banco novo (migração 005): tabela de sinais. SEM_SINAL=true simula um banco antigo, sem ela.
@@ -31,6 +32,11 @@ async function sbop0(k,a,b){
   if(k==='rpc'&&JSON.parse(b).fn==='metricas'){if(SEM_EVENTOS)return {data:null,error:{code:'PGRST202',message:'Could not find the function public.metricas'}};const g=[...docs].some(([p,d])=>p.startsWith('usuarios/')&&d.perfil==='gestao'&&String(d.email).toLowerCase()===String(a).toLowerCase());if(!g)return {data:null,error:null};
     metricasPedidas++;return {data:{periodo:{de:'2026-10-27',ate:'2026-11-02',fuso:'America/Sao_Paulo'},pedidos:{criados:4,entregues:3,no_prazo_pct:67,no_prazo_inicial_pct:33,dias_medio:6.5,cancelados:0},etapas:{feitas:40,pecas:900,horas:31.5,pct_depois:25},processos:[{processo:'Costura teste',feitas:10,pecas:200,horas:8,seg_por_peca:144,seg_padrao:100}],retrabalho:{pecas:5,motivos:{'Costura torta':5}},compras:{itens_em_falta:2,horas_medio_ate_comprar:18},adesao:{pct_na_hora:75,pct_depois:25},desfazer:[{tela:'fabrica/maq',acao:'etapa.concluida',n:3}],uso:[{tela:'fabrica/maq',n:120},{tela:'pedido',n:40}]},error:null}}
   if(k==='rpc'&&JSON.parse(b).fn==='uso_conta'){const {args}=JSON.parse(b);if(SEM_EVENTOS)return {data:null,error:{code:'PGRST202',message:'Could not find the function public.uso_conta'}};if(!acesso(a))return {data:null,error:null};(args.itens||[]).forEach(x=>{const k=[x.dia,x.usuario,x.dv,x.tela].join('|');usoT.set(k,(usoT.get(k)||0)+x.n)});return {data:null,error:null}}
+  // migração 019 (gravação condicional). SEM_019=1 simula o banco de hoje, sem ela (o PostgREST responde PGRST202).
+  if(k==='rpc'&&/^doc_(update|set|criar)_se$/.test(JSON.parse(b).fn)){const {fn,args}=JSON.parse(b);if(SEM_019)return {data:null,error:{code:'PGRST202',message:'Could not find the function public.'+fn}};
+    if(fn==='doc_criar_se'){if(!acesso(a))return {data:null,error:{code:'42501',message:'row-level security'}};if(docs.has(args.p))return {data:false,error:null};docs.set(args.p,args.novo);sinaliza(args.p);setTimeout(()=>avisa(args.p),10);return {data:true,error:null}}
+    if(!acesso(a))return {data:false,error:null};const cur=docs.get(args.p);if(!cur||stj(cur)!==stj(args.esperado))return {data:false,error:null};
+    docs.set(args.p,fn==='doc_set_se'?args.novo:merge(cur,args.patch));sinaliza(args.p);setTimeout(()=>avisa(args.p),10);return {data:true,error:null}}
   if(k==='rpc'){const {args}=JSON.parse(b);if(!acesso(a))return {data:null,error:{code:'42501',message:'row-level security'}};if(!docs.has(args.p))return {data:false,error:null};docs.set(args.p,merge(docs.get(args.p),args.patch));sinaliza(args.p);setTimeout(()=>avisa(args.p),10);return {data:true,error:null}}
   if(k==='login'){const u=users.get(a);if(!u||u.pass!==b)return {error:{message:'Invalid login credentials'}};if(!u.ok)return {error:{message:'Email not confirmed'}};return {}}
   if(k==='signup'){if(users.get(a)?.ok)return {error:{message:'User already registered'}};users.set(a,{pass:b,ok:false});avisos.push('confirmar:'+a);return {}}
