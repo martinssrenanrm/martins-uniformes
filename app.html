@@ -1,7 +1,7 @@
 <title>Chão de Fábrica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800&family=Archivo:wdth,wght@125,400;125,600;125,700&family=Instrument+Serif:ital@0;1&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* Um só visual, claro e de alto contraste, escolhido de propósito para leitura fácil. */
 :root{
@@ -1163,6 +1163,206 @@ button.qd-kpi{cursor:pointer}.qd-kpi b{font-size:28px;line-height:1}.qd-kpi span
 .qd-ctx{display:inline-flex;align-items:center;gap:5px;font-size:16px;font-weight:600;color:var(--ink2);background:var(--grey-soft);border-radius:8px;padding:2px 8px}.qd-ctx svg.ic{width:18px;height:18px}
 .qd-g-h{row-gap:4px}
 .qd-ckcfg{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px}.qd-ckcfg .qd-g-h .campo{flex:1 1 220px;font-weight:700}
+/* ================= Identidade MartinsPro v1.0 (11/2026) =================
+   Manual de Marca MartinsPro v1.0. Só aparência: nenhuma regra, ação ou dado muda aqui.
+   Verde Petróleo é a âncora (menu, ação principal, seleção); área de trabalho clara em Off-white; textos em Grafite e Ardósia.
+   Cores de estado (atrasado, atenção, em dia, pronto, erro) mantêm o significado. O Vermelho Martins fica só na marca.
+   Regras que continuam (público 60+): letra ≥ 16px, alvos ≥ 48px, contraste de texto AA. Impressão e PDFs não são tocados. */
+:root{
+  --mp-petroleo:#102F2F;--mp-petroleo-700:#0A2222;--mp-petroleo-600:#1A3F3F;--mp-petroleo-soft:#E6EDED;--mp-petroleo-line:#B8CACA;
+  --mp-ardosia:#475F5F;--mp-salvia:#5C7E7F;--mp-offwhite:#F5F5F5;--mp-grafite:#1A1A1A;--mp-vermelho:#C73437;--mp-noite:#05031B;--mp-vinho:#3D011B;
+  --font:'Red Hat Display','Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-display:'Archivo','Red Hat Display',system-ui,sans-serif;
+  --font-serif:'Instrument Serif',Georgia,serif;
+  --bg:#F5F5F5;--card:#FFFFFF;--ink:#1A1A1A;--ink2:#475F5F;--muted:#586A6A;
+  --line:#E1E6E6;--line-strong:#C7D1D1;--line-btn:#7D9191;
+  --blue:#102F2F;--blue-dark:#0A2222;--blue-soft:#E6EDED;--blue-line:#B8CACA;
+  --grey-soft:#EEF1F1;
+  --r-sm:10px;--r-md:14px;--r-lg:16px;
+  --sh-1:0 1px 2px rgba(16,47,47,.05),0 1px 3px rgba(16,47,47,.06);
+  --sh-2:0 2px 4px rgba(16,47,47,.04),0 10px 28px rgba(16,47,47,.10);
+  --sh-btn:0 1px 2px rgba(16,47,47,.10);
+  --nav-w:248px;
+}
+html,body{background:var(--bg)}
+body{font-family:var(--font);font-feature-settings:normal;letter-spacing:0}
+h1,h2,h3,.ola b{letter-spacing:-.01em}
+h1:not(.a4 *):not(.tq *){font-weight:800}h2:not(.a4 *):not(.tq *){font-weight:700}
+output,.kpi,.ped-ent,.resumo,.imp-g,.pill,.qd-kpi b,.qd-num{font-variant-numeric:tabular-nums lining-nums}
+/* título curto de página: Archivo Expanded em caixa alta, como os títulos do manual */
+.topo>h1{font-family:var(--font-display);font-stretch:125%;font-weight:700;text-transform:uppercase;letter-spacing:.015em;font-size:26px;line-height:1.15}
+@media (max-width:640px){.topo>h1{font-size:21px}}
+/* foco */
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.campo:focus{border-color:var(--blue);box-shadow:0 0 0 4px color-mix(in srgb,var(--blue) 30%,transparent)}
+.campo::placeholder{color:#677878}
+/* botões: ação principal em petróleo; secundário claro com borda */
+.mbtn:not(.neutro2):not(.go):hover{background:var(--blue-dark)}
+.big.azul:hover,.big.go.ini:hover{background:var(--blue-dark)}
+.big.azul,.p-act.ini{box-shadow:0 1px 2px rgba(16,47,47,.22),0 6px 16px rgba(16,47,47,.16)}
+.mbtn.neutro2:hover,.big.neutro:hover,.voltar:hover,.depc:hover,.subtab:hover,.x:hover,.p-mais:hover,.chk:hover,.pchip:hover{border-color:var(--mp-ardosia);background:#F8FAFA}
+.x.azul{color:var(--link)}
+/* seleção: petróleo (o verde continua para "feito", "em dia" e ações de produção) */
+.depc[aria-pressed="true"]:not(.ok):not(.no){border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.depc[aria-pressed="true"]:not(.ok):not(.no),.pchip[aria-pressed="true"]{box-shadow:0 0 0 3px rgba(16,47,47,.12)}
+.vista{border:1.5px solid var(--line-btn)}
+.zonas{background:#E8EDED}
+.zona[aria-pressed="true"]{box-shadow:0 1px 2px rgba(16,47,47,.10),0 3px 10px rgba(16,47,47,.10)}
+/* superfícies */
+.ped:hover,.pessoa:hover,.qd-card:hover{border-color:var(--line-strong);box-shadow:var(--sh-2)}
+.qd-col{background:#E9EEEE}
+.qd-col h2 small{background:#fff}
+.qd-caixa{background:var(--nota-soft)}
+.ult-a{border-color:var(--mp-petroleo-line)}
+#toast .toast,.toast{background:var(--mp-grafite)}
+.conf{box-shadow:0 24px 60px rgba(16,47,47,.28)}
+.pop{border:1px solid var(--line-strong);box-shadow:var(--sh-2)}
+.pop-fundo{background:rgba(16,47,47,.28)}
+/* barra de baixo (celular e tablet): branca, item ativo em petróleo claro, Novo pedido em petróleo */
+.nav{background:rgba(255,255,255,.94);border-top:1px solid var(--line)}
+.nb{color:var(--mp-ardosia)}
+.nb[aria-current="page"]{background:var(--blue-soft);color:var(--blue)}
+.nb.novo{background:var(--blue);color:#fff;box-shadow:0 1px 2px rgba(16,47,47,.3),0 8px 20px rgba(16,47,47,.2)}
+.nb.novo:hover{background:var(--blue-dark)}
+.nb.novo[aria-current="page"]{background:var(--blue-dark);color:#fff}
+@media (max-width:640px){.nb.novo{background:none;color:var(--blue);box-shadow:none}.nb.novo:hover{background:none}.nb.novo .nb-mais{background:var(--blue);box-shadow:0 4px 14px rgba(16,47,47,.32)}}
+.nav-marca{display:none}
+/* menu lateral em petróleo (computador e tablet deitado, 900 px ou mais) */
+@media (min-width:900px){
+  body:not(.sem-login):not(.chao) main{margin-left:var(--nav-w);padding-block:28px 48px}
+  .nav{top:0;bottom:0;right:auto;width:var(--nav-w);background:var(--mp-petroleo);border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0}
+  .nav .wrap{display:flex;flex-direction:column;align-items:stretch;gap:4px;max-width:none;width:100%;height:100%;margin:0;padding:22px 14px 20px;overflow-y:auto}
+  .nav-marca{display:block;order:-2;padding:4px 10px 22px;margin:0 0 12px;border-bottom:1px solid rgba(245,245,245,.12)}
+  .nav-marca img{display:block;width:180px;height:auto}
+  .nav .nb{flex:none!important;flex-direction:row;justify-content:flex-start;gap:12px;min-height:48px;padding:11px 14px;border-radius:10px;font-size:17px;font-weight:600;color:#C9D6D6;background:none;box-shadow:none}
+  .nav .nb svg.ic{width:24px;height:24px;stroke-width:2}
+  .nav .nb:hover{background:rgba(245,245,245,.08);color:#F5F5F5}
+  .nav .nb[aria-current="page"]{background:var(--mp-ardosia);color:#F5F5F5}
+  .nav .nb.novo{order:-1;justify-content:center;margin:0 0 14px;background:var(--mp-offwhite);color:var(--mp-petroleo);font-weight:700;box-shadow:none}
+  .nav .nb.novo:hover{background:#fff;color:var(--mp-petroleo)}
+  .nav .nb.novo[aria-current="page"]{background:#fff;color:var(--mp-petroleo)}
+  .nav .nb-i em{right:-10px}
+  .nav :focus-visible{outline-color:#F5F5F5}
+  body:not(.chao):not(.sem-login) #undoF{left:calc(var(--nav-w) + 16px);bottom:24px}
+  body.com-undo:not(.chao):not(.sem-login) main{padding-bottom:110px}
+  .toast{left:calc(50% + var(--nav-w) / 2)}
+}
+/* entrada e telas de conexão: fundo em petróleo, assinatura oficial e frase da marca; cartão claro com o formulário */
+.marca-login{display:none}
+body.sem-login:not(.pub){background:var(--mp-petroleo)}
+body.sem-login:not(.pub) main{padding-block:40px 40px}
+body.sem-login:not(.pub) .marca-login{display:grid;justify-items:center;gap:28px;margin:6vh auto 24px;text-align:center}
+.marca-login img{width:min(300px,80vw);height:auto}
+.marca-login p{margin:0;font-family:var(--font-serif);font-size:30px;line-height:1.15;color:#E9EFEF;font-weight:400}
+.marca-login p i{font-style:italic}
+body.sem-login .login,body.sem-login .conect{background:var(--card);border:0;border-radius:var(--r-lg);box-shadow:0 24px 60px rgba(5,3,27,.28);padding:28px 24px}
+body.sem-login .login{margin-top:0}
+body.sem-login .conect{margin:0 auto 40px;max-width:520px}
+body.tem-logo .login .mk-word{display:none}
+/* estados mantêm o significado: "Pronto, falta entregar" continua azul (não é seleção nem marca) */
+:root{--st-pronto:#1A3DA8;--st-pronto-soft:#E3EAFF}
+.u-pronto,.pill.adi{background:var(--st-pronto-soft);color:var(--st-pronto)}
+.qd-per.pronto,.cal-p.pronto{background:var(--st-pronto-soft);color:var(--st-pronto)}.qd-st.pronto{color:var(--st-pronto)}
+html:has(body.sem-login:not(.pub)){background:var(--mp-petroleo)}
+/* vista Quadro no computador: o menu vira uma faixa estreita (ícone e nome curto, símbolo oficial no topo) para caberem as colunas */
+.nav-marca .nm-simb{display:none}
+@media (min-width:900px){
+  body.qd-largo{--nav-w:92px}
+  body.qd-largo .nav .wrap{padding:16px 8px;gap:6px}
+  body.qd-largo .nav-marca{padding:2px 0 14px;margin:0 0 8px;display:flex;justify-content:center}
+  body.qd-largo .nav-marca .nm-logo{display:none}body.qd-largo .nav-marca .nm-simb{display:block;width:52px;height:auto}
+  body.qd-largo .nav .nb{flex-direction:column;justify-content:center;gap:4px;padding:10px 2px;font-size:16px;text-align:center;line-height:1.15}
+  body.qd-largo .nav .nb.novo{margin:0 0 8px;padding:10px 2px}
+  body.qd-largo .nav .nb.novo .nb-l{font-size:0}body.qd-largo .nav .nb.novo .nb-l::before{content:'Novo' / '';font-size:16px}
+  body.qd-largo .qd{grid-auto-columns:minmax(204px,1fr)}
+}
+/* ---------- Identidade MartinsPro v1.1: correções das três revisões (direção de arte, UX, front-end/QA) ---------- */
+:root{
+  --link:#1D6666;                                  /* link e ação de texto: 6,1:1 sobre Off-white, distinto do Grafite */
+  --st-and:#2350D8;--st-and-soft:#EBF0FF;          /* "Fazendo / em andamento": volta ao azul de estado de antes */
+  --line:#DCE3E3;--line-card:#D3DCDC;              /* limites de card visíveis para o público 60+ */
+  --r-badge:8px;--r-ctl:12px;--r-card:16px;        /* escala de raios: selo, controle, card */
+}
+/* impressão e PDF: os documentos voltam exatamente às métricas de antes (a tela mudou, o papel não) */
+.a4,.tq{font-feature-settings:'cv11','ss01';letter-spacing:-.005em}
+.a4 :is(h1,h2,h3),.tq :is(h1,h2,h3){letter-spacing:-.02em}
+
+/* links e ações de texto: cor própria + sublinhado, não parecem texto comum nem botão principal */
+.alrt-go,.ver-p,.junto-add,.olaQ,.como summary,.aj-seta,.he-mini{color:var(--link)}
+.alrt-go,.ver-p,.junto-add,.olaQ{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+.alrt-go{font-size:max(16px,1em)}
+.x.azul:hover{text-decoration:underline;text-underline-offset:3px}
+.x[aria-label^="Fechar"]{color:var(--ink)}       /* Fechar não é ação destrutiva: sai do vermelho (Tirar/Excluir continuam vermelhos) */
+
+/* seleção: um só padrão em toda a interface = fundo claro + borda petróleo + texto petróleo em negrito.
+   Petróleo cheio fica reservado à ação principal. */
+.vista-b[aria-pressed="true"],.subtab[aria-current="page"],.esc-ver .subtab[aria-pressed="true"],.zona[aria-pressed="true"].escuro,.tc-b[aria-pressed=true]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);font-weight:800;box-shadow:inset 0 0 0 1px var(--blue)}
+.vista-b[aria-pressed="true"] svg.ic,.subtab[aria-current="page"] svg.ic{color:var(--blue)}
+.zona[aria-pressed="true"]:not(.escuro){color:var(--blue);font-weight:800}
+
+/* estados que eram azuis voltam a ser azuis (não confundem com seleção nem com marca) */
+.nd.st-and{background:var(--st-and-soft);border-color:var(--st-and)}
+.nd.st-and .nd-s,.tp.and{color:var(--st-and)}
+.tp.and .tc{background:var(--st-and-soft);border-color:var(--st-and);color:var(--st-and)}
+.fl-azul .fl-st{background:var(--st-and)}.fl-azul .fl-ic{background:var(--st-and-soft);color:var(--st-and)}.fl-prim.fl-azul{border-color:var(--st-and)}
+/* não lido / aviso novo: fundo claro com barra petróleo à esquerda, sem moldura pesada */
+.av-item.novo,.novo-f{border:1px solid var(--line-card)!important;background:var(--blue-soft)!important;box-shadow:inset 4px 0 0 var(--blue)}
+/* hoje no calendário */
+.cal-d.hoje{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+
+/* ação principal = petróleo também no assistente de novo pedido e nas telas de entrada/conexão.
+   O verde continua só onde quer dizer "feito / em dia" (Terminei, Feito, produção). */
+.passos i.on{background:var(--blue)}
+[data-a="wNext"].big.go,.login .big.go,.conect .big.go{background:var(--blue);color:#fff;box-shadow:0 1px 2px rgba(16,47,47,.22),0 6px 16px rgba(16,47,47,.16)}
+[data-a="wNext"].big.go:hover,.login .big.go:hover,.conect .big.go:hover{background:var(--blue-dark)}
+
+/* superfícies: cards e listas com borda fina visível; menu "Mais" e avisos sem moldura de formulário */
+.card,.ped,.kpi,.pessoa,.qd-card{border-color:var(--line-card)}
+.menu-r,.av-item{border:1px solid var(--line-card);box-shadow:var(--sh-1)}
+.imp-box{border:1px solid var(--blue-line);background:var(--blue-soft)}
+.voltar{border-radius:var(--r-ctl)}
+.sheet .voltar{box-shadow:0 4px 14px rgba(16,47,47,.12)}
+.fl-bt.p{box-shadow:0 4px 12px rgba(16,47,47,.28)}
+.evt:not(.a4 *):not(.tq *){background:#fff;color:#B3261E;box-shadow:inset 0 0 0 1.5px currentColor}
+@media (max-width:640px){.ped-ent{padding-inline:16px}}
+
+/* barra de baixo: sombra em petróleo; marcador no item ativo */
+.nav{box-shadow:0 -4px 24px rgba(16,47,47,.06);border-top-color:rgba(16,47,47,.08)}
+@media (max-width:899px){.nav .nb[aria-current="page"]:not(.novo){font-weight:800;box-shadow:inset 0 3px 0 var(--blue)}}
+
+/* botão Novo da barra de baixo: o círculo saía cortado em cima (o botão cortava o que passava da borda) */
+@media (max-width:899px){.nav .nb.novo{overflow:visible}}
+/* foco de campo mais visível (borda 2px + halo 30%) */
+.campo:focus{outline:0;border-width:2px}
+
+/* tipografia da marca: títulos de seção em Archivo Expanded; saudação da tela Hoje em Instrument Serif */
+.sec-t,.grupo-h{font-family:var(--font-display);font-stretch:125%;font-weight:700;letter-spacing:0}
+.hj-tt h1{font-family:var(--font-serif);font-weight:400;font-size:32px;letter-spacing:0;line-height:1.1}
+@media (max-width:640px){.hj-tt h1{font-size:28px}}
+
+/* entrada em telas baixas (celular pequeno): assinatura e frase menores, botão de entrar visível sem rolar */
+@media (max-height:760px){
+  body.sem-login:not(.pub) .marca-login{margin:2vh auto 16px;gap:16px}
+  .marca-login img{width:min(220px,64vw)}
+  .marca-login p{font-size:24px}
+  body.sem-login:not(.pub) main{padding-block:16px 24px}
+}
+
+@media (min-width:900px){
+  /* item ativo do menu lateral: barra Off-white à esquerda + negrito (não depende só da cor) */
+  .nav .nb[aria-current="page"]:not(.novo){font-weight:800;box-shadow:inset 4px 0 0 var(--mp-offwhite)}
+  /* gestão: Painel do gestor e Cadastros direto no menu lateral (o "Mais" continua para Empresas, Como usar e Sair).
+     A permissão segue a mesma: o botão só leva à tela quem é da gestão (A.tela confere). */
+  body.com-hoje:not(.operacao) .nav .nb.lg{display:flex}
+  /* telas internas (pedido, novo pedido, menu): a faixa petróleo com a assinatura continua à esquerda,
+     então a marca não some e o conteúdo não pula de lugar. A faixa é só visual: não navega,
+     para não perder um pedido em preenchimento (o assistente não guarda rascunho). */
+  body:not(.sem-login):not(.chao) .sheet{left:var(--nav-w)}
+  body:not(.sem-login):not(.chao) .sheet::before{content:"";position:fixed;left:0;top:0;bottom:0;width:var(--nav-w);background:var(--mp-petroleo) var(--mp-logo,none) no-repeat 24px 26px/180px auto;z-index:-1;pointer-events:auto}
+  body.qd-largo:not(.sem-login):not(.chao) .sheet::before{background:var(--mp-petroleo) var(--mp-simb,none) no-repeat center 18px/52px auto}
+  /* abas do Painel do gestor numa linha só */
+  .g-abas.zonas{display:grid;grid-template-columns:repeat(6,minmax(0,1fr))}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1217,8 +1417,9 @@ button.qd-kpi{cursor:pointer}.qd-kpi b{font-size:28px;line-height:1}.qd-kpi span
 </svg>
 
 <input type="file" id="fArq" multiple hidden><input type="file" id="fImpF" accept="application/pdf,.pdf,.docx,.doc,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" multiple hidden><input type="file" id="fImpM" accept="image/*,application/pdf" multiple hidden><input type="file" id="fImpC" accept="application/pdf,.pdf" multiple hidden><input type="file" id="fImpM1" accept="image/*,application/pdf" hidden>
-<main><div class="wrap"><div id="sync" class="sync"></div></div><div class="wrap" id="app"></div></main>
+<main><div class="marca-login"></div><div class="wrap"><div id="sync" class="sync"></div></div><div class="wrap" id="app"></div></main>
 <nav class="nav" aria-label="Menu"><div class="wrap">
+  <div class="nav-marca" aria-hidden="true"></div>
   <button class="nb hj-nb" data-a="tela" data-t="hoje"><svg class="ic"><use href="#i-hoje"/></svg>Hoje</button>
   <button class="nb" data-a="tela" data-t="fabrica"><svg class="ic"><use href="#i-fabrica"/></svg>Fábrica</button>
   <button class="nb" data-a="tela" data-t="pedidos"><svg class="ic"><use href="#i-lista"/></svg>Pedidos</button>
@@ -1606,6 +1807,11 @@ const PROBS=[{k:'Gola torta',i:'i-gola',alvo:['gola','prepgola','cobregola']},{k
 /* ================= estado ================= */
 /* Cliente desta instalação: vem do build (clientes/<id>.json). Sem build = demonstração/testes, com acessos fictícios. */
 const CLIENTE=(typeof window!=='undefined'&&window.CLIENTE)||{id:'demo',nome:'Demonstração',admins:[{id:'u-helena',email:'helena@exemplo.test',nome:'Regina'},{id:'u-roger',email:'roger@exemplo.test',nome:'Marcos'}]};
+/* Identidade (11/2026): assinatura oficial negativa (off-white + traço vermelho) vinda de clientes/<id>.json › logoNeg.
+   Nunca se escreve o nome da marca em outra fonte no lugar do logo: sem o arquivo, o espaço fica vazio. */
+(()=>{const IMG=/^data:image\/(png|svg\+xml);base64,[A-Za-z0-9+\/=]+$/;const lg=CLIENTE&&IMG.test(CLIENTE.logoNeg||"")?CLIENTE.logoNeg:"";if(!lg)return;document.body.classList.add("tem-logo");
+  const nm=String(CLIENTE.nome||"").replace(/[<>&"]/g,"");const sb=IMG.test(CLIENTE.simboloNeg||"")?CLIENTE.simboloNeg:"";const R=document.documentElement.style;R.setProperty("--mp-logo",`url("${lg}")`);if(sb)R.setProperty("--mp-simb",`url("${sb}")`);const n=document.querySelector(".nav-marca");if(n)n.innerHTML=`<img class="nm-logo" src="${lg}" alt="">${sb?`<img class="nm-simb" src="${sb}" alt="">`:""}`;
+  const l=document.querySelector(".marca-login");if(l)l.innerHTML=`<img src="${lg}" alt="${nm}"><p>Vista sua equipe <i>de confiança</i></p>`})();
 const SUPORTE=()=>CLIENTE.suporte||'o suporte';
 const NOME_EMP=()=>(typeof state!=='undefined'&&state&&state.marca&&state.marca.nome)||CLIENTE.nome||'empresa';
 const gestoresTxt=()=>{const n=((typeof state!=='undefined'&&state&&state.usuarios)||[]).filter(u=>u.perfil==='gestao').map(u=>u.nome).filter(Boolean);return n.length?n.slice(0,3).join(' ou '):'alguém da gestão'};
@@ -2998,7 +3204,7 @@ function cAjustes(){const pr=state.params;
     <div class="aj-row"><span>Dúvidas sobre o app</span><button class="mbtn" data-a="ajuda">${ic('i-duvida')}Como usar</button></div></div>
   <div class="card"><h2>Onde ficam os dados</h2><p style="margin:0;color:var(--ink2)">${NV.modo==='nuvem'?'Na nuvem: todos os aparelhos veem as mesmas informações ao mesmo tempo.':'Só neste aparelho. Abra pelo link do sistema para usar a nuvem.'}</p>${NV.modo==='nuvem'?`<p id="casSt" style="margin:8px 0 0;color:var(--ink2)">${casTexto()}</p>`:''}</div>
   <div class="card"><h2>Sua empresa nos documentos</h2><p class="dica" style="margin:-4px 0 8px">Aparece no Pedido enviado ao cliente e nas fichas.</p>
-    <label class="aj-row"><span>Cor da marca no app</span><input type="color" class="cor-pick" data-marca="cor" value="${esc(/^#[0-9a-f]{6}$/i.test(marca().cor||'')?marca().cor:'#2350d8')}" aria-label="Cor da marca"></label>
+    <label class="aj-row"><span>Cor da marca no app</span><input type="color" class="cor-pick" data-marca="cor" value="${esc(/^#[0-9a-f]{6}$/i.test(marca().cor||'')?marca().cor:'#102F2F')}" aria-label="Cor da marca"></label>
     <div class="imp-h">${logoMarca(false)}<label class="mbtn neutro2" style="cursor:pointer">${ic('i-camera')}${marca().logo?'Trocar logo':'Pôr logo'}<input type="file" id="fLogo" accept="image/*" hidden></label>${marca().logo?'<button class="x" data-a="logoRm">Tirar logo</button>':''}</div>
     ${[['nome','Nome'],['sub','Frase abaixo do nome'],['whats','WhatsApp'],['tel','Telefone'],['email','E-mail'],['insta','Instagram'],['site','Site'],['end','Endereço'],['cnpj','CNPJ']].map(([k,n])=>`<label class="aj-row"><span>${n}</span><input class="campo" data-marca="${k}" value="${esc(marca()[k]||'')}" style="max-width:320px"></label>`).join('')}</div>
   <div class="card"><h2>Informações importantes do Pedido</h2><p class="dica" style="margin:-4px 0 8px">Textos da página “Antes de aprovar” que vai para o cliente.</p>
@@ -5131,7 +5337,7 @@ function qdVoltaRolagem(r){if(!r)return;const B=document.getElementById('qdCols'
    A rolagem para o lado fica só no quadro (a página nunca escorrega) e tem botões com texto. */
 function qdAjusta(){const larg=typeof state!=='undefined'&&state&&ui.tela==='pedidos'&&ui.pv==='qd'&&!!document.getElementById('qdCols');document.body.classList.toggle('qd-largo',larg);if(!larg)return;
   const B=document.getElementById('qdCols'),fixo=innerWidth>=1024;B.classList.toggle('qd-fixo',fixo);B.onscroll=qdNavAtualiza;qdNavAtualiza();
-  if(fixo){const nav=document.querySelector('.nav'),nt=nav&&getComputedStyle(nav).display!=='none'?nav.getBoundingClientRect().top:innerHeight,nh=nt<innerHeight&&nt>innerHeight-200?innerHeight-nt:0,top=B.getBoundingClientRect().top+scrollY;B.style.height=Math.max(240,innerHeight-Math.max(0,B.getBoundingClientRect().top)-nh-12)+'px';const sobra=B.getBoundingClientRect().bottom-(nt<innerHeight?nt:innerHeight)+8;if(sobra>0)B.style.height=Math.max(240,B.offsetHeight-sobra)+'px'}else B.style.height='';
+  if(fixo){const nav=document.querySelector('.nav'),nt=nav&&getComputedStyle(nav).display!=='none'?nav.getBoundingClientRect().top:innerHeight,nh=nt<innerHeight&&nt>innerHeight-200?innerHeight-nt:0,top=B.getBoundingClientRect().top+scrollY;B.style.height=Math.max(240,innerHeight-Math.max(0,B.getBoundingClientRect().top)-nh-12)+'px';const sobra=B.getBoundingClientRect().bottom-(nh?nt:innerHeight)+8;if(sobra>0)B.style.height=Math.max(240,B.offsetHeight-sobra)+'px'}else B.style.height='';
 }
 function qdNavAtualiza(){const B=document.getElementById('qdCols'),N=document.getElementById('qdNavR');if(!B||!N)return;const C=[...B.children].filter(x=>x.classList.contains('qd-col')),sobra=B.scrollWidth-B.clientWidth>4;N.hidden=!sobra;if(!sobra)return;
   const l=B.scrollLeft,r=l+B.clientWidth,vis=C.map((c,i)=>c.offsetLeft-C[0].offsetLeft>=l-4&&c.offsetLeft-C[0].offsetLeft+c.offsetWidth<=r+4?i:-1).filter(i=>i>=0);
