@@ -1227,8 +1227,8 @@ output,.kpi,.ped-ent,.resumo,.imp-g,.pill,.qd-kpi b,.qd-num{font-variant-numeric
 .nb.novo[aria-current="page"]{background:var(--blue-dark);color:#fff}
 @media (max-width:640px){.nb.novo{background:none;color:var(--blue);box-shadow:none}.nb.novo:hover{background:none}.nb.novo .nb-mais{background:var(--blue);box-shadow:0 4px 14px rgba(16,47,47,.32)}}
 .nav-marca{display:none}
-/* menu lateral em petróleo (computador, 1.100 px ou mais) */
-@media (min-width:1100px){
+/* menu lateral em petróleo (computador e tablet deitado, 900 px ou mais) */
+@media (min-width:900px){
   body:not(.sem-login):not(.chao) main{margin-left:var(--nav-w);padding-block:28px 48px}
   .nav{top:0;bottom:0;right:auto;width:var(--nav-w);background:var(--mp-petroleo);border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0}
   .nav .wrap{display:flex;flex-direction:column;align-items:stretch;gap:4px;max-width:none;width:100%;height:100%;margin:0;padding:22px 14px 20px;overflow-y:auto}
@@ -1266,7 +1266,7 @@ body.tem-logo .login .mk-word{display:none}
 html:has(body.sem-login:not(.pub)){background:var(--mp-petroleo)}
 /* vista Quadro no computador: o menu vira uma faixa estreita (ícone e nome curto, símbolo oficial no topo) para caberem as colunas */
 .nav-marca .nm-simb{display:none}
-@media (min-width:1100px){
+@media (min-width:900px){
   body.qd-largo{--nav-w:92px}
   body.qd-largo .nav .wrap{padding:16px 8px;gap:6px}
   body.qd-largo .nav-marca{padding:2px 0 14px;margin:0 0 8px;display:flex;justify-content:center}
@@ -1328,10 +1328,10 @@ html:has(body.sem-login:not(.pub)){background:var(--mp-petroleo)}
 
 /* barra de baixo: sombra em petróleo; marcador no item ativo */
 .nav{box-shadow:0 -4px 24px rgba(16,47,47,.06);border-top-color:rgba(16,47,47,.08)}
-@media (max-width:1099px){.nav .nb[aria-current="page"]:not(.novo){font-weight:800;box-shadow:inset 0 3px 0 var(--blue)}}
+@media (max-width:899px){.nav .nb[aria-current="page"]:not(.novo){font-weight:800;box-shadow:inset 0 3px 0 var(--blue)}}
 
 /* botão Novo da barra de baixo: o círculo saía cortado em cima (o botão cortava o que passava da borda) */
-@media (max-width:1099px){.nav .nb.novo{overflow:visible}}
+@media (max-width:899px){.nav .nb.novo{overflow:visible}}
 /* foco de campo mais visível (borda 2px + halo 30%) */
 .campo:focus{outline:0;border-width:2px}
 
@@ -1348,7 +1348,7 @@ html:has(body.sem-login:not(.pub)){background:var(--mp-petroleo)}
   body.sem-login:not(.pub) main{padding-block:16px 24px}
 }
 
-@media (min-width:1100px){
+@media (min-width:900px){
   /* item ativo do menu lateral: barra Off-white à esquerda + negrito (não depende só da cor) */
   .nav .nb[aria-current="page"]:not(.novo){font-weight:800;box-shadow:inset 4px 0 0 var(--mp-offwhite)}
   /* gestão: Painel do gestor e Cadastros direto no menu lateral (o "Mais" continua para Empresas, Como usar e Sair).
