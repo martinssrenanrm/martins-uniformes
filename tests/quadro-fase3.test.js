@@ -12,19 +12,19 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   const T=await A.evaluate(()=>{const p=state.pedidos.find(p=>!p.concluido&&!p.cancelado&&lotesDe(p.id).length);const l=lotesDe(p.id)[0];l.qr='ab12cd34ef56ab12cd34ef56ab12cd';
     p.etq=['urgente'];qdCkGarante(p);p.ck[0].itens[0].ok=true;p.ck[0].itens[0].por='Regina';p.ck[0].itens[0].em=now();p.resp=[state.usuarios[1].id];p.coment=[{id:'c1',t:'COMENTARIO INTERNO',ts:now(),por:'x',m:[]}];save();
     return {tok:l.qr,id:p.id,qdc:p.qdc,col:qdColDe(p).nome}});
-  ok(T.qdc&&T.qdc.n===T.col&&T.qdc.r.length===1&&/ - /.test(T.qdc.t),'ao salvar, o pedido guarda a coluna, o título e os responsáveis para o QR ('+T.qdc.n+')');
+  ok(T.qdc&&T.qdc.n===T.col&&!T.qdc.r&&Array.isArray(T.qdc.ck)&&/ - /.test(T.qdc.t),'ao salvar, o pedido guarda a coluna, o título e a contagem do checklist para o QR, sem nomes ('+T.qdc.n+')');
   const Q=await ctx.newPage();Q.on('pageerror',e=>erros.push('QR: '+e.message));await Q.goto(APP+'#f='+T.tok);await Q.waitForTimeout(1500);
   let r=await Q.evaluate(()=>{const c=document.querySelector('.pub-qd');return {tem:!!c,txt:c?c.innerText:'',body:document.body.innerText,link:!!document.querySelector('a[href*="#pedido="]')}});
-  ok(r.tem&&r.txt.includes(T.qdc.n)&&/Urgente/.test(r.txt)&&/1\/\d+/.test(r.txt)&&/Marcado por Regina/.test(r.txt),'quem lê o QR vê o cartão: coluna, etiqueta e checklist com quem marcou');
+  ok(r.tem&&r.txt.includes(T.qdc.n)&&/Urgente/.test(r.txt)&&/1\/\d+/.test(r.txt)&&/Feito em/.test(r.txt)&&!/Regina/.test(r.txt),'quem lê o QR vê o cartão: coluna, etiqueta e checklist com a data, sem o nome de quem marcou');
   ok(!/COMENTARIO INTERNO/.test(r.body)&&/entre no app/.test(r.txt),'sem comentários; para marcar, precisa entrar no app');ok(r.link,'link "Abrir este pedido no app" para quem tem acesso');
   const sql=fs.readFileSync(path.join(__dirname,'../supabase/migrations/017_qr_cartao.sql'),'utf8');
-  ok(/'qdc', p->'qdc'/.test(sql)&&/'ck', p->'ck'/.test(sql)&&/'etq', p->'etq'/.test(sql)&&/'quadro', cfg->'quadro'/.test(sql)&&/'link', data->>'link'/.test(sql)&&!/coment/.test(sql.replace(/^--.*$/mg,'')),'migração 017 manda ao QR o cartão (sem comentários)');
+  ok(/'qdc', \(p->'qdc'\) - 'r'/.test(sql)&&/'ck', public.ck_publico\(p->'ck'\)/.test(sql)&&/'etq', p->'etq'/.test(sql)&&/'quadro', cfg->'quadro'/.test(sql)&&/'link', data->>'link'/.test(sql)&&!/coment/.test(sql.replace(/^--.*$/mg,'')),'migração 017 manda ao QR o cartão (sem comentários e sem nomes de quem trabalhou)');
 
   console.log('2) Avisos "Para você"');
   r=await A.evaluate(id=>{const p=pedById(id);const u1=state.usuarios[1];p.resp=[];A.qdResp({id,u:u1.id});A.cmEnvia&&(ui.sheet={t:'pedido',id},render(),document.getElementById('cmNovo').value='Confere a linha @'+uNomeQ(u1),A.cmEnvia({id}));
     p.entrega=now()+DIA;p.lemb=2;save();return u1.id},T.id);
-  await ent(1);r=await A.evaluate(()=>{const u=usuarioAtual(),N=notifsNovas(u);document.querySelector('.sino').click();const pop=document.getElementById('pop').innerText;return {k:N.map(n=>n.k).sort().join(','),pop:/Para você/.test(pop)&&/pôs você como responsável/.test(pop)&&/avisou você/.test(pop),badge:document.querySelector('.sino em')?.textContent}});
-  ok(r.k.includes('resp')&&r.k.includes('menc')&&(r.k.includes('prazo')||r.k.includes('atraso')),'avisos: posto como responsável, avisado num comentário e prazo ('+r.k+')');ok(r.pop&&+r.badge>=3,'aparecem no sininho, em "Para você", com o número ('+r.badge+')');
+  await ent(1);r=await A.evaluate(()=>{const u=usuarioAtual(),N=notifsNovas(u);document.querySelector('.sino').click();const pop=document.getElementById('pop').innerText;return {k:N.map(n=>n.k).sort().join(','),pop:/Marcar todos como vistos/.test(pop)&&!/Nenhum aviso novo/.test(pop)&&/pôs você como responsável/.test(pop)&&/avisou você/.test(pop),badge:document.querySelector('.sino em')?.textContent}});
+  ok(r.k.includes('resp')&&r.k.includes('menc')&&(r.k.includes('prazo')||r.k.includes('atraso')),'avisos: posto como responsável, avisado num comentário e prazo ('+r.k+')');ok(r.pop&&+r.badge>=3,'aparecem no sininho como novos, sem "Nenhum aviso novo", com o número ('+r.badge+')');
   r=await A.evaluate(id=>{document.querySelector(`#pop [data-a=ntAbrir][data-id="${id}"]`).click();const t=ui.sheet&&ui.sheet.t;return {t,n:notifsNovas(usuarioAtual()).filter(n=>n.p.id===id).length}},T.id);
   ok(r.t==='pedido'&&r.n===0,'tocar no aviso abre o pedido e ele deixa de ser novo');
   r=await A.evaluate(id=>{const u=usuarioAtual();const p=pedById(id);p.lemb=0;p.ntVisto={};return notifsDe(u).filter(n=>n.p.id===id).map(n=>n.k).join(',')},T.id);ok(!/prazo/.test(r),'"Não avisar" desliga o aviso de prazo');
@@ -39,9 +39,9 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
   await A.evaluate(()=>{qdF().pz=[];render()});
 
   console.log('4) Caixa de entrada');
-  r=await A.evaluate(()=>{ui.pv='qd';render();document.getElementById('ntNova').value='Escola X quer 80 camisetas para março';A.ntAdd();const n=state.notas.find(x=>/Escola X/.test(x.t));const doc=Object.keys(paraDocs(state)).some(k=>k==='notas/'+n.id);
+  r=await A.evaluate(()=>{ui.pv='qd';render();const fechada=!document.getElementById('ntNova');A.qdIr({c:'caixa'});window.__fech=fechada;document.getElementById('ntNova').value='Escola X quer 80 camisetas para março';A.ntAdd();const n=state.notas.find(x=>/Escola X/.test(x.t));const doc=Object.keys(paraDocs(state)).some(k=>k==='notas/'+n.id);
     const vis=[...document.querySelectorAll('.qd-caixa .qd-nota')].some(e=>/Escola X/.test(e.textContent));A.ntVira({id:n.id});const w=ui.sheet&&ui.sheet.w;return {por:n.por,doc,vis,obs:w&&w.obs,nota:w&&w.nota===n.id,id:n.id}});
-  ok(r.vis&&r.por&&r.doc,'anotação guardada (documento próprio em notas/) e aparece na Caixa de entrada');ok(r.obs&&/Escola X/.test(r.obs)&&r.nota,'Virar pedido abre o Novo pedido com a anotação nas Observações');
+  ok(r.vis&&r.por&&r.doc,'anotação guardada (documento próprio em notas/) e aparece na Caixa de entrada');ok(await A.evaluate(()=>window.__fech),'Caixa de entrada vazia fica recolhida (abre pelo botão)');ok(r.obs&&/Escola X/.test(r.obs)&&r.nota,'Virar pedido abre o Novo pedido com a anotação nas Observações');
   r=await A.evaluate(nid=>{const p=state.pedidos[0];notaVirou(nid,p.id);ui.sheet=null;render();const n=state.notas.find(x=>x.id===nid);return {feito:n.feito&&n.feito.ped===p.id,some:![...document.querySelectorAll('.qd-caixa .qd-nota')].some(e=>/Escola X/.test(e.textContent)),h:qdHistLista(p).some(e=>/anotação/.test(e.t))}},r.id);
   ok(r.feito&&r.some&&r.h,'depois de virar pedido, sai da caixa e fica no histórico do pedido');
   r=await A.evaluate(()=>{document.getElementById('ntNova').value='teste tirar';A.ntAdd();const n=state.notas.find(x=>x.t==='teste tirar');document.querySelector(`[data-a=ntRm][data-id="${n.id}"]`).click();const pede=!!ui.conf;A.confSim();return {pede,feito:!!n.feito,existe:state.notas.includes(n)}});

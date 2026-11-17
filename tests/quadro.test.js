@@ -41,9 +41,9 @@ const CLI={id:'teste',nome:'Confecção Teste',admins:[{id:'u-a',email:'a@teste.
   console.log('3) Cartão, busca e filtros');
   const Q=await A.evaluate(()=>{const p=state.pedidos.find(p=>!p.concluido&&!p.cancelado&&lotesDe(p.id).length>0);return p.id});
   r=await A.evaluate(id=>{const p=pedById(id);p.ficha='6262';p.entrega=now()-DIA;p.evento=true;ui.qf=null;render();const c=[...document.querySelectorAll('.qd-card')].find(e=>e.dataset.id===id);
-    return {t:c.querySelector('.qd-t').textContent,per:c.querySelector('.qd-per').className,etq:[...c.querySelectorAll('.qd-etq')].map(e=>e.textContent),ck:c.querySelector('.qd-rod').textContent.trim(),tit:qdTitulo(p)}},Q);
-  ok(/^6262 .+ - \S/.test(r.t),'título "NÚMERO CLIENTE - produtos" ('+r.t+')');
-  ok(/crit/.test(r.per),'entrega passada → período em vermelho');ok(r.etq.includes('EVENTO'),'pedido para evento mostra a etiqueta EVENTO');ok(/0\/7/.test(r.ck),'progresso do checklist no cartão ('+r.ck+')');
+    return {t:c.querySelector('.qd-t').textContent,prod:(c.querySelector('.qd-prod')||{}).textContent||'',per:c.querySelector('.qd-per').className,etq:[...c.querySelectorAll('.qd-etq')].map(e=>e.textContent),ck:c.querySelector('.qd-rod').textContent.trim(),tit:qdTitulo(p)}},Q);
+  ok(/^6262 \S/.test(r.t)&&r.prod.length>2&&/^6262 .+ - \S/.test(r.tit),'cartão: número e cliente em destaque, peças embaixo; título completo "NÚMERO CLIENTE - produtos" ('+r.t+' / '+r.prod+')');
+  ok(/crit/.test(r.per),'entrega passada → período em vermelho');ok(r.etq.includes('EVENTO'),'pedido para evento mostra a etiqueta EVENTO');ok(!/0\/7/.test(r.ck),'checklist sem nada marcado não aparece no cartão (sem "0/7" em todo cartão)');
   r=await A.evaluate(id=>{const p=pedById(id);p.entrega=now()+DIA;RC={};const a=qdPrazo(p);p.entrega=now()+20*DIA;const b=qdPrazo(p);p.concluido=now();const c=qdPrazo(p);p.concluido=null;return [a,b,c]},Q);
   ok(r[0]==='warn'&&r[1]===''&&r[2]==='ok','amarelo perto de vencer, neutro com folga, verde quando entregue');
   await A.fill('#qdBusca','6262');r=await A.evaluate(()=>[...document.querySelectorAll('.qd-card')].map(e=>e.dataset.id));ok(r.length===1&&r[0]===Q,'busca pelo número acha só aquele pedido');
@@ -57,7 +57,7 @@ const CLI={id:'teste',nome:'Confecção Teste',admins:[{id:'u-a',email:'a@teste.
 
   console.log('4) No pedido: etiquetas, responsáveis, checklist e histórico');
   await A.evaluate(id=>{document.querySelector(`.qd-card[data-id="${id}"]`).click()},Q);await A.waitForTimeout(200);
-  r=await A.evaluate(()=>({t:ui.sheet&&ui.sheet.t,aberto:!!document.querySelector('details[data-blk^="qd"][open]')}));ok(r.t==='pedido'&&r.aberto,'tocar no cartão abre o pedido com o bloco do quadro aberto');
+  r=await A.evaluate(()=>{const d=document.querySelector('details[data-blk^="qd"]');const o={t:ui.sheet&&ui.sheet.t,fechado:d&&!d.open};if(d)d.open=true;return o});ok(r.t==='pedido'&&r.fechado,'tocar no cartão abre o pedido; o bloco do quadro vem fechado (não empurra o resto para baixo)');
   r=await A.evaluate(id=>{const u=state.usuarios[1];document.querySelector(`[data-a=qdResp][data-u="${u.id}"]`).click();document.querySelector('[data-a=qdEtq][data-e=urgente]').click();document.querySelector('[data-a=qdEtq][data-e=evento]').click();
     const p=pedById(id);return {resp:p.resp,etq:p.etq,evento:p.evento,ev:EV.fila.map(e=>e.tipo)}},Q);
   ok(r.resp.length===1&&r.etq.includes('urgente')&&r.evento===false,'responsável e etiqueta entram; EVENTO desmarca o "pedido para evento"');
@@ -80,8 +80,8 @@ const CLI={id:'teste',nome:'Confecção Teste',admins:[{id:'u-a',email:'a@teste.
   r=await A.evaluate(()=>{const c=QD().cols[2];A.qdColRen({c:c.id});document.getElementById('qdCfgNome').value='Mesa de corte';A.qdColRenOk({c:c.id});const nome=QD().cols[2].nome;
     A.qdColOff({c:QD().cols[1].id});const esc=QD().cols[1].off;const id=state.pedidos.find(p=>!p.cancelado).id;
     A.qdEtqAdd&&(document.getElementById('qdEtqNova').value='Amostra',A.qdEtqAdd());const etq=QD().etq.map(e=>e.nome);
-    document.getElementById('qdCkTxt').value='Começo: Tem mockup?; Fez ficha?\nFim: Embalou?';A.qdCkSalva();return {nome,esc,etq,ck:QD().ck,gravou:!!state.quadro}});
-  ok(r.nome==='Mesa de corte'&&r.esc,'renomear e esconder coluna');ok(r.etq.includes('Amostra'),'criar etiqueta');ok(r.ck.length===2&&r.ck[0].itens.length===2&&r.ck[1].nome==='Fim','checklist padrão pelo texto');
+    const n0=QD().ck.length;document.getElementById('qdCkNovoG').value='Fim';A.qdCkCfg({o:'gadd'});const gi=QD().ck.length-1;document.getElementById('qdCkNovo-'+gi).value='Embalou?';A.qdCkCfg({o:'iadd',g:String(gi)});const inp=document.querySelector('[data-ckcfg="g|0"]');inp.value='Começo';inp.dispatchEvent(new Event('change',{bubbles:true}));window.__n0=n0;return {nome,esc,etq,ck:QD().ck,gravou:!!state.quadro}});
+  ok(r.nome==='Mesa de corte'&&r.esc,'renomear e esconder coluna');ok(r.etq.includes('Amostra'),'criar etiqueta');ok(r.ck[r.ck.length-1].nome==='Fim'&&r.ck[r.ck.length-1].itens[0]==='Embalou?'&&r.ck[0].nome==='Começo','checklist padrão editado por campos: grupo novo, item novo e nome mudado');
   r=await A.evaluate(()=>{const t=state.tipos.find(t=>faseT(t.id)==='costura');const c=QD().cols.find(c=>c.tipo==='prod'&&c.id!=='s-'+t.grupo);A.qdMaqCol({m:t.id,v:c.id});return QD().cols[qdIdxEtapa({posto:t.id},QD())].id===c.id});
   ok(r,'mudar a coluna de uma máquina');
   r=await A.evaluate(()=>{state.modOff=['quadro'];ui.tela='pedidos';ui.pv='qd';render();const s={bt:!!document.querySelector('.vista-b[data-v=qd]'),qd:!!document.getElementById('qdBoard'),cfg:(ui.tela='cadastros',render(),!!document.getElementById('Quadro'))};state.modOff=[];return s});
