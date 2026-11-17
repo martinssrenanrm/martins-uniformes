@@ -161,3 +161,15 @@ Risco de estranhamento: **baixo**. Telas novas (Calendário, Caixa de entrada) e
 | Quadro › Caixa de entrada | ✅ | ✅ Guardar anotação / Virar pedido | ✅ (teste) | ✅ aviso | ✅ Tirar pede confirmação e não apaga | ✅ |
 | Ajustes › Importar do Trello | ✅ explica onde exportar | ✅ Importar (verde) | ✅ | ✅ aviso com o que entrou | ✅ mostra antes; "Não importar"; importar de novo não repete | ✅ |
 Prints: `docs/ux/prints/quadro/qr-cartao-*.png`, `para-voce-*.png`, `calendario-*.png`, `caixa-*.png`.
+
+### Correções da auditoria (16/11/2026)
+Risco de estranhamento: **médio** no quadro do computador (muda o visual, não o fluxo) e **baixo** no resto. O botão "Pedidos" da chave de vistas passou a se chamar "Lista".
+| Tela | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Quadro no PC | ✅ 8 colunas em 1.920 px; nome das que faltam | ✅ "Próximas colunas" com texto | ✅ 48 px; página não escorrega (teste em 8 tamanhos) | n/a | ✅ Voltar | ✅ |
+| Cartão | ✅ número + cliente + "Atrasado N dias úteis" / "Pronto, falta entregar" / "Falta: …" | ✅ o cartão inteiro abre o pedido | ✅ | n/a | ✅ | ✅ |
+| Pedidos (cabeçalho 360–1.099 px) | ✅ Lista · Quadro · Calendário · Empresas escritos | ✅ | ✅ 48 px, sininho sempre visível | n/a | ✅ | ✅ |
+| Calendário no celular | ✅ lista por dia | ✅ | ✅ nada espremido | n/a | ✅ Hoje | ✅ |
+| Sininho | ✅ "Avisos · N novos" | ✅ Marcar todos como vistos | ✅ | ✅ aviso "Avisos marcados como vistos" | ✅ | ✅ |
+| Ajustes › Quadro | ✅ | ✅ botões com texto; checklist em campos | ✅ | ✅ | ✅ Tirar pede confirmação | ✅ |
+Prints antes e depois: `docs/ux/prints/auditoria/`.

@@ -897,3 +897,34 @@ Cada sugestão diz **o porquê** e tem um botão que leva para resolver. Quem ca
 **Trazer do Trello (gestão):** Cadastros › Ajustes › Quadro de pedidos › Importar do Trello. O cartão com o número de um pedido leva para ele as etiquetas, o checklist, os comentários e os anexos (como link). Os outros vão para a Caixa de entrada. O app mostra antes o que vai entrar e importar de novo não repete nada.
 
 **O que NÃO mudou:** a lista de Pedidos, o Quadro e o pedido continuam no mesmo lugar.
+
+## Quadro mais fácil de usar (correções da revisão de 16/11)
+
+**No computador:**
+- O quadro agora **usa a tela inteira**. Numa tela grande aparecem as **8 colunas de uma vez**; numa tela menor aparecem 5 ou 6.
+- Quando não cabem todas, use **Próximas colunas** e **Colunas anteriores**. Ao lado aparece o nome das colunas que estão fora da vista.
+- Cada coluna rola por dentro, e o nome dela fica sempre à vista.
+- A página não escorrega mais para o lado.
+
+**Nos cartões:**
+- A foto ficou menor, então cabem mais pedidos na tela.
+- O número e o cliente aparecem em destaque e as peças logo embaixo.
+- Embaixo das datas vem escrito, por exemplo, **"Atrasado 6 dias úteis"**, **"Vence amanhã"** ou **"Pronto, falta entregar"** (este em azul: a produção terminou, só falta entregar).
+- Em Início e Compra, o cartão diz **o que falta** (ficha e mockup, arte aprovada, material para cortar).
+- O "0/16" do checklist só aparece depois que alguém marca algum item.
+
+**Caixa de entrada:** quando está vazia, vira um botão (**Caixa de entrada 0**) e não ocupa uma coluna.
+
+**No pedido:** o bloco **Quadro: etiquetas e checklist** vem fechado, mostrando as etiquetas e os responsáveis. **Comentários** e **Histórico** foram para o fim, depois de Peças e etapas. No checklist, ao lado de cada etapa aparece, por exemplo, **"a produção já passou desta etapa"**. É só um aviso: não marca nada.
+
+**Sininho:** os avisos novos ficam numa lista só, com **Marcar todos como vistos**. O aviso de prazo não volta como novo todo dia. Ele só volta se o pedido atrasar ou a data de entrega mudar.
+
+**Pedidos:** os botões de cima agora se chamam **Lista · Quadro · Calendário · Empresas**, sempre com o nome escrito. Ao voltar para Pedidos, abre sempre a **Lista**.
+
+**Calendário no celular e no tablet:** mostra a lista das entregas, dia por dia.
+
+**QR code da etiqueta:** mostra o checklist sem o nome de quem marcou (só a data). Se o cartão ainda não estiver disponível, a ficha avisa, em vez de mostrar um checklist vazio.
+
+**Duas pessoas no mesmo pedido:** se duas pessoas marcam o checklist ou comentam no mesmo pedido ao mesmo tempo, as duas mudanças ficam. Antes, uma podia sumir.
+
+**Anexos do Trello:** em Cadastros › Ajustes › Quadro de pedidos aparece a lista dos anexos que ainda estão guardados só no Trello, com **Tentar copiar** e **Enviar a cópia**. Só cancele o Trello quando essa lista estiver vazia.
