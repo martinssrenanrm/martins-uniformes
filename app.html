@@ -1276,6 +1276,7 @@ html:has(body.sem-login:not(.pub)){background:var(--mp-petroleo)}
   body.qd-largo .nav .nb.novo .nb-l{font-size:0}body.qd-largo .nav .nb.novo .nb-l::before{content:'Novo' / '';font-size:16px}
   body.qd-largo .qd{grid-auto-columns:minmax(204px,1fr)}
 }
+.ca-puxa-l{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}.ca-puxa-l .campo{max-width:220px;margin:0}.ca-puxa .aviso{margin-top:10px}
 /* ---------- Identidade MartinsPro v1.1: correções das três revisões (direção de arte, UX, front-end/QA) ---------- */
 :root{
   --link:#1D6666;                                  /* link e ação de texto: 6,1:1 sobre Off-white, distinto do Grafite */
@@ -3508,7 +3509,7 @@ function sNovo(){const w=ui.sheet.w,passos=`<div class="passos">${[1,2,3,4].map(
     <div class="rotulo">CNPJ</div><input class="campo" id="wCnpj" value="${esc(w.cnpj||'')}" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off">
     <div class="rotulo">Nº do pedido no Conta Azul</div><input class="campo" id="wFicha" value="${esc(w.ficha||'')}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off" style="max-width:260px">
     <div class="rotulo">Quem vendeu?</div>${selOp('wVend','',w.vend,state.pessoas.filter(p=>temPapel(p,'vendas')||p.id===w.vend).map(p=>[p.id,p.nome]),'Escolha quem vendeu')}${nav()}`;
-  if(w.step===1)return `${head}<div class="imp-box"><b>Tem o pedido do Conta Azul ou a ficha (PDF ou Word)?</b><span>O sistema lê o arquivo e preenche o pedido para você conferir. Do Conta Azul, use o PDF do orçamento ou do pedido. Pode escolher as fichas e os mockups juntos.</span><div class="imp-bar" style="margin:6px 0 0"><button class="mbtn mod-imp" data-a="impFichas">${ic('i-lista')}Importar fichas</button><button class="mbtn neutro2" data-a="impMocks">${ic('i-camisa')}Importar mockups</button></div></div><h1>Para quem é o pedido?</h1><div class="rotulo" style="margin-top:0">Nome da empresa</div><input class="campo" id="wCli" value="${esc(w.cliente)}" placeholder="Ex.: Hospital Santa Clara" autocomplete="off"><div id="wCliSug" class="linha-dep" style="margin-top:8px">${sugClientes(w.cliente,w.cli)}</div>
+  if(w.step===1)return `${head}${cavPode()?`<div class="imp-box ca-puxa"><b>Tem o número da venda no Conta Azul?</b><span>Digite o número e o app puxa a venda: empresa, CNPJ, quem vendeu, peças, quantidades, valores e parcelas. Você confere antes de criar.</span><div class="ca-puxa-l"><input class="campo" id="wCaNum" value="${esc(w.caNum||'')}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off" aria-label="Número da venda no Conta Azul"><button class="mbtn" data-a="wPuxaCA"${w.caBusca?' disabled':''}>${w.caBusca?'Buscando…':'Puxar venda'}</button></div>${w.caErr?`<div class="aviso">${ic('i-alerta')}${esc(w.caErr)}</div>`:''}</div>`:''}<div class="imp-box"><b>Tem o pedido do Conta Azul ou a ficha (PDF ou Word)?</b><span>O sistema lê o arquivo e preenche o pedido para você conferir. Do Conta Azul, use o PDF do orçamento ou do pedido. Pode escolher as fichas e os mockups juntos.</span><div class="imp-bar" style="margin:6px 0 0"><button class="mbtn mod-imp" data-a="impFichas">${ic('i-lista')}Importar fichas</button><button class="mbtn neutro2" data-a="impMocks">${ic('i-camisa')}Importar mockups</button></div></div><h1>Para quem é o pedido?</h1><div class="rotulo" style="margin-top:0">Nome da empresa</div><input class="campo" id="wCli" value="${esc(w.cliente)}" placeholder="Ex.: Hospital Santa Clara" autocomplete="off"><div id="wCliSug" class="linha-dep" style="margin-top:8px">${sugClientes(w.cliente,w.cli)}</div>
     <div class="rotulo">Nome do cliente (contato)</div><input class="campo" id="wCont" value="${esc(w.contato||'')}" placeholder="Ex.: Ana Souza" autocomplete="off">
     <div class="rotulo">CNPJ</div><input class="campo" id="wCnpj" value="${esc(w.cnpj||'')}" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off">
     <div class="rotulo">Nº do pedido no Conta Azul</div><input class="campo" id="wFicha" value="${esc(w.ficha||'')}" placeholder="Ex.: 6218" inputmode="numeric" autocomplete="off" style="max-width:260px">
@@ -5665,6 +5666,19 @@ const A={
   cavAbrir:()=>{cavCarrega(true);openSheet({t:'cav',lig:null})},
   cavLiga:d=>{ui.sheet.lig=d.n||null;render();if(d.n)setTimeout(()=>{const e=document.getElementById('cav-'+d.n);if(e)e.scrollIntoView({block:'start'})},30)},
   cavLigaOk:d=>{const p=pedById(d.id);if(!cavLigar(d.n,d.id))return;if(ui.sheet)ui.sheet.lig=null;commit();toast(`Venda ${d.n} ligada ao pedido de ${p.cliente}`,true)},
+  /* Novo pedido › "Puxar venda": o número da venda do Conta Azul abre a mesma conferência de "Criar pedido" das Vendas do Conta Azul sem pedido. Só lê. */
+  wPuxaCA:async()=>{const w=ui.sheet&&ui.sheet.t==='novo'&&ui.sheet.w;if(!w||w.caBusca)return;const n=((document.getElementById('wCaNum')||{}).value||'').replace(/\D/g,'');w.caNum=n;w.caErr='';
+    if(!n){w.caErr='Digite o número da venda do Conta Azul.';render();return}
+    const ja=state.pedidos.find(p=>fichasDe(p).includes(n));if(ja){w.caErr=`A venda ${n} já tem pedido no sistema (${ja.cliente||'sem nome'}). Abra esse pedido em Pedidos para não duplicar.`;render();return}
+    if(!cavPode()){w.caErr='A busca das vendas do Conta Azul não está disponível para você.';render();return}
+    w.caBusca=true;render();let v=cavVenda(n),erro='';
+    if(!v)try{const L=await NV.db.ev.vendasPedido(new Date(now()-400*DIA).toISOString().slice(0,10));v=(Array.isArray(L)?L:[]).find(x=>cavNum(x)===n)||null}
+      catch(e){erro=e&&e.code==='sem-cav'?'A busca das vendas do Conta Azul não está ligada neste sistema.':'Não consegui buscar a venda. Verifique a internet e tente de novo.'}
+    w.caBusca=false;if(!ui.sheet||ui.sheet.w!==w)return;
+    if(!erro&&!v)erro=`Não achei a venda ${n} entre as vendas aprovadas ou faturadas do Conta Azul. Confira o número. Se ela foi aprovada agora há pouco, espere a próxima atualização das vendas e tente de novo.`;
+    if(erro){w.caErr=erro;render();return}
+    const g=grupoCA(cavFicha(v));g.venda=cavNum(v);openSheet({t:'imp',gi:0,grupos:[g]});
+    if(!(v.itens&&v.itens.length))toast('As peças desta venda ainda não chegaram do Conta Azul. Confira e complete antes de criar.')},
   cavFora:d=>{cavDispensa(d.n,true);commit();toast(`Venda ${d.n} saiu da lista`,true)},
   cavVolta:d=>{cavDispensa(d.n,false);commit();toast(`Venda ${d.n} voltou para a lista`)},
   cavCriar:d=>{const v=cavVenda(d.n);if(!v)return;if(cavPedidos(v).length){toast(`A venda ${d.n} já tem pedido`);return}const g=grupoCA(cavFicha(v));g.venda=cavNum(v);openSheet({t:'imp',gi:0,grupos:[g],volta:'cav'})},
