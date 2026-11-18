@@ -1,10 +1,11 @@
 // Teste: fase 3 do quadro (16/11): cartão do pedido no QR code (sem login), avisos "Para você" no sininho, calendário com resumo,
 // Caixa de entrada (anotação que vira pedido) e importação do JSON do Trello (sem repetir ao importar de novo).
+// (espera o app carregar antes de usar seed(): no GitHub o carregamento às vezes passa de 1,2 s)
 // Rodar: NODE_PATH=$(npm root -g) node tests/quadro-fase3.test.js
 const { chromium } = require('playwright');const path=require('path'),fs=require('fs');
 const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=(c,m)=>{console.log((c?'  ✔ ':'  ✘ ')+m);if(!c)falhas++};
 (async()=>{const b=await chromium.launch();const erros=[];const ctx=await b.newContext({viewport:{width:1100,height:900}});
-  const A=await ctx.newPage();A.on('pageerror',e=>erros.push(e.message));await ctx.addInitScript(()=>{window.claude={use:async()=>null}});await A.goto(APP);await A.waitForTimeout(1200);
+  const A=await ctx.newPage();A.on('pageerror',e=>erros.push(e.message));await ctx.addInitScript(()=>{window.claude={use:async()=>null}});await A.goto(APP);await A.waitForFunction(()=>typeof seed==="function"&&typeof normalizar==="function"&&typeof render==="function",null,{timeout:60000});await A.waitForTimeout(1200);
   const ent=(i)=>A.evaluate(i=>{const u=state.usuarios[i];SESSAO={id:u.id,email:u.email};ui.sheet=null;ui.sino=false;render()},i);
   await A.evaluate(()=>{seed();state=normalizar(state);NV.pronto=true;ui.tela='pedidos';ui.pv='qd'});await ent(0);
 
@@ -13,7 +14,7 @@ const APP='file://'+path.resolve(__dirname,'../app.html');let falhas=0;const ok=
     p.etq=['urgente'];qdCkGarante(p);p.ck[0].itens[0].ok=true;p.ck[0].itens[0].por='Regina';p.ck[0].itens[0].em=now();p.resp=[state.usuarios[1].id];p.coment=[{id:'c1',t:'COMENTARIO INTERNO',ts:now(),por:'x',m:[]}];save();
     return {tok:l.qr,id:p.id,qdc:p.qdc,col:qdColDe(p).nome}});
   ok(T.qdc&&T.qdc.n===T.col&&!T.qdc.r&&Array.isArray(T.qdc.ck)&&/ - /.test(T.qdc.t),'ao salvar, o pedido guarda a coluna, o título e a contagem do checklist para o QR, sem nomes ('+T.qdc.n+')');
-  const Q=await ctx.newPage();Q.on('pageerror',e=>erros.push('QR: '+e.message));await Q.goto(APP+'#f='+T.tok);await Q.waitForTimeout(1500);
+  const Q=await ctx.newPage();Q.on('pageerror',e=>erros.push('QR: '+e.message));await Q.goto(APP+'#f='+T.tok);await Q.waitForSelector('.pub-qd',{timeout:60000}).catch(()=>{});await Q.waitForTimeout(1500);
   let r=await Q.evaluate(()=>{const c=document.querySelector('.pub-qd');return {tem:!!c,txt:c?c.innerText:'',body:document.body.innerText,link:!!document.querySelector('a[href*="#pedido="]')}});
   ok(r.tem&&r.txt.includes(T.qdc.n)&&/Urgente/.test(r.txt)&&/1\/\d+/.test(r.txt)&&/Feito em/.test(r.txt)&&!/Regina/.test(r.txt),'quem lê o QR vê o cartão: coluna, etiqueta e checklist com a data, sem o nome de quem marcou');
   ok(!/COMENTARIO INTERNO/.test(r.body)&&/entre no app/.test(r.txt),'sem comentários; para marcar, precisa entrar no app');ok(r.link,'link "Abrir este pedido no app" para quem tem acesso');
